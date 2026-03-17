@@ -6,59 +6,84 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Users, Caravan, MapPin, FileText, Receipt, UserCog,
   ClipboardList, Truck, Settings, LogOut, Menu, X, Bell, Search, ChevronDown,
-  Wrench, MessageSquare, Shield, Eye, EyeOff,
+  Wrench, MessageSquare, Shield, Eye, EyeOff, Lock, User, ArrowRight, AlertCircle,
 } from 'lucide-react';
 
-const NAV = [
-  { href: '/admin', icon: LayoutDashboard, label: 'Dashboard', section: '' },
-  { href: '/admin/klanten', icon: Users, label: 'Klanten', section: 'Beheer' },
-  { href: '/admin/caravans', icon: Caravan, label: 'Caravans', section: '' },
-  { href: '/admin/locaties', icon: MapPin, label: 'Locaties & Plekken', section: '' },
-  { href: '/admin/contracten', icon: FileText, label: 'Contracten', section: 'Financieel' },
-  { href: '/admin/facturen', icon: Receipt, label: 'Facturen', section: '' },
-  { href: '/admin/transport', icon: Truck, label: 'Transport', section: 'Operationeel' },
-  { href: '/admin/taken', icon: ClipboardList, label: 'Taken', section: '' },
-  { href: '/admin/diensten', icon: Wrench, label: 'Service aanvragen', section: '' },
-  { href: '/admin/berichten', icon: MessageSquare, label: 'Berichten', section: 'Overig' },
-  { href: '/admin/medewerkers', icon: UserCog, label: 'Medewerkers', section: '' },
-  { href: '/admin/instellingen', icon: Settings, label: 'Instellingen', section: '' },
+type NavItem = { href: string; icon: typeof LayoutDashboard; label: string; section: string; roles: string[] };
+
+const NAV: NavItem[] = [
+  { href: '/admin', icon: LayoutDashboard, label: 'Dashboard', section: '', roles: ['admin', 'staff'] },
+  { href: '/admin/klanten', icon: Users, label: 'Klanten', section: 'Beheer', roles: ['admin'] },
+  { href: '/admin/caravans', icon: Caravan, label: 'Caravans', section: '', roles: ['admin'] },
+  { href: '/admin/locaties', icon: MapPin, label: 'Locaties & Plekken', section: '', roles: ['admin'] },
+  { href: '/admin/contracten', icon: FileText, label: 'Contracten', section: 'Financieel', roles: ['admin'] },
+  { href: '/admin/facturen', icon: Receipt, label: 'Facturen', section: '', roles: ['admin'] },
+  { href: '/admin/transport', icon: Truck, label: 'Transport', section: 'Operationeel', roles: ['admin', 'staff'] },
+  { href: '/admin/taken', icon: ClipboardList, label: 'Taken', section: '', roles: ['admin', 'staff'] },
+  { href: '/admin/diensten', icon: Wrench, label: 'Service aanvragen', section: '', roles: ['admin', 'staff'] },
+  { href: '/admin/berichten', icon: MessageSquare, label: 'Berichten', section: 'Overig', roles: ['admin', 'staff'] },
+  { href: '/admin/medewerkers', icon: UserCog, label: 'Medewerkers', section: '', roles: ['admin'] },
+  { href: '/admin/instellingen', icon: Settings, label: 'Instellingen', section: '', roles: ['admin'] },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [role, setRole] = useState<'admin' | 'staff'>('admin');
+  const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'staff'>('admin');
+  const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
   const [showPw, setShowPw] = useState(false);
 
   const checkAuth = useCallback(() => {
     fetch('/api/admin/auth/me', { credentials: 'include' })
       .then(r => r.ok ? r.json() : Promise.reject())
-      .then(d => { setUser(d); setLoading(false); })
+      .then(d => { setAuthenticated(true); setUserName(d.name || 'Admin'); setRole(d.role === 'staff' ? 'staff' : 'admin'); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
 
-  useEffect(() => { checkAuth(); }, [checkAuth]);
+  useEffect(() => {
+    const savedRole = localStorage.getItem('admin_panel_role') as 'admin' | 'staff' | null;
+    if (savedRole === 'admin' || savedRole === 'staff') setSelectedRole(savedRole);
+    checkAuth();
+  }, [checkAuth]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError('');
+    setLoginLoading(true);
     try {
       const res = await fetch('/api/admin/auth/login', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(loginForm), credentials: 'include',
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user: selectedRole, password }),
+        credentials: 'include',
       });
       const data = await res.json();
-      if (!res.ok) { setLoginError(data.error || 'Inloggen mislukt'); return; }
-      setUser(data.user);
-    } catch { setLoginError('Er is een fout opgetreden'); }
+      if (res.ok && data.success) {
+        setAuthenticated(true);
+        setRole(data.role === 'staff' ? 'staff' : 'admin');
+        setUserName(data.name);
+        localStorage.setItem('admin_panel_role', selectedRole);
+      } else {
+        setLoginError(data.error || 'Inloggen mislukt');
+      }
+    } catch {
+      setLoginError('Er is een fout opgetreden');
+    } finally {
+      setLoginLoading(false);
+    }
   };
 
   const handleLogout = async () => {
     await fetch('/api/admin/auth/logout', { method: 'POST', credentials: 'include' });
-    setUser(null);
+    setAuthenticated(false);
+    setPassword('');
+    setUserName('');
   };
 
   if (loading) return (
@@ -70,7 +95,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     </div>
   );
 
-  if (!user) {
+  if (!authenticated) {
     return (
       <div className="min-h-screen bg-[#0a0e1a] flex items-center justify-center px-6 relative overflow-hidden">
         <div className="absolute inset-0">
@@ -82,29 +107,90 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl mb-6 shadow-lg shadow-amber-500/20">
               <Shield className="text-white" size={28} />
             </div>
-            <h1 className="text-white font-black text-3xl tracking-tight">Admin Panel</h1>
+            <h1 className="text-white font-black text-3xl tracking-tight">Beheerportaal</h1>
             <p className="text-white/30 text-sm mt-3">Caravanstalling Spanje</p>
           </div>
-          <form onSubmit={handleLogin} className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-3xl p-8 space-y-5 shadow-2xl">
-            {loginError && <div className="bg-red-500/10 border border-red-500/10 text-red-400 text-sm p-3 rounded-xl">{loginError}</div>}
+
+          <div className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-3xl p-8 space-y-5 shadow-2xl">
+            {/* Role selector tabs */}
             <div>
-              <label className="text-white/40 text-xs font-semibold block mb-2">E-mailadres</label>
-              <input type="email" required value={loginForm.email} onChange={e => setLoginForm({ ...loginForm, email: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-400/30 focus:border-amber-400/30 placeholder:text-white/20 transition-all" placeholder="admin@example.com" />
-            </div>
-            <div>
-              <label className="text-white/40 text-xs font-semibold block mb-2">Wachtwoord</label>
-              <div className="relative">
-                <input type={showPw ? 'text' : 'password'} required value={loginForm.password} onChange={e => setLoginForm({ ...loginForm, password: e.target.value })} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3.5 text-white text-sm pr-10 focus:outline-none focus:ring-2 focus:ring-amber-400/30 focus:border-amber-400/30 placeholder:text-white/20 transition-all" placeholder="••••••••" />
-                <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/40">{showPw ? <EyeOff size={16} /> : <Eye size={16} />}</button>
+              <label className="text-white/30 text-[10px] font-bold uppercase tracking-widest block mb-2.5">Inloggen als</label>
+              <div className="flex bg-white/[0.04] rounded-xl p-1 border border-white/[0.06]">
+                {(['admin', 'staff'] as const).map(r => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => { setSelectedRole(r); setLoginError(''); }}
+                    className={`flex-1 py-3 text-sm font-semibold rounded-lg transition-all flex items-center justify-center gap-2 ${
+                      selectedRole === r
+                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg shadow-amber-500/20'
+                        : 'text-white/30 hover:text-white/50'
+                    }`}
+                  >
+                    {r === 'admin' ? <Shield size={15} /> : <User size={15} />}
+                    {r === 'admin' ? 'Admin' : 'Staff'}
+                  </button>
+                ))}
               </div>
             </div>
-            <button type="submit" className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-amber-500/20">Inloggen</button>
-          </form>
+
+            <form onSubmit={handleLogin} className="space-y-4">
+              {/* Password field */}
+              <div>
+                <label className="text-white/30 text-[10px] font-bold uppercase tracking-widest block mb-2.5">Wachtwoord</label>
+                <div className="relative">
+                  <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/20" />
+                  <input
+                    type={showPw ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={e => { setPassword(e.target.value); setLoginError(''); }}
+                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl pl-10 pr-12 py-3.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-400/30 focus:border-amber-400/30 placeholder:text-white/15 transition-all"
+                    placeholder="••••••••"
+                    autoFocus
+                    autoComplete="current-password"
+                  />
+                  <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/40 transition-colors">
+                    {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Error */}
+              {loginError && (
+                <div className="flex items-start gap-2.5 bg-red-500/10 border border-red-500/10 text-red-400 text-sm p-3.5 rounded-xl">
+                  <AlertCircle size={16} className="shrink-0 mt-0.5" />
+                  <span>{loginError}</span>
+                </div>
+              )}
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={loginLoading}
+                className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 disabled:opacity-60"
+              >
+                {loginLoading ? 'Bezig...' : 'Inloggen'}
+                {!loginLoading && <ArrowRight size={16} />}
+              </button>
+            </form>
+          </div>
+
+          {/* Trust badges */}
+          <div className="flex items-center justify-center gap-5 mt-6">
+            <span className="flex items-center gap-1.5 text-[11px] text-white/20 font-medium">
+              <Shield size={12} /> Beveiligde verbinding
+            </span>
+            <span className="flex items-center gap-1.5 text-[11px] text-white/20 font-medium">
+              <Lock size={12} /> Versleuteld
+            </span>
+          </div>
         </div>
       </div>
     );
   }
 
+  const filteredNav = NAV.filter(n => n.roles.includes(role));
   let lastSection = '';
 
   return (
@@ -116,13 +202,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center text-white text-[10px] font-black">CS</div>
             <div>
               <span className="text-white font-bold text-sm block leading-tight">Caravanstalling</span>
-              <span className="text-white/30 text-[10px]">Admin Panel</span>
+              <span className="text-white/30 text-[10px]">{role === 'admin' ? 'Admin Panel' : 'Staff Portal'}</span>
             </div>
           </div>
           <button className="md:hidden text-white/50" onClick={() => setSidebarOpen(false)}><X size={20} /></button>
         </div>
         <nav className="p-3 space-y-0.5 overflow-y-auto h-[calc(100vh-8rem)] custom-scrollbar">
-          {NAV.map(n => {
+          {filteredNav.map(n => {
             const active = pathname === n.href || (n.href !== '/admin' && pathname.startsWith(n.href));
             let sectionHeader = null;
             if (n.section && n.section !== lastSection) {
@@ -142,10 +228,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         </nav>
         <div className="absolute bottom-0 w-full p-3 border-t border-white/[0.06]">
           <div className="flex items-center gap-3 px-3 mb-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center text-white text-xs font-bold">{user.name.charAt(0)}</div>
+            <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center text-white text-xs font-bold">{userName.charAt(0)}</div>
             <div className="flex-1 min-w-0">
-              <p className="text-white text-xs font-semibold truncate">{user.name}</p>
-              <p className="text-white/30 text-[10px]">{user.role}</p>
+              <p className="text-white text-xs font-semibold truncate">{userName}</p>
+              <p className="text-white/30 text-[10px]">{role}</p>
             </div>
           </div>
           <button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-white/30 hover:text-red-400 hover:bg-red-400/5 w-full transition-all">
@@ -171,10 +257,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             </button>
             <div className="h-6 w-px bg-slate-100" />
             <div className="flex items-center gap-2.5 text-sm">
-              <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-sm shadow-amber-500/20">{user.name.charAt(0)}</div>
+              <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-sm shadow-amber-500/20">{userName.charAt(0)}</div>
               <div className="hidden md:block">
-                <p className="font-semibold text-sm text-slate-800">{user.name}</p>
-                <p className="text-[11px] text-slate-400">{user.role}</p>
+                <p className="font-semibold text-sm text-slate-800">{userName}</p>
+                <p className="text-[11px] text-slate-400">{role}</p>
               </div>
               <ChevronDown size={14} className="text-slate-300" />
             </div>

@@ -18,9 +18,10 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
   const [staffName, setStaffName] = useState('');
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
+  const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [showPw, setShowPw] = useState(false);
+  const [loginLoading, setLoginLoading] = useState(false);
 
   useEffect(() => {
     fetch('/api/staff/auth/me', { credentials: 'include' })
@@ -31,15 +32,18 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (e: React.FormEvent) => {
-    e.preventDefault(); setLoginError('');
-    const res = await fetch('/api/staff/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(loginForm), credentials: 'include' });
-    if (res.ok) { const d = await res.json(); setAuthenticated(true); setStaffName(d.name || ''); }
-    else { const d = await res.json(); setLoginError(d.error || 'Inloggen mislukt'); }
+    e.preventDefault(); setLoginError(''); setLoginLoading(true);
+    try {
+      const res = await fetch('/api/staff/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }), credentials: 'include' });
+      if (res.ok) { const d = await res.json(); setAuthenticated(true); setStaffName(d.name || ''); }
+      else { const d = await res.json(); setLoginError(d.error || 'Inloggen mislukt'); }
+    } catch { setLoginError('Er is een fout opgetreden'); }
+    finally { setLoginLoading(false); }
   };
 
   const logout = async () => {
     await fetch('/api/staff/auth/logout', { method: 'POST', credentials: 'include' });
-    setAuthenticated(false); setStaffName('');
+    setAuthenticated(false); setStaffName(''); setPassword('');
   };
 
   if (loading) return (
@@ -66,19 +70,21 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
           <p className="text-white/30 text-sm mt-3">Caravanstalling Spanje</p>
         </div>
         <form onSubmit={login} className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-3xl p-8 space-y-5 shadow-2xl">
-          {loginError && <div className="bg-red-500/10 text-red-400 text-sm p-3 rounded-xl border border-red-500/10">{loginError}</div>}
+          {loginError && (
+            <div className="flex items-start gap-2.5 bg-red-500/10 text-red-400 text-sm p-3.5 rounded-xl border border-red-500/10">
+              <span>{loginError}</span>
+            </div>
+          )}
           <div>
-            <label className="text-white/40 text-xs font-semibold block mb-2">E-mail</label>
-            <input type="email" required value={loginForm.email} onChange={e=>setLoginForm({...loginForm,email:e.target.value})} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/30 focus:border-emerald-400/30 placeholder:text-white/20 transition-all" />
-          </div>
-          <div>
-            <label className="text-white/40 text-xs font-semibold block mb-2">Wachtwoord</label>
+            <label className="text-white/30 text-[10px] font-bold uppercase tracking-widest block mb-2.5">Wachtwoord</label>
             <div className="relative">
-              <input type={showPw ? 'text' : 'password'} required value={loginForm.password} onChange={e=>setLoginForm({...loginForm,password:e.target.value})} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3.5 text-white text-sm pr-10 focus:outline-none focus:ring-2 focus:ring-emerald-400/30 focus:border-emerald-400/30 placeholder:text-white/20 transition-all" />
-              <button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/40">{showPw ? <EyeOff size={16}/> : <Eye size={16}/>}</button>
+              <input type={showPw ? 'text' : 'password'} required value={password} onChange={e=>{ setPassword(e.target.value); setLoginError(''); }} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3.5 text-white text-sm pr-10 focus:outline-none focus:ring-2 focus:ring-emerald-400/30 focus:border-emerald-400/30 placeholder:text-white/15 transition-all" placeholder="••••••••" autoFocus autoComplete="current-password" />
+              <button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/40 transition-colors">{showPw ? <EyeOff size={16}/> : <Eye size={16}/>}</button>
             </div>
           </div>
-          <button type="submit" className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-emerald-600/20">Inloggen</button>
+          <button type="submit" disabled={loginLoading} className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-emerald-600/20 disabled:opacity-60">
+            {loginLoading ? 'Bezig...' : 'Inloggen'}
+          </button>
         </form>
       </div>
     </div>

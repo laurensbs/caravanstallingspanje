@@ -1,25 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sql } from '@/lib/db';
-import { verifyPassword, createAdminToken } from '@/lib/auth';
+import { createAdminToken } from '@/lib/auth';
+import { timingSafeEqual } from 'crypto';
+
+function safeCompare(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(Buffer.from(a), Buffer.from(b));
+}
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
-    if (!email || !password) return NextResponse.json({ error: 'E-mail en wachtwoord zijn verplicht' }, { status: 400 });
+    const { user, password } = await req.json();
+    if (!user || !password) return NextResponse.json({ error: 'Vul een wachtwoord in' }, { status: 400 });
 
-    const result = await sql`SELECT * FROM admin_users WHERE email = ${email} AND is_active = true LIMIT 1`;
-    if (result.length === 0) return NextResponse.json({ error: 'Ongeldige inloggegevens' }, { status: 401 });
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+    const STAFF_PASSWORD = process.env.STAFF_PASSWORD;
 
-    const admin = result[0];
-    const valid = await verifyPassword(password, admin.password_hash);
-    if (!valid) return NextResponse.json({ error: 'Ongeldige inloggegevens' }, { status: 401 });
+    if (!ADMIN_PASSWORD || !STAFF_PASSWORD) {
+      return NextResponse.json({ error: 'Server configuratie onvolledig' }, { status: 500 });
+    }
 
-    const token = await createAdminToken({ id: admin.id, name: admin.name, email: admin.email, role: admin.role });
+    let role: string;
+    let name: string;
 
-    await sql`UPDATE admin_users SET last_login = NOW() WHERE id = ${admin.id}`;
+    if (user === 'admin' && safeCompare(password, ADMIN_PASSWORD)) {
+      role = 'admin';
+      name = 'Admin';
+    } else if (user === 'staff' && safeCompare(password, STAFF_PASSWORD)) {
+      role = 'staff';
+      name = 'Medewerker';
+    } else {
+      return NextResponse.json({ error: 'Ongeldig wachtwoord' }, { status: 401 });
+    }
 
-    const response = NextResponse.json({ success: true, name: admin.name, role: admin.role });
-    response.cookies.set('admin_token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: 60 * 60 * 24 * 7 });
+    const token = await createAdminToken({ id: user === 'admin' ? 1 : 2, name, email: `${user}@caravanstalling-spanje.com`, role });
+
+    const response = NextResponse.json({ success: true, name, role });
+    response.cookies.set('admin_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+    });
     return response;
   } catch (error) {
     console.error('Admin login error:', error);
