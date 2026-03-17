@@ -33,11 +33,11 @@ export default function StaffTerreinPage() {
 
   const zones = [...new Set(spots.map(s => s.zone))].sort();
 
-  if (loading) return <div className="flex items-center justify-center py-12"><div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" /></div>;
+  if (loading) return <div className="flex items-center justify-center py-12"><div className="animate-spin w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full" /></div>;
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Terreinoverzicht</h1>
+      <h1 className="text-2xl font-black text-slate-900 mb-6">Terreinoverzicht</h1>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="flex items-center gap-2"><div className="w-4 h-4 rounded bg-green-200 border border-green-400" /><span className="text-sm">Vrij</span></div>
@@ -51,27 +51,27 @@ export default function StaffTerreinPage() {
           const occupancy = loc.total_spots > 0 ? Math.round((loc.occupied_spots / loc.total_spots) * 100) : 0;
           const expanded = expandedId === loc.id;
           return (
-            <div key={loc.id} className="bg-white rounded-2xl shadow-sm border overflow-hidden">
+            <div key={loc.id} className="bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-lg hover:shadow-slate-200/50 transition-all">
               <button onClick={() => toggleLocation(loc.id)} className="w-full p-5 flex items-center justify-between text-left">
                 <div className="flex items-center gap-3">
-                  <MapPin size={20} className="text-primary" />
-                  <div><h3 className="font-semibold">{loc.name}</h3><p className="text-xs text-muted">{loc.address}</p></div>
+                  <MapPin size={20} className="text-emerald-500" />
+                  <div><h3 className="font-semibold text-slate-800">{loc.name}</h3><p className="text-xs text-slate-400">{loc.address}</p></div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="text-right"><div className="text-sm font-medium">{loc.occupied_spots}/{loc.total_spots}</div><div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-primary rounded-full" style={{width:`${occupancy}%`}} /></div></div>
-                  {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  <div className="text-right"><div className="text-sm font-medium text-slate-700">{loc.occupied_spots}/{loc.total_spots}</div><div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-emerald-500 rounded-full" style={{width:`${occupancy}%`}} /></div></div>
+                  {expanded ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
                 </div>
               </button>
 
               {expanded && (
-                <div className="border-t px-5 pb-5">
-                  {spotsLoading ? <div className="py-6 text-center text-sm text-muted">Laden...</div> :
-                  zones.length === 0 ? <div className="py-6 text-center text-sm text-muted">Geen plekken geconfigureerd</div> :
+                <div className="border-t border-slate-100 px-5 pb-5">
+                  {spotsLoading ? <div className="py-6 text-center text-sm text-slate-400">Laden...</div> :
+                  zones.length === 0 ? <div className="py-6 text-center text-sm text-slate-400">Geen plekken geconfigureerd</div> :
                   zones.map(zone => {
                     const zoneSpots = spots.filter(s => s.zone === zone);
                     return (
                       <div key={zone} className="mt-4">
-                        <h4 className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">Zone {zone}</h4>
+                        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Zone {zone}</h4>
                         <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-1.5">
                           {zoneSpots.map(spot => (
                             <div key={spot.id} className={`border rounded-lg p-1.5 text-center text-xs cursor-default group relative ${SPOT_COLORS[spot.status] || 'bg-gray-100'}`} title={spot.status === 'bezet' ? `${spot.caravan_brand} ${spot.caravan_model}\n${spot.caravan_license_plate}\n${spot.customer_name}` : spot.status}>

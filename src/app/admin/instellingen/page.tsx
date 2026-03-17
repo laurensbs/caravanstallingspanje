@@ -51,15 +51,15 @@ export default function InstellingenPage() {
 
   const Input = ({ label, field, type = 'text' }: { label: string; field: string; type?: string }) => (
     <div>
-      <label className="text-xs font-medium text-muted block mb-1">{label}</label>
-      <input type={type} value={(settings as Record<string,string|number|boolean>)[field] as string || ''} onChange={e => setSettings(s => ({...s, [field]: e.target.value}))} className="w-full border rounded-xl px-3 py-2.5 text-sm" />
+      <label className="text-xs font-semibold text-slate-500 block mb-1">{label}</label>
+      <input type={type} value={(settings as Record<string,string|number|boolean>)[field] as string || ''} onChange={e => setSettings(s => ({...s, [field]: e.target.value}))} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all" />
     </div>
   );
 
   const Toggle = ({ label, desc, field }: { label: string; desc: string; field: string }) => (
     <div className="flex items-center justify-between py-3">
-      <div><p className="text-sm font-medium">{label}</p><p className="text-xs text-muted">{desc}</p></div>
-      <button type="button" onClick={() => setSettings(s => ({...s, [field]: !(s as Record<string,string|number|boolean>)[field]}))} className={`w-10 h-6 rounded-full transition ${(settings as Record<string,string|number|boolean>)[field] ? 'bg-primary' : 'bg-gray-300'} relative`}>
+      <div><p className="text-sm font-medium text-slate-700">{label}</p><p className="text-xs text-slate-400">{desc}</p></div>
+      <button type="button" onClick={() => setSettings(s => ({...s, [field]: !(s as Record<string,string|number|boolean>)[field]}))} className={`w-10 h-6 rounded-full transition ${(settings as Record<string,string|number|boolean>)[field] ? 'bg-amber-500' : 'bg-slate-300'} relative`}>
         <span className={`w-4 h-4 bg-white rounded-full absolute top-1 transition ${(settings as Record<string,string|number|boolean>)[field] ? 'left-5' : 'left-1'}`} />
       </button>
     </div>
@@ -67,21 +67,21 @@ export default function InstellingenPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Instellingen</h1>
-        <button onClick={save} disabled={saving} className="bg-primary hover:bg-primary-light text-white font-semibold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 disabled:opacity-50"><Save size={16} />{saving ? 'Opslaan...' : 'Opslaan'}</button>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-2xl font-black text-slate-900">Instellingen</h1>
+        <button onClick={save} disabled={saving} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50"><Save size={16} />{saving ? 'Opslaan...' : 'Opslaan'}</button>
       </div>
 
       <div className="flex gap-6">
         <div className="w-56 flex-shrink-0">
-          <div className="bg-white rounded-2xl shadow-sm border p-2 space-y-1">
+          <div className="bg-white rounded-2xl border border-slate-100 p-2 space-y-1">
             {tabs.map(t => (
-              <button key={t.id} onClick={() => setActiveTab(t.id)} className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-left ${activeTab === t.id ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-surface text-muted'}`}><t.icon size={16} />{t.label}</button>
+              <button key={t.id} onClick={() => setActiveTab(t.id)} className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-left transition-all ${activeTab === t.id ? 'bg-gradient-to-r from-amber-50 to-amber-100/50 text-amber-700 font-semibold border border-amber-200/50' : 'hover:bg-slate-50 text-slate-400 hover:text-slate-600'}`}><t.icon size={16} />{t.label}</button>
             ))}
           </div>
         </div>
 
-        <div className="flex-1 bg-white rounded-2xl shadow-sm border p-6">
+        <div className="flex-1 bg-white rounded-2xl border border-slate-100 p-6">
           {activeTab === 'bedrijf' && (
             <div className="space-y-4">
               <h2 className="font-bold mb-4">Bedrijfsgegevens</h2>
@@ -138,18 +138,18 @@ export default function InstellingenPage() {
           {activeTab === 'beveiliging' && (
             <div className="space-y-6">
               <h2 className="font-bold mb-4">Beveiliging</h2>
-              <div className="p-4 bg-surface rounded-xl">
-                <h3 className="font-medium text-sm mb-2">Wachtwoord wijzigen</h3>
+              <div className="p-4 bg-slate-50 rounded-xl">
+                <h3 className="font-medium text-sm text-slate-700 mb-2">Wachtwoord wijzigen</h3>
                 <div className="space-y-3">
-                  <input type="password" placeholder="Huidig wachtwoord" className="w-full border rounded-xl px-3 py-2.5 text-sm" />
-                  <input type="password" placeholder="Nieuw wachtwoord" className="w-full border rounded-xl px-3 py-2.5 text-sm" />
-                  <input type="password" placeholder="Bevestig nieuw wachtwoord" className="w-full border rounded-xl px-3 py-2.5 text-sm" />
-                  <button className="bg-primary text-white font-semibold px-4 py-2 rounded-xl text-sm">Wijzigen</button>
+                  <input type="password" placeholder="Huidig wachtwoord" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:ring-2 focus:ring-amber-400/20 outline-none" />
+                  <input type="password" placeholder="Nieuw wachtwoord" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:ring-2 focus:ring-amber-400/20 outline-none" />
+                  <input type="password" placeholder="Bevestig nieuw wachtwoord" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:ring-2 focus:ring-amber-400/20 outline-none" />
+                  <button className="bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold px-4 py-2 rounded-xl text-sm shadow-md shadow-amber-500/20">Wijzigen</button>
                 </div>
               </div>
-              <div className="p-4 bg-surface rounded-xl">
-                <h3 className="font-medium text-sm mb-2">Database</h3>
-                <p className="text-xs text-muted mb-3">Initialiseer de database of reset alle tabellen.</p>
+              <div className="p-4 bg-slate-50 rounded-xl">
+                <h3 className="font-medium text-sm text-slate-700 mb-2">Database</h3>
+                <p className="text-xs text-slate-400 mb-3">Initialiseer de database of reset alle tabellen.</p>
                 <div className="flex gap-2">
                   <button onClick={async () => { await fetch('/api/setup', { method: 'POST' }); alert('Database geïnitialiseerd'); }} className="bg-green-600 text-white font-semibold px-4 py-2 rounded-xl text-sm">Database initialiseren</button>
                 </div>

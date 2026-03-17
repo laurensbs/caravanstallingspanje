@@ -32,23 +32,23 @@ export default function StaffTakenPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Mijn taken</h1>
+      <h1 className="text-2xl font-black text-slate-900 mb-6">Mijn taken</h1>
 
-      <div className="bg-white rounded-2xl shadow-sm border mb-6 p-4">
+      <div className="bg-white rounded-2xl border border-slate-100 mb-6 p-4">
         <div className="flex gap-2">
           {['open', 'in_uitvoering', 'afgerond', ''].map(s => (
-            <button key={s} onClick={() => setStatusFilter(s)} className={`px-3 py-1.5 rounded-lg text-sm font-medium ${statusFilter === s ? 'bg-primary text-white' : 'bg-surface hover:bg-gray-200'}`}>{s === 'in_uitvoering' ? 'In uitvoering' : s === '' ? 'Alle' : s === 'afgerond' ? 'Afgerond' : 'Open'}</button>
+            <button key={s} onClick={() => setStatusFilter(s)} className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${statusFilter === s ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md shadow-emerald-500/20' : 'bg-slate-50 hover:bg-slate-100 text-slate-500'}`}>{s === 'in_uitvoering' ? 'In uitvoering' : s === '' ? 'Alle' : s === 'afgerond' ? 'Afgerond' : 'Open'}</button>
           ))}
         </div>
       </div>
 
       <div className="space-y-3">
-        {loading ? <div className="bg-white rounded-2xl shadow-sm border p-8 text-center text-muted">Laden...</div> :
-        tasks.length === 0 ? <div className="bg-white rounded-2xl shadow-sm border p-8 text-center text-muted">Geen taken gevonden</div> :
+        {loading ? <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center text-slate-400">Laden...</div> :
+        tasks.length === 0 ? <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center text-slate-400">Geen taken gevonden</div> :
         tasks.map(t => {
           const overdue = t.due_date && !t.completed_at && new Date(t.due_date) < new Date();
           return (
-            <div key={t.id} className={`bg-white rounded-2xl shadow-sm border p-5 ${overdue ? 'border-red-200' : ''}`}>
+            <div key={t.id} className={`bg-white rounded-2xl border p-5 hover:shadow-lg hover:shadow-slate-200/50 transition-all ${overdue ? 'border-red-200' : 'border-slate-100'}`}>
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
@@ -56,8 +56,8 @@ export default function StaffTakenPage() {
                     <h3 className="font-semibold">{t.title}</h3>
                     <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${PRIORITY_COLORS[t.priority]}`}>{t.priority}</span>
                   </div>
-                  {t.description && <p className="text-sm text-muted ml-6">{t.description}</p>}
-                  <div className="flex gap-4 mt-2 ml-6 text-xs text-muted">
+                  {t.description && <p className="text-sm text-slate-400 ml-6">{t.description}</p>}
+                  <div className="flex gap-4 mt-2 ml-6 text-xs text-slate-400">
                     {t.location_name && <span>{t.location_name}</span>}
                     {t.due_date && <span className={overdue ? 'text-red-500 font-medium' : ''}>Deadline: {fmtDate(t.due_date)} {overdue && <AlertTriangle size={10} className="inline ml-0.5" />}</span>}
                   </div>
