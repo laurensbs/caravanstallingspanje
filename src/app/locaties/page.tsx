@@ -58,12 +58,12 @@ export default function LocatiesPage() {
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center">
             <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-4 block">Locaties</span>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6">
               Onze <span className="gradient-text">Locaties</span>
             </h1>
-            <p className="text-white/50 max-w-2xl text-lg leading-relaxed">
+            <p className="text-white/50 max-w-2xl mx-auto text-lg leading-relaxed">
               Meerdere beveiligde terreinen verspreid over de Costa Brava voor optimale service en bereikbaarheid.
             </p>
           </motion.div>
@@ -71,8 +71,14 @@ export default function LocatiesPage() {
       </section>
 
       {/* Locations */}
-      <section className="py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-6 sm:space-y-8">
+      <section className="py-16 sm:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <AnimatedSection className="text-center mb-12 sm:mb-16">
+            <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3 block">Onze terreinen</span>
+            <h2 className="text-3xl md:text-4xl font-black text-primary-dark mb-4">3 beveiligde locaties</h2>
+            <p className="text-muted max-w-2xl mx-auto">Verspreid over de Costa Brava voor optimale bereikbaarheid</p>
+          </AnimatedSection>
+          <div className="space-y-6 sm:space-y-8">
           {LOCATIONS.map((l, i) => (
             <AnimatedSection key={l.name} delay={i * 0.1}>
               <div className="bg-white rounded-3xl p-8 md:p-10 border border-gray-100 card-hover">
@@ -106,12 +112,13 @@ export default function LocatiesPage() {
               </div>
             </AnimatedSection>
           ))}
+          </div>
         </div>
       </section>
 
       {/* Map placeholder */}
-      <section className="py-24 bg-surface">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="py-16 sm:py-24 bg-surface">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <AnimatedSection className="text-center mb-12">
             <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3 block">Waar vindt u ons</span>
             <h2 className="text-3xl md:text-4xl font-black text-primary-dark">Costa Brava, Spanje</h2>
@@ -133,13 +140,13 @@ export default function LocatiesPage() {
       {/* CTA */}
       <section className="py-16 bg-primary-dark text-white relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="max-w-4xl mx-auto px-6 text-center relative">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center relative">
           <AnimatedSection>
             <h2 className="text-3xl font-black mb-4">Wilt u uw caravan bij ons stallen?</h2>
             <p className="text-white/50 mb-8">Neem contact met ons op voor een vrijblijvende offerte of bezoek ons terrein.</p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Link href="/contact" className="bg-gradient-to-r from-accent to-accent-light hover:from-accent-light hover:to-accent text-primary-dark font-bold px-8 py-4 rounded-2xl text-sm transition-all duration-300 shadow-lg shadow-accent/20 inline-flex items-center gap-2">
-                Offerte aanvragen <ArrowRight size={16} />
+              <Link href="/stalling" className="bg-gradient-to-r from-accent to-accent-light hover:from-accent-light hover:to-accent text-white font-bold px-8 py-4 rounded-2xl text-sm transition-all duration-300 shadow-lg shadow-accent/20 inline-flex items-center gap-2">
+                Stalling aanvragen <ArrowRight size={16} />
               </Link>
               <a href="tel:+34972000000" className="glass text-white font-semibold px-8 py-4 rounded-2xl text-sm transition-all hover:bg-white/10 inline-flex items-center gap-2">
                 <Phone size={16} /> Bel ons

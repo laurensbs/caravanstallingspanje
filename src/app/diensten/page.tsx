@@ -51,12 +51,12 @@ export default function DienstenPage() {
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center">
             <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-4 block">Diensten</span>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6">
               Onze <span className="gradient-text">Diensten</span>
             </h1>
-            <p className="text-white/50 max-w-2xl text-lg leading-relaxed">
+            <p className="text-white/50 max-w-2xl mx-auto text-lg leading-relaxed">
               Meer dan alleen caravanstalling. Wij ontzorgen u volledig met onderhoud, reparatie, schoonmaak en transport.
             </p>
           </motion.div>

@@ -35,12 +35,12 @@ export default function ContactPage() {
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center">
             <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-4 block">Contact</span>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6">
               Neem <span className="gradient-text">Contact</span> op
             </h1>
-            <p className="text-white/50 max-w-2xl text-lg leading-relaxed">
+            <p className="text-white/50 max-w-2xl mx-auto text-lg leading-relaxed">
               Heeft u vragen of wilt u een offerte aanvragen? Wij reageren binnen 24 uur.
             </p>
           </motion.div>
@@ -100,7 +100,7 @@ export default function ContactPage() {
                       <select value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} className={`${inputClass} ${!form.subject ? 'text-gray-400' : 'text-gray-900'}`}>
                         <option value="">Kies een onderwerp</option>
                         <option>Stalling informatie</option>
-                        <option>Offerte aanvragen</option>
+                        <option>Stalling aanvragen</option>
                         <option>Caravanverhuur</option>
                         <option>Onderhoud & reparatie</option>
                         <option>Transport aanvragen</option>
@@ -120,7 +120,7 @@ export default function ContactPage() {
                   <button
                     type="submit"
                     disabled={status === 'sending'}
-                    className="bg-gradient-to-r from-accent to-accent-light hover:from-accent-light hover:to-accent text-primary-dark font-bold px-8 py-4 rounded-xl text-sm transition-all duration-300 shadow-lg shadow-accent/20 hover:shadow-accent/40 inline-flex items-center gap-2 disabled:opacity-50"
+                    className="bg-gradient-to-r from-accent to-accent-light hover:from-accent-light hover:to-accent text-white font-bold px-8 py-4 rounded-xl text-sm transition-all duration-300 shadow-lg shadow-accent/20 hover:shadow-accent/40 inline-flex items-center gap-2 disabled:opacity-50"
                   >
                     <Send size={16} /> {status === 'sending' ? 'Verzenden...' : 'Verstuur bericht'}
                   </button>

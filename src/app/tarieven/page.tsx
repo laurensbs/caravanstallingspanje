@@ -69,12 +69,12 @@ export default function TarievenPage() {
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center">
             <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-4 block">Tarieven</span>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6">
               Onze <span className="gradient-text">Tarieven</span>
             </h1>
-            <p className="text-white/50 max-w-2xl text-lg leading-relaxed">
+            <p className="text-white/50 max-w-2xl mx-auto text-lg leading-relaxed">
               Transparante prijzen zonder verrassingen. Alle prijzen zijn exclusief 21% IVA.
             </p>
           </motion.div>
@@ -82,8 +82,13 @@ export default function TarievenPage() {
       </section>
 
       {/* Plans */}
-      <section className="py-24">
+      <section className="py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <AnimatedSection className="text-center mb-12 sm:mb-16">
+            <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3 block">Stallingsopties</span>
+            <h2 className="text-3xl md:text-4xl font-black text-primary-dark mb-4">Kies uw stallingstype</h2>
+            <p className="text-muted max-w-2xl mx-auto">Transparante maandtarieven, inclusief beveiliging en verzekering</p>
+          </AnimatedSection>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-6">
             {PLANS.map((p, i) => (
               <AnimatedSection key={p.name} delay={i * 0.1}>
@@ -110,7 +115,7 @@ export default function TarievenPage() {
                     href="/contact"
                     className={`block text-center font-bold px-6 py-4 rounded-xl text-sm transition-all duration-300 ${
                       p.popular
-                        ? 'bg-gradient-to-r from-accent to-accent-light hover:from-accent-light hover:to-accent text-primary-dark shadow-lg shadow-accent/20'
+                        ? 'bg-gradient-to-r from-accent to-accent-light hover:from-accent-light hover:to-accent text-white shadow-lg shadow-accent/20'
                         : 'bg-primary hover:bg-primary-light text-white'
                     }`}
                   >
@@ -149,12 +154,12 @@ export default function TarievenPage() {
       {/* FAQ hint / CTA */}
       <section className="py-16 bg-primary-dark text-white relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="max-w-4xl mx-auto px-6 text-center relative">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center relative">
           <AnimatedSection>
             <HelpCircle size={24} className="text-accent mx-auto mb-4" />
-            <h2 className="text-3xl font-black mb-4">Vragen over onze tarieven?</h2>
+            <h2 className="text-2xl sm:text-3xl font-black mb-4">Vragen over onze tarieven?</h2>
             <p className="text-white/50 mb-8">Neem gerust contact met ons op. Wij maken graag een offerte op maat voor uw situatie.</p>
-            <Link href="/contact" className="bg-gradient-to-r from-accent to-accent-light hover:from-accent-light hover:to-accent text-primary-dark font-bold px-8 py-4 rounded-2xl text-sm transition-all duration-300 shadow-lg shadow-accent/20 inline-flex items-center gap-2">
+            <Link href="/stalling" className="bg-gradient-to-r from-accent to-accent-light hover:from-accent-light hover:to-accent text-white font-bold px-8 py-4 rounded-2xl text-sm transition-all duration-300 shadow-lg shadow-accent/20 inline-flex items-center gap-2">
               Contact opnemen <ArrowRight size={16} />
             </Link>
           </AnimatedSection>
