@@ -81,7 +81,11 @@ export default function Header() {
               <Clock size={11} /> Ma-Vr 09:30 - 16:30
             </span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-5">
+            <Link href="/mijn-account" className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${isHome ? 'text-white/50 hover:text-white' : 'text-muted hover:text-primary-dark'}`}>
+              <User size={12} /> Mijn Account
+            </Link>
+            <div className="w-px h-3.5 bg-current opacity-15" />
             <div ref={langRef} className="relative">
               <button onClick={() => setLangOpen(!langOpen)} className={`flex items-center gap-1.5 text-xs ${isHome ? 'text-white/50 hover:text-white' : 'text-muted hover:text-primary-dark'} transition-colors`}>
                 <Globe size={12} />
@@ -204,10 +208,6 @@ export default function Header() {
               <button onClick={() => setLangOpen(!langOpen)} className={`lg:hidden p-2 rounded-lg transition-colors ${mutedColor}`}>
                 <span className="text-sm">{currentFlag}</span>
               </button>
-
-              <Link href="/mijn-account" className={`hidden sm:flex items-center gap-1.5 text-[13px] font-medium transition-colors ${mutedColor} hover:${textColor}`}>
-                <User size={15} /> <span className="hidden md:inline">Mijn Account</span>
-              </Link>
 
               <Link href="/stalling" className="hidden sm:inline-flex items-center gap-1.5 bg-accent hover:bg-accent-dark text-white text-[13px] font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md">
                 Stalling aanvragen
