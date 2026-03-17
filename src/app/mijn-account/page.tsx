@@ -71,17 +71,17 @@ export default function MijnAccountPage() {
   const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString('nl-NL') : '-';
   const STATUS_COLORS: Record<string,string> = { betaald: 'bg-emerald-50 text-emerald-700 border-emerald-200', open: 'bg-blue-50 text-blue-700 border-blue-200', verzonden: 'bg-amber-50 text-amber-700 border-amber-200', actief: 'bg-emerald-50 text-emerald-700 border-emerald-200', verlopen: 'bg-red-50 text-red-700 border-red-200' };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50"><div className="animate-spin w-8 h-8 border-2 border-sky-800 border-t-transparent rounded-full" /></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-50"><div className="animate-spin w-8 h-8 border-2 border-accent border-t-transparent rounded-full" /></div>;
 
   if (!auth) return (
     <>
       <Header />
       <div className="min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-sky-50 p-4 relative overflow-hidden">
-        <div className="absolute top-20 right-20 w-72 h-72 bg-sky-100/40 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 left-20 w-72 h-72 bg-amber-100/30 rounded-full blur-3xl" />
-        <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-10 w-full max-w-md relative">
+        <div className="absolute top-20 right-20 w-72 h-72 bg-accent/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-20 w-72 h-72 bg-accent/5 rounded-full blur-3xl" />
+        <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 sm:p-10 w-full max-w-md relative">
           <div className="text-center mb-8">
-            <div className="w-14 h-14 bg-gradient-to-br from-sky-700 to-sky-800 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-sky-800/20">
+            <div className="w-14 h-14 bg-gradient-to-br from-accent to-accent-light rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-accent/20">
               <Shield className="text-white" size={24}/>
             </div>
             <h1 className="text-2xl font-black text-slate-900">{isRegister ? 'Account aanmaken' : 'Mijn Account'}</h1>
@@ -91,21 +91,21 @@ export default function MijnAccountPage() {
           {isRegister ? (
             <form onSubmit={register} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-xs font-semibold text-slate-400 block mb-2">Voornaam *</label><input required value={registerForm.first_name} onChange={e=>setRegisterForm({...registerForm,first_name:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-sky-800/20 focus:border-sky-800 transition-all"/></div>
-                <div><label className="text-xs font-semibold text-slate-400 block mb-2">Achternaam *</label><input required value={registerForm.last_name} onChange={e=>setRegisterForm({...registerForm,last_name:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-sky-800/20 focus:border-sky-800 transition-all"/></div>
+                <div><label className="text-xs font-semibold text-slate-400 block mb-2">Voornaam *</label><input required value={registerForm.first_name} onChange={e=>setRegisterForm({...registerForm,first_name:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"/></div>
+                <div><label className="text-xs font-semibold text-slate-400 block mb-2">Achternaam *</label><input required value={registerForm.last_name} onChange={e=>setRegisterForm({...registerForm,last_name:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"/></div>
               </div>
-              <div><label className="text-xs font-semibold text-slate-400 block mb-2">E-mail *</label><input type="email" required value={registerForm.email} onChange={e=>setRegisterForm({...registerForm,email:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-sky-800/20 focus:border-sky-800 transition-all"/></div>
-              <div><label className="text-xs font-semibold text-slate-400 block mb-2">Telefoon</label><input value={registerForm.phone} onChange={e=>setRegisterForm({...registerForm,phone:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-sky-800/20 focus:border-sky-800 transition-all"/></div>
-              <div><label className="text-xs font-semibold text-slate-400 block mb-2">Wachtwoord *</label><div className="relative"><input type={showPw?'text':'password'} required minLength={8} value={registerForm.password} onChange={e=>setRegisterForm({...registerForm,password:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm pr-10 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-sky-800/20 focus:border-sky-800 transition-all"/><button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500">{showPw?<EyeOff size={16}/>:<Eye size={16}/>}</button></div></div>
-              <button type="submit" className="w-full bg-gradient-to-r from-sky-700 to-sky-800 hover:from-sky-800 hover:to-sky-900 text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-sky-800/20">Registreren</button>
-              <p className="text-center text-sm text-slate-400">Al een account? <button type="button" onClick={()=>setIsRegister(false)} className="text-sky-700 font-semibold hover:underline">Inloggen</button></p>
+              <div><label className="text-xs font-semibold text-slate-400 block mb-2">E-mail *</label><input type="email" required value={registerForm.email} onChange={e=>setRegisterForm({...registerForm,email:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"/></div>
+              <div><label className="text-xs font-semibold text-slate-400 block mb-2">Telefoon</label><input value={registerForm.phone} onChange={e=>setRegisterForm({...registerForm,phone:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"/></div>
+              <div><label className="text-xs font-semibold text-slate-400 block mb-2">Wachtwoord *</label><div className="relative"><input type={showPw?'text':'password'} required minLength={8} value={registerForm.password} onChange={e=>setRegisterForm({...registerForm,password:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm pr-10 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"/><button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500">{showPw?<EyeOff size={16}/>:<Eye size={16}/>}</button></div></div>
+              <button type="submit" className="w-full bg-gradient-to-r from-accent to-accent-light hover:from-accent-dark hover:to-accent text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-accent/20">Registreren</button>
+              <p className="text-center text-sm text-slate-400">Al een account? <button type="button" onClick={()=>setIsRegister(false)} className="text-accent font-semibold hover:underline">Inloggen</button></p>
             </form>
           ) : (
             <form onSubmit={login} className="space-y-4">
-              <div><label className="text-xs font-semibold text-slate-400 block mb-2">E-mail</label><input type="email" required value={loginForm.email} onChange={e=>setLoginForm({...loginForm,email:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-sky-800/20 focus:border-sky-800 transition-all"/></div>
-              <div><label className="text-xs font-semibold text-slate-400 block mb-2">Wachtwoord</label><div className="relative"><input type={showPw?'text':'password'} required value={loginForm.password} onChange={e=>setLoginForm({...loginForm,password:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm pr-10 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-sky-800/20 focus:border-sky-800 transition-all"/><button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500">{showPw?<EyeOff size={16}/>:<Eye size={16}/>}</button></div></div>
-              <button type="submit" className="w-full bg-gradient-to-r from-sky-700 to-sky-800 hover:from-sky-800 hover:to-sky-900 text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-sky-800/20">Inloggen</button>
-              <p className="text-center text-sm text-slate-400">Nog geen account? <button type="button" onClick={()=>setIsRegister(true)} className="text-sky-700 font-semibold hover:underline">Registreren</button></p>
+              <div><label className="text-xs font-semibold text-slate-400 block mb-2">E-mail</label><input type="email" required value={loginForm.email} onChange={e=>setLoginForm({...loginForm,email:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"/></div>
+              <div><label className="text-xs font-semibold text-slate-400 block mb-2">Wachtwoord</label><div className="relative"><input type={showPw?'text':'password'} required value={loginForm.password} onChange={e=>setLoginForm({...loginForm,password:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm pr-10 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"/><button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500">{showPw?<EyeOff size={16}/>:<Eye size={16}/>}</button></div></div>
+              <button type="submit" className="w-full bg-gradient-to-r from-accent to-accent-light hover:from-accent-dark hover:to-accent text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-accent/20">Inloggen</button>
+              <p className="text-center text-sm text-slate-400">Nog geen account? <button type="button" onClick={()=>setIsRegister(true)} className="text-accent font-semibold hover:underline">Registreren</button></p>
             </form>
           )}
         </div>
@@ -125,13 +125,13 @@ export default function MijnAccountPage() {
   return (
     <>
       <Header />
-      <section className="gradient-bg text-white py-16 relative overflow-hidden">
-        <div className="absolute inset-0 pattern-overlay" />
-        <div className="relative max-w-6xl mx-auto px-6">
+      <section className="bg-primary-dark text-white py-12 sm:py-16 relative overflow-hidden">
+        <div className="absolute inset-0 dot-pattern opacity-20" />
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between">
             <div>
-              <div className="inline-flex items-center gap-2 text-amber-400 text-sm font-semibold mb-3">
-                <div className="w-8 h-px bg-amber-400" /> MIJN ACCOUNT
+              <div className="inline-flex items-center gap-2 text-accent text-sm font-semibold mb-3">
+                <div className="w-8 h-px bg-accent" /> MIJN ACCOUNT
               </div>
               <h1 className="text-3xl md:text-4xl font-black">Welkom, {customer?.name}</h1>
               <p className="text-white/50 text-sm mt-2">Klantnummer: {customer?.customer_number}</p>
@@ -143,11 +143,11 @@ export default function MijnAccountPage() {
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-6 -mt-6 relative z-10 pb-24">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 -mt-6 relative z-10 pb-16 sm:pb-24">
         {/* Tabs */}
         <div className="flex gap-1.5 mb-8 overflow-x-auto pb-2 bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100 p-1.5">
           {TABS.map(t => (
-            <button key={t.id} onClick={()=>setTab(t.id)} className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${tab === t.id ? 'bg-sky-800 text-white shadow-md shadow-sky-800/20' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}>
+            <button key={t.id} onClick={()=>setTab(t.id)} className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${tab === t.id ? 'bg-primary text-white shadow-md shadow-primary/20' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}>
               <t.icon size={16}/>{t.label}
             </button>
           ))}
@@ -258,17 +258,17 @@ export default function MijnAccountPage() {
             <h2 className="font-bold text-slate-900 text-lg mb-2">Dienst aanvragen</h2>
             <p className="text-sm text-slate-400 mb-8">Vraag een reparatie, onderhoud, keuring, schoonmaak of transport aan voor uw caravan.</p>
             {!showServiceForm ? (
-              <button onClick={()=>setShowServiceForm(true)} className="bg-sky-800 hover:bg-sky-700 text-white font-bold px-6 py-3 rounded-xl text-sm transition-all shadow-lg shadow-sky-800/10 inline-flex items-center gap-2">
+              <button onClick={()=>setShowServiceForm(true)} className="bg-primary hover:bg-primary-light text-white font-bold px-6 py-3 rounded-xl text-sm transition-all shadow-lg shadow-primary/10 inline-flex items-center gap-2">
                 <Wrench size={16}/> Nieuw verzoek indienen
               </button>
             ) : (
               <form onSubmit={submitService} className="space-y-5 max-w-lg">
-                <div><label className="text-xs font-semibold text-slate-400 block mb-2">Caravan *</label><select required value={serviceForm.caravan_id} onChange={e=>setServiceForm({...serviceForm,caravan_id:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-sky-800/20 focus:border-sky-800 transition-all"><option value="">Selecteer caravan</option>{caravans.map(c=><option key={c.id} value={c.id}>{c.brand} {c.model} - {c.license_plate}</option>)}</select></div>
-                <div><label className="text-xs font-semibold text-slate-400 block mb-2">Type dienst *</label><select required value={serviceForm.service_type} onChange={e=>setServiceForm({...serviceForm,service_type:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-sky-800/20 focus:border-sky-800 transition-all"><option value="reparatie">Reparatie</option><option value="onderhoud">Onderhoud</option><option value="keuring">Technische keuring</option><option value="schoonmaak">Schoonmaak</option><option value="transport">Transport</option></select></div>
-                <div><label className="text-xs font-semibold text-slate-400 block mb-2">Omschrijving *</label><textarea required value={serviceForm.description} onChange={e=>setServiceForm({...serviceForm,description:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-sky-800/20 focus:border-sky-800 resize-none transition-all" rows={4} placeholder="Beschrijf uw verzoek..."/></div>
+                <div><label className="text-xs font-semibold text-slate-400 block mb-2">Caravan *</label><select required value={serviceForm.caravan_id} onChange={e=>setServiceForm({...serviceForm,caravan_id:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"><option value="">Selecteer caravan</option>{caravans.map(c=><option key={c.id} value={c.id}>{c.brand} {c.model} - {c.license_plate}</option>)}</select></div>
+                <div><label className="text-xs font-semibold text-slate-400 block mb-2">Type dienst *</label><select required value={serviceForm.service_type} onChange={e=>setServiceForm({...serviceForm,service_type:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"><option value="reparatie">Reparatie</option><option value="onderhoud">Onderhoud</option><option value="keuring">Technische keuring</option><option value="schoonmaak">Schoonmaak</option><option value="transport">Transport</option></select></div>
+                <div><label className="text-xs font-semibold text-slate-400 block mb-2">Omschrijving *</label><textarea required value={serviceForm.description} onChange={e=>setServiceForm({...serviceForm,description:e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent resize-none transition-all" rows={4} placeholder="Beschrijf uw verzoek..."/></div>
                 <div className="flex gap-3">
                   <button type="button" onClick={()=>setShowServiceForm(false)} className="px-5 py-3 text-sm text-slate-400 hover:text-slate-600 font-medium transition-colors">Annuleren</button>
-                  <button type="submit" className="bg-sky-800 hover:bg-sky-700 text-white font-bold px-6 py-3 rounded-xl text-sm transition-all shadow-lg shadow-sky-800/10">Indienen</button>
+                  <button type="submit" className="bg-primary hover:bg-primary-light text-white font-bold px-6 py-3 rounded-xl text-sm transition-all shadow-lg shadow-primary/10">Indienen</button>
                 </div>
               </form>
             )}

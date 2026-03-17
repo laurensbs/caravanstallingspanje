@@ -46,13 +46,13 @@ export default function StallingPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-primary-dark via-primary/80 to-primary-dark" />
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px]" />
-        <div className="relative max-w-7xl mx-auto px-6">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-4 block">Caravanstalling</span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6">
               Caravanstalling aan de<br /><span className="gradient-text">Costa Brava</span>
             </h1>
-            <p className="text-white/50 max-w-2xl text-lg leading-relaxed">
+            <p className="text-white/50 max-w-2xl text-base sm:text-lg leading-relaxed">
               Dé specialist in het veilig en betrouwbaar stallen van uw caravan in Sant Climent de Peralta, Girona. Al meer dan 10 jaar een begrip.
             </p>
           </motion.div>
@@ -61,8 +61,8 @@ export default function StallingPage() {
 
       {/* Storage types */}
       <section className="py-24">
-        <div className="max-w-7xl mx-auto px-6">
-          <AnimatedSection className="text-center mb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <AnimatedSection className="text-center mb-12 sm:mb-16">
             <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3 block">Stallingstypen</span>
             <h2 className="text-3xl md:text-4xl font-black text-primary-dark mb-4">Kies uw stallingtype</h2>
             <p className="text-muted max-w-2xl mx-auto">Binnen- en buitenstalling met professionele beveiliging en zorg</p>
@@ -92,8 +92,8 @@ export default function StallingPage() {
                     <span className="text-4xl font-black text-primary-dark">€{t.price}</span>
                     <span className="text-muted text-sm">{t.period}</span>
                   </div>
-                  <Link href="/contact" className="w-full bg-primary hover:bg-primary-light text-white font-bold px-6 py-3.5 rounded-xl text-sm transition-all duration-300 inline-flex items-center justify-center gap-2">
-                    Offerte aanvragen <ArrowRight size={14} />
+                  <Link href="/stalling" className="w-full bg-gradient-to-r from-accent to-accent-light hover:from-accent-dark hover:to-accent text-white font-bold px-6 py-3.5 rounded-xl text-sm transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-lg shadow-accent/20">
+                    Stalling aanvragen <ArrowRight size={14} />
                   </Link>
                 </div>
               </AnimatedSection>
@@ -105,8 +105,8 @@ export default function StallingPage() {
       {/* Security */}
       <section className="py-24 bg-surface relative overflow-hidden">
         <div className="absolute top-0 left-0 w-96 h-96 bg-primary/3 rounded-full blur-3xl" />
-        <div className="max-w-7xl mx-auto px-6 relative">
-          <AnimatedSection className="text-center mb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
+          <AnimatedSection className="text-center mb-12 sm:mb-16">
             <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3 block">Beveiliging</span>
             <h2 className="text-3xl md:text-4xl font-black text-primary-dark mb-4">Veiligheid staat voorop</h2>
             <p className="text-muted max-w-2xl mx-auto">Uw caravan is bij ons in de beste handen met professionele beveiliging</p>
@@ -133,8 +133,8 @@ export default function StallingPage() {
       </section>
 
       {/* Spot System */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="py-16 sm:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <AnimatedSection>
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div>
@@ -182,14 +182,14 @@ export default function StallingPage() {
       {/* Also rental */}
       <section className="py-16 bg-gradient-to-r from-primary via-primary-light to-primary relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="max-w-7xl mx-auto px-6 relative">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="flex items-center gap-6">
-              <div className="w-16 h-16 bg-accent/20 rounded-2xl flex items-center justify-center animate-pulse-glow shrink-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8">
+            <div className="flex items-start sm:items-center gap-4 sm:gap-6">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-accent/20 rounded-2xl flex items-center justify-center animate-pulse-glow shrink-0">
                 <Sparkles className="text-accent" size={28} />
               </div>
               <div>
-                <h3 className="text-white text-2xl md:text-3xl font-black mb-1">Ook aan caravanverhuur!</h3>
+                <h3 className="text-white text-xl sm:text-2xl md:text-3xl font-black mb-1">Ook aan caravanverhuur!</h3>
                 <p className="text-white/50 max-w-lg">Wist u dat wij ook caravans verhuren? Perfect voor een vakantie aan de Costa Brava.</p>
               </div>
             </div>

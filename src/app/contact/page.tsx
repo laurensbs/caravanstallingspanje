@@ -34,10 +34,10 @@ export default function ContactPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-primary-dark via-primary/80 to-primary-dark" />
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px]" />
-        <div className="relative max-w-7xl mx-auto px-6">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-4 block">Contact</span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6">
               Neem <span className="gradient-text">Contact</span> op
             </h1>
             <p className="text-white/50 max-w-2xl text-lg leading-relaxed">
@@ -49,8 +49,8 @@ export default function ContactPage() {
 
       {/* Main content */}
       <section className="py-24">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid lg:grid-cols-5 gap-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-5 gap-8 sm:gap-12">
             {/* Form */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}

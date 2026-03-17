@@ -89,7 +89,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   if (loading) return (
     <div className="h-screen flex items-center justify-center bg-[#0a0e1a]">
       <div className="flex flex-col items-center gap-4">
-        <div className="w-10 h-10 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-2 border-accent border-t-transparent rounded-full animate-spin" />
         <p className="text-white/30 text-sm">Laden...</p>
       </div>
     </div>
@@ -99,12 +99,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     return (
       <div className="min-h-screen bg-[#0a0e1a] flex items-center justify-center px-6 relative overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-amber-900/10 rounded-full blur-[120px]" />
+          <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#e2725b]/10 rounded-full blur-[120px]" />
           <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-sky-900/10 rounded-full blur-[120px]" />
         </div>
         <div className="w-full max-w-md relative">
           <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl mb-6 shadow-lg shadow-amber-500/20">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-accent to-accent-light rounded-2xl mb-6 shadow-lg shadow-accent/20">
               <Shield className="text-white" size={28} />
             </div>
             <h1 className="text-white font-black text-3xl tracking-tight">Beheerportaal</h1>
@@ -123,7 +123,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                     onClick={() => { setSelectedRole(r); setLoginError(''); }}
                     className={`flex-1 py-3 text-sm font-semibold rounded-lg transition-all flex items-center justify-center gap-2 ${
                       selectedRole === r
-                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg shadow-amber-500/20'
+                        ? 'bg-gradient-to-r from-accent to-accent-light text-white shadow-lg shadow-accent/20'
                         : 'text-white/30 hover:text-white/50'
                     }`}
                   >
@@ -145,7 +145,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                     required
                     value={password}
                     onChange={e => { setPassword(e.target.value); setLoginError(''); }}
-                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl pl-10 pr-12 py-3.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-400/30 focus:border-amber-400/30 placeholder:text-white/15 transition-all"
+                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl pl-10 pr-12 py-3.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/30 placeholder:text-white/15 transition-all"
                     placeholder="••••••••"
                     autoFocus
                     autoComplete="current-password"
@@ -168,7 +168,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               <button
                 type="submit"
                 disabled={loginLoading}
-                className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 disabled:opacity-60"
+                className="w-full bg-gradient-to-r from-accent to-accent-light hover:from-accent-dark hover:to-accent text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-accent/20 flex items-center justify-center gap-2 disabled:opacity-60"
               >
                 {loginLoading ? 'Bezig...' : 'Inloggen'}
                 {!loginLoading && <ArrowRight size={16} />}
@@ -199,7 +199,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <aside className={`fixed inset-y-0 left-0 z-40 w-[270px] bg-[#0a0e1a] transform transition-transform md:relative md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center justify-between h-16 px-5 border-b border-white/[0.06]">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center text-white text-[10px] font-black">CS</div>
+            <div className="w-8 h-8 bg-gradient-to-br from-accent to-accent-light rounded-lg flex items-center justify-center text-white text-[10px] font-black">CS</div>
             <div>
               <span className="text-white font-bold text-sm block leading-tight">Caravanstalling</span>
               <span className="text-white/30 text-[10px]">{role === 'admin' ? 'Admin Panel' : 'Staff Portal'}</span>
@@ -219,8 +219,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               <div key={n.href}>
                 {sectionHeader}
                 <Link href={n.href} onClick={() => setSidebarOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${active ? 'bg-white/[0.08] text-white shadow-sm' : 'text-white/40 hover:text-white/80 hover:bg-white/[0.03]'}`}>
-                  <n.icon size={17} className={active ? 'text-amber-400' : ''} /> {n.label}
-                  {active && <div className="w-1.5 h-1.5 rounded-full bg-amber-400 ml-auto" />}
+                  <n.icon size={17} className={active ? 'text-accent' : ''} /> {n.label}
+                  {active && <div className="w-1.5 h-1.5 rounded-full bg-accent ml-auto" />}
                 </Link>
               </div>
             );
@@ -228,7 +228,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         </nav>
         <div className="absolute bottom-0 w-full p-3 border-t border-white/[0.06]">
           <div className="flex items-center gap-3 px-3 mb-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center text-white text-xs font-bold">{userName.charAt(0)}</div>
+            <div className="w-8 h-8 bg-gradient-to-br from-accent to-accent-light rounded-lg flex items-center justify-center text-white text-xs font-bold">{userName.charAt(0)}</div>
             <div className="flex-1 min-w-0">
               <p className="text-white text-xs font-semibold truncate">{userName}</p>
               <p className="text-white/30 text-[10px]">{role}</p>
@@ -257,7 +257,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             </button>
             <div className="h-6 w-px bg-slate-100" />
             <div className="flex items-center gap-2.5 text-sm">
-              <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-sm shadow-amber-500/20">{userName.charAt(0)}</div>
+              <div className="w-8 h-8 bg-gradient-to-br from-accent to-accent-light rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-sm shadow-accent/20">{userName.charAt(0)}</div>
               <div className="hidden md:block">
                 <p className="font-semibold text-sm text-slate-800">{userName}</p>
                 <p className="text-[11px] text-slate-400">{role}</p>
@@ -268,7 +268,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto p-6 bg-slate-50">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-50">
           {children}
         </main>
       </div>

@@ -50,10 +50,10 @@ export default function DienstenPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-primary-dark via-primary/80 to-primary-dark" />
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px]" />
-        <div className="relative max-w-7xl mx-auto px-6">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-4 block">Diensten</span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6">
               Onze <span className="gradient-text">Diensten</span>
             </h1>
             <p className="text-white/50 max-w-2xl text-lg leading-relaxed">
@@ -64,8 +64,8 @@ export default function DienstenPage() {
       </section>
 
       {/* Services */}
-      <section className="py-24">
-        <div className="max-w-7xl mx-auto px-6 space-y-20">
+      <section className="py-16 sm:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-16 sm:space-y-20">
           {DIENSTEN.map((d, i) => (
             <AnimatedSection key={d.title}>
               <div className={`flex flex-col ${i % 2 ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-12 items-center`}>
@@ -96,8 +96,8 @@ export default function DienstenPage() {
       </section>
 
       {/* Caravanverhuur sectie */}
-      <section className="py-24 bg-surface">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="py-16 sm:py-24 bg-surface">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <AnimatedSection>
             <div className="bg-white rounded-3xl p-8 md:p-12 border border-gray-100 shadow-sm">
               <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -134,12 +134,12 @@ export default function DienstenPage() {
       {/* CTA */}
       <section className="py-16 bg-primary-dark text-white relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="max-w-4xl mx-auto px-6 text-center relative">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center relative">
           <AnimatedSection>
-            <h2 className="text-3xl font-black mb-4">Interesse in onze diensten?</h2>
-            <p className="text-white/50 mb-8">Neem contact met ons op voor een vrijblijvende offerte of meer informatie.</p>
-            <Link href="/contact" className="bg-gradient-to-r from-accent to-accent-light hover:from-accent-light hover:to-accent text-primary-dark font-bold px-8 py-4 rounded-2xl text-sm transition-all duration-300 shadow-lg shadow-accent/20 inline-flex items-center gap-2">
-              Contact opnemen <ArrowRight size={16} />
+            <h2 className="text-2xl sm:text-3xl font-black mb-4">Interesse in onze diensten?</h2>
+            <p className="text-white/50 mb-8 text-sm sm:text-base">Neem contact met ons op of vraag direct stalling aan.</p>
+            <Link href="/stalling" className="bg-gradient-to-r from-accent to-accent-light hover:from-accent-light hover:to-accent text-white font-bold px-8 py-4 rounded-2xl text-sm transition-all duration-300 shadow-lg shadow-accent/20 inline-flex items-center gap-2">
+              Stalling aanvragen <ArrowRight size={16} />
             </Link>
           </AnimatedSection>
         </div>

@@ -68,10 +68,10 @@ export default function TarievenPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-primary-dark via-primary/80 to-primary-dark" />
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px]" />
-        <div className="relative max-w-7xl mx-auto px-6">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-4 block">Tarieven</span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6">
               Onze <span className="gradient-text">Tarieven</span>
             </h1>
             <p className="text-white/50 max-w-2xl text-lg leading-relaxed">
@@ -83,8 +83,8 @@ export default function TarievenPage() {
 
       {/* Plans */}
       <section className="py-24">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-3 gap-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-6">
             {PLANS.map((p, i) => (
               <AnimatedSection key={p.name} delay={i * 0.1}>
                 <div className={`relative bg-white rounded-3xl p-8 border-2 ${p.color} card-hover h-full flex flex-col ${p.popular ? 'shadow-xl shadow-accent/10 scale-[1.02] ring-1 ring-accent/20' : ''}`}>
@@ -114,7 +114,7 @@ export default function TarievenPage() {
                         : 'bg-primary hover:bg-primary-light text-white'
                     }`}
                   >
-                    Offerte aanvragen <ArrowRight size={14} className="inline ml-1" />
+                    Stalling aanvragen <ArrowRight size={14} className="inline ml-1" />
                   </Link>
                 </div>
               </AnimatedSection>
@@ -125,8 +125,8 @@ export default function TarievenPage() {
 
       {/* Extra services */}
       <section className="py-24 bg-surface">
-        <div className="max-w-4xl mx-auto px-6">
-          <AnimatedSection className="text-center mb-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <AnimatedSection className="text-center mb-10 sm:mb-12">
             <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3 block">Aanvullend</span>
             <h2 className="text-3xl md:text-4xl font-black text-primary-dark mb-4">Extra diensten</h2>
             <p className="text-muted">Aanvullende services die u kunt bijboeken</p>
