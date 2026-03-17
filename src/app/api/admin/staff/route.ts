@@ -4,7 +4,7 @@ import { hashPassword } from '@/lib/auth';
 
 export async function GET() {
   try {
-    const staff = await sql`SELECT s.*, l.name as location_name FROM staff s LEFT JOIN locations l ON s.location_id = l.id ORDER BY s.is_active DESC, s.first_name`;
+    const staff = await sql`SELECT s.id, s.first_name, s.last_name, s.email, s.phone, s.role, s.location_id, s.is_active, s.created_at, s.updated_at, l.name as location_name FROM staff s LEFT JOIN locations l ON s.location_id = l.id ORDER BY s.is_active DESC, s.first_name`;
     return NextResponse.json({ staff });
   } catch (error) {
     console.error('Staff GET error:', error);

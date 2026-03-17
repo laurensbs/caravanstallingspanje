@@ -4,6 +4,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { FileText, Plus, X, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 
 interface Contract { id: number; contract_number: string; customer_name: string; caravan_name: string; license_plate: string; location_name: string; start_date: string; end_date: string; monthly_rate: number; status: string; auto_renew: boolean; }
+interface CustomerOption { id: number; first_name: string; last_name: string; }
+interface CaravanOption { id: number; brand: string; model: string; license_plate: string; customer_id: number; }
+interface LocationOption { id: number; name: string; }
+interface SpotOption { id: number; label: string; zone: string; status: string; }
 
 const STATUS_COLORS: Record<string, string> = { actief: 'bg-green-100 text-green-700', verlopen: 'bg-red-100 text-red-700', opgezegd: 'bg-gray-100 text-gray-500', concept: 'bg-amber-100 text-amber-700' };
 
@@ -14,7 +18,11 @@ export default function ContractenPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ customer_id: '', caravan_id: '', location_id: '', spot_id: '', start_date: '', end_date: '', monthly_rate: '', auto_renew: true });
+  const [customers, setCustomers] = useState<CustomerOption[]>([]);
+  const [caravans, setCaravans] = useState<CaravanOption[]>([]);
+  const [locations, setLocations] = useState<LocationOption[]>([]);
+  const [spots, setSpots] = useState<SpotOption[]>([]);
+  const [form, setForm] = useState({ customer_id: '', caravan_id: '', location_id: '', spot_id: '', start_date: '', end_date: '', monthly_rate: '', deposit: '0', auto_renew: true });
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -22,10 +30,33 @@ export default function ContractenPage() {
     if (statusFilter) params.set('status', statusFilter);
     const res = await fetch(`/api/admin/contracts?${params}`, { credentials: 'include' });
     const data = await res.json();
-    setContracts(data.contracts || []); setTotal(data.total || 0); setLoading(false);
+    setContracts(data.contracts || []); setTotal(data.total || data.contracts?.length || 0); setLoading(false);
   }, [page, statusFilter]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
+
+  const openForm = async () => {
+    const [custRes, caravRes, locRes] = await Promise.all([
+      fetch('/api/admin/customers?limit=500', { credentials: 'include' }),
+      fetch('/api/admin/caravans?limit=500', { credentials: 'include' }),
+      fetch('/api/admin/locations', { credentials: 'include' }),
+    ]);
+    const custData = await custRes.json();
+    const caravData = await caravRes.json();
+    const locData = await locRes.json();
+    setCustomers(custData.customers || []);
+    setCaravans(caravData.caravans || []);
+    setLocations(locData.locations || []);
+    setForm({ customer_id: '', caravan_id: '', location_id: '', spot_id: '', start_date: '', end_date: '', monthly_rate: '', deposit: '0', auto_renew: true });
+    setShowForm(true);
+  };
+
+  const loadSpots = async (locationId: string) => {
+    if (!locationId) { setSpots([]); return; }
+    const res = await fetch(`/api/admin/locations/${locationId}/spots`, { credentials: 'include' });
+    const data = await res.json();
+    setSpots((data.spots || []).filter((s: SpotOption) => s.status === 'vrij'));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,6 +64,7 @@ export default function ContractenPage() {
     setShowForm(false); fetchData();
   };
 
+  const filteredCaravans = form.customer_id ? caravans.filter(c => String(c.customer_id) === form.customer_id) : caravans;
   const fmt = (n: number) => new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n);
   const fmtDate = (d: string) => new Date(d).toLocaleDateString('nl-NL');
   const totalPages = Math.ceil(total / 50);
@@ -41,7 +73,7 @@ export default function ContractenPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div><h1 className="text-2xl font-black text-slate-900">Contracten</h1><p className="text-sm text-slate-400 mt-1">{total} contracten</p></div>
-        <button onClick={() => setShowForm(true)} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all"><Plus size={16} /> Nieuw contract</button>
+        <button onClick={openForm} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all"><Plus size={16} /> Nieuw contract</button>
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-100 mb-6 p-4">
@@ -89,22 +121,47 @@ export default function ContractenPage() {
 
       {showForm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b border-slate-100"><h2 className="text-lg font-bold text-slate-900">Nieuw contract</h2><button onClick={() => setShowForm(false)} className="text-slate-400 hover:text-slate-600"><X size={20}/></button></div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-xs font-semibold text-slate-500 block mb-1">Klant ID *</label><input required value={form.customer_id} onChange={e=>setForm({...form,customer_id:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
-                <div><label className="text-xs font-semibold text-slate-500 block mb-1">Caravan ID *</label><input required value={form.caravan_id} onChange={e=>setForm({...form,caravan_id:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
+              <div>
+                <label className="text-xs font-semibold text-slate-500 block mb-1">Klant *</label>
+                <select required value={form.customer_id} onChange={e => setForm({...form, customer_id: e.target.value, caravan_id: ''})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all">
+                  <option value="">Selecteer klant...</option>
+                  {customers.map(c => <option key={c.id} value={c.id}>{c.first_name} {c.last_name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-500 block mb-1">Caravan *</label>
+                <select required value={form.caravan_id} onChange={e => setForm({...form, caravan_id: e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all">
+                  <option value="">Selecteer caravan...</option>
+                  {filteredCaravans.map(c => <option key={c.id} value={c.id}>{c.brand} {c.model} {c.license_plate ? `(${c.license_plate})` : ''}</option>)}
+                </select>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-xs font-semibold text-slate-500 block mb-1">Locatie ID *</label><input required value={form.location_id} onChange={e=>setForm({...form,location_id:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
-                <div><label className="text-xs font-semibold text-slate-500 block mb-1">Plek ID</label><input value={form.spot_id} onChange={e=>setForm({...form,spot_id:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
+                <div>
+                  <label className="text-xs font-semibold text-slate-500 block mb-1">Locatie *</label>
+                  <select required value={form.location_id} onChange={e => { setForm({...form, location_id: e.target.value, spot_id: ''}); loadSpots(e.target.value); }} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all">
+                    <option value="">Selecteer locatie...</option>
+                    {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-slate-500 block mb-1">Stallingplek</label>
+                  <select value={form.spot_id} onChange={e => setForm({...form, spot_id: e.target.value})} disabled={!form.location_id} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all disabled:opacity-50">
+                    <option value="">Geen plek</option>
+                    {spots.map(s => <option key={s.id} value={s.id}>{s.label} (Zone {s.zone})</option>)}
+                  </select>
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div><label className="text-xs font-semibold text-slate-500 block mb-1">Startdatum *</label><input type="date" required value={form.start_date} onChange={e=>setForm({...form,start_date:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
                 <div><label className="text-xs font-semibold text-slate-500 block mb-1">Einddatum *</label><input type="date" required value={form.end_date} onChange={e=>setForm({...form,end_date:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
               </div>
-              <div><label className="text-xs font-semibold text-slate-500 block mb-1">Maandtarief *</label><input type="number" step="0.01" required value={form.monthly_rate} onChange={e=>setForm({...form,monthly_rate:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className="text-xs font-semibold text-slate-500 block mb-1">Maandtarief (€) *</label><input type="number" step="0.01" required value={form.monthly_rate} onChange={e=>setForm({...form,monthly_rate:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
+                <div><label className="text-xs font-semibold text-slate-500 block mb-1">Borg (€)</label><input type="number" step="0.01" value={form.deposit} onChange={e=>setForm({...form,deposit:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"/></div>
+              </div>
               <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.auto_renew} onChange={e=>setForm({...form,auto_renew:e.target.checked})} className="rounded"/> Automatisch verlengen</label>
               <div className="flex gap-3 justify-end pt-2">
                 <button type="button" onClick={()=>setShowForm(false)} className="px-4 py-2.5 text-sm text-slate-400 hover:bg-slate-100 rounded-xl transition-colors">Annuleren</button>

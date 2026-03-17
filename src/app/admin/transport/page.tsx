@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Truck, Plus, X, ChevronLeft, ChevronRight, MapPin, ArrowRight } from 'lucide-react';
+import { Plus, X, ChevronLeft, ChevronRight, MapPin, ArrowRight } from 'lucide-react';
 
 interface TransportOrder { id: number; customer_name: string; caravan_brand: string; caravan_model: string; caravan_license_plate: string; pickup_address: string; delivery_address: string; scheduled_date: string; completed_date: string; status: string; notes: string; assigned_staff_name: string; created_at: string; }
+interface CaravanOption { id: number; brand: string; model: string; license_plate: string; customer_name: string; }
+interface StaffOption { id: number; first_name: string; last_name: string; }
 
 const STATUS_COLORS: Record<string,string> = { aangevraagd: 'bg-blue-100 text-blue-700', gepland: 'bg-amber-100 text-amber-700', onderweg: 'bg-purple-100 text-purple-700', afgeleverd: 'bg-green-100 text-green-700', geannuleerd: 'bg-gray-100 text-gray-500' };
 
@@ -14,7 +16,9 @@ export default function TransportPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ caravan_id: '', pickup_address: '', delivery_address: '', scheduled_date: '', notes: '' });
+  const [caravans, setCaravans] = useState<CaravanOption[]>([]);
+  const [staffList, setStaffList] = useState<StaffOption[]>([]);
+  const [form, setForm] = useState({ caravan_id: '', pickup_address: '', delivery_address: '', scheduled_date: '', notes: '', assigned_staff_id: '' });
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -27,10 +31,23 @@ export default function TransportPage() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  const openForm = async () => {
+    const [caravanRes, staffRes] = await Promise.all([
+      fetch('/api/admin/caravans?limit=500', { credentials: 'include' }),
+      fetch('/api/admin/staff?limit=500', { credentials: 'include' }),
+    ]);
+    const caravanData = await caravanRes.json();
+    const staffData = await staffRes.json();
+    setCaravans(caravanData.caravans || []);
+    setStaffList(staffData.staff || []);
+    setForm({ caravan_id: '', pickup_address: '', delivery_address: '', scheduled_date: '', notes: '', assigned_staff_id: '' });
+    setShowForm(true);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await fetch('/api/admin/transport', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form), credentials: 'include' });
-    setShowForm(false); setForm({ caravan_id: '', pickup_address: '', delivery_address: '', scheduled_date: '', notes: '' }); fetchData();
+    setShowForm(false); fetchData();
   };
 
   const updateStatus = async (id: number, status: string) => {
@@ -45,7 +62,7 @@ export default function TransportPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div><h1 className="text-2xl font-black text-slate-900">Transport</h1><p className="text-sm text-slate-400 mt-1">{total} transportopdrachten</p></div>
-        <button onClick={() => setShowForm(true)} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all"><Plus size={16} /> Nieuwe opdracht</button>
+        <button onClick={openForm} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all"><Plus size={16} /> Nieuwe opdracht</button>
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-100 mb-6 p-4">
@@ -98,14 +115,27 @@ export default function TransportPage() {
 
       {showForm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b border-slate-100"><h2 className="text-lg font-bold text-slate-900">Nieuwe transportopdracht</h2><button onClick={()=>setShowForm(false)} className="text-slate-400 hover:text-slate-600"><X size={20}/></button></div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div><label className="text-xs font-semibold text-slate-500 block mb-1">Caravan ID *</label><input required value={form.caravan_id} onChange={e=>setForm({...form,caravan_id:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
-              <div><label className="text-xs font-semibold text-slate-500 block mb-1">Ophaaladres</label><input value={form.pickup_address} onChange={e=>setForm({...form,pickup_address:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
-              <div><label className="text-xs font-semibold text-slate-500 block mb-1">Afleveradres</label><input value={form.delivery_address} onChange={e=>setForm({...form,delivery_address:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
+              <div>
+                <label className="text-xs font-semibold text-slate-500 block mb-1">Caravan *</label>
+                <select required value={form.caravan_id} onChange={e=>setForm({...form,caravan_id:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all">
+                  <option value="">Selecteer caravan...</option>
+                  {caravans.map(c => <option key={c.id} value={c.id}>{c.brand} {c.model} — {c.license_plate} ({c.customer_name})</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-500 block mb-1">Chauffeur (optioneel)</label>
+                <select value={form.assigned_staff_id} onChange={e=>setForm({...form,assigned_staff_id:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all">
+                  <option value="">Niet toegewezen</option>
+                  {staffList.map(s => <option key={s.id} value={s.id}>{s.first_name} {s.last_name}</option>)}
+                </select>
+              </div>
+              <div><label className="text-xs font-semibold text-slate-500 block mb-1">Ophaaladres</label><input value={form.pickup_address} onChange={e=>setForm({...form,pickup_address:e.target.value})} placeholder="Bijv. Stalling Costa del Sol" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
+              <div><label className="text-xs font-semibold text-slate-500 block mb-1">Afleveradres</label><input value={form.delivery_address} onChange={e=>setForm({...form,delivery_address:e.target.value})} placeholder="Bijv. Camping La Marina, Alicante" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
               <div><label className="text-xs font-semibold text-slate-500 block mb-1">Geplande datum *</label><input type="date" required value={form.scheduled_date} onChange={e=>setForm({...form,scheduled_date:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
-              <div><label className="text-xs font-semibold text-slate-500 block mb-1">Opmerkingen</label><textarea value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all" rows={3}/></div>
+              <div><label className="text-xs font-semibold text-slate-500 block mb-1">Opmerkingen</label><textarea value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})} placeholder="Bijzonderheden voor transport..." className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all" rows={3}/></div>
               <div className="flex gap-3 justify-end pt-2">
                 <button type="button" onClick={()=>setShowForm(false)} className="px-4 py-2.5 text-sm text-slate-400 hover:bg-slate-100 rounded-xl transition-colors">Annuleren</button>
                 <button type="submit" className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-amber-500/20 transition-all">Aanmaken</button>

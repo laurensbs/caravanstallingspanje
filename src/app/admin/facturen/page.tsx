@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Receipt, Plus, X, ChevronLeft, ChevronRight, CheckCircle, AlertTriangle, Euro } from 'lucide-react';
+import { Receipt, Plus, X, ChevronLeft, ChevronRight, CheckCircle, AlertTriangle } from 'lucide-react';
 
 interface Invoice { id: number; invoice_number: string; customer_name: string; customer_email: string; description: string; subtotal: number; tax_amount: number; total: number; status: string; due_date: string; paid_date: string; payment_method: string; created_at: string; }
+interface CustomerOption { id: number; first_name: string; last_name: string; email: string; }
+interface ContractOption { id: number; contract_number: string; customer_id: number; monthly_rate: number; }
 
 const STATUS_COLORS: Record<string,string> = { open: 'bg-blue-100 text-blue-700', verzonden: 'bg-amber-100 text-amber-700', betaald: 'bg-green-100 text-green-700', achterstallig: 'bg-red-100 text-red-700', geannuleerd: 'bg-gray-100 text-gray-500' };
 
@@ -14,7 +16,9 @@ export default function FacturenPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ customer_id: '', description: '', subtotal: '', tax_rate: '21', due_date: '' });
+  const [customers, setCustomers] = useState<CustomerOption[]>([]);
+  const [contracts, setContracts] = useState<ContractOption[]>([]);
+  const [form, setForm] = useState({ customer_id: '', contract_id: '', description: '', subtotal: '', tax_rate: '21', due_date: '' });
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -26,6 +30,19 @@ export default function FacturenPage() {
   }, [page, statusFilter]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
+
+  const openForm = async () => {
+    const [custRes, contRes] = await Promise.all([
+      fetch('/api/admin/customers?limit=500', { credentials: 'include' }),
+      fetch('/api/admin/contracts?status=actief', { credentials: 'include' }),
+    ]);
+    const custData = await custRes.json();
+    const contData = await contRes.json();
+    setCustomers(custData.customers || []);
+    setContracts(contData.contracts || []);
+    setForm({ customer_id: '', contract_id: '', description: '', subtotal: '', tax_rate: '21', due_date: '' });
+    setShowForm(true);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,6 +58,7 @@ export default function FacturenPage() {
     fetchData();
   };
 
+  const filteredContracts = form.customer_id ? contracts.filter(c => String(c.customer_id) === form.customer_id) : contracts;
   const fmt = (n: number) => new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n);
   const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString('nl-NL') : '-';
   const totalPages = Math.ceil(total / 50);
@@ -51,7 +69,7 @@ export default function FacturenPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div><h1 className="text-2xl font-black text-slate-900">Facturen</h1><p className="text-sm text-slate-400 mt-1">{total} facturen · Openstaand: {fmt(totalOpen)}</p></div>
-        <button onClick={() => setShowForm(true)} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all"><Plus size={16} /> Nieuwe factuur</button>
+        <button onClick={openForm} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all"><Plus size={16} /> Nieuwe factuur</button>
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-100 mb-6 p-4">
@@ -103,15 +121,29 @@ export default function FacturenPage() {
 
       {showForm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b border-slate-100"><h2 className="text-lg font-bold text-slate-900">Nieuwe factuur</h2><button onClick={()=>setShowForm(false)} className="text-slate-400 hover:text-slate-600"><X size={20}/></button></div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div><label className="text-xs font-semibold text-slate-500 block mb-1">Klant ID *</label><input required value={form.customer_id} onChange={e=>setForm({...form,customer_id:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
+              <div>
+                <label className="text-xs font-semibold text-slate-500 block mb-1">Klant *</label>
+                <select required value={form.customer_id} onChange={e => setForm({...form, customer_id: e.target.value, contract_id: ''})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all">
+                  <option value="">Selecteer klant...</option>
+                  {customers.map(c => <option key={c.id} value={c.id}>{c.first_name} {c.last_name} ({c.email})</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-500 block mb-1">Contract (optioneel)</label>
+                <select value={form.contract_id} onChange={e => { const ct = contracts.find(c => String(c.id) === e.target.value); setForm({...form, contract_id: e.target.value, subtotal: ct ? String(ct.monthly_rate) : form.subtotal, description: ct ? `Stalling ${ct.contract_number}` : form.description }); }} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all">
+                  <option value="">Geen contract</option>
+                  {filteredContracts.map(c => <option key={c.id} value={c.id}>{c.contract_number} (€{c.monthly_rate}/mnd)</option>)}
+                </select>
+              </div>
               <div><label className="text-xs font-semibold text-slate-500 block mb-1">Omschrijving</label><input value={form.description} onChange={e=>setForm({...form,description:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
               <div className="grid grid-cols-2 gap-4">
                 <div><label className="text-xs font-semibold text-slate-500 block mb-1">Subtotaal (€) *</label><input type="number" step="0.01" required value={form.subtotal} onChange={e=>setForm({...form,subtotal:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
                 <div><label className="text-xs font-semibold text-slate-500 block mb-1">BTW % *</label><input type="number" step="0.01" required value={form.tax_rate} onChange={e=>setForm({...form,tax_rate:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
               </div>
+              {form.subtotal && <p className="text-xs text-slate-400">Totaal incl. BTW: {fmt(parseFloat(form.subtotal) * (1 + parseFloat(form.tax_rate) / 100))}</p>}
               <div><label className="text-xs font-semibold text-slate-500 block mb-1">Vervaldatum *</label><input type="date" required value={form.due_date} onChange={e=>setForm({...form,due_date:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
               <div className="flex gap-3 justify-end pt-2">
                 <button type="button" onClick={()=>setShowForm(false)} className="px-4 py-2.5 text-sm text-slate-400 hover:bg-slate-100 rounded-xl transition-colors">Annuleren</button>

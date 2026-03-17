@@ -6,7 +6,7 @@ export async function GET(req: NextRequest) {
     const url = new URL(req.url);
     const status = url.searchParams.get('status') || undefined;
     const contracts = await getAllContracts(status);
-    return NextResponse.json({ contracts });
+    return NextResponse.json({ contracts, total: contracts.length });
   } catch (error) {
     console.error('Contracts GET error:', error);
     return NextResponse.json({ error: 'Failed to fetch contracts' }, { status: 500 });
