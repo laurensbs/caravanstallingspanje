@@ -3,49 +3,15 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
-import { MapPin, Shield, Car, CheckCircle, ArrowRight, Camera, Wrench, Phone } from 'lucide-react';
+import { MapPin, Shield, Wrench, Sun, ArrowRight, Phone, CheckCircle, Star, Clock } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 
-function AnimatedSection({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+function A({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-80px' });
-  return (
-    <motion.div ref={ref} initial={{ opacity: 0, y: 40 }} animate={isInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7, delay, ease: [0.25, 0.4, 0.25, 1] }} className={className}>
-      {children}
-    </motion.div>
-  );
+  const v = useInView(ref, { once: true, margin: '-60px' });
+  return <motion.div ref={ref} initial={{ opacity: 0, y: 32 }} animate={v ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6, delay, ease: [0.25, 0.4, 0.25, 1] }} className={className}>{children}</motion.div>;
 }
-
-const LOCATIONS = [
-  {
-    name: 'Hoofdlocatie - Sant Climent de Peralta',
-    address: 'Ctra de Palamos, 91, 17110 Sant Climent de Peralta, Girona',
-    type: 'Buiten- & binnenstalling',
-    capacity: '800+ plaatsen',
-    badge: 'Hoofdlocatie',
-    color: 'from-blue-500/10 to-blue-600/5',
-    features: ['Buitenstalling (Zone A-D)', 'Overdekte binnenstalling (Zone H)', 'Werkplaats', 'Wasplaats', 'Securitas Direct bewaking', '24/7 camerabewaking'],
-  },
-  {
-    name: 'Locatie Pals',
-    address: 'Omgeving Pals, Costa Brava',
-    type: 'Buitenstalling',
-    capacity: '600+ plaatsen',
-    badge: 'Costa Brava',
-    color: 'from-emerald-500/10 to-emerald-600/5',
-    features: ['Ruim buitenterrein', 'Afgesloten terrein', 'Camerabewaking', 'Goede bereikbaarheid', 'Dichtbij populaire campings'],
-  },
-  {
-    name: 'Locatie Blanes',
-    address: 'Omgeving Blanes, Costa Brava',
-    type: 'Buitenstalling',
-    capacity: '500+ plaatsen',
-    badge: 'Zuid Costa Brava',
-    color: 'from-amber-500/10 to-amber-600/5',
-    features: ['Buitenstalling', 'Beveiligd terrein', 'Camerabewaking', 'Zuid Costa Brava', 'Seizoensstalling (Zone S)'],
-  },
-];
 
 export default function LocatiesPage() {
   return (
@@ -53,106 +19,169 @@ export default function LocatiesPage() {
       <Header />
 
       {/* Hero */}
-      <section className="relative bg-primary-dark text-white py-24 md:py-32 overflow-hidden">
+      <section className="relative bg-primary-dark text-white py-20 sm:py-28 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-dark via-primary/80 to-primary-dark" />
         <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px]" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center">
-            <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-4 block">Locaties</span>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6">
-              Onze <span className="gradient-text">Locaties</span>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-4">Onze locatie</p>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] mb-6">
+              <span className="gradient-text">Costa Brava</span>, Spanje
             </h1>
-            <p className="text-white/50 max-w-2xl mx-auto text-lg leading-relaxed">
-              Meerdere beveiligde terreinen verspreid over de Costa Brava voor optimale service en bereikbaarheid.
+            <p className="text-white/50 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
+              Centraal gelegen in Sant Climent de Peralta, Girona. Tussen de prachtige stranden en dorpen van de Costa Brava.
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Locations */}
-      <section className="py-16 sm:py-24">
+      {/* Main Location */}
+      <section className="py-20 sm:py-28 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <AnimatedSection className="text-center mb-12 sm:mb-16">
-            <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3 block">Onze terreinen</span>
-            <h2 className="text-3xl md:text-4xl font-black text-primary-dark mb-4">3 beveiligde locaties</h2>
-            <p className="text-muted max-w-2xl mx-auto">Verspreid over de Costa Brava voor optimale bereikbaarheid</p>
-          </AnimatedSection>
-          <div className="space-y-6 sm:space-y-8">
-          {LOCATIONS.map((l, i) => (
-            <AnimatedSection key={l.name} delay={i * 0.1}>
-              <div className="bg-white rounded-3xl p-8 md:p-10 border border-gray-100 card-hover">
-                <div className="flex flex-col lg:flex-row lg:items-start gap-8">
-                  <div className={`w-20 h-20 bg-gradient-to-br ${l.color} rounded-2xl flex items-center justify-center shrink-0`}>
-                    <MapPin className="text-primary" size={32} />
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+            <A>
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-accent/10 text-accent rounded-xl flex items-center justify-center">
+                    <MapPin size={22} />
                   </div>
-                  <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-3 mb-2">
-                      <h2 className="text-xl font-black text-primary-dark">{l.name}</h2>
-                      <span className="bg-accent/10 text-accent text-[10px] font-bold px-3 py-1 rounded-full">{l.badge}</span>
+                  <span className="text-[10px] font-bold bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full uppercase tracking-wider">Hoofdvestiging</span>
+                </div>
+                <h2 className="text-3xl sm:text-4xl font-black mb-2">Sant Climent de Peralta</h2>
+                <p className="text-accent font-bold text-sm mb-6">Ctra de Palamós, 91 · 17110 Girona</p>
+                <p className="text-muted leading-relaxed mb-8">
+                  Ons hoofdterrein ligt aan de Ctra de Palamós in het rustige Sant Climent de Peralta, provincie Girona. 
+                  Centraal gelegen ten opzichte van populaire badplaatsen als Pals, Begur, L&apos;Estartit en Palamós. 
+                  Direct aan de doorgaande weg, makkelijk bereikbaar vanuit alle richtingen.
+                </p>
+
+                <div className="space-y-4 mb-8">
+                  {[
+                    { icon: Shield, title: 'Beveiligd terrein', desc: 'Securitas Direct alarm, 24/7 camerabewaking, afgesloten terreinmuren' },
+                    { icon: Wrench, title: 'Eigen werkplaats', desc: 'Volledige werkplaats voor reparatie, onderhoud en CaravanRepair®' },
+                    { icon: Sun, title: 'Binnen- & buitenstalling', desc: 'Overdekte en open stallingsplekken, elk met eigen pleknummer' },
+                    { icon: Clock, title: 'Openingstijden', desc: 'Ma t/m vr: 09:30 – 16:30 · Weekend: gesloten' },
+                  ].map(f => (
+                    <div key={f.title} className="flex gap-4">
+                      <div className="w-10 h-10 bg-surface rounded-xl flex items-center justify-center shrink-0">
+                        <f.icon size={18} className="text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-sm mb-0.5">{f.title}</p>
+                        <p className="text-xs text-muted">{f.desc}</p>
+                      </div>
                     </div>
-                    <p className="text-muted text-sm mb-5">{l.address}</p>
-                    <div className="flex flex-wrap gap-4 mb-6">
-                      <span className="flex items-center gap-2 text-sm font-medium bg-surface px-3 py-1.5 rounded-lg">
-                        <Shield size={14} className="text-primary" /> {l.type}
-                      </span>
-                      <span className="flex items-center gap-2 text-sm font-medium bg-surface px-3 py-1.5 rounded-lg">
-                        <Car size={14} className="text-primary" /> {l.capacity}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5">
-                      {l.features.map(f => (
-                        <span key={f} className="flex items-center gap-2 text-sm text-gray-600">
-                          <CheckCircle size={13} className="text-success shrink-0" /> {f}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+                  ))}
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link href="/contact" className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2">
+                    Route plannen <ArrowRight size={14} />
+                  </Link>
+                  <a href="tel:+34650036755" className="text-primary-dark hover:text-accent font-bold px-6 py-3 rounded-xl text-sm transition-colors inline-flex items-center gap-2 border border-black/[0.08]">
+                    <Phone size={15} /> +34 650 036 755
+                  </a>
                 </div>
               </div>
-            </AnimatedSection>
-          ))}
+            </A>
+
+            <A delay={0.15}>
+              {/* Map placeholder */}
+              <div className="bg-surface rounded-2xl overflow-hidden border border-black/[0.04]">
+                <div className="aspect-square sm:aspect-[4/3] relative">
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2975.8!2d3.14!3d42.01!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12ba8d9e42ceae9f%3A0x4af8d0d99ced30a2!2sCtra.%20de%20Palam%C3%B3s%2C%2091%2C%2017110%20Sant%20Climent%20de%20Peralta%2C%20Girona%2C%20Spain!5e0!3m2!1snl!2snl!4v1"
+                    width="100%"
+                    height="100%"
+                    className="absolute inset-0 border-0 w-full h-full"
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Locatie Caravanstalling Spanje"
+                  />
+                </div>
+                <div className="p-5 bg-white/80 backdrop-blur-sm border-t border-black/[0.04]">
+                  <p className="text-xs text-muted font-medium">
+                    <MapPin size={12} className="inline mr-1" />
+                    Ctra de Palamós, 91 · 17110 Sant Climent de Peralta, Girona, Spanje
+                  </p>
+                </div>
+              </div>
+            </A>
           </div>
         </div>
       </section>
 
-      {/* Map placeholder */}
-      <section className="py-16 sm:py-24 bg-surface">
+      {/* Nearby */}
+      <section className="py-20 sm:py-28 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <AnimatedSection className="text-center mb-12">
-            <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3 block">Waar vindt u ons</span>
-            <h2 className="text-3xl md:text-4xl font-black text-primary-dark">Costa Brava, Spanje</h2>
-          </AnimatedSection>
-          <AnimatedSection delay={0.2}>
-            <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm">
-              <div className="aspect-[21/9] bg-gradient-to-br from-primary/5 to-primary/10 flex items-center justify-center">
-                <div className="text-center">
-                  <MapPin size={48} className="text-primary/20 mx-auto mb-3" />
-                  <p className="text-muted text-sm font-medium">Google Maps integratie</p>
-                  <p className="text-muted/60 text-xs mt-1">Sant Climent de Peralta, Girona, Spanje</p>
+          <A className="text-center max-w-2xl mx-auto mb-14">
+            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3">Omgeving</p>
+            <h2 className="text-3xl sm:text-4xl font-black mb-4">Populaire bestemmingen</h2>
+            <div className="section-divider mt-5" />
+            <p className="text-muted mt-5">Onze stalling ligt centraal aan de Costa Brava, op korte afstand van de mooiste badplaatsen en dorpen.</p>
+          </A>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-5xl mx-auto">
+            {[
+              { place: 'Pals', km: '6 km', desc: 'Middeleeuws dorp met prachtige stranden', rating: 4.8 },
+              { place: 'Begur', km: '10 km', desc: 'Charmant kustdorp, verborgen baaien', rating: 4.9 },
+              { place: 'L\'Estartit', km: '12 km', desc: 'Duikparadijs, Medes eilanden', rating: 4.7 },
+              { place: 'Palamós', km: '15 km', desc: 'Vissershaven, culinaire hotspot', rating: 4.6 },
+            ].map((p, i) => (
+              <A key={p.place} delay={i * 0.08}>
+                <div className="bg-white rounded-2xl p-6 border border-black/[0.04] card-hover h-full text-center">
+                  <p className="text-accent font-bold text-xl mb-1">{p.km}</p>
+                  <h3 className="font-black text-lg mb-2">{p.place}</h3>
+                  <p className="text-xs text-muted leading-relaxed mb-3">{p.desc}</p>
+                  <div className="flex items-center justify-center gap-1">
+                    <Star size={11} className="text-amber-400" fill="currentColor" />
+                    <span className="text-xs font-medium">{p.rating}</span>
+                  </div>
                 </div>
-              </div>
+              </A>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Facts */}
+      <section className="py-16 sm:py-20 bg-white">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <A>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+              {[
+                { val: '20+', lbl: 'Jaar ervaring' },
+                { val: '12', lbl: 'Medewerkers' },
+                { val: '4.9/5', lbl: 'Google reviews' },
+                { val: '7', lbl: 'Transporteenheden' },
+              ].map(s => (
+                <div key={s.lbl}>
+                  <p className="text-3xl sm:text-4xl font-black gradient-text mb-1">{s.val}</p>
+                  <p className="text-xs text-muted font-medium">{s.lbl}</p>
+                </div>
+              ))}
             </div>
-          </AnimatedSection>
+          </A>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-primary-dark text-white relative overflow-hidden">
+      <section className="bg-primary-dark relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center relative">
-          <AnimatedSection>
-            <h2 className="text-3xl font-black mb-4">Wilt u uw caravan bij ons stallen?</h2>
-            <p className="text-white/50 mb-8">Neem contact met ons op voor een vrijblijvende offerte of bezoek ons terrein.</p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link href="/stalling" className="bg-gradient-to-r from-accent to-accent-light hover:from-accent-light hover:to-accent text-white font-bold px-8 py-4 rounded-2xl text-sm transition-all duration-300 shadow-lg shadow-accent/20 inline-flex items-center gap-2">
-                Stalling aanvragen <ArrowRight size={16} />
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
+          <A>
+            <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">Bezoek onze stalling</h2>
+            <p className="text-white/40 mb-8">Maak een afspraak voor een rondleiding of neem vrijblijvend contact op.</p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link href="/contact" className="bg-accent hover:bg-accent-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm">
+                Neem contact op <ArrowRight size={15} />
               </Link>
-              <a href="tel:+34972000000" className="glass text-white font-semibold px-8 py-4 rounded-2xl text-sm transition-all hover:bg-white/10 inline-flex items-center gap-2">
-                <Phone size={16} /> Bel ons
+              <a href="tel:+34650036755" className="text-white/60 hover:text-white font-medium px-6 py-3.5 rounded-xl text-sm transition-colors inline-flex items-center gap-2 border border-white/10 hover:border-white/20">
+                <Phone size={15} /> +34 650 036 755
               </a>
             </div>
-          </AnimatedSection>
+          </A>
         </div>
       </section>
 

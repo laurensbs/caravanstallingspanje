@@ -42,7 +42,7 @@ export default function FloatingActions() {
             className="flex flex-col gap-2 mb-1"
           >
             <a
-              href="https://wa.me/34972000000"
+              href="https://wa.me/34650036755"
               target="_blank"
               rel="noopener noreferrer"
               className="w-12 h-12 rounded-full bg-[#25D366] shadow-lg shadow-[#25D366]/20 flex items-center justify-center text-white hover:scale-110 transition-transform duration-300"
@@ -51,7 +51,7 @@ export default function FloatingActions() {
               <MessageCircle size={20} />
             </a>
             <a
-              href="tel:+34972000000"
+              href="tel:+34650036755"
               className="w-12 h-12 rounded-full bg-primary shadow-lg shadow-primary/20 flex items-center justify-center text-white hover:scale-110 transition-transform duration-300"
               aria-label="Bel ons"
             >

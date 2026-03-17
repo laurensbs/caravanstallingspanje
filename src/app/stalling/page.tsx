@@ -3,38 +3,15 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
-import { Shield, Thermometer, Camera, CheckCircle, ArrowRight, Lock, Eye, Caravan, Sparkles } from 'lucide-react';
+import { Shield, Thermometer, Camera, CheckCircle, ArrowRight, Lock, Eye, Sparkles, Truck, Phone } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 
-function AnimatedSection({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+function A({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-80px' });
-  return (
-    <motion.div ref={ref} initial={{ opacity: 0, y: 40 }} animate={isInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7, delay, ease: [0.25, 0.4, 0.25, 1] }} className={className}>
-      {children}
-    </motion.div>
-  );
+  const v = useInView(ref, { once: true, margin: '-60px' });
+  return <motion.div ref={ref} initial={{ opacity: 0, y: 32 }} animate={v ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6, delay, ease: [0.25, 0.4, 0.25, 1] }} className={className}>{children}</motion.div>;
 }
-
-const TYPES = [
-  {
-    title: 'Buitenstalling',
-    icon: Shield,
-    desc: 'Veilige buitenstalling op ons afgesloten en beveiligd terrein. Ideaal voor seizoensstalling van uw caravan.',
-    features: ['Afgesloten terrein', '24/7 camerabewaking', 'Securitas Direct alarm', 'Standaard verzekerd', 'Tweewekelijkse controle', 'Jaarlijkse technische keuring'],
-    price: '65', period: '/maand', tag: 'Populair',
-    gradient: 'from-emerald-500/10 to-emerald-600/5',
-  },
-  {
-    title: 'Binnenstalling (Overdekt)',
-    icon: Thermometer,
-    desc: 'Overdekte parkeerplaatsen voor extra bescherming tegen zon, regen en temperatuurschommelingen. Ideaal voor langdurige stalling.',
-    features: ['Geïsoleerde hal', 'Bescherming tegen weer', 'Geen last van hitte of koude', 'Alle voordelen buitenstalling', 'Beperkte beschikbaarheid', 'Premium locatie'],
-    price: '95', period: '/maand', tag: 'Premium',
-    gradient: 'from-blue-500/10 to-blue-600/5',
-  },
-];
 
 export default function StallingPage() {
   return (
@@ -42,161 +19,154 @@ export default function StallingPage() {
       <Header />
 
       {/* Hero */}
-      <section className="relative bg-primary-dark text-white py-24 md:py-32 overflow-hidden">
+      <section className="relative bg-primary-dark text-white py-20 sm:py-28 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-dark via-primary/80 to-primary-dark" />
         <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px]" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center">
-            <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-4 block">Caravanstalling</span>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6">
-              Caravanstalling aan de<br /><span className="gradient-text">Costa Brava</span>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-4">Caravanstalling</p>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] mb-6">
+              Veilige stalling aan de <span className="gradient-text">Costa Brava</span>
             </h1>
             <p className="text-white/50 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-              Dé specialist in het veilig en betrouwbaar stallen van uw caravan in Sant Climent de Peralta, Girona. Al meer dan 10 jaar een begrip.
+              Dé specialist in het veilig en betrouwbaar stallen van uw caravan in Sant Climent de Peralta. Securitas Direct bewaking, standaard verzekerd.
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Storage types */}
-      <section className="py-16 sm:py-24">
+      {/* Stalling types */}
+      <section className="py-20 sm:py-28 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <AnimatedSection className="text-center mb-12 sm:mb-16">
-            <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3 block">Stallingstypen</span>
-            <h2 className="text-3xl md:text-4xl font-black text-primary-dark mb-4">Kies uw stallingtype</h2>
-            <p className="text-muted max-w-2xl mx-auto">Binnen- en buitenstalling met professionele beveiliging en zorg</p>
-          </AnimatedSection>
+          <A className="text-center max-w-2xl mx-auto mb-14">
+            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3">Stallingstypen</p>
+            <h2 className="text-3xl sm:text-4xl font-black mb-4">Kies uw stallingtype</h2>
+            <div className="section-divider mt-5" />
+          </A>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {TYPES.map((t, i) => (
-              <AnimatedSection key={t.title} delay={i * 0.15}>
-                <div className="relative bg-white rounded-3xl p-8 md:p-10 border border-gray-100 card-hover h-full">
-                  {t.tag && (
-                    <span className="absolute top-6 right-6 bg-accent/10 text-accent text-[10px] font-bold px-3 py-1 rounded-full">{t.tag}</span>
-                  )}
-                  <div className={`w-16 h-16 bg-gradient-to-br ${t.gradient} rounded-2xl flex items-center justify-center mb-6`}>
-                    <t.icon className="text-primary" size={28} />
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {[
+              {
+                title: 'Buitenstalling', icon: Shield, price: '65',
+                desc: 'Veilige buitenstalling op ons afgesloten en beveiligd terrein. Ideaal voor seizoensstalling van uw caravan, camper of boot.',
+                features: ['Afgesloten terrein', '24/7 camerabewaking', 'Securitas Direct alarm', 'Standaard verzekerd', 'Tweewekelijkse controle', 'Jaarlijkse technische keuring'],
+                tag: 'Populair', gradient: 'bg-emerald-50 text-emerald-600'
+              },
+              {
+                title: 'Binnenstalling (Overdekt)', icon: Thermometer, price: '95',
+                desc: 'Overdekte parkeerplaatsen in geïsoleerde hal voor extra bescherming tegen zon, regen en temperatuurschommelingen.',
+                features: ['Geïsoleerde hal', 'Bescherming tegen weer', 'Geen hitte of koude', 'Alle voordelen buitenstalling', 'Beperkte beschikbaarheid', 'Premium locatie'],
+                tag: 'Premium', gradient: 'bg-blue-50 text-blue-600'
+              },
+            ].map((t, i) => (
+              <A key={t.title} delay={i * 0.12}>
+                <div className="relative bg-white rounded-2xl p-8 sm:p-10 border border-black/[0.06] card-hover h-full">
+                  {t.tag && <span className="absolute top-6 right-6 bg-accent/8 text-accent text-[10px] font-bold px-3 py-1 rounded-full">{t.tag}</span>}
+                  <div className={`w-14 h-14 ${t.gradient} rounded-xl flex items-center justify-center mb-6`}>
+                    <t.icon size={24} />
                   </div>
-                  <h2 className="text-2xl font-black text-primary-dark mb-3">{t.title}</h2>
+                  <h2 className="text-2xl font-black mb-3">{t.title}</h2>
                   <p className="text-muted mb-6 leading-relaxed">{t.desc}</p>
                   <ul className="space-y-2.5 mb-8">
                     {t.features.map(f => (
-                      <li key={f} className="flex items-center gap-2.5 text-sm">
-                        <CheckCircle size={15} className="text-success shrink-0" /> {f}
-                      </li>
+                      <li key={f} className="flex items-center gap-2.5 text-sm"><CheckCircle size={14} className="text-success shrink-0" /> {f}</li>
                     ))}
                   </ul>
                   <div className="flex items-end gap-1 mb-6">
                     <span className="text-sm text-muted">Vanaf</span>
-                    <span className="text-4xl font-black text-primary-dark">€{t.price}</span>
-                    <span className="text-muted text-sm">{t.period}</span>
+                    <span className="text-4xl font-black">€{t.price}</span>
+                    <span className="text-muted text-sm">/maand</span>
                   </div>
-                  <Link href="/stalling" className="w-full bg-gradient-to-r from-accent to-accent-light hover:from-accent-dark hover:to-accent text-white font-bold px-6 py-3.5 rounded-xl text-sm transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-lg shadow-accent/20">
+                  <Link href="/contact" className="w-full bg-accent hover:bg-accent-dark text-white font-bold px-6 py-3.5 rounded-xl text-sm transition-all duration-200 inline-flex items-center justify-center gap-2 shadow-sm">
                     Stalling aanvragen <ArrowRight size={14} />
                   </Link>
                 </div>
-              </AnimatedSection>
+              </A>
             ))}
           </div>
         </div>
       </section>
 
       {/* Security */}
-      <section className="py-16 sm:py-24 bg-surface relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-primary/3 rounded-full blur-3xl" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
-          <AnimatedSection className="text-center mb-12 sm:mb-16">
-            <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3 block">Beveiliging</span>
-            <h2 className="text-3xl md:text-4xl font-black text-primary-dark mb-4">Veiligheid staat voorop</h2>
-            <p className="text-muted max-w-2xl mx-auto">Uw caravan is bij ons in de beste handen met professionele beveiliging</p>
-          </AnimatedSection>
+      <section className="py-20 sm:py-28 bg-surface">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <A className="text-center max-w-2xl mx-auto mb-14">
+            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3">Beveiliging</p>
+            <h2 className="text-3xl sm:text-4xl font-black mb-4">Veiligheid staat voorop</h2>
+            <div className="section-divider mt-5" />
+          </A>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {[
-              { icon: Lock, title: 'Securitas Direct', desc: 'Professioneel alarmsysteem van Securitas Direct met directe alarmopvolging.' },
+              { icon: Lock, title: 'Securitas Direct', desc: 'Professioneel alarmsysteem met directe alarmopvolging bij ongeautoriseerde toegang.' },
               { icon: Camera, title: '24/7 Camerabewaking', desc: 'Geavanceerd camerasysteem met continue registratie van alle bewegingen op het terrein.' },
               { icon: Shield, title: 'Standaard verzekerd', desc: 'Uw caravan is op onze stalling standaard verzekerd tegen schade en diefstal.' },
             ].map((f, i) => (
-              <AnimatedSection key={f.title} delay={i * 0.1}>
-                <div className="bg-white rounded-2xl p-8 text-center border border-gray-100 card-hover h-full">
-                  <div className="w-16 h-16 bg-primary/5 rounded-2xl flex items-center justify-center mx-auto mb-5">
-                    <f.icon className="text-primary" size={28} />
+              <A key={f.title} delay={i * 0.1}>
+                <div className="bg-white rounded-2xl p-7 text-center border border-black/[0.04] card-hover h-full">
+                  <div className="w-14 h-14 bg-primary-dark/[0.04] rounded-xl flex items-center justify-center mx-auto mb-5">
+                    <f.icon className="text-primary" size={24} />
                   </div>
-                  <h3 className="font-bold text-lg mb-3 text-primary-dark">{f.title}</h3>
+                  <h3 className="font-bold text-[17px] mb-2">{f.title}</h3>
                   <p className="text-sm text-muted leading-relaxed">{f.desc}</p>
                 </div>
-              </AnimatedSection>
+              </A>
             ))}
           </div>
         </div>
       </section>
 
       {/* Spot System */}
-      <section className="py-16 sm:py-24 bg-white">
+      <section className="py-20 sm:py-28 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <AnimatedSection>
+          <A>
             <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <div>
-                <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3 block">Organisatie</span>
-                <h2 className="text-3xl md:text-4xl font-black text-primary-dark mb-6">Pleknummersysteem</h2>
-                <p className="text-muted mb-6 leading-relaxed">
-                  Elke caravan krijgt een eigen, vaste plek toegewezen met een uniek pleknummer. Zo weet u altijd precies waar uw caravan staat
-                  en kunnen wij efficiënt werk plannen.
-                </p>
-                <p className="text-muted mb-8 leading-relaxed">
-                  In uw klantportaal kunt u uw pleknummer, contractstatus en inspecties altijd inzien.
-                </p>
-                <div className="space-y-3">
+              <div className="text-center lg:text-left">
+                <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3">Organisatie</p>
+                <h2 className="text-3xl sm:text-4xl font-black mb-6">Pleknummersysteem</h2>
+                <div className="section-divider mt-0 mb-6 mx-auto lg:mx-0" />
+                <p className="text-muted mb-6 leading-relaxed">Elke caravan krijgt een eigen, vaste plek met een uniek pleknummer. Zo weet u altijd precies waar uw caravan staat en plannen wij efficiënt werk.</p>
+                <p className="text-muted mb-8 leading-relaxed">In uw klantportaal kunt u uw pleknummer, contractstatus en inspecties altijd online inzien.</p>
+                <div className="space-y-3 text-left max-w-sm mx-auto lg:mx-0">
                   {['Zones A-D: Buitenstalling', 'Zone H: Binnenstalling (overdekt)', 'Zone S: Seizoensstalling'].map(z => (
-                    <div key={z} className="flex items-center gap-3 text-sm">
-                      <CheckCircle size={15} className="text-success shrink-0" />
-                      <span className="text-gray-700 font-medium">{z}</span>
-                    </div>
+                    <div key={z} className="flex items-center gap-3 text-sm"><CheckCircle size={14} className="text-success shrink-0" /><span className="font-medium">{z}</span></div>
                   ))}
                 </div>
               </div>
-              <div className="bg-surface rounded-3xl p-8 border border-gray-100">
+              <div className="bg-surface rounded-2xl p-6 sm:p-8 border border-black/[0.04]">
                 <div className="grid grid-cols-4 gap-2">
                   {['A-001','A-002','A-003','A-004','A-005','A-006','A-007','A-008','B-001','B-002','B-003','B-004','H-001','H-002','H-003','H-004'].map((spot, i) => {
-                    const colors = ['bg-emerald-100 text-emerald-700', 'bg-blue-100 text-blue-700', 'bg-amber-100 text-amber-700'];
-                    const color = i < 8 ? (i % 3 === 0 ? colors[0] : i % 3 === 1 ? colors[1] : colors[2]) : i < 12 ? colors[0] : colors[1];
-                    return (
-                      <div key={spot} className={`${color} rounded-xl p-3 text-center text-xs font-bold`}>
-                        {spot}
-                      </div>
-                    );
+                    const c = i < 8 ? (i % 3 === 0 ? 'bg-emerald-100 text-emerald-700' : i % 3 === 1 ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700') : i < 12 ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700';
+                    return <div key={spot} className={`${c} rounded-xl p-3 text-center text-xs font-bold`}>{spot}</div>;
                   })}
                 </div>
-                <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-gray-100">
-                  <span className="flex items-center gap-1.5 text-[10px] font-medium text-gray-500"><span className="w-2.5 h-2.5 bg-emerald-400 rounded-full" /> Vrij</span>
-                  <span className="flex items-center gap-1.5 text-[10px] font-medium text-gray-500"><span className="w-2.5 h-2.5 bg-blue-400 rounded-full" /> Bezet</span>
-                  <span className="flex items-center gap-1.5 text-[10px] font-medium text-gray-500"><span className="w-2.5 h-2.5 bg-amber-400 rounded-full" /> Gereserveerd</span>
+                <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-black/[0.04]">
+                  <span className="flex items-center gap-1.5 text-[10px] font-medium text-muted"><span className="w-2.5 h-2.5 bg-emerald-400 rounded-full" /> Vrij</span>
+                  <span className="flex items-center gap-1.5 text-[10px] font-medium text-muted"><span className="w-2.5 h-2.5 bg-blue-400 rounded-full" /> Bezet</span>
+                  <span className="flex items-center gap-1.5 text-[10px] font-medium text-muted"><span className="w-2.5 h-2.5 bg-amber-400 rounded-full" /> Gereserveerd</span>
                 </div>
               </div>
             </div>
-          </AnimatedSection>
+          </A>
         </div>
       </section>
 
-      {/* Also rental */}
-      <section className="py-16 bg-gradient-to-r from-primary via-primary-light to-primary relative overflow-hidden">
+      {/* CTA */}
+      <section className="bg-primary-dark relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8">
-            <div className="flex items-start sm:items-center gap-4 sm:gap-6">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-accent/20 rounded-2xl flex items-center justify-center animate-pulse-glow shrink-0">
-                <Sparkles className="text-accent" size={28} />
-              </div>
-              <div>
-                <h3 className="text-white text-xl sm:text-2xl md:text-3xl font-black mb-1">Ook aan caravanverhuur!</h3>
-                <p className="text-white/50 max-w-lg">Wist u dat wij ook caravans verhuren? Perfect voor een vakantie aan de Costa Brava.</p>
-              </div>
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
+          <A>
+            <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">Wilt u uw caravan bij ons stallen?</h2>
+            <p className="text-white/40 mb-8">Neem contact op voor meer informatie of vraag direct een plek aan.</p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link href="/contact" className="bg-accent hover:bg-accent-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm">
+                Stalling aanvragen <ArrowRight size={15} />
+              </Link>
+              <a href="tel:+34650036755" className="text-white/60 hover:text-white font-medium px-6 py-3.5 rounded-xl text-sm transition-colors inline-flex items-center gap-2 border border-white/10 hover:border-white/20">
+                <Phone size={15} /> +34 650 036 755
+              </a>
             </div>
-            <Link href="/contact" className="shrink-0 bg-accent hover:bg-accent-light text-white font-bold px-8 py-4 rounded-2xl text-sm transition-all duration-300 shadow-lg shadow-accent/20 inline-flex items-center gap-2">
-              Informeer naar verhuur <ArrowRight size={16} />
-            </Link>
-          </div>
+          </A>
         </div>
       </section>
 

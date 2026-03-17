@@ -3,59 +3,90 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
-import { CheckCircle, ArrowRight, Star, Sparkles, HelpCircle } from 'lucide-react';
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { CheckCircle, ArrowRight, Phone, Shield, HelpCircle, ChevronDown, Sparkles } from 'lucide-react';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { useRef, useState } from 'react';
 
-function AnimatedSection({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+function A({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-80px' });
+  const v = useInView(ref, { once: true, margin: '-60px' });
+  return <motion.div ref={ref} initial={{ opacity: 0, y: 32 }} animate={v ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6, delay, ease: [0.25, 0.4, 0.25, 1] }} className={className}>{children}</motion.div>;
+}
+
+function FaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
   return (
-    <motion.div ref={ref} initial={{ opacity: 0, y: 40 }} animate={isInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7, delay, ease: [0.25, 0.4, 0.25, 1] }} className={className}>
-      {children}
-    </motion.div>
+    <div className="border-b border-black/[0.06] last:border-0">
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between py-5 text-left group">
+        <span className="font-bold text-sm pr-6">{q}</span>
+        <ChevronDown size={18} className={`text-muted shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
+            <p className="text-sm text-muted leading-relaxed pb-5">{a}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
-const PLANS = [
+const plans = [
   {
-    name: 'Buitenstalling',
+    title: 'Buitenstalling',
     price: '65',
     period: '/maand',
-    desc: 'Veilige buitenstalling op beveiligd terrein',
-    features: ['Afgesloten terrein', '24/7 bewaking', 'Standaard verzekerd', 'Tweewekelijkse controle', 'Jaarlijkse technische keuring', 'Gratis plaatsen op terrein'],
-    popular: false,
-    color: 'border-gray-200',
+    desc: 'Veilige buitenstalling op ons afgesloten, beveiligde terrein.',
+    features: ['Eigen pleknummer', '24/7 camerabewaking', 'Securitas Direct alarm', 'Standaard verzekerd', 'Tweewekelijkse controle', 'Jaarlijkse technische keuring'],
+    popular: true,
+    color: 'bg-emerald-50 text-emerald-600',
+    cta: 'Stalling aanvragen',
   },
   {
-    name: 'Binnenstalling',
+    title: 'Binnenstalling',
     price: '95',
     period: '/maand',
-    desc: 'Overdekte stalling met maximale bescherming',
-    features: ['Alle voordelen buitenstalling', 'Geïsoleerde hal', 'Bescherming tegen zon & regen', 'Geen temperatuurschommelingen', 'Premium locatie', 'Beperkt beschikbaar'],
-    popular: true,
-    color: 'border-accent',
+    desc: 'Overdekte, geïsoleerde hal voor maximale bescherming.',
+    features: ['Alles van buitenstalling', 'Geïsoleerde hal', 'Bescherming tegen weer', 'Geen UV-schade', 'Stabiele temperatuur', 'Beperkt beschikbaar'],
+    popular: false,
+    color: 'bg-blue-50 text-blue-600',
+    cta: 'Beschikbaarheid checken',
   },
   {
-    name: 'Seizoensstalling',
+    title: 'Seizoensstalling',
     price: '45',
     period: '/maand',
-    desc: 'Tijdelijke stalling buiten het seizoen (okt-apr)',
-    features: ['Buitenstalling', 'Beveiligd terrein', 'Camerabewaking', 'Minimaal 6 maanden', 'Flexibele start/einddatum', 'Upgrade naar jaarstalling mogelijk'],
+    desc: 'Voordelig tarief bij stalling alleen buiten het seizoen (okt-apr).',
+    features: ['Eigen pleknummer', '24/7 camerabewaking', 'Securitas Direct alarm', 'Standaard verzekerd', 'Controle tijdens stalling', 'Okt t/m april'],
     popular: false,
-    color: 'border-gray-200',
+    color: 'bg-amber-50 text-amber-600',
+    cta: 'Meer informatie',
   },
 ];
 
-const EXTRAS = [
-  { name: 'Transport (binnen 30km)', price: 'Vanaf €75' },
-  { name: 'Transport (30-60km)', price: 'Vanaf €125' },
-  { name: 'Jaarlijks onderhoud pakket', price: '€149/jaar' },
-  { name: 'Exterieur wassen & waxen', price: 'Vanaf €89' },
-  { name: 'Interieur dieptereiniging', price: 'Vanaf €129' },
-  { name: 'Bandenwissel (4 banden)', price: 'Vanaf €49' },
-  { name: 'Voortent op-/afbouw', price: 'Vanaf €59' },
-  { name: 'Accu laden & onderhoud', price: '€25' },
+const extras = [
+  { service: 'Jaarlijkse technische keuring', price: 'Inbegrepen' },
+  { service: 'Tweewekelijkse controle', price: 'Inbegrepen' },
+  { service: 'Basiswas exterieur', price: '€ 75' },
+  { service: 'Complete schoonmaak (ext. + int.)', price: '€ 150' },
+  { service: 'Polishbehandeling', price: '€ 195' },
+  { service: 'Anti-mos & alg behandeling', price: '€ 95' },
+  { service: 'Dakbehandeling', price: '€ 85' },
+  { service: 'Seizoensklaar pakket', price: '€ 245' },
+  { service: 'Transport NL ↔ Spanje', price: 'Op aanvraag' },
+  { service: 'Koelkast verhuur (seizoen)', price: '€ 120' },
+  { service: 'Elektrische fiets verhuur (week)', price: '€ 65' },
+  { service: 'Mobiele airco verhuur (week)', price: '€ 85' },
+];
+
+const faqs = [
+  { q: 'Wat is inbegrepen bij de stallingsprijs?', a: 'Bij alle stallingstypen is inbegrepen: eigen pleknummer, 24/7 camerabewaking, Securitas Direct alarmsysteem, standaardverzekering, tweewekelijkse controle en een jaarlijkse technische keuring.' },
+  { q: 'Kan ik mijn caravan het hele jaar door ophalen?', a: 'Ja, tijdens onze openingstijden (ma-vr 09:30-16:30) kunt u uw caravan ophalen. Wij bereiden uw caravan voor zodat deze rijklaar staat op de afgesproken datum.' },
+  { q: 'Hoe werkt de verzekering?', a: 'Alle gestalde caravans zijn standaard verzekerd via onze collectieve polis. Deze dekt schade en diefstal op ons terrein. Voor uitgebreidere dekking kunt u informeren naar aanvullende opties.' },
+  { q: 'Zijn er langetermijnkortingen?', a: 'Ja, bij een jaarcontract bieden wij een aantrekkelijk tarief. Neem contact op voor een persoonlijke offerte.' },
+  { q: 'Kan ik ook een camper of boot stallen?', a: 'Ja, wij stallen naast caravans ook campers, vouwwagens en boten. De tarieven zijn afhankelijk van de afmetingen. Neem contact op voor een offerte.' },
+  { q: 'Hoe regel ik transport van Nederland naar Spanje?', a: 'Wij beschikken over 7 eigen transporteenheden en verzorgen het transport door heel Europa. Neem contact op voor een transportofferte.' },
 ];
 
 export default function TarievenPage() {
@@ -64,105 +95,130 @@ export default function TarievenPage() {
       <Header />
 
       {/* Hero */}
-      <section className="relative bg-primary-dark text-white py-24 md:py-32 overflow-hidden">
+      <section className="relative bg-primary-dark text-white py-20 sm:py-28 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-dark via-primary/80 to-primary-dark" />
         <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px]" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center">
-            <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-4 block">Tarieven</span>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6">
-              Onze <span className="gradient-text">Tarieven</span>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-4">Tarieven</p>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] mb-6">
+              Transparante <span className="gradient-text">tarieven</span>
             </h1>
-            <p className="text-white/50 max-w-2xl mx-auto text-lg leading-relaxed">
-              Transparante prijzen zonder verrassingen. Alle prijzen zijn exclusief 21% IVA.
+            <p className="text-white/50 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
+              Geen verborgen kosten. Bewaking, verzekering en inspecties inbegrepen bij elk stallingstype.
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Plans */}
-      <section className="py-16 sm:py-24">
+      {/* Pricing Cards */}
+      <section className="py-20 sm:py-28 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <AnimatedSection className="text-center mb-12 sm:mb-16">
-            <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3 block">Stallingsopties</span>
-            <h2 className="text-3xl md:text-4xl font-black text-primary-dark mb-4">Kies uw stallingstype</h2>
-            <p className="text-muted max-w-2xl mx-auto">Transparante maandtarieven, inclusief beveiliging en verzekering</p>
-          </AnimatedSection>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-6">
-            {PLANS.map((p, i) => (
-              <AnimatedSection key={p.name} delay={i * 0.1}>
-                <div className={`relative bg-white rounded-3xl p-8 border-2 ${p.color} card-hover h-full flex flex-col ${p.popular ? 'shadow-xl shadow-accent/10 scale-[1.02] ring-1 ring-accent/20' : ''}`}>
-                  {p.popular && (
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-accent to-accent-light text-primary-dark text-[10px] font-black px-5 py-1.5 rounded-full shadow-lg shadow-accent/20 flex items-center gap-1">
-                      <Star size={10} fill="currentColor" /> POPULAIR
-                    </div>
-                  )}
-                  <h3 className="text-xl font-black text-primary-dark">{p.name}</h3>
-                  <p className="text-sm text-muted mt-1 mb-6">{p.desc}</p>
-                  <div className="mb-8">
-                    <span className="text-5xl font-black text-primary-dark">€{p.price}</span>
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {plans.map((p, i) => (
+              <A key={p.title} delay={i * 0.1}>
+                <div className={`relative bg-white rounded-2xl p-7 sm:p-8 border h-full flex flex-col ${p.popular ? 'border-accent/30 ring-1 ring-accent/10 shadow-lg' : 'border-black/[0.06]'}`}>
+                  {p.popular && <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-accent text-white text-[10px] font-bold px-4 py-1.5 rounded-full shadow-sm uppercase tracking-wider">Populair</span>}
+                  <div className={`w-12 h-12 ${p.color} rounded-xl flex items-center justify-center mb-5`}>
+                    <Shield size={20} />
+                  </div>
+                  <h3 className="text-xl font-black mb-1">{p.title}</h3>
+                  <p className="text-xs text-muted leading-relaxed mb-5">{p.desc}</p>
+                  <div className="flex items-end gap-1 mb-6">
+                    <span className="text-sm text-muted">Vanaf</span>
+                    <span className="text-4xl font-black">€{p.price}</span>
                     <span className="text-muted text-sm">{p.period}</span>
                   </div>
                   <ul className="space-y-2.5 mb-8 flex-1">
                     {p.features.map(f => (
-                      <li key={f} className="flex items-center gap-2.5 text-sm">
-                        <CheckCircle size={14} className="text-success shrink-0" /> {f}
-                      </li>
+                      <li key={f} className="flex items-center gap-2.5 text-sm"><CheckCircle size={14} className="text-success shrink-0" /> {f}</li>
                     ))}
                   </ul>
-                  <Link
-                    href="/contact"
-                    className={`block text-center font-bold px-6 py-4 rounded-xl text-sm transition-all duration-300 ${
-                      p.popular
-                        ? 'bg-gradient-to-r from-accent to-accent-light hover:from-accent-light hover:to-accent text-white shadow-lg shadow-accent/20'
-                        : 'bg-primary hover:bg-primary-light text-white'
-                    }`}
-                  >
-                    Stalling aanvragen <ArrowRight size={14} className="inline ml-1" />
+                  <Link href="/contact" className={`w-full font-bold px-6 py-3.5 rounded-xl text-sm transition-all inline-flex items-center justify-center gap-2 ${p.popular ? 'bg-accent hover:bg-accent-dark text-white shadow-sm' : 'bg-primary-dark/[0.04] hover:bg-primary-dark/[0.08] text-primary-dark'}`}>
+                    {p.cta} <ArrowRight size={14} />
                   </Link>
                 </div>
-              </AnimatedSection>
+              </A>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Extra services */}
-      <section className="py-24 bg-surface">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <AnimatedSection className="text-center mb-10 sm:mb-12">
-            <span className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3 block">Aanvullend</span>
-            <h2 className="text-3xl md:text-4xl font-black text-primary-dark mb-4">Extra diensten</h2>
-            <p className="text-muted">Aanvullende services die u kunt bijboeken</p>
-          </AnimatedSection>
+      {/* Extra Services */}
+      <section className="py-20 sm:py-28 bg-surface">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <A className="text-center max-w-2xl mx-auto mb-14">
+            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3">Extra diensten</p>
+            <h2 className="text-3xl sm:text-4xl font-black mb-4">Aanvullende services</h2>
+            <div className="section-divider mt-5" />
+          </A>
 
-          <AnimatedSection delay={0.2}>
-            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 divide-y divide-gray-50 overflow-hidden">
-              {EXTRAS.map(e => (
-                <div key={e.name} className="flex items-center justify-between px-7 py-4.5 hover:bg-surface/50 transition-colors">
-                  <span className="text-sm font-semibold text-gray-700">{e.name}</span>
-                  <span className="text-sm font-black text-primary-dark">{e.price}</span>
+          <A>
+            <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-black/[0.06] overflow-hidden">
+              {extras.map((e, i) => (
+                <div key={e.service} className={`flex items-center justify-between px-6 py-4 text-sm ${i !== extras.length - 1 ? 'border-b border-black/[0.04]' : ''}`}>
+                  <span className="font-medium">{e.service}</span>
+                  <span className={`font-bold shrink-0 ml-4 ${e.price === 'Inbegrepen' ? 'text-success' : e.price === 'Op aanvraag' ? 'text-accent' : ''}`}>{e.price}</span>
                 </div>
               ))}
             </div>
-            <p className="text-center text-xs text-muted mt-5">Alle prijzen zijn exclusief 21% IVA (Spaans BTW). Maatwerk tarieven op aanvraag.</p>
-          </AnimatedSection>
+          </A>
         </div>
       </section>
 
-      {/* FAQ hint / CTA */}
-      <section className="py-16 bg-primary-dark text-white relative overflow-hidden">
+      {/* CaravanRepair */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <A>
+            <div className="bg-surface rounded-2xl p-8 sm:p-10 border border-black/[0.04] flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+              <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center shrink-0">
+                <Sparkles className="text-accent" size={28} />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-black text-lg mb-1">CaravanRepair® Masterdealer</h3>
+                <p className="text-sm text-muted leading-relaxed">Wand-, hagel- en vochtschade? Als officieel Masterdealer bieden wij het gepatenteerde CaravanRepair® herstelsysteem met levenslange garantie.</p>
+              </div>
+              <Link href="/diensten#caravanrepair" className="bg-accent hover:bg-accent-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shrink-0 shadow-sm">
+                Meer info <ArrowRight size={14} />
+              </Link>
+            </div>
+          </A>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-20 sm:py-28 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <A className="text-center max-w-2xl mx-auto mb-14">
+            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3">Veelgestelde vragen</p>
+            <h2 className="text-3xl sm:text-4xl font-black mb-4">Heeft u vragen?</h2>
+            <div className="section-divider mt-5" />
+          </A>
+
+          <A>
+            <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-black/[0.06] px-6 sm:px-8">
+              {faqs.map(f => <FaqItem key={f.q} q={f.q} a={f.a} />)}
+            </div>
+          </A>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="bg-primary-dark relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center relative">
-          <AnimatedSection>
-            <HelpCircle size={24} className="text-accent mx-auto mb-4" />
-            <h2 className="text-2xl sm:text-3xl font-black mb-4">Vragen over onze tarieven?</h2>
-            <p className="text-white/50 mb-8">Neem gerust contact met ons op. Wij maken graag een offerte op maat voor uw situatie.</p>
-            <Link href="/stalling" className="bg-gradient-to-r from-accent to-accent-light hover:from-accent-light hover:to-accent text-white font-bold px-8 py-4 rounded-2xl text-sm transition-all duration-300 shadow-lg shadow-accent/20 inline-flex items-center gap-2">
-              Contact opnemen <ArrowRight size={16} />
-            </Link>
-          </AnimatedSection>
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
+          <A>
+            <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">Klaar om uw caravan te stallen?</h2>
+            <p className="text-white/40 mb-8">Vraag vrijblijvend een offerte aan of bel voor direct advies.</p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link href="/contact" className="bg-accent hover:bg-accent-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm">
+                Offerte aanvragen <ArrowRight size={15} />
+              </Link>
+              <a href="tel:+34650036755" className="text-white/60 hover:text-white font-medium px-6 py-3.5 rounded-xl text-sm transition-colors inline-flex items-center gap-2 border border-white/10 hover:border-white/20">
+                <Phone size={15} /> +34 650 036 755
+              </a>
+            </div>
+          </A>
         </div>
       </section>
 
