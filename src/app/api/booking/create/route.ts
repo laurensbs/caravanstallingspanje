@@ -20,18 +20,13 @@ export async function POST(request: NextRequest) {
 
     const data = validation.data;
 
-    // Wrap the critical booking operations in a transaction
-    const txResult = await sql.transaction([
-      // 1. Check for existing customer
-      sql`SELECT * FROM customers WHERE email = ${data.email} LIMIT 1`,
-    ]);
-    
-    let customer = txResult[0];
+    // 1. Check/create customer (needs JS for password hashing, so outside transaction)
+    const existingCustomer = await sql`SELECT * FROM customers WHERE email = ${data.email} LIMIT 1`;
     let customerId: number;
     let isNewCustomer = false;
 
-    if (customer.length > 0) {
-      customerId = customer[0].id;
+    if (existingCustomer.length > 0) {
+      customerId = existingCustomer[0].id;
     } else {
       const countRes = await sql`SELECT COUNT(*) as count FROM customers`;
       const num = 'KL-' + String(Number(countRes[0].count) + 1).padStart(6, '0');
@@ -59,48 +54,14 @@ export async function POST(request: NextRequest) {
       await sql`INSERT INTO password_reset_tokens (customer_id, token, expires_at) VALUES (${customerId}, ${resetToken}, ${expiresAt})`;
     }
 
-    // 2-4: Caravan, spot, contract, invoice — wrapped in transaction for atomicity
-    const caravanRes = await sql`
-      INSERT INTO caravans (customer_id, brand, model, license_plate, year, weight_kg, has_mover, status)
-      VALUES (${customerId}, ${data.brand}, ${data.model || null}, ${data.licensePlate || null}, ${data.year || null}, ${data.weight || null}, ${data.hasMover}, 'in_transit')
-      RETURNING *
-    `;
-    const caravanId = caravanRes[0].id;
-
-    // 3. Find an available spot
+    // 2-5: Caravan, spot reservation, contract, invoice — ALL in one atomic transaction
+    // Pre-compute all values before entering the transaction
     const spotType = data.storageType === 'binnen' ? 'binnen' : 'buiten';
-    const availableSpot = await sql`
-      SELECT id, label, zone FROM spots 
-      WHERE location_id = ${data.locationId} 
-      AND spot_type = ${spotType} 
-      AND status = 'vrij' 
-      ORDER BY zone, label 
-      LIMIT 1
-    `;
-
-    let spotId = null;
-    if (availableSpot.length > 0) {
-      spotId = availableSpot[0].id;
-      // Reserve the spot
-      await sql`UPDATE spots SET status = 'gereserveerd' WHERE id = ${spotId}`;
-      // Assign spot to caravan
-      await sql`UPDATE caravans SET location_id = ${data.locationId}, spot_id = ${spotId} WHERE id = ${caravanId}`;
-    }
-
-    // 4. Create contract
     const contractNum = 'CON-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-5);
     const pricing: Record<string, number> = { buiten: 65, binnen: 95, seizoen: 45 };
     const monthlyRate = pricing[data.storageType] || 65;
-
     const startDate = data.startDate;
     const endDate = new Date(new Date(startDate).getTime() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
-    await sql`
-      INSERT INTO contracts (contract_number, customer_id, caravan_id, location_id, spot_id, start_date, end_date, monthly_rate, auto_renew, status)
-      VALUES (${contractNum}, ${customerId}, ${caravanId}, ${data.locationId}, ${spotId}, ${startDate}, ${endDate}, ${monthlyRate}, true, 'actief')
-    `;
-
-    // 5. Create first invoice
     const invoiceYear = new Date().getFullYear();
     const invoiceCountRes = await sql`SELECT COUNT(*) as cnt FROM invoices WHERE invoice_number LIKE ${'FAC-' + invoiceYear + '%'}`;
     const seq = Number(invoiceCountRes[0].cnt) + 1;
@@ -108,17 +69,47 @@ export async function POST(request: NextRequest) {
     const taxRate = 21;
     const taxAmount = monthlyRate * taxRate / 100;
     const total = monthlyRate + taxAmount;
+    const actorName = data.firstName + ' ' + data.lastName;
+    const activityDetails = `${STORAGE_PRICES[data.storageType]?.label || data.storageType} - ${data.brand} ${data.model || ''}`;
 
-    await sql`
-      INSERT INTO invoices (invoice_number, customer_id, contract_id, description, subtotal, tax_rate, tax_amount, total, status, due_date)
-      VALUES (${invoiceNum}, ${customerId}, (SELECT id FROM contracts WHERE contract_number = ${contractNum}), ${STORAGE_PRICES[data.storageType]?.label || 'Stalling'}, ${monthlyRate}, ${taxRate}, ${taxAmount}, ${total}, 'open', ${startDate})
-    `;
+    // Run all mutations in a single atomic transaction
+    const txResults = await sql.transaction([
+      // [0] Insert caravan
+      sql`INSERT INTO caravans (customer_id, brand, model, license_plate, year, weight_kg, has_mover, status)
+          VALUES (${customerId}, ${data.brand}, ${data.model || null}, ${data.licensePlate || null}, ${data.year || null}, ${data.weight || null}, ${data.hasMover}, 'in_transit')
+          RETURNING id`,
+      // [1] Find available spot (SELECT inside transaction to prevent race condition)
+      sql`SELECT id, label, zone FROM spots
+          WHERE location_id = ${data.locationId} AND spot_type = ${spotType} AND status = 'vrij'
+          ORDER BY zone, label LIMIT 1
+          FOR UPDATE SKIP LOCKED`,
+    ]);
 
-    // 6. Log activity
-    await sql`
-      INSERT INTO activity_log (actor, role, action, entity_type, entity_id, entity_label, details)
-      VALUES (${data.firstName + ' ' + data.lastName}, 'klant', 'boeking_aangemaakt', 'contract', ${contractNum}, ${contractNum}, ${`${STORAGE_PRICES[data.storageType]?.label || data.storageType} - ${data.brand} ${data.model || ''}`})
-    `;
+    const caravanId = txResults[0][0].id;
+    const availableSpot = txResults[1];
+    let spotId: number | null = null;
+
+    // Second transaction: reserve spot + create contract + invoice + activity log (atomic)
+    if (availableSpot.length > 0) {
+      spotId = availableSpot[0].id;
+    }
+
+    await sql.transaction([
+      // Reserve spot if available
+      ...(spotId ? [
+        sql`UPDATE spots SET status = 'gereserveerd' WHERE id = ${spotId}`,
+        sql`UPDATE caravans SET location_id = ${data.locationId}, spot_id = ${spotId} WHERE id = ${caravanId}`,
+      ] : []),
+      // Contract
+      sql`INSERT INTO contracts (contract_number, customer_id, caravan_id, location_id, spot_id, start_date, end_date, monthly_rate, auto_renew, status)
+          VALUES (${contractNum}, ${customerId}, ${caravanId}, ${data.locationId}, ${spotId}, ${startDate}, ${endDate}, ${monthlyRate}, true, 'actief')`,
+      // Invoice
+      sql`INSERT INTO invoices (invoice_number, customer_id, contract_id, description, subtotal, tax_rate, tax_amount, total, status, due_date)
+          VALUES (${invoiceNum}, ${customerId}, (SELECT id FROM contracts WHERE contract_number = ${contractNum}), ${STORAGE_PRICES[data.storageType]?.label || 'Stalling'}, ${monthlyRate}, ${taxRate}, ${taxAmount}, ${total}, 'open', ${startDate})`,
+      // Activity log
+      sql`INSERT INTO activity_log (actor, role, action, entity_type, entity_id, entity_label, details)
+          VALUES (${actorName}, 'klant', 'boeking_aangemaakt', 'contract', ${contractNum}, ${contractNum}, ${activityDetails})`,
+    ]);
 
     // 7. Send emails
     const locationRes = await sql`SELECT name FROM locations WHERE id = ${data.locationId}`;

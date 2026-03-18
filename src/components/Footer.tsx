@@ -177,14 +177,31 @@ export default function Footer() {
             </div>
             {newsletterStatus === 'success' ? (
               <p className="text-accent-light font-bold text-sm">✓ Ingeschreven!</p>
+            ) : newsletterStatus === 'error' ? (
+              <div className="text-center sm:text-left">
+                <p className="text-red-400 font-bold text-sm mb-1">Inschrijving mislukt</p>
+                <button onClick={() => setNewsletterStatus('idle')} className="text-white/50 text-xs underline hover:text-white/70 transition-colors">Probeer opnieuw</button>
+              </div>
             ) : (
               <form
-                onSubmit={(e: FormEvent) => {
+                onSubmit={async (e: FormEvent) => {
                   e.preventDefault();
                   if (!newsletterEmail) return;
                   setNewsletterStatus('loading');
-                  // Store newsletter subscription (could be expanded with a proper email service)
-                  setTimeout(() => setNewsletterStatus('success'), 500);
+                  try {
+                    const res = await fetch('/api/newsletter/subscribe', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ email: newsletterEmail }),
+                    });
+                    if (res.ok) {
+                      setNewsletterStatus('success');
+                    } else {
+                      setNewsletterStatus('error');
+                    }
+                  } catch {
+                    setNewsletterStatus('error');
+                  }
                 }}
                 className="flex gap-2 w-full sm:w-auto"
               >

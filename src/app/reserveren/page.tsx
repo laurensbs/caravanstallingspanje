@@ -259,10 +259,10 @@ function BookingPageInner() {
 
                   <div className="grid sm:grid-cols-3 gap-4 bg-surface rounded-2xl p-6 border border-black/[0.04]">
                     <div>
-                      <label className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Lengte caravan</label>
+                      <label htmlFor="caravanLength" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Lengte caravan *</label>
                       <div className="relative">
                         <Ruler size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/40" />
-                        <select value={form.caravanLength} onChange={e => update("caravanLength", e.target.value)} required className="w-full pl-10 pr-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none appearance-none">
+                        <select id="caravanLength" value={form.caravanLength} onChange={e => update("caravanLength", e.target.value)} required aria-required="true" className="w-full pl-10 pr-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none appearance-none">
                           <option value="">Selecteer...</option>
                           <option value="< 5m">&lt; 5 meter</option>
                           <option value="5-6m">5 - 6 meter</option>
@@ -273,17 +273,17 @@ function BookingPageInner() {
                       </div>
                     </div>
                     <div>
-                      <label className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Startdatum</label>
+                      <label htmlFor="startDate" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Startdatum *</label>
                       <div className="relative">
                         <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/40" />
-                        <input type="date" value={form.startDate} onChange={e => update("startDate", e.target.value)} required className="w-full pl-10 pr-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="startDate" type="date" value={form.startDate} onChange={e => update("startDate", e.target.value)} required aria-required="true" className="w-full pl-10 pr-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                     </div>
                     <div>
-                      <label className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Locatie</label>
+                      <label htmlFor="locationId" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Locatie *</label>
                       <div className="relative">
                         <MapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/40" />
-                        <select value={form.locationId} onChange={e => update("locationId", e.target.value)} className="w-full pl-10 pr-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none appearance-none">
+                        <select id="locationId" value={form.locationId} onChange={e => update("locationId", e.target.value)} aria-required="true" className="w-full pl-10 pr-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none appearance-none">
                           <option value={1}>Sant Climent de Peralta</option>
                           <option value={2}>Pals</option>
                           <option value={3}>Blanes</option>
@@ -322,26 +322,26 @@ function BookingPageInner() {
                   <div className="bg-surface rounded-2xl p-6 border border-black/[0.04] space-y-4">
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Merk *</label>
-                        <input value={form.brand} onChange={e => update("brand", e.target.value)} placeholder="bijv. Hobby, Fendt, Knaus..." className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <label htmlFor="brand" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Merk *</label>
+                        <input id="brand" value={form.brand} onChange={e => update("brand", e.target.value)} aria-required="true" placeholder="bijv. Hobby, Fendt, Knaus..." className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                       <div>
-                        <label className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Model</label>
-                        <input value={form.model} onChange={e => update("model", e.target.value)} placeholder="bijv. De Luxe 490 KMF" className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <label htmlFor="model" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Model</label>
+                        <input id="model" value={form.model} onChange={e => update("model", e.target.value)} placeholder="bijv. De Luxe 490 KMF" className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                     </div>
                     <div className="grid sm:grid-cols-3 gap-4">
                       <div>
-                        <label className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Kenteken</label>
-                        <input value={form.licensePlate} onChange={e => update("licensePlate", e.target.value)} placeholder="XX-YYY-Z" className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <label htmlFor="licensePlate" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Kenteken</label>
+                        <input id="licensePlate" value={form.licensePlate} onChange={e => update("licensePlate", e.target.value)} placeholder="XX-YYY-Z" className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                       <div>
-                        <label className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Bouwjaar</label>
-                        <input type="number" value={form.year} onChange={e => update("year", e.target.value)} placeholder="2020" className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <label htmlFor="year" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Bouwjaar</label>
+                        <input id="year" type="number" value={form.year} onChange={e => update("year", e.target.value)} placeholder="2020" className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                       <div>
-                        <label className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Gewicht (kg)</label>
-                        <input type="number" value={form.weight} onChange={e => update("weight", e.target.value)} placeholder="1500" className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <label htmlFor="weight" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Gewicht (kg)</label>
+                        <input id="weight" type="number" value={form.weight} onChange={e => update("weight", e.target.value)} placeholder="1500" className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                     </div>
                     <label className="flex items-center gap-3 p-3 bg-surface rounded-xl cursor-pointer">
@@ -363,22 +363,22 @@ function BookingPageInner() {
                   <div className="bg-surface rounded-2xl p-6 border border-black/[0.04] space-y-4">
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Voornaam *</label>
-                        <input value={form.firstName} onChange={e => update("firstName", e.target.value)} className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <label htmlFor="firstName" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Voornaam *</label>
+                        <input id="firstName" value={form.firstName} onChange={e => update("firstName", e.target.value)} aria-required="true" className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                       <div>
-                        <label className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Achternaam *</label>
-                        <input value={form.lastName} onChange={e => update("lastName", e.target.value)} className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <label htmlFor="lastName" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Achternaam *</label>
+                        <input id="lastName" value={form.lastName} onChange={e => update("lastName", e.target.value)} aria-required="true" className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                     </div>
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">E-mailadres *</label>
-                        <input type="email" value={form.email} onChange={e => update("email", e.target.value)} className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <label htmlFor="bookingEmail" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">E-mailadres *</label>
+                        <input id="bookingEmail" type="email" value={form.email} onChange={e => update("email", e.target.value)} aria-required="true" className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                       <div>
-                        <label className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Telefoonnummer *</label>
-                        <input type="tel" value={form.phone} onChange={e => update("phone", e.target.value)} placeholder="+31 6 ..." className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <label htmlFor="bookingPhone" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Telefoonnummer *</label>
+                        <input id="bookingPhone" type="tel" value={form.phone} onChange={e => update("phone", e.target.value)} aria-required="true" placeholder="+31 6 ..." className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                     </div>
                   </div>

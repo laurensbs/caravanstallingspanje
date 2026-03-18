@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Users, Caravan, MapPin, FileText, Receipt, Truck, ClipboardList, TrendingUp, AlertTriangle, ArrowUpRight, Activity, BarChart3 } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 interface Stats {
   totalCustomers: number; totalCaravans: number; storedCaravans: number; onSiteCaravans: number;
   activeContracts: number; totalLocations: number; openInvoices: number; openInvoiceAmount: number;
   overdueInvoices: number; overdueAmount: number; openTasks: number; pendingTransports: number; yearRevenue: number;
+  monthlyRevenue: { month: string; revenue: number; count: number }[];
 }
 
 export default function AdminDashboard() {
@@ -66,69 +68,83 @@ export default function AdminDashboard() {
 
       {/* Charts */}
       <div className="grid lg:grid-cols-2 gap-6 mb-8">
-        {/* Occupancy */}
+        {/* Occupancy — Pie Chart */}
         <div className="bg-surface rounded-2xl p-6 border border-sand-dark/20">
           <h2 className="font-bold text-surface-dark flex items-center gap-2 mb-5"><BarChart3 size={16} className="text-ocean" /> Bezettingsgraad</h2>
-          <div className="space-y-4">
-            {(() => {
-              const stored = stats.storedCaravans || 0;
-              const total = stats.totalCaravans || 1;
-              const pct = Math.round((stored / total) * 100);
-              return (
-                <>
-                  <div className="flex items-end justify-between">
-                    <div><p className="text-3xl font-black text-surface-dark">{pct}%</p><p className="text-xs text-warm-gray/70">{stored} van {total} plekken bezet</p></div>
-                  </div>
-                  <div className="w-full h-4 bg-sand/60 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-ocean to-ocean-dark rounded-full transition-all duration-700" style={{ width: `${pct}%` }} />
-                  </div>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-sand/40 rounded-xl p-3 text-center"><p className="text-lg font-black text-surface-dark">{stored}</p><p className="text-[10px] text-warm-gray/70">Gestald</p></div>
-                    <div className="bg-sand/40 rounded-xl p-3 text-center"><p className="text-lg font-black text-surface-dark">{stats.onSiteCaravans || 0}</p><p className="text-[10px] text-warm-gray/70">Op camping</p></div>
-                    <div className="bg-sand/40 rounded-xl p-3 text-center"><p className="text-lg font-black text-surface-dark">{total - stored - (stats.onSiteCaravans || 0)}</p><p className="text-[10px] text-warm-gray/70">In transit</p></div>
-                  </div>
-                </>
-              );
-            })()}
-          </div>
+          {(() => {
+            const stored = stats.storedCaravans || 0;
+            const onSite = stats.onSiteCaravans || 0;
+            const inTransit = Math.max(0, (stats.totalCaravans || 0) - stored - onSite);
+            const total = stats.totalCaravans || 1;
+            const pct = Math.round((stored / total) * 100);
+            const pieData = [
+              { name: 'Gestald', value: stored, color: '#1a6b8a' },
+              { name: 'Op camping', value: onSite, color: '#C4653A' },
+              { name: 'In transit', value: inTransit, color: '#d4c5b0' },
+            ].filter(d => d.value > 0);
+            return (
+              <>
+                <div className="flex items-center justify-between mb-4">
+                  <div><p className="text-3xl font-black text-surface-dark">{pct}%</p><p className="text-xs text-warm-gray/70">{stored} van {total} plekken bezet</p></div>
+                </div>
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" strokeWidth={2} stroke="#FAF9F7">
+                        {pieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                      </Pie>
+                      <Tooltip formatter={(value) => [String(value), '']} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="flex justify-center gap-4 mt-2">
+                  {pieData.map(d => (
+                    <div key={d.name} className="flex items-center gap-1.5 text-xs text-warm-gray/70">
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: d.color }} />
+                      {d.name} ({d.value})
+                    </div>
+                  ))}
+                </div>
+              </>
+            );
+          })()}
         </div>
 
-        {/* Revenue */}
+        {/* Revenue — Bar Chart */}
         <div className="bg-surface rounded-2xl p-6 border border-sand-dark/20">
-          <h2 className="font-bold text-surface-dark flex items-center gap-2 mb-5"><TrendingUp size={16} className="text-accent" /> Financieel overzicht</h2>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-accent/[0.06] rounded-xl p-4 border border-accent/20">
-                <p className="text-xs text-warm-gray/70 mb-1">Jaaromzet {new Date().getFullYear()}</p>
-                <p className="text-xl font-black text-surface-dark">{fmt(stats.yearRevenue)}</p>
-              </div>
-              <div className="bg-warning/[0.06] rounded-xl p-4 border border-warning/20">
-                <p className="text-xs text-warm-gray/70 mb-1">Openstaand</p>
-                <p className="text-xl font-black text-surface-dark">{fmt(stats.openInvoiceAmount)}</p>
-              </div>
+          <h2 className="font-bold text-surface-dark flex items-center gap-2 mb-5"><TrendingUp size={16} className="text-accent" /> Maandomzet</h2>
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="bg-accent/[0.06] rounded-xl p-4 border border-accent/20">
+              <p className="text-xs text-warm-gray/70 mb-1">Jaaromzet {new Date().getFullYear()}</p>
+              <p className="text-xl font-black text-surface-dark">{fmt(stats.yearRevenue)}</p>
             </div>
-            <div className="space-y-2">
-              {[
-                { label: 'Betaald', value: stats.yearRevenue, color: 'bg-accent', pct: stats.yearRevenue / (stats.yearRevenue + stats.openInvoiceAmount + stats.overdueAmount || 1) * 100 },
-                { label: 'Openstaand', value: stats.openInvoiceAmount, color: 'bg-warning', pct: stats.openInvoiceAmount / (stats.yearRevenue + stats.openInvoiceAmount + stats.overdueAmount || 1) * 100 },
-                { label: 'Achterstallig', value: stats.overdueAmount, color: 'bg-danger', pct: stats.overdueAmount / (stats.yearRevenue + stats.openInvoiceAmount + stats.overdueAmount || 1) * 100 },
-              ].map(b => (
-                <div key={b.label} className="flex items-center gap-3">
-                  <span className="text-xs text-warm-gray/70 w-24">{b.label}</span>
-                  <div className="flex-1 h-3 bg-sand/60 rounded-full overflow-hidden">
-                    <div className={`h-full ${b.color} rounded-full transition-all duration-700`} style={{ width: `${Math.max(b.pct, 1)}%` }} />
-                  </div>
-                  <span className="text-xs font-semibold text-surface-dark w-20 text-right">{fmt(b.value)}</span>
-                </div>
-              ))}
+            <div className="bg-warning/[0.06] rounded-xl p-4 border border-warning/20">
+              <p className="text-xs text-warm-gray/70 mb-1">Openstaand</p>
+              <p className="text-xl font-black text-surface-dark">{fmt(stats.openInvoiceAmount)}</p>
             </div>
-            {stats.activeContracts > 0 && (
-              <div className="bg-sand/40 rounded-xl p-3 text-center mt-2">
-                <p className="text-xs text-warm-gray/70">Gemiddelde maandelijkse omzet per contract</p>
-                <p className="text-lg font-black text-surface-dark">{fmt(stats.yearRevenue / 12 / stats.activeContracts)}</p>
-              </div>
-            )}
           </div>
+          {(stats.monthlyRevenue?.length || 0) > 0 ? (
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={stats.monthlyRevenue.map(m => ({ ...m, label: m.month.slice(5) }))}>
+                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#8a7f77' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#8a7f77' }} axisLine={false} tickLine={false} tickFormatter={v => `€${(v / 1000).toFixed(0)}k`} />
+                  <Tooltip formatter={(value) => [fmt(Number(value)), 'Omzet']} labelFormatter={(l) => `Maand ${l}`} />
+                  <Bar dataKey="revenue" fill="#3D5A3E" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <div className="h-48 flex items-center justify-center text-warm-gray/50 text-sm">
+              Nog geen omzetgegevens beschikbaar
+            </div>
+          )}
+          {stats.activeContracts > 0 && (
+            <div className="bg-sand/40 rounded-xl p-3 text-center mt-2">
+              <p className="text-xs text-warm-gray/70">Gemiddelde maandelijkse omzet per contract</p>
+              <p className="text-lg font-black text-surface-dark">{fmt(stats.yearRevenue / 12 / stats.activeContracts)}</p>
+            </div>
+          )}
         </div>
       </div>
 

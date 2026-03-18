@@ -401,11 +401,28 @@ export async function getCaravansByCustomer(customerId: number) {
 }
 
 // Contracts
-export async function getAllContracts(status?: string) {
-  if (status) {
-    return sql`SELECT co.*, cu.first_name || ' ' || cu.last_name as customer_name, ca.brand || ' ' || COALESCE(ca.model,'') as caravan_name, ca.license_plate, l.name as location_name FROM contracts co LEFT JOIN customers cu ON co.customer_id = cu.id LEFT JOIN caravans ca ON co.caravan_id = ca.id LEFT JOIN locations l ON co.location_id = l.id WHERE co.status = ${status} ORDER BY co.end_date DESC`;
+export async function getAllContracts(page = 1, limit = 50, status?: string, search?: string) {
+  const offset = (page - 1) * limit;
+  if (status && search) {
+    const q = `%${search}%`;
+    const rows = await sql`SELECT co.*, cu.first_name || ' ' || cu.last_name as customer_name, ca.brand || ' ' || COALESCE(ca.model,'') as caravan_name, ca.license_plate, l.name as location_name FROM contracts co LEFT JOIN customers cu ON co.customer_id = cu.id LEFT JOIN caravans ca ON co.caravan_id = ca.id LEFT JOIN locations l ON co.location_id = l.id WHERE co.status = ${status} AND (co.contract_number ILIKE ${q} OR cu.first_name ILIKE ${q} OR cu.last_name ILIKE ${q} OR ca.license_plate ILIKE ${q}) ORDER BY co.end_date DESC LIMIT ${limit} OFFSET ${offset}`;
+    const cnt = await sql`SELECT COUNT(*) as total FROM contracts co LEFT JOIN customers cu ON co.customer_id = cu.id LEFT JOIN caravans ca ON co.caravan_id = ca.id WHERE co.status = ${status} AND (co.contract_number ILIKE ${q} OR cu.first_name ILIKE ${q} OR cu.last_name ILIKE ${q} OR ca.license_plate ILIKE ${q})`;
+    return { contracts: rows, total: Number(cnt[0].total) };
   }
-  return sql`SELECT co.*, cu.first_name || ' ' || cu.last_name as customer_name, ca.brand || ' ' || COALESCE(ca.model,'') as caravan_name, ca.license_plate, l.name as location_name FROM contracts co LEFT JOIN customers cu ON co.customer_id = cu.id LEFT JOIN caravans ca ON co.caravan_id = ca.id LEFT JOIN locations l ON co.location_id = l.id ORDER BY co.end_date DESC`;
+  if (status) {
+    const rows = await sql`SELECT co.*, cu.first_name || ' ' || cu.last_name as customer_name, ca.brand || ' ' || COALESCE(ca.model,'') as caravan_name, ca.license_plate, l.name as location_name FROM contracts co LEFT JOIN customers cu ON co.customer_id = cu.id LEFT JOIN caravans ca ON co.caravan_id = ca.id LEFT JOIN locations l ON co.location_id = l.id WHERE co.status = ${status} ORDER BY co.end_date DESC LIMIT ${limit} OFFSET ${offset}`;
+    const cnt = await sql`SELECT COUNT(*) as total FROM contracts WHERE status = ${status}`;
+    return { contracts: rows, total: Number(cnt[0].total) };
+  }
+  if (search) {
+    const q = `%${search}%`;
+    const rows = await sql`SELECT co.*, cu.first_name || ' ' || cu.last_name as customer_name, ca.brand || ' ' || COALESCE(ca.model,'') as caravan_name, ca.license_plate, l.name as location_name FROM contracts co LEFT JOIN customers cu ON co.customer_id = cu.id LEFT JOIN caravans ca ON co.caravan_id = ca.id LEFT JOIN locations l ON co.location_id = l.id WHERE co.contract_number ILIKE ${q} OR cu.first_name ILIKE ${q} OR cu.last_name ILIKE ${q} OR ca.license_plate ILIKE ${q} ORDER BY co.end_date DESC LIMIT ${limit} OFFSET ${offset}`;
+    const cnt = await sql`SELECT COUNT(*) as total FROM contracts co LEFT JOIN customers cu ON co.customer_id = cu.id LEFT JOIN caravans ca ON co.caravan_id = ca.id WHERE co.contract_number ILIKE ${q} OR cu.first_name ILIKE ${q} OR cu.last_name ILIKE ${q} OR ca.license_plate ILIKE ${q}`;
+    return { contracts: rows, total: Number(cnt[0].total) };
+  }
+  const rows = await sql`SELECT co.*, cu.first_name || ' ' || cu.last_name as customer_name, ca.brand || ' ' || COALESCE(ca.model,'') as caravan_name, ca.license_plate, l.name as location_name FROM contracts co LEFT JOIN customers cu ON co.customer_id = cu.id LEFT JOIN caravans ca ON co.caravan_id = ca.id LEFT JOIN locations l ON co.location_id = l.id ORDER BY co.end_date DESC LIMIT ${limit} OFFSET ${offset}`;
+  const cnt = await sql`SELECT COUNT(*) as total FROM contracts`;
+  return { contracts: rows, total: Number(cnt[0].total) };
 }
 
 export async function getContractsByCustomer(customerId: number) {
@@ -529,7 +546,7 @@ export async function createServiceRequest(data: Record<string, unknown>) {
 
 // Dashboard Stats
 export async function getDashboardStats() {
-  const [customers, caravans, activeContracts, locations, openInvoices, overdueInvoices, openTasks, pendingTransports, revenue] = await Promise.all([
+  const [customers, caravans, activeContracts, locations, openInvoices, overdueInvoices, openTasks, pendingTransports, revenue, monthlyRevenue, onSiteCaravans] = await Promise.all([
     sql`SELECT COUNT(*) as total FROM customers`,
     sql`SELECT COUNT(*) as total, COUNT(*) FILTER (WHERE status = 'gestald') as stored FROM caravans`,
     sql`SELECT COUNT(*) as total FROM contracts WHERE status = 'actief'`,
@@ -539,11 +556,16 @@ export async function getDashboardStats() {
     sql`SELECT COUNT(*) as total FROM tasks WHERE status IN ('open','in_uitvoering')`,
     sql`SELECT COUNT(*) as total FROM transport_orders WHERE status IN ('aangevraagd','gepland')`,
     sql`SELECT COALESCE(SUM(total),0) as year_total FROM invoices WHERE status = 'betaald' AND EXTRACT(YEAR FROM paid_date) = EXTRACT(YEAR FROM CURRENT_DATE)`,
+    sql`SELECT TO_CHAR(paid_date, 'YYYY-MM') as month, COALESCE(SUM(total),0) as revenue, COUNT(*) as count
+        FROM invoices WHERE status = 'betaald' AND paid_date >= CURRENT_DATE - INTERVAL '12 months'
+        GROUP BY TO_CHAR(paid_date, 'YYYY-MM') ORDER BY month`,
+    sql`SELECT COUNT(*) as total FROM caravans WHERE status = 'op_camping'`,
   ]);
   return {
     totalCustomers: Number(customers[0].total),
     totalCaravans: Number(caravans[0].total),
     storedCaravans: Number(caravans[0].stored),
+    onSiteCaravans: Number(onSiteCaravans[0].total),
     activeContracts: Number(activeContracts[0].total),
     totalLocations: Number(locations[0].total),
     openInvoices: Number(openInvoices[0].total),
@@ -553,6 +575,7 @@ export async function getDashboardStats() {
     openTasks: Number(openTasks[0].total),
     pendingTransports: Number(pendingTransports[0].total),
     yearRevenue: Number(revenue[0].year_total),
+    monthlyRevenue: monthlyRevenue.map(r => ({ month: r.month, revenue: Number(r.revenue), count: Number(r.count) })),
   };
 }
 

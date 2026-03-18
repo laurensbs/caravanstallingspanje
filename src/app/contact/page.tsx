@@ -17,6 +17,23 @@ export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  function validateField(name: string, value: string) {
+    if ((name === 'name' || name === 'email' || name === 'subject' || name === 'message') && !value.trim()) {
+      return 'Dit veld is verplicht';
+    }
+    if (name === 'email' && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      return 'Voer een geldig e-mailadres in';
+    }
+    return '';
+  }
+
+  function handleBlur(e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
+    const { name, value } = e.target;
+    const error = validateField(name, value);
+    setFieldErrors(prev => ({ ...prev, [name]: error }));
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -30,6 +47,19 @@ export default function ContactPage() {
       subject: (form.elements.namedItem('subject') as HTMLSelectElement).value,
       message: (form.elements.namedItem('message') as HTMLTextAreaElement).value,
     };
+
+    // Client-side validation
+    const errors: Record<string, string> = {};
+    for (const [key, val] of Object.entries(data)) {
+      const err = validateField(key, val);
+      if (err) errors[key] = err;
+    }
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       if (!res.ok) throw new Error('Verzenden mislukt');
@@ -85,25 +115,27 @@ export default function ContactPage() {
                   <h2 className="text-2xl font-black mb-1">Stuur ons een bericht</h2>
                   <p className="text-warm-gray text-sm mb-8">Vul het onderstaande formulier in en wij reageren binnen 1 werkdag. Of bel ons direct op +34 650 036 755.</p>
 
-                  <form onSubmit={(e) => { handleSubmit(e); }} className="space-y-5">
+                  <form onSubmit={(e) => { handleSubmit(e); }} className="space-y-5" noValidate>
                     <div className="grid sm:grid-cols-2 gap-5">
                       <div>
                         <label htmlFor="name" className="block text-xs font-bold mb-1.5">Naam *</label>
-                        <input id="name" name="name" type="text" required aria-required="true" className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" placeholder="Uw naam" />
+                        <input id="name" name="name" type="text" required aria-required="true" aria-invalid={!!fieldErrors.name} aria-describedby={fieldErrors.name ? 'name-error' : undefined} onBlur={handleBlur} className={`w-full border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all ${fieldErrors.name ? 'border-red-400 bg-red-50/30' : 'border-sand-dark/[0.08]'}`} placeholder="Uw naam" />
+                        {fieldErrors.name && <p id="name-error" className="text-red-600 text-xs mt-1" role="alert">{fieldErrors.name}</p>}
                       </div>
                       <div>
                         <label htmlFor="email" className="block text-xs font-bold mb-1.5">E-mail *</label>
-                        <input id="email" name="email" type="email" required aria-required="true" className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" placeholder="uw@email.com" />
+                        <input id="email" name="email" type="email" required aria-required="true" aria-invalid={!!fieldErrors.email} aria-describedby={fieldErrors.email ? 'email-error' : undefined} onBlur={handleBlur} className={`w-full border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all ${fieldErrors.email ? 'border-red-400 bg-red-50/30' : 'border-sand-dark/[0.08]'}`} placeholder="uw@email.com" />
+                        {fieldErrors.email && <p id="email-error" className="text-red-600 text-xs mt-1" role="alert">{fieldErrors.email}</p>}
                       </div>
                     </div>
                     <div className="grid sm:grid-cols-2 gap-5">
                       <div>
                         <label htmlFor="phone" className="block text-xs font-bold mb-1.5">Telefoon</label>
-                        <input id="phone" name="phone" type="tel" className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" placeholder="+31 6 1234 5678" />
+                        <input id="phone" name="phone" type="tel" onBlur={handleBlur} className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" placeholder="+31 6 1234 5678" />
                       </div>
                       <div>
                         <label htmlFor="subject" className="block text-xs font-bold mb-1.5">Onderwerp *</label>
-                        <select id="subject" name="subject" required aria-required="true" className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all bg-surface">
+                        <select id="subject" name="subject" required aria-required="true" aria-invalid={!!fieldErrors.subject} aria-describedby={fieldErrors.subject ? 'subject-error' : undefined} onBlur={handleBlur} className={`w-full border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all bg-surface ${fieldErrors.subject ? 'border-red-400 bg-red-50/30' : 'border-sand-dark/[0.08]'}`}>
                           <option value="">Kies een onderwerp</option>
                           <option value="stalling">Stalling aanvragen</option>
                           <option value="reparatie">Reparatie & Onderhoud</option>
@@ -114,17 +146,19 @@ export default function ContactPage() {
                           <option value="schoonmaak">Schoonmaak</option>
                           <option value="overig">Overig</option>
                         </select>
+                        {fieldErrors.subject && <p id="subject-error" className="text-red-600 text-xs mt-1" role="alert">{fieldErrors.subject}</p>}
                       </div>
                     </div>
                     <div>
                       <label htmlFor="message" className="block text-xs font-bold mb-1.5">Bericht *</label>
-                      <textarea id="message" name="message" rows={5} required aria-required="true" className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all resize-none" placeholder="Waar kunnen wij u mee helpen?" />
+                      <textarea id="message" name="message" rows={5} required aria-required="true" aria-invalid={!!fieldErrors.message} aria-describedby={fieldErrors.message ? 'message-error' : undefined} onBlur={handleBlur} className={`w-full border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all resize-none ${fieldErrors.message ? 'border-red-400 bg-red-50/30' : 'border-sand-dark/[0.08]'}`} placeholder="Waar kunnen wij u mee helpen?" />
+                      {fieldErrors.message && <p id="message-error" className="text-red-600 text-xs mt-1" role="alert">{fieldErrors.message}</p>}
                     </div>
                     <button type="submit" disabled={loading} aria-busy={loading} className="bg-accent hover:bg-accent-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm disabled:opacity-60">
                       {loading ? 'Verzenden...' : 'Verstuur bericht'} <Send size={14} />
                     </button>
                     {formError && (
-                      <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 text-sm p-4 rounded-xl">
+                      <div role="alert" className="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 text-sm p-4 rounded-xl">
                         <MessageCircle size={16} className="shrink-0 mt-0.5" />
                         <span>{formError}</span>
                       </div>
