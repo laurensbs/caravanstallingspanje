@@ -1,5 +1,5 @@
 'use client';
-import { fmt, fmtDate } from "@/lib/format";
+import { fmt, fmtDate, CUSTOMER_STATUS_COLORS } from "@/lib/format";
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
@@ -37,14 +37,6 @@ export default function CustomerDetailPage() {
     }).catch(() => {}).finally(() => setLoading(false));
   }, [id]);
 
-  const STATUS_COLORS: Record<string, string> = {
-    betaald: 'bg-accent/10 text-primary-dark border-accent/30',
-    open: 'bg-ocean/10 text-ocean-dark border-ocean/30',
-    actief: 'bg-accent/10 text-primary-dark border-accent/30',
-    verlopen: 'bg-danger/10 text-danger border-danger/30',
-    gestald: 'bg-accent/10 text-primary-dark border-accent/30',
-    in_transit: 'bg-ocean/10 text-ocean-dark border-ocean/30',
-  };
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" /></div>;
   if (!customer) return <div className="text-center py-16"><p className="text-warm-gray">Klant niet gevonden</p><Link href="/admin/klanten" className="text-primary text-sm mt-2 inline-block">Terug naar klanten</Link></div>;
@@ -103,7 +95,7 @@ export default function CustomerDetailPage() {
                     <p className="text-sm font-semibold text-surface-dark">{c.brand} {c.model}</p>
                     <p className="text-xs text-warm-gray/70">{c.license_plate} — {c.location_name || '-'} {c.spot_label || ''}</p>
                   </div>
-                  <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${STATUS_COLORS[c.status] || 'bg-sand/40 text-warm-gray border-sand-dark/30'}`}>{c.status}</span>
+                  <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${CUSTOMER_STATUS_COLORS[c.status] || 'bg-sand/40 text-warm-gray border-sand-dark/30'}`}>{c.status}</span>
                 </div>
               ))}
             </div>
@@ -125,7 +117,7 @@ export default function CustomerDetailPage() {
                   <td className="py-3 font-mono text-xs">{c.contract_number}</td>
                   <td className="py-3 text-xs text-warm-gray">{fmtDate(c.start_date)} — {fmtDate(c.end_date)}</td>
                   <td className="py-3 text-right font-bold">{fmt(c.monthly_rate)}</td>
-                  <td className="py-3 text-center"><span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${STATUS_COLORS[c.status] || 'bg-sand/40 text-warm-gray border-sand-dark/30'}`}>{c.status}</span></td>
+                  <td className="py-3 text-center"><span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${CUSTOMER_STATUS_COLORS[c.status] || 'bg-sand/40 text-warm-gray border-sand-dark/30'}`}>{c.status}</span></td>
                 </tr>
               ))}
             </tbody>
@@ -147,7 +139,7 @@ export default function CustomerDetailPage() {
                   <td className="py-3 font-mono text-xs">{i.invoice_number}</td>
                   <td className="py-3 text-right font-bold">{fmt(i.total)}</td>
                   <td className="py-3 text-xs text-warm-gray">{fmtDate(i.due_date)}</td>
-                  <td className="py-3 text-center"><span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${STATUS_COLORS[i.status] || 'bg-sand/40 text-warm-gray border-sand-dark/30'}`}>{i.status}</span></td>
+                  <td className="py-3 text-center"><span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${CUSTOMER_STATUS_COLORS[i.status] || 'bg-sand/40 text-warm-gray border-sand-dark/30'}`}>{i.status}</span></td>
                 </tr>
               ))}
             </tbody>

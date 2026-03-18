@@ -62,7 +62,7 @@ export default function BlogPostPage() {
       {/* Hero */}
       <section className="relative bg-hero text-white py-16 sm:py-24 overflow-hidden">
         <div className="absolute inset-0">
-          <Image src={post.image} alt="" fill className="img-cover opacity-20" priority />
+          <Image src={post.image} alt="Achtergrondafbeelding" fill sizes="100vw" className="img-cover opacity-20" priority />
           <div className="hero-overlay absolute inset-0" />
         </div>
         <div className="absolute inset-0 dot-pattern opacity-20" />
@@ -164,7 +164,7 @@ export default function BlogPostPage() {
                 <Link key={rp.slug} href={`/blog/${rp.slug}`} className="group block">
                   <div className="bg-card rounded-2xl overflow-hidden border border-sand-dark/20 card-hover">
                     <div className="relative aspect-[16/10] overflow-hidden">
-                      <Image src={rp.image} alt={rp.title} fill className="img-cover group-hover:scale-105 transition-transform duration-500" />
+                      <Image src={rp.image} alt={rp.title} fill sizes="(max-width: 640px) 100vw, 33vw" className="img-cover group-hover:scale-105 transition-transform duration-500" />
                     </div>
                     <div className="p-5">
                       <div className="flex items-center gap-3 text-[11px] text-warm-gray mb-2">

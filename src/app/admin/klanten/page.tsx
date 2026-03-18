@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { Search, Plus, X, ChevronLeft, ChevronRight, Edit2, Eye, Mail, Phone } from 'lucide-react';
+import { useAdminData } from '@/hooks/useAdminData';
+import Modal from '@/components/ui/Modal';
 
 interface Customer {
   id: number; customer_number: string; first_name: string; last_name: string; email: string;
@@ -10,30 +12,12 @@ interface Customer {
 }
 
 export default function KlantenPage() {
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(true);
+  const { items: customers, total, page, setPage, loading, refetch: fetchCustomers } = useAdminData<Customer>({ endpoint: '/api/admin/customers', dataKey: 'customers', params: { search } });
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Customer | null>(null);
   const [form, setForm] = useState({ first_name: '', last_name: '', email: '', phone: '', address: '', city: '', postal_code: '', country: 'Nederland', company_name: '', notes: '' });
   const limit = 50;
-
-  const fetchCustomers = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: String(limit) });
-      if (search) params.set('search', search);
-      const res = await fetch(`/api/admin/customers?${params}`, { credentials: 'include' });
-      const data = await res.json();
-      setCustomers(data.customers || []);
-      setTotal(data.total || 0);
-    } catch { /* */ }
-    setLoading(false);
-  }, [page, search]);
-
-  useEffect(() => { fetchCustomers(); }, [fetchCustomers]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,7 +54,7 @@ export default function KlantenPage() {
         <div className="flex items-center gap-2 bg-sand/40 rounded-xl px-3.5 py-2.5 border border-sand-dark/20">
           <Search size={15} className="text-warm-gray/50" />
           <input placeholder="Zoek op naam, email, klantnummer..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} className="bg-transparent text-sm outline-none flex-1 text-warm-gray placeholder:text-warm-gray/50" />
-          {search && <button onClick={() => setSearch('')}><X size={14} className="text-warm-gray/70" /></button>}
+          {search && <button onClick={() => setSearch('')} aria-label="Zoekopdracht wissen"><X size={14} className="text-warm-gray/70" /></button>}
         </div>
       </div>
 
@@ -123,22 +107,16 @@ export default function KlantenPage() {
           <div className="flex items-center justify-between px-4 py-3 border-t border-sand-dark/20">
             <p className="text-xs text-warm-gray/70">Pagina {page} van {totalPages}</p>
             <div className="flex gap-1">
-              <button disabled={page <= 1} onClick={() => setPage(p => p - 1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 text-warm-gray/70 transition-colors"><ChevronLeft size={16} /></button>
-              <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 text-warm-gray/70 transition-colors"><ChevronRight size={16} /></button>
+              <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 text-warm-gray/70 transition-colors" aria-label="Vorige pagina"><ChevronLeft size={16} /></button>
+              <button disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 text-warm-gray/70 transition-colors" aria-label="Volgende pagina"><ChevronRight size={16} /></button>
             </div>
           </div>
         )}
       </div>
 
       {/* Form modal */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-surface rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="flex items-center justify-between p-6 border-b border-sand-dark/20">
-              <h2 className="text-lg font-bold text-surface-dark">{editing ? 'Klant bewerken' : 'Nieuwe klant'}</h2>
-              <button onClick={() => setShowForm(false)} className="text-warm-gray/70 hover:text-warm-gray transition-colors"><X size={20} /></button>
-            </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+      <Modal open={showForm} onClose={() => setShowForm(false)} title={editing ? 'Klant bewerken' : 'Nieuwe klant'}>
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div><label className="text-xs font-semibold text-warm-gray/70 block mb-1.5">Voornaam *</label><input required value={form.first_name} onChange={e => setForm({ ...form, first_name: e.target.value })} className="w-full border border-sand-dark/30 rounded-xl px-3.5 py-2.5 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" /></div>
                 <div><label className="text-xs font-semibold text-warm-gray/70 block mb-1.5">Achternaam *</label><input required value={form.last_name} onChange={e => setForm({ ...form, last_name: e.target.value })} className="w-full border border-sand-dark/30 rounded-xl px-3.5 py-2.5 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" /></div>
@@ -158,9 +136,7 @@ export default function KlantenPage() {
                 <button type="submit" className="bg-primary hover:bg-primary-dark text-white font-bold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-primary/20 transition-all">Opslaan</button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 }

@@ -117,7 +117,7 @@ export default function DienstenPage() {
                 </Link>
               </div>
               <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
-                <Image src="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=800&q=80" alt="Beveiligd stallingsterrein aan de Costa Brava" fill className="object-cover" />
+                <Image src="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=800&q=80" alt="Beveiligd stallingsterrein aan de Costa Brava" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-surface-dark/40 to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4">
                   <p className="text-white text-xs font-medium bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-lg inline-block">Sant Climent de Peralta, Girona</p>

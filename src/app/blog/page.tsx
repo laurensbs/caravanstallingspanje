@@ -36,7 +36,7 @@ export default function BlogPage() {
             <Link href={`/blog/${featured.slug}`} className="group block">
               <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                 <div className="relative aspect-[16/10] rounded-2xl overflow-hidden">
-                  <Image src={featured.image} alt={featured.title} fill className="img-cover group-hover:scale-105 transition-transform duration-500" />
+                  <Image src={featured.image} alt={featured.title} fill sizes="(max-width: 1024px) 100vw, 50vw" className="img-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute top-4 left-4">
                     <span className={`text-[11px] font-bold px-3 py-1 rounded-full ${categoryColors[featured.category] || 'bg-primary/10 text-primary'}`}>
                       {featured.category}
@@ -81,7 +81,7 @@ export default function BlogPage() {
                 <Link href={`/blog/${post.slug}`} className="group block h-full">
                   <div className="bg-card rounded-2xl overflow-hidden border border-sand-dark/20 h-full flex flex-col card-hover">
                     <div className="relative aspect-[16/10] overflow-hidden">
-                      <Image src={post.image} alt={post.title} fill className="img-cover group-hover:scale-105 transition-transform duration-500" />
+                      <Image src={post.image} alt={post.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="img-cover group-hover:scale-105 transition-transform duration-500" />
                       <div className="absolute top-3 left-3">
                         <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${categoryColors[post.category] || 'bg-primary/10 text-primary'}`}>
                           {post.category}

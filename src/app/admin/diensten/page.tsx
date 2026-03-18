@@ -1,31 +1,17 @@
 'use client';
-import { fmt, fmtDate } from "@/lib/format";
+import { fmt, fmtDate, SERVICE_STATUS_COLORS } from "@/lib/format";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { Wrench, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
+import { useAdminData } from '@/hooks/useAdminData';
 
 interface ServiceRequest { id: number; customer_name: string; caravan_brand: string; caravan_model: string; caravan_license_plate: string; service_type: string; description: string; status: string; estimated_cost: number; actual_cost: number; scheduled_date: string; completed_date: string; created_at: string; }
 
-const STATUS_COLORS: Record<string,string> = { aangevraagd: 'bg-ocean/15 text-ocean-dark', goedgekeurd: 'bg-warning/15 text-warning', in_uitvoering: 'bg-primary/15 text-primary', afgerond: 'bg-accent/15 text-primary-dark', geannuleerd: 'bg-sand text-warm-gray' };
 const SERVICE_LABELS: Record<string,string> = { reparatie: 'Reparatie', onderhoud: 'Onderhoud', keuring: 'Technische keuring', schoonmaak: 'Schoonmaak', transport: 'Transport', overig: 'Overig' };
 
 export default function DienstenPage() {
-  const [requests, setRequests] = useState<ServiceRequest[]>([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('');
-  const [loading, setLoading] = useState(true);
-
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    const params = new URLSearchParams({ page: String(page), limit: '50' });
-    if (statusFilter) params.set('status', statusFilter);
-    const res = await fetch(`/api/admin/services?${params}`, { credentials: 'include' });
-    const data = await res.json();
-    setRequests(data.requests || []); setTotal(data.total || 0); setLoading(false);
-  }, [page, statusFilter]);
-
-  useEffect(() => { fetchData(); }, [fetchData]);
+  const { items: requests, total, page, setPage, loading, refetch: fetchData } = useAdminData<ServiceRequest>({ endpoint: '/api/admin/services', dataKey: 'requests', params: { status: statusFilter } });
 
   const updateStatus = async (id: number, status: string) => {
     await fetch(`/api/admin/services/${id}/status`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }), credentials: 'include' });
@@ -72,7 +58,7 @@ export default function DienstenPage() {
                 <td className="px-4 py-3 text-xs text-warm-gray/70 max-w-[200px] truncate">{r.description || '-'}</td>
                 <td className="px-4 py-3 text-right text-xs text-warm-gray">{r.actual_cost ? fmt(r.actual_cost) : r.estimated_cost ? <span className="text-warm-gray/70">~{fmt(r.estimated_cost)}</span> : '-'}</td>
                 <td className="px-4 py-3 text-xs text-warm-gray">{fmtDate(r.scheduled_date || r.created_at)}</td>
-                <td className="px-4 py-3 text-center"><span className={`text-xs font-medium px-2 py-1 rounded-full ${STATUS_COLORS[r.status] || 'bg-sand'}`}>{r.status === 'in_uitvoering' ? 'in uitvoering' : r.status}</span></td>
+                <td className="px-4 py-3 text-center"><span className={`text-xs font-medium px-2 py-1 rounded-full ${SERVICE_STATUS_COLORS[r.status] || 'bg-sand'}`}>{r.status === 'in_uitvoering' ? 'in uitvoering' : r.status}</span></td>
                 <td className="px-4 py-3 text-right">
                   <select value={r.status} onChange={e => updateStatus(r.id, e.target.value)} className="text-xs border border-sand-dark/30 rounded-lg px-2 py-1 bg-sand/40 focus:ring-2 focus:ring-primary/20 outline-none">
                     <option value="aangevraagd">Aangevraagd</option>
@@ -88,7 +74,7 @@ export default function DienstenPage() {
         </table>
         </div>
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-sand-dark/20"><p className="text-xs text-warm-gray/70">Pagina {page}/{totalPages}</p><div className="flex gap-1"><button disabled={page<=1} onClick={()=>setPage(p=>p-1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors"><ChevronLeft size={16} className="text-warm-gray/70"/></button><button disabled={page>=totalPages} onClick={()=>setPage(p=>p+1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors"><ChevronRight size={16} className="text-warm-gray/70"/></button></div></div>
+          <div className="flex items-center justify-between px-4 py-3 border-t border-sand-dark/20"><p className="text-xs text-warm-gray/70">Pagina {page}/{totalPages}</p><div className="flex gap-1"><button disabled={page<=1} onClick={()=>setPage(page-1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors" aria-label="Vorige pagina"><ChevronLeft size={16} className="text-warm-gray/70"/></button><button disabled={page>=totalPages} onClick={()=>setPage(page+1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors" aria-label="Volgende pagina"><ChevronRight size={16} className="text-warm-gray/70"/></button></div></div>
         )}
       </div>
     </div>

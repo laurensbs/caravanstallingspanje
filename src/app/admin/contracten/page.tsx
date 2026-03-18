@@ -1,8 +1,10 @@
 'use client';
-import { fmt, fmtDate } from "@/lib/format";
+import { fmt, fmtDate, CONTRACT_STATUS_COLORS } from "@/lib/format";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { FileText, Plus, X, ChevronLeft, ChevronRight, RefreshCw, Edit2 } from 'lucide-react';
+import { useAdminData } from '@/hooks/useAdminData';
+import Modal from '@/components/ui/Modal';
 
 interface Contract { id: number; contract_number: string; customer_name: string; caravan_name: string; license_plate: string; location_name: string; start_date: string; end_date: string; monthly_rate: number; status: string; auto_renew: boolean; }
 interface CustomerOption { id: number; first_name: string; last_name: string; }
@@ -10,14 +12,10 @@ interface CaravanOption { id: number; brand: string; model: string; license_plat
 interface LocationOption { id: number; name: string; }
 interface SpotOption { id: number; label: string; zone: string; status: string; }
 
-const STATUS_COLORS: Record<string, string> = { actief: 'bg-accent/15 text-accent-dark', verlopen: 'bg-danger/15 text-danger', opgezegd: 'bg-sand text-warm-gray', concept: 'bg-warning/15 text-warning' };
 
 export default function ContractenPage() {
-  const [contracts, setContracts] = useState<Contract[]>([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('');
-  const [loading, setLoading] = useState(true);
+  const { items: contracts, total, page, setPage, loading, refetch: fetchData } = useAdminData<Contract>({ endpoint: '/api/admin/contracts', dataKey: 'contracts', params: { status: statusFilter } });
   const [showForm, setShowForm] = useState(false);
   const [customers, setCustomers] = useState<CustomerOption[]>([]);
   const [caravans, setCaravans] = useState<CaravanOption[]>([]);
@@ -25,17 +23,6 @@ export default function ContractenPage() {
   const [spots, setSpots] = useState<SpotOption[]>([]);
   const [form, setForm] = useState({ customer_id: '', caravan_id: '', location_id: '', spot_id: '', start_date: '', end_date: '', monthly_rate: '', deposit: '0', auto_renew: true });
   const [editing, setEditing] = useState<Contract | null>(null);
-
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    const params = new URLSearchParams({ page: String(page), limit: '50' });
-    if (statusFilter) params.set('status', statusFilter);
-    const res = await fetch(`/api/admin/contracts?${params}`, { credentials: 'include' });
-    const data = await res.json();
-    setContracts(data.contracts || []); setTotal(data.total || data.contracts?.length || 0); setLoading(false);
-  }, [page, statusFilter]);
-
-  useEffect(() => { fetchData(); }, [fetchData]);
 
   const openForm = async () => {
     const [custRes, caravRes, locRes] = await Promise.all([
@@ -127,7 +114,7 @@ export default function ContractenPage() {
                 <td className="px-4 py-3 text-xs text-warm-gray">{fmtDate(c.start_date)} – {fmtDate(c.end_date)}</td>
                 <td className="px-4 py-3 text-right font-medium text-surface-dark">{fmt(Number(c.monthly_rate))}/mnd</td>
                 <td className="px-4 py-3 text-center">
-                  <span className={`text-xs font-medium px-2 py-1 rounded-full ${STATUS_COLORS[c.status] || 'bg-sand'}`}>{c.status}</span>
+                  <span className={`text-xs font-medium px-2 py-1 rounded-full ${CONTRACT_STATUS_COLORS[c.status] || 'bg-sand'}`}>{c.status}</span>
                   {c.auto_renew && <span title="Auto-verlenging"><RefreshCw size={12} className="inline ml-1 text-warm-gray/70" /></span>}
                 </td>
                 <td className="px-4 py-3 text-right">
@@ -139,15 +126,12 @@ export default function ContractenPage() {
         </table>
         </div>
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-sand-dark/20"><p className="text-xs text-warm-gray/70">Pagina {page}/{totalPages}</p><div className="flex gap-1"><button disabled={page<=1} onClick={()=>setPage(p=>p-1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors"><ChevronLeft size={16} className="text-warm-gray/70"/></button><button disabled={page>=totalPages} onClick={()=>setPage(p=>p+1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors"><ChevronRight size={16} className="text-warm-gray/70"/></button></div></div>
+          <div className="flex items-center justify-between px-4 py-3 border-t border-sand-dark/20"><p className="text-xs text-warm-gray/70">Pagina {page}/{totalPages}</p><div className="flex gap-1"><button disabled={page<=1} onClick={()=>setPage(page-1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors" aria-label="Vorige pagina"><ChevronLeft size={16} className="text-warm-gray/70"/></button><button disabled={page>=totalPages} onClick={()=>setPage(page+1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors" aria-label="Volgende pagina"><ChevronRight size={16} className="text-warm-gray/70"/></button></div></div>
         )}
       </div>
 
-      {showForm && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-surface rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="flex items-center justify-between p-6 border-b border-sand-dark/20"><h2 className="text-lg font-bold text-surface-dark">{editing ? 'Contract bewerken' : 'Nieuw contract'}</h2><button onClick={() => setShowForm(false)} className="text-warm-gray/70 hover:text-warm-gray"><X size={20}/></button></div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+      <Modal open={showForm} onClose={() => setShowForm(false)} title={editing ? 'Contract bewerken' : 'Nieuw contract'}>
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="text-xs font-semibold text-warm-gray block mb-1">Klant *</label>
                 <select required value={form.customer_id} onChange={e => setForm({...form, customer_id: e.target.value, caravan_id: ''})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
@@ -192,9 +176,7 @@ export default function ContractenPage() {
                 <button type="submit" className="bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-primary/20 transition-all">Opslaan</button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 }

@@ -180,7 +180,7 @@ export default function Footer() {
             ) : newsletterStatus === 'error' ? (
               <div className="text-center sm:text-left">
                 <p className="text-red-400 font-bold text-sm mb-1">Inschrijving mislukt</p>
-                <button onClick={() => setNewsletterStatus('idle')} className="text-white/70 text-xs underline hover:text-white/70 transition-colors">Probeer opnieuw</button>
+                <button onClick={() => setNewsletterStatus('idle')} className="text-white/70 text-xs underline hover:text-white transition-colors">Probeer opnieuw</button>
               </div>
             ) : (
               <form

@@ -112,7 +112,7 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
             <label className="text-white/70 text-[10px] font-bold uppercase tracking-widest block mb-2.5">Wachtwoord</label>
             <div className="relative">
               <input type={showPw ? 'text' : 'password'} required value={password} onChange={e=>{ setPassword(e.target.value); setLoginError(''); }} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3.5 text-white text-sm pr-10 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 placeholder:text-white/15 transition-all" placeholder="••••••••" autoFocus autoComplete="current-password" />
-              <button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/60 transition-colors">{showPw ? <EyeOff size={16}/> : <Eye size={16}/>}</button>
+              <button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/60 transition-colors" aria-label={showPw ? "Wachtwoord verbergen" : "Wachtwoord tonen"}>{showPw ? <EyeOff size={16}/> : <Eye size={16}/>}</button>
             </div>
           </div>
           <button type="submit" disabled={loginLoading} className="w-full bg-gradient-to-r from-primary to-primary-dark hover:from-primary hover:to-primary-dark text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-primary/20 disabled:opacity-60">
@@ -154,7 +154,7 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-dark rounded-lg flex items-center justify-center text-white text-xs font-bold">{staffName.charAt(0)}</div>
             <p className="text-white text-xs font-semibold truncate flex-1">{staffName}</p>
             <div className="relative">
-              <button onClick={() => { setShowNotifications(!showNotifications); setUnreadCount(0); }} className="relative text-white/70 hover:text-white/60 transition-colors">
+              <button onClick={() => { setShowNotifications(!showNotifications); setUnreadCount(0); }} className="relative text-white/70 hover:text-white/60 transition-colors" aria-label="Meldingen">
                 <Bell size={17} />
                 {unreadCount > 0 && <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 rounded-full text-[9px] text-white font-bold flex items-center justify-center">{unreadCount}</span>}
               </button>
@@ -194,11 +194,11 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
           <span className="text-white font-bold text-sm">{staffName || 'Staff'}</span>
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={() => { setShowNotifications(!showNotifications); setUnreadCount(0); }} className="relative text-white/70 hover:text-white/60 transition-colors">
+          <button onClick={() => { setShowNotifications(!showNotifications); setUnreadCount(0); }} className="relative text-white/70 hover:text-white/60 transition-colors" aria-label="Meldingen">
             <Bell size={18} />
             {unreadCount > 0 && <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 rounded-full text-[9px] text-white font-bold flex items-center justify-center">{unreadCount}</span>}
           </button>
-          <button onClick={logout} className="text-white/70 hover:text-red-400 transition-colors"><LogOut size={18}/></button>
+          <button onClick={logout} className="text-white/70 hover:text-red-400 transition-colors" aria-label="Uitloggen"><LogOut size={18}/></button>
         </div>
         {showNotifications && (
           <div className="absolute top-full right-4 mt-1 w-64 bg-surface-dark border border-white/[0.08] rounded-xl shadow-2xl overflow-hidden z-50">

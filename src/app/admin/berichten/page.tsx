@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { MessageSquare, Send, Plus, X, Clock, User, Archive, MailOpen, Inbox } from 'lucide-react';
+import Modal from '@/components/ui/Modal';
 
 interface Conversation { id: number; customer_id: number; subject: string; status: string; customer_name: string; customer_email: string; unread_count: number; last_message: string; last_message_at: string; created_at: string; }
 interface ConvMessage { id: number; conversation_id: number; sender_type: string; sender_id: number; sender_name: string; message: string; is_read: boolean; created_at: string; }
@@ -120,36 +121,28 @@ export default function BerichtenPage() {
       </div>
 
       {/* New conversation modal */}
-      {showNew && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowNew(false)}>
-          <div className="bg-surface rounded-2xl shadow-2xl w-full max-w-lg" onClick={e => e.stopPropagation()}>
-            <div className="p-6 border-b border-sand-dark/20 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-surface-dark">Nieuw gesprek</h2>
-              <button onClick={() => setShowNew(false)} className="text-warm-gray/70 hover:text-warm-gray"><X size={20} /></button>
-            </div>
-            <div className="p-6 space-y-4">
+      <Modal open={showNew} onClose={() => setShowNew(false)} title="Nieuw gesprek">
+            <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium text-surface-dark block mb-1">Klant ID (optioneel)</label>
-                <input value={newCustomerId} onChange={e => setNewCustomerId(e.target.value)} placeholder="bijv. 42" className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none" />
+                <input value={newCustomerId} onChange={e => setNewCustomerId(e.target.value)} placeholder="bijv. 42" className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
               <div>
                 <label className="text-sm font-medium text-surface-dark block mb-1">Onderwerp</label>
-                <input value={newSubject} onChange={e => setNewSubject(e.target.value)} placeholder="Onderwerp van het gesprek" className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none" />
+                <input value={newSubject} onChange={e => setNewSubject(e.target.value)} placeholder="Onderwerp van het gesprek" className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
               <div>
                 <label className="text-sm font-medium text-surface-dark block mb-1">Bericht</label>
-                <textarea value={newMessage} onChange={e => setNewMessage(e.target.value)} rows={4} placeholder="Typ uw bericht..." className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none resize-none" />
+                <textarea value={newMessage} onChange={e => setNewMessage(e.target.value)} rows={4} placeholder="Typ uw bericht..." className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none" />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button onClick={() => setShowNew(false)} className="px-5 py-2.5 rounded-xl text-sm font-medium text-warm-gray hover:bg-sand/40">Annuleren</button>
+                <button onClick={createConversation} disabled={sending || !newSubject.trim() || !newMessage.trim()} className="bg-primary text-white font-semibold px-6 py-2.5 rounded-xl text-sm disabled:opacity-50 flex items-center gap-2">
+                  <Send size={14} /> Versturen
+                </button>
               </div>
             </div>
-            <div className="p-6 border-t border-sand-dark/20 flex justify-end gap-3">
-              <button onClick={() => setShowNew(false)} className="px-5 py-2.5 rounded-xl text-sm font-medium text-warm-gray hover:bg-sand/40">Annuleren</button>
-              <button onClick={createConversation} disabled={sending || !newSubject.trim() || !newMessage.trim()} className="bg-primary text-white font-semibold px-6 py-2.5 rounded-xl text-sm disabled:opacity-50 flex items-center gap-2">
-                <Send size={14} /> Versturen
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      </Modal>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Conversation list */}
@@ -234,9 +227,9 @@ export default function BerichtenPage() {
                     onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendReply(); } }}
                     placeholder="Typ een antwoord... (Enter om te versturen)"
                     rows={2}
-                    className="flex-1 px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none resize-none"
+                    className="flex-1 px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none"
                   />
-                  <button onClick={sendReply} disabled={sending || !reply.trim()} className="bg-primary hover:bg-primary-dark text-white p-3 rounded-xl self-end disabled:opacity-50 transition-all">
+                  <button onClick={sendReply} disabled={sending || !reply.trim()} className="bg-primary hover:bg-primary-dark text-white p-3 rounded-xl self-end disabled:opacity-50 transition-all" aria-label="Antwoord versturen">
                     <Send size={18} />
                   </button>
                 </div>

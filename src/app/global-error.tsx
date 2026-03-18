@@ -15,8 +15,8 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
           <div className="w-16 h-16 mx-auto mb-6 bg-red-100 rounded-2xl flex items-center justify-center">
             <span className="text-2xl">⚠️</span>
           </div>
-          <h2 className="text-2xl font-bold text-[#2C2520] mb-3">Er ging iets mis</h2>
-          <p className="text-[#8B8680] mb-6">Onze excuses voor het ongemak. Het probleem is automatisch gemeld.</p>
+          <h2 className="text-2xl font-bold text-surface-dark mb-3">Er ging iets mis</h2>
+          <p className="text-warm-gray mb-6">Onze excuses voor het ongemak. Het probleem is automatisch gemeld.</p>
           <button onClick={reset} className="bg-primary hover:bg-primary-dark text-white font-bold px-6 py-3 rounded-xl transition-colors">
             Opnieuw proberen
           </button>

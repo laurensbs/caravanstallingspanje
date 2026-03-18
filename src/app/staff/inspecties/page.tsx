@@ -252,7 +252,7 @@ export default function StaffInspectiesPage() {
                 <h2 className="text-lg font-bold text-surface-dark">Nieuwe inspectie</h2>
                 <p className="text-xs text-warm-gray/70">Stap {formStep + 1} van {STEPS.length}: {STEPS[formStep]}</p>
               </div>
-              <button onClick={() => { setShowForm(false); stopCamera(); }} className="text-warm-gray/70 hover:text-warm-gray p-1"><X size={20}/></button>
+              <button onClick={() => { setShowForm(false); stopCamera(); }} className="text-warm-gray/70 hover:text-warm-gray p-1" aria-label="Sluiten"><X size={20}/></button>
             </div>
 
             {/* Progress bar */}
@@ -325,9 +325,9 @@ export default function StaffInspectiesPage() {
                       {/* Camera controls */}
                       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 pt-10">
                         <div className="flex items-center justify-center gap-6">
-                          <button onClick={switchCamera} className="w-10 h-10 rounded-full bg-surface/20 backdrop-blur flex items-center justify-center text-white"><SwitchCamera size={18}/></button>
-                          <button onClick={capturePhoto} className="w-16 h-16 rounded-full bg-surface border-4 border-white/50 shadow-lg active:scale-90 transition-transform" />
-                          <button onClick={stopCamera} className="w-10 h-10 rounded-full bg-surface/20 backdrop-blur flex items-center justify-center text-white"><X size={18}/></button>
+                          <button onClick={switchCamera} className="w-10 h-10 rounded-full bg-surface/20 backdrop-blur flex items-center justify-center text-white" aria-label="Camera wisselen"><SwitchCamera size={18}/></button>
+                          <button onClick={capturePhoto} className="w-16 h-16 rounded-full bg-surface border-4 border-white/50 shadow-lg active:scale-90 transition-transform" aria-label="Foto maken" />
+                          <button onClick={stopCamera} className="w-10 h-10 rounded-full bg-surface/20 backdrop-blur flex items-center justify-center text-white" aria-label="Camera sluiten"><X size={18}/></button>
                         </div>
                       </div>
                     </div>

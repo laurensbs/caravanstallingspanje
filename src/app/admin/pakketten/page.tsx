@@ -3,6 +3,7 @@ import { fmt, fmtDate } from "@/lib/format";
 
 import { useState, useEffect, useCallback } from 'react';
 import { Package, Plus, Pencil, Trash2, Check, X, Euro, Tag, ToggleLeft, ToggleRight } from 'lucide-react';
+import Modal from '@/components/ui/Modal';
 
 interface ServicePackage {
   id: number; name: string; slug: string; category: string; description: string;
@@ -126,34 +127,28 @@ export default function DienstenPakkettenPage() {
       </div>
 
       {/* Form modal */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => { setShowForm(false); setEditing(null); }}>
-          <div className="bg-surface rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <div className="p-6 border-b border-sand-dark/20 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-surface-dark">{editing ? 'Pakket bewerken' : 'Nieuw pakket'}</h2>
-              <button onClick={() => { setShowForm(false); setEditing(null); }} className="text-warm-gray/70 hover:text-warm-gray"><X size={20} /></button>
-            </div>
-            <div className="p-6 space-y-4">
+      <Modal open={showForm} onClose={() => { setShowForm(false); setEditing(null); }} title={editing ? 'Pakket bewerken' : 'Nieuw pakket'}>
+            <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-semibold text-warm-gray block mb-1">Naam *</label>
-                  <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value, slug: editing ? form.slug : e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-') })} className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm outline-none focus:border-warning" />
+                  <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value, slug: editing ? form.slug : e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-') })} className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm outline-none focus:border-primary" />
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-warm-gray block mb-1">Slug *</label>
-                  <input value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm outline-none focus:border-warning" />
+                  <input value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm outline-none focus:border-primary" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-semibold text-warm-gray block mb-1">Categorie</label>
-                  <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm outline-none focus:border-warning">
+                  <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm outline-none focus:border-primary">
                     {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-warm-gray block mb-1">Prijstype</label>
-                  <select value={form.price_type} onChange={e => setForm({ ...form, price_type: e.target.value })} className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm outline-none focus:border-warning">
+                  <select value={form.price_type} onChange={e => setForm({ ...form, price_type: e.target.value })} className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm outline-none focus:border-primary">
                     {PRICE_TYPES.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
                   </select>
                 </div>
@@ -161,31 +156,29 @@ export default function DienstenPakkettenPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-semibold text-warm-gray block mb-1">Prijs (€) *</label>
-                  <input type="number" step="0.01" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm outline-none focus:border-warning" />
+                  <input type="number" step="0.01" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm outline-none focus:border-primary" />
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-warm-gray block mb-1">Sortering</label>
-                  <input type="number" value={form.sort_order} onChange={e => setForm({ ...form, sort_order: e.target.value })} className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm outline-none focus:border-warning" />
+                  <input type="number" value={form.sort_order} onChange={e => setForm({ ...form, sort_order: e.target.value })} className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm outline-none focus:border-primary" />
                 </div>
               </div>
               <div>
                 <label className="text-xs font-semibold text-warm-gray block mb-1">Omschrijving</label>
-                <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={2} className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm outline-none focus:border-warning resize-none" />
+                <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={2} className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm outline-none focus:border-primary resize-none" />
               </div>
               <div>
                 <label className="text-xs font-semibold text-warm-gray block mb-1">Features (1 per regel)</label>
-                <textarea value={form.features} onChange={e => setForm({ ...form, features: e.target.value })} rows={4} placeholder="Tweewekelijkse inspectie&#10;Bandenspanning controle&#10;Acculader dienst" className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm outline-none focus:border-warning resize-none" />
+                <textarea value={form.features} onChange={e => setForm({ ...form, features: e.target.value })} rows={4} placeholder="Tweewekelijkse inspectie&#10;Bandenspanning controle&#10;Acculader dienst" className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm outline-none focus:border-primary resize-none" />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button onClick={() => { setShowForm(false); setEditing(null); }} className="px-5 py-2.5 rounded-xl text-sm font-medium text-warm-gray hover:bg-sand/40">Annuleren</button>
+                <button onClick={savePackage} disabled={!form.name || !form.slug || !form.price} className="bg-primary text-white font-semibold px-6 py-2.5 rounded-xl text-sm disabled:opacity-50 flex items-center gap-2">
+                  <Check size={14} /> Opslaan
+                </button>
               </div>
             </div>
-            <div className="p-6 border-t border-sand-dark/20 flex justify-end gap-3">
-              <button onClick={() => { setShowForm(false); setEditing(null); }} className="px-5 py-2.5 rounded-xl text-sm font-medium text-warm-gray hover:bg-sand/40">Annuleren</button>
-              <button onClick={savePackage} disabled={!form.name || !form.slug || !form.price} className="bg-primary text-white font-semibold px-6 py-2.5 rounded-xl text-sm disabled:opacity-50 flex items-center gap-2">
-                <Check size={14} /> Opslaan
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      </Modal>
 
       {/* Packages grid */}
       {loading ? (

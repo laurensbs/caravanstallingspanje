@@ -1,8 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { Search, Plus, X, ChevronLeft, ChevronRight, Edit2, MapPin, Filter, Trash2 } from 'lucide-react';
+import { useAdminData } from '@/hooks/useAdminData';
+import Modal from '@/components/ui/Modal';
 
+import { CARAVAN_STATUS_COLORS } from '@/lib/format';
 interface CaravanRow {
   id: number; brand: string; model: string; year: number; license_plate: string;
   length_m: number; weight_kg: number; has_mover: boolean; status: string; customer_id: number; customer_name: string; customer_email: string;
@@ -14,15 +17,11 @@ interface LocationOption { id: number; name: string; }
 interface SpotOption { id: number; label: string; zone: string; status: string; }
 
 const STATUSES = ['gestald', 'op_camping', 'in_transit', 'onderhoud', 'verkocht'];
-const STATUS_COLORS: Record<string, string> = { gestald: 'bg-accent/15 text-accent-dark', op_camping: 'bg-ocean/15 text-ocean-dark', in_transit: 'bg-warning/15 text-warning', onderhoud: 'bg-orange-100 text-orange-700', verkocht: 'bg-sand text-warm-gray' };
 
 export default function CaravansPage() {
-  const [caravans, setCaravans] = useState<CaravanRow[]>([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [loading, setLoading] = useState(true);
+  const { items: caravans, total, page, setPage, loading, refetch: fetchData } = useAdminData<CaravanRow>({ endpoint: '/api/admin/caravans', dataKey: 'caravans', params: { search, status: statusFilter } });
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<CaravanRow | null>(null);
   const [customers, setCustomers] = useState<CustomerOption[]>([]);
@@ -30,20 +29,6 @@ export default function CaravansPage() {
   const [spots, setSpots] = useState<SpotOption[]>([]);
   const [form, setForm] = useState({ customer_id: '', brand: '', model: '', year: '', license_plate: '', length_m: '', weight_kg: '', has_mover: false, status: 'gestald', location_id: '', spot_id: '', insurance_expiry: '', apk_expiry: '', notes: '' });
   const limit = 50;
-
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
-    if (search) params.set('search', search);
-    if (statusFilter) params.set('status', statusFilter);
-    const res = await fetch(`/api/admin/caravans?${params}`, { credentials: 'include' });
-    const data = await res.json();
-    setCaravans(data.caravans || []);
-    setTotal(data.total || 0);
-    setLoading(false);
-  }, [page, search, statusFilter]);
-
-  useEffect(() => { fetchData(); }, [fetchData]);
 
   const loadFormOptions = async () => {
     const [custRes, locRes] = await Promise.all([
@@ -120,7 +105,7 @@ export default function CaravansPage() {
           <div className="flex items-center gap-2 bg-sand/40 rounded-xl px-3.5 py-2.5 flex-1 min-w-[200px] border border-sand-dark/20">
             <Search size={15} className="text-warm-gray/50" />
             <input placeholder="Zoek op merk, model, kenteken, klant..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} className="bg-transparent text-sm outline-none flex-1 text-warm-gray placeholder:text-warm-gray/50" />
-            {search && <button onClick={() => setSearch('')}><X size={14} className="text-warm-gray/70" /></button>}
+            {search && <button onClick={() => setSearch('')} aria-label="Zoekopdracht wissen"><X size={14} className="text-warm-gray/70" /></button>}
           </div>
           <div className="flex items-center gap-2">
             <Filter size={14} className="text-warm-gray/50" />
@@ -165,7 +150,7 @@ export default function CaravansPage() {
                     ) : <span className="text-xs text-warm-gray/70">Geen plek</span>}
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`text-xs font-medium px-2 py-1 rounded-full ${STATUS_COLORS[c.status] || 'bg-sand'}`}>{c.status.replace('_', ' ')}</span>
+                    <span className={`text-xs font-medium px-2 py-1 rounded-full ${CARAVAN_STATUS_COLORS[c.status] || 'bg-sand'}`}>{c.status.replace('_', ' ')}</span>
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-1">
@@ -182,22 +167,16 @@ export default function CaravansPage() {
           <div className="flex items-center justify-between px-4 py-3 border-t border-sand-dark/20">
             <p className="text-xs text-warm-gray/70">Pagina {page} van {totalPages} ({total} resultaten)</p>
             <div className="flex gap-1">
-              <button disabled={page <= 1} onClick={() => setPage(p => p - 1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors"><ChevronLeft size={16} className="text-warm-gray/70" /></button>
-              <button disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors"><ChevronRight size={16} className="text-warm-gray/70" /></button>
+              <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors" aria-label="Vorige pagina"><ChevronLeft size={16} className="text-warm-gray/70" /></button>
+              <button disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors" aria-label="Volgende pagina"><ChevronRight size={16} className="text-warm-gray/70" /></button>
             </div>
           </div>
         )}
       </div>
 
       {/* Form modal */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-surface rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="flex items-center justify-between p-6 border-b border-sand-dark/20">
-              <h2 className="text-lg font-bold text-surface-dark">{editing ? 'Caravan bewerken' : 'Caravan toevoegen'}</h2>
-              <button onClick={() => setShowForm(false)} className="text-warm-gray/70 hover:text-warm-gray transition-colors"><X size={20} /></button>
-            </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+      <Modal open={showForm} onClose={() => setShowForm(false)} title={editing ? 'Caravan bewerken' : 'Caravan toevoegen'}>
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="text-xs font-semibold text-warm-gray block mb-1">Klant *</label>
                 <select required value={form.customer_id} onChange={e => setForm({ ...form, customer_id: e.target.value })} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
@@ -249,9 +228,7 @@ export default function CaravansPage() {
                 <button type="submit" className="bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-primary/20 transition-all">{editing ? 'Bijwerken' : 'Opslaan'}</button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 }

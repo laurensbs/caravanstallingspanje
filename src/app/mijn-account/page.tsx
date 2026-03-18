@@ -1,5 +1,5 @@
 'use client';
-import { fmt, fmtDate } from "@/lib/format";
+import { fmt, fmtDate, CUSTOMER_STATUS_COLORS } from "@/lib/format";
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -116,7 +116,7 @@ function CustomerMessagesTab() {
               </div>
               <div className="p-4 border-t border-sand-dark/20 flex gap-2">
                 <input value={reply} onChange={e => setReply(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') sendReply(); }} placeholder="Typ een reactie..." className="flex-1 px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
-                <button onClick={sendReply} disabled={sending || !reply.trim()} className="bg-primary text-white p-2.5 rounded-xl disabled:opacity-50"><Send size={16} /></button>
+                <button onClick={sendReply} disabled={sending || !reply.trim()} className="bg-primary text-white p-2.5 rounded-xl disabled:opacity-50" aria-label="Bericht versturen"><Send size={16} /></button>
               </div>
             </div>
           ) : (
@@ -261,7 +261,6 @@ function MijnAccountContent() {
     } catch { setPwChangeMsg('Er ging iets mis'); }
   };
 
-  const STATUS_COLORS: Record<string,string> = { betaald: 'bg-accent/10 text-primary-dark border-accent/30', open: 'bg-ocean/10 text-ocean-dark border-ocean/30', verzonden: 'bg-warning/10 text-warning border-warning/30', actief: 'bg-accent/10 text-primary-dark border-accent/30', verlopen: 'bg-danger/10 text-danger border-danger/30' };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-sand/40"><div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" /></div>;
 
@@ -321,14 +320,14 @@ function MijnAccountContent() {
               </div>
               <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">E-mail *</label><input type="email" required value={registerForm.email} onChange={e=>setRegisterForm({...registerForm,email:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
               <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Telefoon</label><input value={registerForm.phone} onChange={e=>setRegisterForm({...registerForm,phone:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
-              <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Wachtwoord *</label><div className="relative"><input type={showPw?'text':'password'} required minLength={8} value={registerForm.password} onChange={e=>setRegisterForm({...registerForm,password:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm pr-10 bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/><button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-warm-gray/50 hover:text-warm-gray">{showPw?<EyeOff size={16}/>:<Eye size={16}/>}</button></div></div>
+              <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Wachtwoord *</label><div className="relative"><input type={showPw?'text':'password'} required minLength={8} value={registerForm.password} onChange={e=>setRegisterForm({...registerForm,password:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm pr-10 bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/><button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-warm-gray/50 hover:text-warm-gray" aria-label={showPw ? "Wachtwoord verbergen" : "Wachtwoord tonen"}>{showPw?<EyeOff size={16}/>:<Eye size={16}/>}</button></div></div>
               <button type="submit" className="w-full bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-primary/20">Registreren</button>
               <p className="text-center text-sm text-warm-gray/70">Al een account? <button type="button" onClick={()=>setIsRegister(false)} className="text-primary font-semibold hover:underline">Inloggen</button></p>
             </form>
           ) : (
             <form onSubmit={login} className="space-y-4">
               <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">E-mail</label><input type="email" required value={loginForm.email} onChange={e=>setLoginForm({...loginForm,email:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
-              <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Wachtwoord</label><div className="relative"><input type={showPw?'text':'password'} required value={loginForm.password} onChange={e=>setLoginForm({...loginForm,password:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm pr-10 bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/><button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-warm-gray/50 hover:text-warm-gray">{showPw?<EyeOff size={16}/>:<Eye size={16}/>}</button></div></div>
+              <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Wachtwoord</label><div className="relative"><input type={showPw?'text':'password'} required value={loginForm.password} onChange={e=>setLoginForm({...loginForm,password:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm pr-10 bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/><button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-warm-gray/50 hover:text-warm-gray" aria-label={showPw ? "Wachtwoord verbergen" : "Wachtwoord tonen"}>{showPw?<EyeOff size={16}/>:<Eye size={16}/>}</button></div></div>
               <button type="submit" className="w-full bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-primary/20">Inloggen</button>
               <div className="flex items-center justify-between text-sm">
                 <button type="button" onClick={()=>setShowForgot(true)} className="text-primary font-semibold hover:underline">Wachtwoord vergeten?</button>
@@ -560,7 +559,7 @@ function MijnAccountContent() {
                   <td className="px-5 py-4 text-xs text-warm-gray">{fmtDate(c.start_date)} — {fmtDate(c.end_date)}</td>
                   <td className="px-5 py-4 text-right font-bold text-surface-dark">{fmt(c.monthly_rate)}</td>
                   <td className="px-5 py-4 text-center">{c.auto_renew ? <CheckCircle2 size={16} className="text-accent mx-auto"/> : <Clock size={16} className="text-warm-gray/50 mx-auto"/>}</td>
-                  <td className="px-5 py-4 text-center"><span className={`text-xs font-semibold px-3 py-1 rounded-full border ${STATUS_COLORS[c.status] || 'bg-sand/40 text-warm-gray border-sand-dark/30'}`}>{c.status}</span></td>
+                  <td className="px-5 py-4 text-center"><span className={`text-xs font-semibold px-3 py-1 rounded-full border ${CUSTOMER_STATUS_COLORS[c.status] || 'bg-sand/40 text-warm-gray border-sand-dark/30'}`}>{c.status}</span></td>
                 </tr>
               ))}</tbody>
             </table>
@@ -588,7 +587,7 @@ function MijnAccountContent() {
                   <td className="px-5 py-4 text-xs text-warm-gray">{i.description || '-'}</td>
                   <td className="px-5 py-4 text-right font-bold text-surface-dark">{fmt(i.total)}</td>
                   <td className="px-5 py-4 text-xs text-warm-gray">{fmtDate(i.due_date)}</td>
-                  <td className="px-5 py-4 text-center"><span className={`text-xs font-semibold px-3 py-1 rounded-full border ${STATUS_COLORS[i.status] || 'bg-sand/40 text-warm-gray border-sand-dark/30'}`}>{i.status}</span></td>
+                  <td className="px-5 py-4 text-center"><span className={`text-xs font-semibold px-3 py-1 rounded-full border ${CUSTOMER_STATUS_COLORS[i.status] || 'bg-sand/40 text-warm-gray border-sand-dark/30'}`}>{i.status}</span></td>
                   <td className="px-5 py-4 text-center">
                     {i.status !== 'betaald' && (
                       <button onClick={() => window.open(`/api/customer/invoices?pay=${i.id}`, '_blank')} className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-dark transition-colors">

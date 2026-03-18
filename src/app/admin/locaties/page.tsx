@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { MapPin, Plus, X, Grid3X3, ChevronDown, ChevronUp } from 'lucide-react';
+import Modal from '@/components/ui/Modal';
 
 interface Location { id: number; name: string; address: string; city: string; capacity_inside: number; capacity_outside: number; is_active: boolean; total_spots: number; occupied_spots: number; }
 interface Spot { id: number; label: string; zone: string; spot_type: string; status: string; caravan_brand: string; caravan_model: string; caravan_license_plate: string; customer_name: string; }
@@ -140,13 +141,10 @@ export default function LocatiesPage() {
       </div>
 
       {/* Add location modal */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-surface rounded-2xl w-full max-w-md shadow-2xl">
-            <div className="flex items-center justify-between p-6 border-b border-sand-dark/20"><h2 className="text-lg font-bold text-surface-dark">Nieuwe locatie</h2><button onClick={() => setShowForm(false)} className="text-warm-gray/70 hover:text-warm-gray"><X size={20} /></button></div>
-            <form onSubmit={handleAddLocation} className="p-6 space-y-4">
-              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Naam *</label><input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none transition-all" /></div>
-              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Adres</label><input value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none transition-all" /></div>
+      <Modal open={showForm} onClose={() => setShowForm(false)} title="Nieuwe locatie" size="sm">
+            <form onSubmit={handleAddLocation} className="space-y-4">
+              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Naam *</label><input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" /></div>
+              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Adres</label><input value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" /></div>
               <div className="grid grid-cols-3 gap-4">
                 <div><label className="text-xs font-semibold text-warm-gray block mb-1">Stad</label><input value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 outline-none" /></div>
                 <div><label className="text-xs font-semibold text-warm-gray block mb-1">Binnen capaciteit</label><input type="number" value={form.capacity_inside} onChange={e => setForm({ ...form, capacity_inside: e.target.value })} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 outline-none" /></div>
@@ -157,9 +155,7 @@ export default function LocatiesPage() {
                 <button type="submit" className="bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-primary/20 transition-all">Opslaan</button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 }

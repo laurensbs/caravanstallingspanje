@@ -52,7 +52,7 @@ export default function InstellingenPage() {
   const Input = ({ label, field, type = 'text' }: { label: string; field: string; type?: string }) => (
     <div>
       <label className="text-xs font-semibold text-warm-gray block mb-1">{label}</label>
-      <input type={type} value={(settings as Record<string,string|number|boolean>)[field] as string || ''} onChange={e => setSettings(s => ({...s, [field]: e.target.value}))} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none transition-all" />
+      <input type={type} value={(settings as Record<string,string|number|boolean>)[field] as string || ''} onChange={e => setSettings(s => ({...s, [field]: e.target.value}))} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
     </div>
   );
 

@@ -1,36 +1,23 @@
 'use client';
-import { fmt, fmtDate } from "@/lib/format";
+import { fmt, fmtDate, INVOICE_STATUS_COLORS } from "@/lib/format";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { Receipt, Plus, X, ChevronLeft, ChevronRight, CheckCircle, AlertTriangle, Download } from 'lucide-react';
+import { useAdminData } from '@/hooks/useAdminData';
+import Modal from '@/components/ui/Modal';
 
 interface Invoice { id: number; invoice_number: string; customer_name: string; customer_email: string; description: string; subtotal: number; tax_amount: number; total: number; status: string; due_date: string; paid_date: string; payment_method: string; created_at: string; }
 interface CustomerOption { id: number; first_name: string; last_name: string; email: string; }
 interface ContractOption { id: number; contract_number: string; customer_id: number; monthly_rate: number; }
 
-const STATUS_COLORS: Record<string,string> = { open: 'bg-ocean/15 text-ocean-dark', verzonden: 'bg-warning/15 text-warning', betaald: 'bg-accent/15 text-accent-dark', achterstallig: 'bg-danger/15 text-danger', geannuleerd: 'bg-sand text-warm-gray' };
 
 export default function FacturenPage() {
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('');
-  const [loading, setLoading] = useState(true);
+  const { items: invoices, total, page, setPage, loading, refetch: fetchData } = useAdminData<Invoice>({ endpoint: '/api/admin/invoices', dataKey: 'invoices', params: { status: statusFilter } });
   const [showForm, setShowForm] = useState(false);
   const [customers, setCustomers] = useState<CustomerOption[]>([]);
   const [contracts, setContracts] = useState<ContractOption[]>([]);
   const [form, setForm] = useState({ customer_id: '', contract_id: '', description: '', subtotal: '', tax_rate: '21', due_date: '' });
-
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    const params = new URLSearchParams({ page: String(page), limit: '50' });
-    if (statusFilter) params.set('status', statusFilter);
-    const res = await fetch(`/api/admin/invoices?${params}`, { credentials: 'include' });
-    const data = await res.json();
-    setInvoices(data.invoices || []); setTotal(data.total || 0); setLoading(false);
-  }, [page, statusFilter]);
-
-  useEffect(() => { fetchData(); }, [fetchData]);
 
   const openForm = async () => {
     const [custRes, contRes] = await Promise.all([
@@ -103,7 +90,7 @@ export default function FacturenPage() {
                   <td className="px-4 py-3 text-warm-gray/70 text-xs max-w-[200px] truncate">{i.description || '-'}</td>
                   <td className="px-4 py-3 text-right font-medium text-surface-dark">{fmt(Number(i.total))}</td>
                   <td className="px-4 py-3 text-xs text-warm-gray">{fmtDate(i.due_date)} {overdue && <AlertTriangle size={12} className="inline text-danger ml-1" />}</td>
-                  <td className="px-4 py-3 text-center"><span className={`text-xs font-medium px-2 py-1 rounded-full ${STATUS_COLORS[overdue && i.status !== 'betaald' ? 'achterstallig' : i.status] || 'bg-sand'}`}>{overdue && i.status !== 'betaald' ? 'achterstallig' : i.status}</span></td>
+                  <td className="px-4 py-3 text-center"><span className={`text-xs font-medium px-2 py-1 rounded-full ${INVOICE_STATUS_COLORS[overdue && i.status !== 'betaald' ? 'achterstallig' : i.status] || 'bg-sand'}`}>{overdue && i.status !== 'betaald' ? 'achterstallig' : i.status}</span></td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <a href={`/api/admin/invoices/${i.id}/pdf`} target="_blank" rel="noopener noreferrer" className="text-xs text-ocean font-medium flex items-center gap-1 hover:text-ocean-dark transition-colors"><Download size={12} /> PDF</a>
@@ -119,15 +106,12 @@ export default function FacturenPage() {
         </table>
         </div>
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-sand-dark/20"><p className="text-xs text-warm-gray/70">Pagina {page}/{totalPages}</p><div className="flex gap-1"><button disabled={page<=1} onClick={()=>setPage(p=>p-1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors"><ChevronLeft size={16} className="text-warm-gray/70"/></button><button disabled={page>=totalPages} onClick={()=>setPage(p=>p+1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors"><ChevronRight size={16} className="text-warm-gray/70"/></button></div></div>
+          <div className="flex items-center justify-between px-4 py-3 border-t border-sand-dark/20"><p className="text-xs text-warm-gray/70">Pagina {page}/{totalPages}</p><div className="flex gap-1"><button disabled={page<=1} onClick={()=>setPage(page-1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors" aria-label="Vorige pagina"><ChevronLeft size={16} className="text-warm-gray/70"/></button><button disabled={page>=totalPages} onClick={()=>setPage(page+1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors" aria-label="Volgende pagina"><ChevronRight size={16} className="text-warm-gray/70"/></button></div></div>
         )}
       </div>
 
-      {showForm && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-surface rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="flex items-center justify-between p-6 border-b border-sand-dark/20"><h2 className="text-lg font-bold text-surface-dark">Nieuwe factuur</h2><button onClick={()=>setShowForm(false)} className="text-warm-gray/70 hover:text-warm-gray"><X size={20}/></button></div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+      <Modal open={showForm} onClose={() => setShowForm(false)} title="Nieuwe factuur">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="text-xs font-semibold text-warm-gray block mb-1">Klant *</label>
                 <select required value={form.customer_id} onChange={e => setForm({...form, customer_id: e.target.value, contract_id: ''})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
@@ -154,9 +138,7 @@ export default function FacturenPage() {
                 <button type="submit" className="bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-primary/20 transition-all">Aanmaken</button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 }

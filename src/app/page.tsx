@@ -63,7 +63,7 @@ export default function HomePage() {
       {/* ═══ HERO ═══ */}
       <section id="main-content" className="relative min-h-[92vh] flex items-center bg-hero overflow-hidden">
         <div className="absolute inset-0">
-          <Image src="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1920&q=80" alt="" fill className="object-cover opacity-25" priority />
+          <Image src="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1920&q=80" alt="Caravanstalling terrein" fill sizes="100vw" className="object-cover opacity-25" priority />
           <div className="hero-overlay absolute inset-0" />
         </div>
         <div className="absolute inset-0 dot-pattern opacity-30" />
@@ -117,7 +117,7 @@ export default function HomePage() {
             <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }}>
               <div className="booking-widget rounded-2xl p-6 sm:p-8">
                 <div className="text-center mb-6">
-                  <h3 className="text-lg font-bold text-surface-dark">Direct stalling aanvragen</h3>
+                  <h2 className="text-lg font-bold text-surface-dark">Direct stalling aanvragen</h2>
                   <p className="text-warm-gray text-xs mt-1">Costa Brava, Spanje</p>
                 </div>
 
@@ -253,7 +253,7 @@ export default function HomePage() {
 
       {/* ═══ IMAGE BREAK ═══ */}
       <section className="relative h-[320px] sm:h-[420px] overflow-hidden">
-        <Image src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1920&q=80" alt="Costa Brava terrein" fill className="object-cover" />
+        <Image src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1920&q=80" alt="Costa Brava terrein" fill sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-surface-dark/80 via-surface-dark/20 to-transparent" />
         <div className="absolute bottom-0 inset-x-0 max-w-7xl mx-auto px-4 sm:px-6 pb-10 sm:pb-14 text-center">
           <p className="text-white/70 text-sm font-medium mb-2">Sant Climent de Peralta, Girona</p>
@@ -423,7 +423,7 @@ export default function HomePage() {
                 <Link href={`/blog/${post.slug}`} className="group block h-full">
                   <div className="bg-card rounded-2xl overflow-hidden border border-sand-dark/20 h-full flex flex-col card-hover">
                     <div className="relative aspect-[16/10] overflow-hidden">
-                      <Image src={post.image} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <Image src={post.image} alt={post.title} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
                       <div className="absolute top-3 left-3">
                         <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white/90 text-primary">{post.category}</span>
                       </div>

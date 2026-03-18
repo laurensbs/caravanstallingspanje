@@ -17,7 +17,7 @@ export default function PageHero({ badge, title, subtitle, image, children }: Pa
       <div className="absolute inset-0">
         {image ? (
           <>
-            <Image src={image} alt="" fill className="object-cover opacity-20" priority />
+            <Image src={image} alt="Achtergrondafbeelding" fill sizes="100vw" className="object-cover opacity-20" priority />
             <div className="hero-overlay absolute inset-0" />
           </>
         ) : (

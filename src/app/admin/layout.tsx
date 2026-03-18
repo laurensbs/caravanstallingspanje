@@ -240,7 +240,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                     autoFocus
                     autoComplete="current-password"
                   />
-                  <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/60 transition-colors">
+                  <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/60 transition-colors" aria-label={showPw ? "Wachtwoord verbergen" : "Wachtwoord tonen"}>
                     {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
@@ -295,7 +295,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               <span className="text-white/70 text-[10px]">{role === 'admin' ? 'Admin Panel' : 'Staff Portal'}</span>
             </div>
           </div>
-          <button className="md:hidden text-white/70" onClick={() => setSidebarOpen(false)}><X size={20} /></button>
+          <button className="md:hidden text-white/70" onClick={() => setSidebarOpen(false)} aria-label="Zijmenu sluiten"><X size={20} /></button>
         </div>
         <nav className="p-3 space-y-0.5 overflow-y-auto h-[calc(100vh-8rem)] custom-scrollbar">
           {filteredNav.map(n => {
@@ -335,7 +335,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         {/* Top bar */}
         <header className="h-16 bg-surface border-b border-sand-dark/30 flex items-center justify-between px-6 shrink-0">
           <div className="flex items-center gap-3">
-            <button className="md:hidden text-warm-gray/70 hover:text-warm-gray" onClick={() => setSidebarOpen(true)}><Menu size={20} /></button>
+            <button className="md:hidden text-warm-gray/70 hover:text-warm-gray" onClick={() => setSidebarOpen(true)} aria-label="Menu openen"><Menu size={20} /></button>
             <div className="flex items-center gap-2 bg-sand/40 rounded-xl px-3.5 py-2.5 w-full md:w-80 border border-sand-dark/20 relative">
               <Search size={15} className="text-warm-gray/50" />
               <input
@@ -364,7 +364,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </div>
           <div className="flex items-center gap-4">
             <div className="relative">
-              <button onClick={() => setShowNotifications(!showNotifications)} className="relative text-warm-gray/50 hover:text-warm-gray transition-colors">
+              <button onClick={() => setShowNotifications(!showNotifications)} className="relative text-warm-gray/50 hover:text-warm-gray transition-colors" aria-label="Notificaties">
                 <Bell size={19} />
                 {unreadCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[9px] font-bold rounded-full flex items-center justify-center">{unreadCount}</span>}
               </button>

@@ -59,7 +59,7 @@ export default function Modal({ open, onClose, title, description, children, siz
                   <h3 className="text-lg font-bold text-surface-dark">{title}</h3>
                   {description && <p className="text-sm text-warm-gray mt-1">{description}</p>}
                 </div>
-                <button onClick={onClose} className="p-1.5 hover:bg-sand rounded-lg transition-colors text-warm-gray hover:text-surface-dark">
+                <button onClick={onClose} className="p-1.5 hover:bg-sand rounded-lg transition-colors text-warm-gray hover:text-surface-dark" aria-label="Sluiten">
                   <X size={18} />
                 </button>
               </div>
