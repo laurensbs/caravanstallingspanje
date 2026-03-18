@@ -66,7 +66,7 @@ export default function HomePage() {
       {/* ═══ HERO ═══ */}
       <section id="main-content" className="relative min-h-[92vh] flex items-center bg-hero overflow-hidden">
         <div className="absolute inset-0">
-          <Image src="https://u.cubeupload.com/laurensbos/caravanstoragespain.jpg" alt="Caravanstalling terrein" fill sizes="100vw" className="object-cover opacity-25" priority />
+          <Image src="https://u.cubeupload.com/laurensbos/caravanstoragespain.jpg" alt="Caravanstalling terrein" fill sizes="100vw" className="object-cover opacity-30" priority />
           <div className="hero-overlay absolute inset-0" />
         </div>
         <div className="absolute inset-0 dot-pattern opacity-30" />
@@ -258,7 +258,7 @@ export default function HomePage() {
 
       {/* ═══ IMAGE BREAK ═══ */}
       <section className="relative h-[320px] sm:h-[420px] overflow-hidden">
-        <Image src="https://u.cubeupload.com/laurensbos/caravanstoragespain4.jpg" alt="Costa Brava terrein" fill sizes="100vw" className="object-cover" />
+        <Image src="https://u.cubeupload.com/laurensbos/caravanstoragespain3.jpg" alt="Caravanstalling terrein in Spanje" fill sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-surface-dark/80 via-surface-dark/20 to-transparent" />
         <div className="absolute bottom-0 inset-x-0 max-w-7xl mx-auto px-4 sm:px-6 pb-10 sm:pb-14 text-center">
           <p className="text-white/70 text-sm font-medium mb-2">Sant Climent de Peralta, Girona</p>
@@ -322,26 +322,31 @@ export default function HomePage() {
             <div className="section-divider mt-5 mb-5" />
           </A>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { step: "01", icon: Phone, title: "Vertel uw wensen", desc: "Beantwoord een paar vragen en ontvang een voorstel op maat." },
-              { step: "02", icon: MapPin, title: "Plek reserveren", desc: "Wij wijzen een vaste plek toe op uw gewenste locatie." },
-              { step: "03", icon: Truck, title: "Caravan brengen", desc: "Breng uw caravan of wij halen hem op met ons transport." },
-              { step: "04", icon: Shield, title: "Wij zorgen ervoor", desc: "Bewaking, controles, onderhoud – wij regelen alles." },
-            ].map((s, i) => (
-              <A key={s.step} delay={i * 0.1}>
-                <div className="text-center">
-                  <div className="relative inline-flex mb-5">
-                    <div className="w-16 h-16 bg-sand rounded-2xl flex items-center justify-center">
-                      <s.icon size={24} className="text-primary" />
+          <div className="relative">
+            {/* Connecting line */}
+            <div className="hidden md:block absolute top-14 left-[12.5%] right-[12.5%] h-[2px] bg-gradient-to-r from-primary/10 via-primary/25 to-primary/10" />
+
+            <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
+              {[
+                { step: "1", icon: Phone, title: "Vertel uw wensen", desc: "Beantwoord een paar vragen en ontvang een voorstel op maat." },
+                { step: "2", icon: MapPin, title: "Plek reserveren", desc: "Wij wijzen een vaste plek toe op uw gewenste locatie." },
+                { step: "3", icon: Truck, title: "Caravan brengen", desc: "Breng uw caravan of wij halen hem op met ons transport." },
+                { step: "4", icon: Shield, title: "Wij zorgen ervoor", desc: "Bewaking, controles, onderhoud – wij regelen alles." },
+              ].map((s, i) => (
+                <A key={s.step} delay={i * 0.1}>
+                  <div className="bg-surface rounded-2xl p-6 border border-sand-dark/10 text-center relative hover:border-primary/15 hover:shadow-md transition-all h-full">
+                    <div className="relative inline-flex mb-5">
+                      <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center">
+                        <s.icon size={22} className="text-primary" />
+                      </div>
+                      <span className="absolute -top-1 -right-1 w-6 h-6 bg-primary text-white text-[11px] font-black rounded-full flex items-center justify-center shadow-sm">{s.step}</span>
                     </div>
-                    <span className="absolute -top-1.5 -right-1.5 w-7 h-7 bg-primary text-white text-[11px] font-black rounded-full flex items-center justify-center shadow-sm">{s.step}</span>
+                    <h3 className="font-bold text-[15px] mb-2">{s.title}</h3>
+                    <p className="text-sm text-warm-gray leading-relaxed">{s.desc}</p>
                   </div>
-                  <h3 className="font-bold text-[15px] mb-2">{s.title}</h3>
-                  <p className="text-sm text-warm-gray leading-relaxed">{s.desc}</p>
-                </div>
-              </A>
-            ))}
+                </A>
+              ))}
+            </div>
           </div>
         </div>
       </section>
