@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { hashPassword } from '@/lib/auth';
+import { validateBody, staffSchema } from '@/lib/validations';
 
 export async function GET() {
   try {
@@ -14,10 +15,10 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const data = await req.json();
-    if (!data.email || !data.password || !data.first_name || !data.last_name) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
+    const body = await req.json();
+    const validated = validateBody(staffSchema, body);
+    if (!validated.success) return NextResponse.json({ error: validated.error }, { status: 400 });
+    const data = validated.data;
     const password_hash = await hashPassword(data.password);
     const result = await sql`INSERT INTO staff (first_name, last_name, email, phone, password_hash, role, location_id) VALUES (${data.first_name}, ${data.last_name}, ${data.email}, ${data.phone || null}, ${password_hash}, ${data.role || 'medewerker'}, ${data.location_id || null}) RETURNING id, first_name, last_name, email, role`;
     return NextResponse.json({ staff: result[0] }, { status: 201 });

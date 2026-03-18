@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllCustomers, createCustomer, sql } from '@/lib/db';
+import { validateBody, customerSchema } from '@/lib/validations';
 
 export async function GET(req: NextRequest) {
   try {
@@ -17,8 +18,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const data = await req.json();
-    const customer = await createCustomer(data);
+    const body = await req.json();
+    const validated = validateBody(customerSchema, body);
+    if (!validated.success) return NextResponse.json({ error: validated.error }, { status: 400 });
+    const customer = await createCustomer(validated.data);
     return NextResponse.json({ customer }, { status: 201 });
   } catch (error) {
     console.error('Customer POST error:', error);

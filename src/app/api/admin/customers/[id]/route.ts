@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
+import { validateBody, customerSchema } from '@/lib/validations';
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -16,7 +17,10 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const data = await req.json();
+    const body = await req.json();
+    const validated = validateBody(customerSchema, body);
+    if (!validated.success) return NextResponse.json({ error: validated.error }, { status: 400 });
+    const data = validated.data;
     await sql`UPDATE customers SET first_name = ${data.first_name}, last_name = ${data.last_name}, email = ${data.email}, phone = ${data.phone || null}, address = ${data.address || null}, city = ${data.city || null}, postal_code = ${data.postal_code || null}, country = ${data.country || 'NL'}, company_name = ${data.company_name || null}, notes = ${data.notes || null}, updated_at = NOW() WHERE id = ${id}`;
     return NextResponse.json({ success: true });
   } catch (error) {

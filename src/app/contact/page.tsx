@@ -43,12 +43,12 @@ export default function ContactPage() {
       <Header />
 
       {/* Hero */}
-      <section className="relative bg-primary-dark text-white py-20 sm:py-28 overflow-hidden">
+      <section className="relative bg-surface-dark text-white py-20 sm:py-28 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-dark via-primary/80 to-primary-dark" />
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-4">Contact</p>
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-4">Contact</p>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] mb-6">
               Neem <span className="gradient-text">contact</span> op
             </h1>
@@ -60,47 +60,47 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Grid */}
-      <section className="py-20 sm:py-28 bg-white">
+      <section className="py-20 sm:py-28 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-5 gap-12 lg:gap-16">
 
             {/* Form */}
             <A className="lg:col-span-3">
               {submitted ? (
-                <div className="bg-surface rounded-2xl p-10 sm:p-14 text-center border border-black/[0.04]">
-                  <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <CheckCircle className="text-emerald-600" size={32} />
+                <div className="bg-surface rounded-2xl p-10 sm:p-14 text-center border border-sand-dark/[0.04]">
+                  <div className="w-16 h-16 bg-accent/15 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <CheckCircle className="text-accent" size={32} />
                   </div>
                   <h2 className="text-2xl font-black mb-3">Bericht verzonden</h2>
-                  <p className="text-muted leading-relaxed mb-6">Bedankt voor uw bericht. Wij nemen zo spoedig mogelijk contact met u op, meestal binnen 1 werkdag.</p>
-                  <Link href="/" className="text-accent hover:text-accent-dark font-bold text-sm inline-flex items-center gap-1">
+                  <p className="text-warm-gray leading-relaxed mb-6">Bedankt voor uw bericht. Wij nemen zo spoedig mogelijk contact met u op, meestal binnen 1 werkdag.</p>
+                  <Link href="/" className="text-primary hover:text-surface-dark font-bold text-sm inline-flex items-center gap-1">
                     Terug naar home <ArrowRight size={14} />
                   </Link>
                 </div>
               ) : (
                 <div>
                   <h2 className="text-2xl font-black mb-1">Stuur ons een bericht</h2>
-                  <p className="text-muted text-sm mb-8">Vul het formulier in en wij reageren binnen 1 werkdag.</p>
+                  <p className="text-warm-gray text-sm mb-8">Vul het formulier in en wij reageren binnen 1 werkdag.</p>
 
                   <form onSubmit={(e) => { handleSubmit(e); }} className="space-y-5">
                     <div className="grid sm:grid-cols-2 gap-5">
                       <div>
                         <label htmlFor="name" className="block text-xs font-bold mb-1.5">Naam *</label>
-                        <input id="name" name="name" type="text" required className="w-full border border-black/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 transition-all" placeholder="Uw naam" />
+                        <input id="name" name="name" type="text" required className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" placeholder="Uw naam" />
                       </div>
                       <div>
                         <label htmlFor="email" className="block text-xs font-bold mb-1.5">E-mail *</label>
-                        <input id="email" name="email" type="email" required className="w-full border border-black/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 transition-all" placeholder="uw@email.com" />
+                        <input id="email" name="email" type="email" required className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" placeholder="uw@email.com" />
                       </div>
                     </div>
                     <div className="grid sm:grid-cols-2 gap-5">
                       <div>
                         <label htmlFor="phone" className="block text-xs font-bold mb-1.5">Telefoon</label>
-                        <input id="phone" name="phone" type="tel" className="w-full border border-black/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 transition-all" placeholder="+31 6 1234 5678" />
+                        <input id="phone" name="phone" type="tel" className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" placeholder="+31 6 1234 5678" />
                       </div>
                       <div>
                         <label htmlFor="subject" className="block text-xs font-bold mb-1.5">Onderwerp *</label>
-                        <select id="subject" name="subject" required className="w-full border border-black/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 transition-all bg-white">
+                        <select id="subject" name="subject" required className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all bg-surface">
                           <option value="">Kies een onderwerp</option>
                           <option value="stalling">Stalling aanvragen</option>
                           <option value="reparatie">Reparatie & Onderhoud</option>
@@ -115,7 +115,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <label htmlFor="message" className="block text-xs font-bold mb-1.5">Bericht *</label>
-                      <textarea id="message" name="message" rows={5} required className="w-full border border-black/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 transition-all resize-none" placeholder="Waar kunnen wij u mee helpen?" />
+                      <textarea id="message" name="message" rows={5} required className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all resize-none" placeholder="Waar kunnen wij u mee helpen?" />
                     </div>
                     <button type="submit" disabled={loading} className="bg-accent hover:bg-accent-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm disabled:opacity-60">
                       {loading ? 'Verzenden...' : 'Verstuur bericht'} <Send size={14} />
@@ -128,7 +128,7 @@ export default function ContactPage() {
             {/* Contact Info Sidebar */}
             <A delay={0.15} className="lg:col-span-2">
               <div className="space-y-6">
-                <div className="bg-surface rounded-2xl p-7 border border-black/[0.04]">
+                <div className="bg-surface rounded-2xl p-7 border border-sand-dark/[0.04]">
                   <h3 className="font-black text-lg mb-5">Contactgegevens</h3>
                   <div className="space-y-5">
                     {[
@@ -138,13 +138,13 @@ export default function ContactPage() {
                       { icon: Clock, label: 'Openingstijden', value: 'Maandag t/m vrijdag\n09:30 – 16:30\nWeekend: gesloten', href: undefined },
                     ].map(c => (
                       <div key={c.label} className="flex gap-4">
-                        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-black/[0.04] shrink-0">
-                          <c.icon size={16} className="text-accent" />
+                        <div className="w-10 h-10 bg-surface rounded-xl flex items-center justify-center border border-sand-dark/[0.04] shrink-0">
+                          <c.icon size={16} className="text-primary" />
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-0.5">{c.label}</p>
+                          <p className="text-[10px] font-bold text-warm-gray uppercase tracking-wider mb-0.5">{c.label}</p>
                           {c.href ? (
-                            <a href={c.href} className="text-sm font-medium hover:text-accent transition-colors">{c.value}</a>
+                            <a href={c.href} className="text-sm font-medium hover:text-primary transition-colors">{c.value}</a>
                           ) : (
                             <p className="text-sm font-medium whitespace-pre-line">{c.value}</p>
                           )}
@@ -154,17 +154,17 @@ export default function ContactPage() {
                   </div>
                 </div>
 
-                <div className="bg-surface rounded-2xl p-7 border border-black/[0.04]">
+                <div className="bg-surface rounded-2xl p-7 border border-sand-dark/[0.04]">
                   <h3 className="font-black text-lg mb-3">Liever direct bellen?</h3>
-                  <p className="text-sm text-muted leading-relaxed mb-4">Wij spreken Nederlands, Engels en Spaans. Bel ons gerust tijdens openingstijden.</p>
-                  <a href="tel:+34650036755" className="bg-primary-dark hover:bg-primary text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 w-full justify-center">
+                  <p className="text-sm text-warm-gray leading-relaxed mb-4">Wij spreken Nederlands, Engels en Spaans. Bel ons gerust tijdens openingstijden.</p>
+                  <a href="tel:+34650036755" className="bg-surface-dark hover:bg-primary text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 w-full justify-center">
                     <Phone size={15} /> Bel +34 650 036 755
                   </a>
                 </div>
 
-                <div className="bg-surface rounded-2xl p-7 border border-black/[0.04]">
+                <div className="bg-surface rounded-2xl p-7 border border-sand-dark/[0.04]">
                   <h3 className="font-black text-lg mb-3">WhatsApp</h3>
-                  <p className="text-sm text-muted leading-relaxed mb-4">Stuur ons een WhatsApp-bericht. Handig voor foto&apos;s van schade of vragen onderweg.</p>
+                  <p className="text-sm text-warm-gray leading-relaxed mb-4">Stuur ons een WhatsApp-bericht. Handig voor foto&apos;s van schade of vragen onderweg.</p>
                   <a href="https://wa.me/34650036755" target="_blank" rel="noopener noreferrer" className="bg-[#25D366] hover:bg-[#22C35E] text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 w-full justify-center">
                     <MessageCircle size={15} /> WhatsApp ons
                   </a>
@@ -179,7 +179,7 @@ export default function ContactPage() {
       <section className="bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
           <A>
-            <div className="rounded-2xl overflow-hidden border border-black/[0.04]">
+            <div className="rounded-2xl overflow-hidden border border-sand-dark/[0.04]">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2975.8!2d3.14!3d42.01!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12ba8d9e42ceae9f%3A0x4af8d0d99ced30a2!2sCtra.%20de%20Palam%C3%B3s%2C%2091%2C%2017110%20Sant%20Climent%20de%20Peralta%2C%20Girona%2C%20Spain!5e0!3m2!1snl!2snl!4v1"
                 width="100%"

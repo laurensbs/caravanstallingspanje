@@ -19,12 +19,12 @@ export default function LocatiesPage() {
       <Header />
 
       {/* Hero */}
-      <section className="relative bg-primary-dark text-white py-20 sm:py-28 overflow-hidden">
+      <section className="relative bg-surface-dark text-white py-20 sm:py-28 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-dark via-primary/80 to-primary-dark" />
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-4">Onze locatie</p>
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-4">Onze locatie</p>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] mb-6">
               <span className="gradient-text">Costa Brava</span>, Spanje
             </h1>
@@ -36,20 +36,20 @@ export default function LocatiesPage() {
       </section>
 
       {/* Main Location */}
-      <section className="py-20 sm:py-28 bg-white">
+      <section className="py-20 sm:py-28 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
             <A>
               <div>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-accent/10 text-accent rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-accent/10 text-primary rounded-xl flex items-center justify-center">
                     <MapPin size={22} />
                   </div>
-                  <span className="text-[10px] font-bold bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full uppercase tracking-wider">Hoofdvestiging</span>
+                  <span className="text-[10px] font-bold bg-accent/10 text-accent px-3 py-1 rounded-full uppercase tracking-wider">Hoofdvestiging</span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-black mb-2">Sant Climent de Peralta</h2>
-                <p className="text-accent font-bold text-sm mb-6">Ctra de Palamós, 91 · 17110 Girona</p>
-                <p className="text-muted leading-relaxed mb-8">
+                <p className="text-primary font-bold text-sm mb-6">Ctra de Palamós, 91 · 17110 Girona</p>
+                <p className="text-warm-gray leading-relaxed mb-8">
                   Ons hoofdterrein ligt aan de Ctra de Palamós in het rustige Sant Climent de Peralta, provincie Girona. 
                   Centraal gelegen ten opzichte van populaire badplaatsen als Pals, Begur, L&apos;Estartit en Palamós. 
                   Direct aan de doorgaande weg, makkelijk bereikbaar vanuit alle richtingen.
@@ -68,7 +68,7 @@ export default function LocatiesPage() {
                       </div>
                       <div>
                         <p className="font-bold text-sm mb-0.5">{f.title}</p>
-                        <p className="text-xs text-muted">{f.desc}</p>
+                        <p className="text-xs text-warm-gray">{f.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -78,7 +78,7 @@ export default function LocatiesPage() {
                   <Link href="/contact" className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2">
                     Route plannen <ArrowRight size={14} />
                   </Link>
-                  <a href="tel:+34650036755" className="text-primary-dark hover:text-accent font-bold px-6 py-3 rounded-xl text-sm transition-colors inline-flex items-center gap-2 border border-black/[0.08]">
+                  <a href="tel:+34650036755" className="text-surface-dark hover:text-primary font-bold px-6 py-3 rounded-xl text-sm transition-colors inline-flex items-center gap-2 border border-sand-dark/[0.08]">
                     <Phone size={15} /> +34 650 036 755
                   </a>
                 </div>
@@ -87,7 +87,7 @@ export default function LocatiesPage() {
 
             <A delay={0.15}>
               {/* Map placeholder */}
-              <div className="bg-surface rounded-2xl overflow-hidden border border-black/[0.04]">
+              <div className="bg-surface rounded-2xl overflow-hidden border border-sand-dark/[0.04]">
                 <div className="aspect-square sm:aspect-[4/3] relative">
                   <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2975.8!2d3.14!3d42.01!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12ba8d9e42ceae9f%3A0x4af8d0d99ced30a2!2sCtra.%20de%20Palam%C3%B3s%2C%2091%2C%2017110%20Sant%20Climent%20de%20Peralta%2C%20Girona%2C%20Spain!5e0!3m2!1snl!2snl!4v1"
@@ -100,8 +100,8 @@ export default function LocatiesPage() {
                     title="Locatie Caravanstalling Spanje"
                   />
                 </div>
-                <div className="p-5 bg-white/80 backdrop-blur-sm border-t border-black/[0.04]">
-                  <p className="text-xs text-muted font-medium">
+                <div className="p-5 bg-surface/80 backdrop-blur-sm border-t border-sand-dark/[0.04]">
+                  <p className="text-xs text-warm-gray font-medium">
                     <MapPin size={12} className="inline mr-1" />
                     Ctra de Palamós, 91 · 17110 Sant Climent de Peralta, Girona, Spanje
                   </p>
@@ -116,10 +116,10 @@ export default function LocatiesPage() {
       <section className="py-20 sm:py-28 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3">Omgeving</p>
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Omgeving</p>
             <h2 className="text-3xl sm:text-4xl font-black mb-4">Populaire bestemmingen</h2>
             <div className="section-divider mt-5" />
-            <p className="text-muted mt-5">Onze stalling ligt centraal aan de Costa Brava, op korte afstand van de mooiste badplaatsen en dorpen.</p>
+            <p className="text-warm-gray mt-5">Onze stalling ligt centraal aan de Costa Brava, op korte afstand van de mooiste badplaatsen en dorpen.</p>
           </A>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-5xl mx-auto">
@@ -130,12 +130,12 @@ export default function LocatiesPage() {
               { place: 'Palamós', km: '15 km', desc: 'Vissershaven, culinaire hotspot', rating: 4.6 },
             ].map((p, i) => (
               <A key={p.place} delay={i * 0.08}>
-                <div className="bg-white rounded-2xl p-6 border border-black/[0.04] card-hover h-full text-center">
-                  <p className="text-accent font-bold text-xl mb-1">{p.km}</p>
+                <div className="bg-surface rounded-2xl p-6 border border-sand-dark/[0.04] card-hover h-full text-center">
+                  <p className="text-primary font-bold text-xl mb-1">{p.km}</p>
                   <h3 className="font-black text-lg mb-2">{p.place}</h3>
-                  <p className="text-xs text-muted leading-relaxed mb-3">{p.desc}</p>
+                  <p className="text-xs text-warm-gray leading-relaxed mb-3">{p.desc}</p>
                   <div className="flex items-center justify-center gap-1">
-                    <Star size={11} className="text-amber-400" fill="currentColor" />
+                    <Star size={11} className="text-warning" fill="currentColor" />
                     <span className="text-xs font-medium">{p.rating}</span>
                   </div>
                 </div>
@@ -146,7 +146,7 @@ export default function LocatiesPage() {
       </section>
 
       {/* Facts */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20 bg-surface">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
@@ -158,7 +158,7 @@ export default function LocatiesPage() {
               ].map(s => (
                 <div key={s.lbl}>
                   <p className="text-3xl sm:text-4xl font-black gradient-text mb-1">{s.val}</p>
-                  <p className="text-xs text-muted font-medium">{s.lbl}</p>
+                  <p className="text-xs text-warm-gray font-medium">{s.lbl}</p>
                 </div>
               ))}
             </div>
@@ -167,7 +167,7 @@ export default function LocatiesPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-primary-dark relative overflow-hidden">
+      <section className="bg-surface-dark relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
           <A>

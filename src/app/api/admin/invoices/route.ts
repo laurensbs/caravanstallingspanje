@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllInvoices, createInvoice } from '@/lib/db';
+import { validateBody, invoiceSchema } from '@/lib/validations';
 
 export async function GET(req: NextRequest) {
   try {
@@ -17,8 +18,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const data = await req.json();
-    const invoice = await createInvoice(data);
+    const body = await req.json();
+    const validated = validateBody(invoiceSchema, body);
+    if (!validated.success) return NextResponse.json({ error: validated.error }, { status: 400 });
+    const invoice = await createInvoice(validated.data);
     return NextResponse.json({ invoice }, { status: 201 });
   } catch (error) {
     console.error('Invoice POST error:', error);

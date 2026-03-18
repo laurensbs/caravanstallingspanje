@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllContracts, createContract } from '@/lib/db';
+import { validateBody, contractSchema } from '@/lib/validations';
 
 export async function GET(req: NextRequest) {
   try {
@@ -15,8 +16,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const data = await req.json();
-    const contract = await createContract(data);
+    const body = await req.json();
+    const validated = validateBody(contractSchema, body);
+    if (!validated.success) return NextResponse.json({ error: validated.error }, { status: 400 });
+    const contract = await createContract(validated.data);
     return NextResponse.json({ contract }, { status: 201 });
   } catch (error) {
     console.error('Contract POST error:', error);

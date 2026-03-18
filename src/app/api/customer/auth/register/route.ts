@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { hashPassword, createCustomerToken } from '@/lib/auth';
+import { validateBody, registerSchema } from '@/lib/validations';
 
 export async function POST(req: NextRequest) {
   try {
-    const { first_name, last_name, email, phone, password } = await req.json();
-    if (!first_name || !last_name || !email || !password) return NextResponse.json({ error: 'Vul alle verplichte velden in' }, { status: 400 });
-    if (password.length < 8) return NextResponse.json({ error: 'Wachtwoord moet minimaal 8 tekens zijn' }, { status: 400 });
+    const body = await req.json();
+    const validated = validateBody(registerSchema, body);
+    if (!validated.success) return NextResponse.json({ error: validated.error }, { status: 400 });
+    const { firstName: first_name, lastName: last_name, email, phone, password } = validated.data;
 
     const existing = await sql`SELECT id FROM customers WHERE email = ${email} LIMIT 1`;
     if (existing.length > 0) return NextResponse.json({ error: 'Dit e-mailadres is al in gebruik' }, { status: 400 });

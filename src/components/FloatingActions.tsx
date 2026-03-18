@@ -24,7 +24,7 @@ export default function FloatingActions() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="w-11 h-11 rounded-full bg-white shadow-lg shadow-black/10 border border-gray-200 flex items-center justify-center text-gray-500 hover:text-primary hover:border-primary/30 transition-all duration-300 hover:shadow-xl"
+            className="w-11 h-11 rounded-full bg-white shadow-lg shadow-warm-gray/10 border border-sand-dark flex items-center justify-center text-warm-gray hover:text-primary hover:border-primary/30 transition-all duration-300 hover:shadow-xl"
             aria-label="Scroll naar boven"
           >
             <ArrowUp size={18} />
@@ -66,8 +66,8 @@ export default function FloatingActions() {
         onClick={() => setExpanded(!expanded)}
         className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-105 ${
           expanded
-            ? 'bg-gray-700 shadow-gray-700/20 rotate-45'
-            : 'bg-accent shadow-accent/30 animate-pulse-glow'
+            ? 'bg-surface-dark shadow-surface-dark/20 rotate-45'
+            : 'bg-primary shadow-primary/30 animate-pulse-glow'
         }`}
         aria-label="Contact opties"
       >

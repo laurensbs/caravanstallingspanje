@@ -28,17 +28,29 @@ const REVIEWS = [
 export default function HomePage() {
   const t = useT();
   const [booking, setBooking] = useState({ type: "buiten", length: "", start: "", location: "sant-climent" });
-  const [submitted, setSubmitted] = useState(false);
+  const [checkingAvail, setCheckingAvail] = useState(false);
+  const [availSpots, setAvailSpots] = useState<number | null>(null);
 
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "Website Booking", email: "noreply@caravanstalling-spanje.com", subject: `Stalling aanvraag - ${booking.type}`, message: `Type: ${booking.type}\nLengte: ${booking.length}m\nStartdatum: ${booking.start}\nLocatie: ${booking.location}` }),
-    });
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 5000);
+    setCheckingAvail(true);
+    try {
+      const locMap: Record<string, number> = { 'sant-climent': 1, 'pals': 2, 'blanes': 3 };
+      const res = await fetch("/api/booking/check-availability", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ storageType: booking.type, caravanLength: booking.length, startDate: booking.start, locationId: locMap[booking.location] || 1 }),
+      });
+      const data = await res.json();
+      setAvailSpots(data.available ?? 0);
+      // Redirect to booking wizard with preselected values
+      setTimeout(() => {
+        window.location.href = `/reserveren?type=${booking.type}&length=${encodeURIComponent(booking.length)}&start=${booking.start}&location=${locMap[booking.location] || 1}`;
+      }, 1500);
+    } catch {
+      window.location.href = `/reserveren?type=${booking.type}`;
+    }
+    setCheckingAvail(false);
   };
 
   return (
@@ -46,7 +58,7 @@ export default function HomePage() {
       <Header />
 
       {/* ═══ HERO ═══ */}
-      <section className="relative min-h-[92vh] flex items-center bg-primary-dark overflow-hidden">
+      <section className="relative min-h-[92vh] flex items-center bg-surface-dark overflow-hidden">
         <div className="absolute inset-0">
           <img src="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1920&q=80" alt="" className="img-cover opacity-25" />
           <div className="hero-overlay absolute inset-0" />
@@ -58,7 +70,7 @@ export default function HomePage() {
             {/* Left: Text */}
             <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7 }} className="text-center lg:text-left">
               <div className="inline-flex items-center gap-2 bg-white/[0.06] border border-white/10 text-white/70 px-4 py-1.5 rounded-full text-xs font-medium mb-6">
-                <MapPin size={12} className="text-accent" /> Costa Brava, Spanje
+                <MapPin size={12} className="text-primary" /> Costa Brava, Spanje
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] text-white mb-6">
                 Meer dan alleen{" "}
@@ -91,7 +103,7 @@ export default function HomePage() {
                   { icon: CheckCircle, text: "Standaard verzekerd" },
                 ].map(b => (
                   <div key={b.text} className="flex items-center gap-2">
-                    <b.icon size={14} className="text-accent/70" />
+                    <b.icon size={14} className="text-primary-light/70" />
                     <span className="text-white/40 text-xs">{b.text}</span>
                   </div>
                 ))}
@@ -102,39 +114,40 @@ export default function HomePage() {
             <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }}>
               <div className="booking-widget rounded-2xl p-6 sm:p-8">
                 <div className="text-center mb-6">
-                  <h3 className="text-lg font-bold text-primary-dark">Direct stalling aanvragen</h3>
-                  <p className="text-muted text-xs mt-1">Costa Brava, Spanje</p>
+                  <h3 className="text-lg font-bold text-surface-dark">Direct stalling aanvragen</h3>
+                  <p className="text-warm-gray text-xs mt-1">Costa Brava, Spanje</p>
                 </div>
 
-                {submitted ? (
+                {availSpots !== null ? (
                   <div className="text-center py-8">
                     <CheckCircle size={40} className="text-success mx-auto mb-3" />
-                    <p className="font-bold text-primary-dark">Aanvraag ontvangen!</p>
-                    <p className="text-sm text-muted mt-1">Wij nemen binnen 24 uur contact op.</p>
+                    <p className="font-bold text-surface-dark">{availSpots} plekken beschikbaar!</p>
+                    <p className="text-sm text-warm-gray mt-1">U wordt doorgestuurd naar de reserveringspagina...</p>
+                    <div className="mt-4 w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
                   </div>
                 ) : (
                   <form onSubmit={handleBooking} className="space-y-4">
                     <div>
-                      <label className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Type stalling</label>
+                      <label className="text-[11px] font-semibold text-warm-gray block mb-2 uppercase tracking-wider">Type stalling</label>
                       <div className="grid grid-cols-3 gap-2">
                         {[
                           { val: "buiten", label: "Buitenstalling", price: "\u20ac65/mnd" },
                           { val: "binnen", label: "Binnenstalling", price: "\u20ac95/mnd" },
                           { val: "seizoen", label: "Seizoensstalling", price: "\u20ac45/mnd" },
                         ].map(o => (
-                          <button key={o.val} type="button" onClick={() => setBooking({ ...booking, type: o.val })} className={`p-3 rounded-xl text-center transition-all text-xs border ${booking.type === o.val ? "bg-accent/[0.07] border-accent text-accent font-bold ring-1 ring-accent/20" : "bg-surface border-transparent text-muted hover:border-black/[0.08]"}`}>
+                          <button key={o.val} type="button" onClick={() => setBooking({ ...booking, type: o.val })} className={`p-3 rounded-xl text-center transition-all text-xs border ${booking.type === o.val ? "bg-primary/[0.07] border-primary text-primary font-bold ring-1 ring-primary/20" : "bg-sand/50 border-sand-dark/30 text-warm-gray hover:border-primary/20"}`}>
                             <div className="font-semibold text-[12px]">{o.label}</div>
-                            <div className={`text-[10px] mt-0.5 ${booking.type === o.val ? "text-accent/60" : "text-muted/60"}`}>{o.price}</div>
+                            <div className={`text-[10px] mt-0.5 ${booking.type === o.val ? "text-primary/60" : "text-warm-gray/60"}`}>{o.price}</div>
                           </button>
                         ))}
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Lengte caravan</label>
+                        <label className="text-[11px] font-semibold text-warm-gray block mb-2 uppercase tracking-wider">Lengte caravan</label>
                         <div className="relative">
-                          <Ruler size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/40" />
-                          <select value={booking.length} onChange={e => setBooking({ ...booking, length: e.target.value })} required className="w-full pl-9 pr-3 py-3 bg-surface border border-transparent rounded-xl text-sm text-primary-dark focus:ring-2 focus:ring-accent/20 focus:border-accent/30 outline-none transition-all appearance-none">
+                          <Ruler size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray/40" />
+                          <select value={booking.length} onChange={e => setBooking({ ...booking, length: e.target.value })} required className="w-full pl-9 pr-3 py-3 bg-sand/40 border border-sand-dark/40 rounded-xl text-sm text-surface-dark focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all appearance-none">
                             <option value="">Selecteer...</option>
                             <option value="< 5m">&lt; 5 meter</option>
                             <option value="5-6m">5 - 6 meter</option>
@@ -145,26 +158,26 @@ export default function HomePage() {
                         </div>
                       </div>
                       <div>
-                        <label className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Startdatum</label>
+                        <label className="text-[11px] font-semibold text-warm-gray block mb-2 uppercase tracking-wider">Startdatum</label>
                         <div className="relative">
-                          <Calendar size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/40" />
-                          <input type="date" required value={booking.start} onChange={e => setBooking({ ...booking, start: e.target.value })} className="w-full pl-9 pr-3 py-3 bg-surface border border-transparent rounded-xl text-sm text-primary-dark focus:ring-2 focus:ring-accent/20 focus:border-accent/30 outline-none transition-all" />
+                          <Calendar size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray/40" />
+                          <input type="date" required value={booking.start} onChange={e => setBooking({ ...booking, start: e.target.value })} className="w-full pl-9 pr-3 py-3 bg-sand/40 border border-sand-dark/40 rounded-xl text-sm text-surface-dark focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all" />
                         </div>
                       </div>
                     </div>
                     <div>
-                      <label className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Locatie</label>
+                      <label className="text-[11px] font-semibold text-warm-gray block mb-2 uppercase tracking-wider">Locatie</label>
                       <div className="relative">
-                        <MapPin size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/40" />
-                        <select value={booking.location} onChange={e => setBooking({ ...booking, location: e.target.value })} className="w-full pl-9 pr-3 py-3 bg-surface border border-transparent rounded-xl text-sm text-primary-dark focus:ring-2 focus:ring-accent/20 focus:border-accent/30 outline-none transition-all appearance-none">
+                        <MapPin size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray/40" />
+                        <select value={booking.location} onChange={e => setBooking({ ...booking, location: e.target.value })} className="w-full pl-9 pr-3 py-3 bg-sand/40 border border-sand-dark/40 rounded-xl text-sm text-surface-dark focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all appearance-none">
                           <option value="sant-climent">Sant Climent de Peralta</option>
                           <option value="pals">Pals</option>
                           <option value="blanes">Blanes</option>
                         </select>
                       </div>
                     </div>
-                    <button type="submit" className="w-full bg-accent hover:bg-accent-dark text-white font-bold py-3.5 rounded-xl text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow-md">
-                      Beschikbaarheid checken <ArrowRight size={15} />
+                    <button type="submit" disabled={checkingAvail} className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3.5 rounded-xl text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow-md disabled:opacity-60">
+                      {checkingAvail ? <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg> Controleren...</> : <>Beschikbaarheid checken <ArrowRight size={15} /></>}
                     </button>
                   </form>
                 )}
@@ -175,7 +188,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══ DIENSTEN BAR ═══ */}
-      <section className="bg-white border-b border-black/[0.04]">
+      <section className="bg-white border-b border-sand-dark/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5">
           <div className="flex flex-wrap justify-center gap-3 sm:gap-8 lg:gap-12">
             {[
@@ -186,8 +199,8 @@ export default function HomePage() {
               { icon: ShoppingBag, label: "Verkoop", href: "/diensten" },
               { icon: Bike, label: "Verhuur", href: "/diensten" },
             ].map(s => (
-              <Link key={s.label} href={s.href} className="flex items-center gap-2 text-muted hover:text-accent transition-colors py-2 px-3 rounded-lg group text-sm font-medium">
-                <s.icon size={17} className="group-hover:text-accent transition-colors" />
+              <Link key={s.label} href={s.href} className="flex items-center gap-2 text-warm-gray hover:text-primary transition-colors py-2 px-3 rounded-lg group text-sm font-medium">
+                <s.icon size={17} className="group-hover:text-primary transition-colors" />
                 <span className="hidden sm:inline">{s.label}</span>
               </Link>
             ))}
@@ -199,30 +212,30 @@ export default function HomePage() {
       <section className="py-20 sm:py-28 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3">Waarom Caravanstalling Spanje</p>
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Waarom Caravanstalling Spanje</p>
             <h2 className="text-3xl sm:text-4xl font-black mb-4">Meer dan alleen stalling</h2>
             <div className="section-divider mt-5 mb-5" />
-            <p className="text-muted leading-relaxed">
+            <p className="text-warm-gray leading-relaxed">
               Wij ontzorgen u volledig. Van veilige stalling tot professionele reparatie, transport en verkoop. Alles onder \u00e9\u00e9n dak, met Nederlandstalig personeel.
             </p>
           </A>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: Shield, title: "Beveiligde stalling", desc: "Securitas Direct alarmsysteem, 24/7 camerabewaking en standaard verzekerd. Buiten- en binnenstalling beschikbaar.", color: "bg-blue-50 text-blue-600" },
-              { icon: Wrench, title: "Reparatie & onderhoud", desc: "Goed uitgeruste werkplaats met ervaren monteurs. Van banden en remmen tot dakluiken en airco.", color: "bg-amber-50 text-amber-600" },
-              { icon: Sparkles, title: "CaravanRepair\u00ae Masterdealer", desc: "Onzichtbaar schadeherstel van geprofileerde wanden. Levenslange garantie op alle wandreparaties.", color: "bg-purple-50 text-purple-600" },
-              { icon: Truck, title: "Transport (7 eenheden)", desc: "Wij leveren uw caravan af op de camping en halen deze weer op. 12 medewerkers in het seizoen.", color: "bg-emerald-50 text-emerald-600" },
-              { icon: ShoppingBag, title: "Verkoop tweedehands", desc: "Gecontroleerde tweedehands caravans te koop. Eerlijk advies en volledige transparantie.", color: "bg-rose-50 text-rose-600" },
-              { icon: Eye, title: "Tweewekelijkse controle", desc: "Elke 2 weken worden alle caravans gecontroleerd op schades. Jaarlijks technische keuring.", color: "bg-cyan-50 text-cyan-600" },
+              { icon: Shield, title: "Beveiligde stalling", desc: "Securitas Direct alarmsysteem, 24/7 camerabewaking en standaard verzekerd. Buiten- en binnenstalling beschikbaar.", color: "bg-ocean/10 text-ocean" },
+              { icon: Wrench, title: "Reparatie & onderhoud", desc: "Goed uitgeruste werkplaats met ervaren monteurs. Van banden en remmen tot dakluiken en airco.", color: "bg-warning/10 text-warning" },
+              { icon: Sparkles, title: "CaravanRepair\u00ae Masterdealer", desc: "Onzichtbaar schadeherstel van geprofileerde wanden. Levenslange garantie op alle wandreparaties.", color: "bg-primary/10 text-primary" },
+              { icon: Truck, title: "Transport (7 eenheden)", desc: "Wij leveren uw caravan af op de camping en halen deze weer op. 12 medewerkers in het seizoen.", color: "bg-accent/10 text-accent" },
+              { icon: ShoppingBag, title: "Verkoop tweedehands", desc: "Gecontroleerde tweedehands caravans te koop. Eerlijk advies en volledige transparantie.", color: "bg-danger/10 text-danger" },
+              { icon: Eye, title: "Tweewekelijkse controle", desc: "Elke 2 weken worden alle caravans gecontroleerd op schades. Jaarlijks technische keuring.", color: "bg-info/10 text-info" },
             ].map((f, i) => (
               <A key={f.title} delay={i * 0.08}>
-                <div className="bg-white rounded-2xl p-7 border border-black/[0.04] hover:border-black/[0.08] card-hover h-full group">
+                <div className="bg-white rounded-2xl p-7 border border-sand-dark/30 hover:border-primary/20 card-hover h-full group">
                   <div className={`w-12 h-12 ${f.color} rounded-xl flex items-center justify-center mb-5 transition-transform group-hover:scale-110 duration-300`}>
                     <f.icon size={21} />
                   </div>
                   <h3 className="font-bold text-[17px] mb-2">{f.title}</h3>
-                  <p className="text-sm text-muted leading-relaxed">{f.desc}</p>
+                  <p className="text-sm text-warm-gray leading-relaxed">{f.desc}</p>
                 </div>
               </A>
             ))}
@@ -233,7 +246,7 @@ export default function HomePage() {
       {/* ═══ IMAGE BREAK ═══ */}
       <section className="relative h-[320px] sm:h-[420px] overflow-hidden">
         <img src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1920&q=80" alt="Costa Brava terrein" className="img-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-primary-dark/80 via-primary-dark/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-surface-dark/80 via-surface-dark/20 to-transparent" />
         <div className="absolute bottom-0 inset-x-0 max-w-7xl mx-auto px-4 sm:px-6 pb-10 sm:pb-14 text-center">
           <p className="text-white/50 text-sm font-medium mb-2">Sant Climent de Peralta, Girona</p>
           <h3 className="text-white text-2xl sm:text-3xl font-black">3 beveiligde locaties aan de Costa Brava</h3>
@@ -244,10 +257,10 @@ export default function HomePage() {
       <section className="py-20 sm:py-28 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3">Stallingstypen</p>
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Stallingstypen</p>
             <h2 className="text-3xl sm:text-4xl font-black mb-4">Kies uw stallingtype</h2>
             <div className="section-divider mt-5 mb-5" />
-            <p className="text-muted leading-relaxed">Transparante maandtarieven inclusief beveiliging, verzekering en tweewekelijkse controle.</p>
+            <p className="text-warm-gray leading-relaxed">Transparante maandtarieven inclusief beveiliging, verzekering en tweewekelijkse controle.</p>
           </A>
 
           <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -257,21 +270,21 @@ export default function HomePage() {
               { title: "Seizoensstalling", price: "45", desc: "Flexibele stalling buiten het seizoen", features: ["Buitenstalling", "Beveiligd terrein", "Camerabewaking", "Min. 6 maanden", "Upgrade mogelijk"], popular: false },
             ].map((p, i) => (
               <A key={p.title} delay={i * 0.1}>
-                <div className={`relative bg-white rounded-2xl p-7 h-full flex flex-col text-center ${p.popular ? 'border-2 border-accent shadow-lg shadow-accent/10 ring-1 ring-accent/10' : 'border border-black/[0.06]'}`}>
-                  {p.popular && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white text-[10px] font-bold px-4 py-1 rounded-full shadow-sm">Meest gekozen</span>}
+                <div className={`relative bg-white rounded-2xl p-7 h-full flex flex-col text-center ${p.popular ? 'border-2 border-primary shadow-lg shadow-primary/10 ring-1 ring-primary/10' : 'border border-sand-dark/30'}`}>
+                  {p.popular && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-bold px-4 py-1 rounded-full shadow-sm">Meest gekozen</span>}
                   <h3 className="text-lg font-bold mt-1">{p.title}</h3>
-                  <p className="text-xs text-muted mt-1 mb-5">{p.desc}</p>
+                  <p className="text-xs text-warm-gray mt-1 mb-5">{p.desc}</p>
                   <div className="mb-6">
                     <span className="text-4xl font-black">\u20ac{p.price}</span>
-                    <span className="text-muted text-sm">/mnd</span>
+                    <span className="text-warm-gray text-sm">/mnd</span>
                   </div>
                   <ul className="space-y-2.5 mb-8 flex-1 text-left">
                     {p.features.map(f => (
                       <li key={f} className="flex items-center gap-2.5 text-sm"><CheckCircle size={14} className="text-success shrink-0" /> {f}</li>
                     ))}
                   </ul>
-                  <Link href="/stalling" className={`block py-3 rounded-xl text-sm font-bold transition-all duration-200 ${p.popular ? 'bg-accent hover:bg-accent-dark text-white shadow-sm' : 'bg-primary-dark hover:bg-primary text-white'}`}>
-                    Stalling aanvragen
+                  <Link href="/reserveren" className={`block py-3 rounded-xl text-sm font-bold transition-all duration-200 ${p.popular ? 'bg-primary hover:bg-primary-dark text-white shadow-sm' : 'bg-surface-dark hover:bg-surface-dark/90 text-white'}`}>
+                    Direct reserveren
                   </Link>
                 </div>
               </A>
@@ -284,7 +297,7 @@ export default function HomePage() {
       <section className="py-20 sm:py-28 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3">In 4 stappen</p>
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">In 4 stappen</p>
             <h2 className="text-3xl sm:text-4xl font-black mb-4">Hoe werkt het?</h2>
             <div className="section-divider mt-5 mb-5" />
           </A>
@@ -299,13 +312,13 @@ export default function HomePage() {
               <A key={s.step} delay={i * 0.1}>
                 <div className="text-center">
                   <div className="relative inline-flex mb-5">
-                    <div className="w-16 h-16 bg-surface rounded-2xl flex items-center justify-center">
+                    <div className="w-16 h-16 bg-sand rounded-2xl flex items-center justify-center">
                       <s.icon size={24} className="text-primary" />
                     </div>
-                    <span className="absolute -top-1.5 -right-1.5 w-7 h-7 bg-accent text-white text-[11px] font-black rounded-full flex items-center justify-center shadow-sm">{s.step}</span>
+                    <span className="absolute -top-1.5 -right-1.5 w-7 h-7 bg-primary text-white text-[11px] font-black rounded-full flex items-center justify-center shadow-sm">{s.step}</span>
                   </div>
                   <h3 className="font-bold text-[15px] mb-2">{s.title}</h3>
-                  <p className="text-sm text-muted leading-relaxed">{s.desc}</p>
+                  <p className="text-sm text-warm-gray leading-relaxed">{s.desc}</p>
                 </div>
               </A>
             ))}
@@ -314,21 +327,21 @@ export default function HomePage() {
       </section>
 
       {/* ═══ CARAVANREPAIR BANNER ═══ */}
-      <section className="bg-primary-dark relative overflow-hidden">
+      <section className="bg-surface-dark relative overflow-hidden">
         <div className="absolute inset-0 line-pattern" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-16 relative">
           <A>
             <div className="flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
               <div className="flex flex-col md:flex-row items-center gap-5">
-                <div className="w-14 h-14 bg-accent/15 rounded-2xl flex items-center justify-center shrink-0 animate-pulse-glow">
-                  <Sparkles className="text-accent" size={24} />
+                <div className="w-14 h-14 bg-primary/15 rounded-2xl flex items-center justify-center shrink-0 animate-pulse-glow">
+                  <Sparkles className="text-primary-light" size={24} />
                 </div>
                 <div>
                   <h3 className="text-white text-xl sm:text-2xl font-black mb-1">CaravanRepair\u00ae Masterdealer</h3>
                   <p className="text-white/40 max-w-lg text-sm">Onzichtbaar schadeherstel van geprofileerde wanden. Alle verzekeraars erkend. Levenslange garantie.</p>
                 </div>
               </div>
-              <Link href="/diensten" className="shrink-0 bg-accent hover:bg-accent-light text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all duration-200 inline-flex items-center gap-2 shadow-sm">
+              <Link href="/diensten" className="shrink-0 bg-primary hover:bg-primary-light text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all duration-200 inline-flex items-center gap-2 shadow-sm">
                 Meer informatie <ChevronRight size={15} />
               </Link>
             </div>
@@ -340,28 +353,28 @@ export default function HomePage() {
       <section className="py-20 sm:py-28 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3">Beoordelingen</p>
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Beoordelingen</p>
             <h2 className="text-3xl sm:text-4xl font-black mb-4">Wat klanten zeggen</h2>
             <div className="section-divider mt-5 mb-5" />
             <div className="flex items-center justify-center gap-1.5 mt-4">
-              {[1,2,3,4,5].map(i => <Star key={i} size={16} fill="currentColor" className="text-accent" />)}
-              <span className="text-muted text-sm ml-2 font-medium">4.9/5 op Google (25+ reviews)</span>
+              {[1,2,3,4,5].map(i => <Star key={i} size={16} fill="currentColor" className="text-primary" />)}
+              <span className="text-warm-gray text-sm ml-2 font-medium">4.9/5 op Google (25+ reviews)</span>
             </div>
           </A>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {REVIEWS.map((r, i) => (
               <A key={r.name} delay={i * 0.08}>
-                <div className="bg-white rounded-2xl p-6 border border-black/[0.04] h-full flex flex-col">
-                  <div className="flex items-center gap-1 text-accent mb-4">
+                <div className="bg-white rounded-2xl p-6 border border-sand-dark/20 h-full flex flex-col">
+                  <div className="flex items-center gap-1 text-primary mb-4">
                     {Array.from({ length: r.rating }).map((_, j) => <Star key={j} size={13} fill="currentColor" />)}
                   </div>
-                  <p className="text-sm text-muted leading-relaxed flex-1 mb-5">&ldquo;{r.text}&rdquo;</p>
-                  <div className="flex items-center gap-3 pt-4 border-t border-black/[0.04]">
-                    <div className="w-9 h-9 bg-accent/8 rounded-full flex items-center justify-center text-accent font-bold text-xs">{r.name.charAt(0)}</div>
+                  <p className="text-sm text-warm-gray leading-relaxed flex-1 mb-5">&ldquo;{r.text}&rdquo;</p>
+                  <div className="flex items-center gap-3 pt-4 border-t border-sand-dark/20">
+                    <div className="w-9 h-9 bg-primary/8 rounded-full flex items-center justify-center text-primary font-bold text-xs">{r.name.charAt(0)}</div>
                     <div>
-                      <p className="text-sm font-semibold text-primary-dark">{r.name}</p>
-                      <p className="text-xs text-muted">{r.loc}</p>
+                      <p className="text-sm font-semibold text-surface-dark">{r.name}</p>
+                      <p className="text-xs text-warm-gray">{r.loc}</p>
                     </div>
                   </div>
                 </div>
@@ -370,7 +383,7 @@ export default function HomePage() {
           </div>
 
           <div className="text-center mt-8">
-            <a href="https://maps.google.com/?cid=15176926728354354003" target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-accent hover:text-accent-dark inline-flex items-center gap-1.5 transition-colors">
+            <a href="https://maps.google.com/?cid=15176926728354354003" target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-primary hover:text-primary-dark inline-flex items-center gap-1.5 transition-colors">
               Bekijk alle reviews op Google <ArrowRight size={13} />
             </a>
           </div>
@@ -383,20 +396,20 @@ export default function HomePage() {
           <A>
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
               <div className="text-center lg:text-left">
-                <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3">Klantportaal</p>
+                <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Klantportaal</p>
                 <h2 className="text-3xl sm:text-4xl font-black mb-6">Alles online inzien</h2>
                 <div className="section-divider mt-0 mb-6 mx-auto lg:mx-0" />
-                <p className="text-muted mb-8 leading-relaxed max-w-lg mx-auto lg:mx-0">Beheer uw stalling online. Bekijk contracten, facturen, inspecties en dien service aanvragen in via uw persoonlijke dashboard.</p>
+                <p className="text-warm-gray mb-8 leading-relaxed max-w-lg mx-auto lg:mx-0">Beheer uw stalling online. Bekijk contracten, facturen, inspecties en dien service aanvragen in via uw persoonlijke dashboard.</p>
                 <ul className="space-y-3 mb-8 text-left max-w-md mx-auto lg:mx-0">
                   {["Uw caravans en pleknummers bekijken", "Contracten en verlengingen inzien", "Facturen downloaden en betaalstatus", "Service aanvragen (reparatie, transport)", "Inspectierapportages ontvangen"].map(f => (
                     <li key={f} className="flex items-center gap-3 text-sm"><CheckCircle size={15} className="text-success shrink-0" /><span>{f}</span></li>
                   ))}
                 </ul>
-                <Link href="/mijn-account" className="inline-flex items-center gap-2 bg-primary-dark hover:bg-primary text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all duration-200">
+                <Link href="/mijn-account" className="inline-flex items-center gap-2 bg-surface-dark hover:bg-surface-dark/90 text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all duration-200">
                   <Users size={15} /> Naar mijn account
                 </Link>
               </div>
-              <div className="bg-surface rounded-2xl p-6 sm:p-8 border border-black/[0.04]">
+              <div className="bg-sand rounded-2xl p-6 sm:p-8 border border-sand-dark/30">
                 <div className="space-y-3.5">
                   {[
                     { label: "Mijn Caravans", value: "Hobby De Luxe 490 KMF", sub: "Plek A-042 \u00b7 Buitenstalling" },
@@ -404,10 +417,10 @@ export default function HomePage() {
                     { label: "Volgende factuur", value: "\u20ac65,00", sub: "Vervaldatum: 01-04-2026" },
                     { label: "Laatste inspectie", value: "Goedgekeurd", sub: "02-03-2026 \u00b7 Geen bijzonderheden" },
                   ].map(item => (
-                    <div key={item.label} className="bg-white rounded-xl p-4 border border-black/[0.04]">
-                      <p className="text-[11px] text-muted font-medium uppercase tracking-wider">{item.label}</p>
-                      <p className="text-sm font-bold text-primary-dark mt-1">{item.value}</p>
-                      <p className="text-xs text-muted mt-0.5">{item.sub}</p>
+                    <div key={item.label} className="bg-white rounded-xl p-4 border border-sand-dark/20">
+                      <p className="text-[11px] text-warm-gray font-medium uppercase tracking-wider">{item.label}</p>
+                      <p className="text-sm font-bold text-surface-dark mt-1">{item.value}</p>
+                      <p className="text-xs text-warm-gray mt-0.5">{item.sub}</p>
                     </div>
                   ))}
                 </div>
@@ -418,15 +431,15 @@ export default function HomePage() {
       </section>
 
       {/* ═══ CTA ═══ */}
-      <section className="bg-primary-dark relative overflow-hidden">
+      <section className="bg-surface-dark relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
           <A>
             <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">Klaar om uw caravan veilig te stallen?</h2>
             <p className="text-white/40 mb-8 max-w-lg mx-auto">Neem contact op of vraag direct een stallingsplek aan. Wij reageren binnen 24 uur.</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link href="/stalling" className="bg-accent hover:bg-accent-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all duration-200 inline-flex items-center gap-2 shadow-sm">
-                Stalling aanvragen <ArrowRight size={15} />
+              <Link href="/reserveren" className="bg-primary hover:bg-primary-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all duration-200 inline-flex items-center gap-2 shadow-sm">
+                Direct reserveren <ArrowRight size={15} />
               </Link>
               <a href="tel:+34650036755" className="text-white/60 hover:text-white font-medium px-6 py-3.5 rounded-xl text-sm transition-colors inline-flex items-center gap-2 border border-white/10 hover:border-white/20">
                 <Phone size={15} /> +34 650 036 755

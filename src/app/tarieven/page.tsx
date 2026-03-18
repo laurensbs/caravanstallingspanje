@@ -16,15 +16,15 @@ function A({ children, className = '', delay = 0 }: { children: React.ReactNode;
 function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border-b border-black/[0.06] last:border-0">
+    <div className="border-b border-sand-dark/[0.06] last:border-0">
       <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between py-5 text-left group">
         <span className="font-bold text-sm pr-6">{q}</span>
-        <ChevronDown size={18} className={`text-muted shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown size={18} className={`text-warm-gray shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
       </button>
       <AnimatePresence>
         {open && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
-            <p className="text-sm text-muted leading-relaxed pb-5">{a}</p>
+            <p className="text-sm text-warm-gray leading-relaxed pb-5">{a}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -40,7 +40,7 @@ const plans = [
     desc: 'Veilige buitenstalling op ons afgesloten, beveiligde terrein.',
     features: ['Eigen pleknummer', '24/7 camerabewaking', 'Securitas Direct alarm', 'Standaard verzekerd', 'Tweewekelijkse controle', 'Jaarlijkse technische keuring'],
     popular: true,
-    color: 'bg-emerald-50 text-emerald-600',
+    color: 'bg-accent/10 text-accent',
     cta: 'Stalling aanvragen',
   },
   {
@@ -50,7 +50,7 @@ const plans = [
     desc: 'Overdekte, geïsoleerde hal voor maximale bescherming.',
     features: ['Alles van buitenstalling', 'Geïsoleerde hal', 'Bescherming tegen weer', 'Geen UV-schade', 'Stabiele temperatuur', 'Beperkt beschikbaar'],
     popular: false,
-    color: 'bg-blue-50 text-blue-600',
+    color: 'bg-ocean/10 text-ocean',
     cta: 'Beschikbaarheid checken',
   },
   {
@@ -60,7 +60,7 @@ const plans = [
     desc: 'Voordelig tarief bij stalling alleen buiten het seizoen (okt-apr).',
     features: ['Eigen pleknummer', '24/7 camerabewaking', 'Securitas Direct alarm', 'Standaard verzekerd', 'Controle tijdens stalling', 'Okt t/m april'],
     popular: false,
-    color: 'bg-amber-50 text-amber-600',
+    color: 'bg-warning/10 text-warning',
     cta: 'Meer informatie',
   },
 ];
@@ -95,12 +95,12 @@ export default function TarievenPage() {
       <Header />
 
       {/* Hero */}
-      <section className="relative bg-primary-dark text-white py-20 sm:py-28 overflow-hidden">
+      <section className="relative bg-surface-dark text-white py-20 sm:py-28 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-dark via-primary/80 to-primary-dark" />
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-4">Tarieven</p>
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-4">Tarieven</p>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] mb-6">
               Transparante <span className="gradient-text">tarieven</span>
             </h1>
@@ -117,24 +117,24 @@ export default function TarievenPage() {
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {plans.map((p, i) => (
               <A key={p.title} delay={i * 0.1}>
-                <div className={`relative bg-white rounded-2xl p-7 sm:p-8 border h-full flex flex-col ${p.popular ? 'border-accent/30 ring-1 ring-accent/10 shadow-lg' : 'border-black/[0.06]'}`}>
+                <div className={`relative bg-white rounded-2xl p-7 sm:p-8 border h-full flex flex-col ${p.popular ? 'border-accent/30 ring-1 ring-accent/10 shadow-lg' : 'border-sand-dark/[0.06]'}`}>
                   {p.popular && <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-accent text-white text-[10px] font-bold px-4 py-1.5 rounded-full shadow-sm uppercase tracking-wider">Populair</span>}
                   <div className={`w-12 h-12 ${p.color} rounded-xl flex items-center justify-center mb-5`}>
                     <Shield size={20} />
                   </div>
                   <h3 className="text-xl font-black mb-1">{p.title}</h3>
-                  <p className="text-xs text-muted leading-relaxed mb-5">{p.desc}</p>
+                  <p className="text-xs text-warm-gray leading-relaxed mb-5">{p.desc}</p>
                   <div className="flex items-end gap-1 mb-6">
-                    <span className="text-sm text-muted">Vanaf</span>
+                    <span className="text-sm text-warm-gray">Vanaf</span>
                     <span className="text-4xl font-black">€{p.price}</span>
-                    <span className="text-muted text-sm">{p.period}</span>
+                    <span className="text-warm-gray text-sm">{p.period}</span>
                   </div>
                   <ul className="space-y-2.5 mb-8 flex-1">
                     {p.features.map(f => (
                       <li key={f} className="flex items-center gap-2.5 text-sm"><CheckCircle size={14} className="text-success shrink-0" /> {f}</li>
                     ))}
                   </ul>
-                  <Link href="/contact" className={`w-full font-bold px-6 py-3.5 rounded-xl text-sm transition-all inline-flex items-center justify-center gap-2 ${p.popular ? 'bg-accent hover:bg-accent-dark text-white shadow-sm' : 'bg-primary-dark/[0.04] hover:bg-primary-dark/[0.08] text-primary-dark'}`}>
+                  <Link href="/contact" className={`w-full font-bold px-6 py-3.5 rounded-xl text-sm transition-all inline-flex items-center justify-center gap-2 ${p.popular ? 'bg-accent hover:bg-accent-dark text-white shadow-sm' : 'bg-surface-dark/[0.04] hover:bg-sand-dark/[0.08] text-surface-dark'}`}>
                     {p.cta} <ArrowRight size={14} />
                   </Link>
                 </div>
@@ -148,17 +148,17 @@ export default function TarievenPage() {
       <section className="py-20 sm:py-28 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3">Extra diensten</p>
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Extra diensten</p>
             <h2 className="text-3xl sm:text-4xl font-black mb-4">Aanvullende services</h2>
             <div className="section-divider mt-5" />
           </A>
 
           <A>
-            <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-black/[0.06] overflow-hidden">
+            <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-sand-dark/[0.06] overflow-hidden">
               {extras.map((e, i) => (
-                <div key={e.service} className={`flex items-center justify-between px-6 py-4 text-sm ${i !== extras.length - 1 ? 'border-b border-black/[0.04]' : ''}`}>
+                <div key={e.service} className={`flex items-center justify-between px-6 py-4 text-sm ${i !== extras.length - 1 ? 'border-b border-sand-dark/[0.04]' : ''}`}>
                   <span className="font-medium">{e.service}</span>
-                  <span className={`font-bold shrink-0 ml-4 ${e.price === 'Inbegrepen' ? 'text-success' : e.price === 'Op aanvraag' ? 'text-accent' : ''}`}>{e.price}</span>
+                  <span className={`font-bold shrink-0 ml-4 ${e.price === 'Inbegrepen' ? 'text-success' : e.price === 'Op aanvraag' ? 'text-primary' : ''}`}>{e.price}</span>
                 </div>
               ))}
             </div>
@@ -170,13 +170,13 @@ export default function TarievenPage() {
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <A>
-            <div className="bg-surface rounded-2xl p-8 sm:p-10 border border-black/[0.04] flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+            <div className="bg-surface rounded-2xl p-8 sm:p-10 border border-sand-dark/[0.04] flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
               <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center shrink-0">
-                <Sparkles className="text-accent" size={28} />
+                <Sparkles className="text-primary" size={28} />
               </div>
               <div className="flex-1">
                 <h3 className="font-black text-lg mb-1">CaravanRepair® Masterdealer</h3>
-                <p className="text-sm text-muted leading-relaxed">Wand-, hagel- en vochtschade? Als officieel Masterdealer bieden wij het gepatenteerde CaravanRepair® herstelsysteem met levenslange garantie.</p>
+                <p className="text-sm text-warm-gray leading-relaxed">Wand-, hagel- en vochtschade? Als officieel Masterdealer bieden wij het gepatenteerde CaravanRepair® herstelsysteem met levenslange garantie.</p>
               </div>
               <Link href="/diensten#caravanrepair" className="bg-accent hover:bg-accent-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shrink-0 shadow-sm">
                 Meer info <ArrowRight size={14} />
@@ -190,13 +190,13 @@ export default function TarievenPage() {
       <section className="py-20 sm:py-28 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3">Veelgestelde vragen</p>
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Veelgestelde vragen</p>
             <h2 className="text-3xl sm:text-4xl font-black mb-4">Heeft u vragen?</h2>
             <div className="section-divider mt-5" />
           </A>
 
           <A>
-            <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-black/[0.06] px-6 sm:px-8">
+            <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">
               {faqs.map(f => <FaqItem key={f.q} q={f.q} a={f.a} />)}
             </div>
           </A>
@@ -204,7 +204,7 @@ export default function TarievenPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-primary-dark relative overflow-hidden">
+      <section className="bg-surface-dark relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
           <A>

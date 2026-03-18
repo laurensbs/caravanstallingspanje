@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
+import { validateBody, transportSchema } from '@/lib/validations';
 
 export async function GET(req: NextRequest) {
   try {
@@ -25,7 +26,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const data = await req.json();
+    const body = await req.json();
+    const validated = validateBody(transportSchema, body);
+    if (!validated.success) return NextResponse.json({ error: validated.error }, { status: 400 });
+    const data = validated.data;
     const result = await sql`INSERT INTO transport_orders (caravan_id, pickup_address, delivery_address, scheduled_date, notes) VALUES (${data.caravan_id}, ${data.pickup_address || null}, ${data.delivery_address || null}, ${data.scheduled_date}, ${data.notes || null}) RETURNING *`;
     return NextResponse.json({ order: result[0] }, { status: 201 });
   } catch (error) {

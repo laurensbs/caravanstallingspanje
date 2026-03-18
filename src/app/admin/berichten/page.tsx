@@ -1,77 +1,185 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { MessageSquare, Mail, Phone, Clock, CheckCircle, Trash2 } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { MessageSquare, Send, Plus, X, Clock, User, Archive, MailOpen, Inbox } from 'lucide-react';
 
-interface Message { id: number; name: string; email: string; phone: string; subject: string; message: string; is_read: boolean; replied_at: string; created_at: string; }
+interface Conversation { id: number; customer_id: number; subject: string; status: string; customer_name: string; customer_email: string; unread_count: number; last_message: string; last_message_at: string; created_at: string; }
+interface ConvMessage { id: number; conversation_id: number; sender_type: string; sender_id: number; sender_name: string; message: string; is_read: boolean; created_at: string; }
 
 export default function BerichtenPage() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [selectedConv, setSelectedConv] = useState<Conversation | null>(null);
+  const [messages, setMessages] = useState<ConvMessage[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedMsg, setSelectedMsg] = useState<Message | null>(null);
-  const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('all');
+  const [msgLoading, setMsgLoading] = useState(false);
+  const [reply, setReply] = useState('');
+  const [sending, setSending] = useState(false);
+  const [filter, setFilter] = useState<'all' | 'open' | 'gesloten'>('all');
+  const [showNew, setShowNew] = useState(false);
+  const [newSubject, setNewSubject] = useState('');
+  const [newMessage, setNewMessage] = useState('');
+  const [newCustomerId, setNewCustomerId] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const fetchData = useCallback(async () => {
+  const fetchConversations = useCallback(async () => {
     setLoading(true);
-    const res = await fetch('/api/admin/messages', { credentials: 'include' });
+    const res = await fetch('/api/admin/conversations', { credentials: 'include' });
     const data = await res.json();
-    setMessages(data.messages || []); setLoading(false);
+    setConversations(data.conversations || []);
+    setLoading(false);
   }, []);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => { fetchConversations(); }, [fetchConversations]);
 
-  const markRead = async (id: number) => {
-    await fetch(`/api/admin/messages/${id}/read`, { method: 'PATCH', credentials: 'include' });
-    fetchData();
+  const openConversation = async (conv: Conversation) => {
+    setSelectedConv(conv);
+    setMsgLoading(true);
+    const res = await fetch(`/api/admin/conversations/${conv.id}`, { credentials: 'include' });
+    const data = await res.json();
+    setMessages(data.messages || []);
+    setMsgLoading(false);
+    // Update unread count locally
+    setConversations(prev => prev.map(c => c.id === conv.id ? { ...c, unread_count: 0 } : c));
+    setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
   };
 
-  const deleteMsg = async (id: number) => {
-    if (!confirm('Weet je zeker dat je dit bericht wilt verwijderen?')) return;
-    await fetch(`/api/admin/messages/${id}`, { method: 'DELETE', credentials: 'include' });
-    if (selectedMsg?.id === id) setSelectedMsg(null);
-    fetchData();
+  const sendReply = async () => {
+    if (!reply.trim() || !selectedConv) return;
+    setSending(true);
+    await fetch(`/api/admin/conversations/${selectedConv.id}`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: reply, sender_type: 'admin', sender_name: 'Beheerder' }),
+    });
+    setReply('');
+    setSending(false);
+    openConversation(selectedConv);
+    fetchConversations();
+  };
+
+  const createConversation = async () => {
+    if (!newSubject.trim() || !newMessage.trim()) return;
+    setSending(true);
+    await fetch('/api/admin/conversations', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_id: newCustomerId ? Number(newCustomerId) : null,
+        subject: newSubject,
+        message: newMessage,
+        sender_type: 'admin',
+        sender_name: 'Beheerder',
+      }),
+    });
+    setSending(false);
+    setShowNew(false);
+    setNewSubject('');
+    setNewMessage('');
+    setNewCustomerId('');
+    fetchConversations();
+  };
+
+  const toggleStatus = async (conv: Conversation) => {
+    const newStatus = conv.status === 'open' ? 'gesloten' : 'open';
+    await fetch(`/api/admin/conversations/${conv.id}`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus }),
+    });
+    fetchConversations();
+    if (selectedConv?.id === conv.id) {
+      setSelectedConv({ ...conv, status: newStatus });
+    }
   };
 
   const fmtDate = (d: string) => {
     const date = new Date(d);
     const now = new Date();
     const diff = now.getTime() - date.getTime();
-    if (diff < 3600000) return `${Math.floor(diff / 60000)} min geleden`;
-    if (diff < 86400000) return `${Math.floor(diff / 3600000)} uur geleden`;
+    if (diff < 3600000) return `${Math.floor(diff / 60000)} min`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}u`;
     return date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
   };
 
-  const filtered = messages.filter(m => filter === 'all' ? true : filter === 'unread' ? !m.is_read : m.is_read);
-  const unreadCount = messages.filter(m => !m.is_read).length;
+  const filtered = conversations.filter(c => filter === 'all' ? true : c.status === filter);
+  const totalUnread = conversations.reduce((sum, c) => sum + Number(c.unread_count || 0), 0);
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <div><h1 className="text-2xl font-black text-slate-900">Berichten</h1><p className="text-sm text-slate-400 mt-1">{unreadCount} ongelezen van {messages.length} berichten</p></div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-black text-surface-dark">Berichten</h1>
+          <p className="text-sm text-warm-gray/70 mt-1">{totalUnread} ongelezen • {conversations.length} gesprekken</p>
+        </div>
+        <button onClick={() => setShowNew(true)} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all">
+          <Plus size={16} /> Nieuw gesprek
+        </button>
       </div>
 
+      {/* New conversation modal */}
+      {showNew && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowNew(false)}>
+          <div className="bg-surface rounded-2xl shadow-2xl w-full max-w-lg" onClick={e => e.stopPropagation()}>
+            <div className="p-6 border-b border-sand-dark/20 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-surface-dark">Nieuw gesprek</h2>
+              <button onClick={() => setShowNew(false)} className="text-warm-gray/70 hover:text-warm-gray"><X size={20} /></button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="text-sm font-medium text-surface-dark block mb-1">Klant ID (optioneel)</label>
+                <input value={newCustomerId} onChange={e => setNewCustomerId(e.target.value)} placeholder="bijv. 42" className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-surface-dark block mb-1">Onderwerp</label>
+                <input value={newSubject} onChange={e => setNewSubject(e.target.value)} placeholder="Onderwerp van het gesprek" className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-surface-dark block mb-1">Bericht</label>
+                <textarea value={newMessage} onChange={e => setNewMessage(e.target.value)} rows={4} placeholder="Typ uw bericht..." className="w-full px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none resize-none" />
+              </div>
+            </div>
+            <div className="p-6 border-t border-sand-dark/20 flex justify-end gap-3">
+              <button onClick={() => setShowNew(false)} className="px-5 py-2.5 rounded-xl text-sm font-medium text-warm-gray hover:bg-sand/40">Annuleren</button>
+              <button onClick={createConversation} disabled={sending || !newSubject.trim() || !newMessage.trim()} className="bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold px-6 py-2.5 rounded-xl text-sm disabled:opacity-50 flex items-center gap-2">
+                <Send size={14} /> Versturen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Conversation list */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-            <div className="p-3 border-b border-slate-100 flex gap-2">
-              {(['all', 'unread', 'read'] as const).map(f => (
-                <button key={f} onClick={() => setFilter(f)} className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex-1 transition-all ${filter === f ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/20' : 'bg-slate-50 hover:bg-slate-100 text-slate-500'}`}>{f === 'all' ? 'Alle' : f === 'unread' ? 'Ongelezen' : 'Gelezen'}</button>
+          <div className="bg-surface rounded-2xl border border-sand-dark/20 overflow-hidden">
+            <div className="p-3 border-b border-sand-dark/20 flex gap-2">
+              {([['all', 'Alle', Inbox], ['open', 'Open', MailOpen], ['gesloten', 'Archief', Archive]] as const).map(([key, label, Icon]) => (
+                <button key={key} onClick={() => setFilter(key as typeof filter)} className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex-1 transition-all flex items-center justify-center gap-1.5 ${filter === key ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>
+                  <Icon size={12} /> {label}
+                </button>
               ))}
             </div>
             <div className="divide-y max-h-[600px] overflow-y-auto">
-              {loading ? <div className="p-4 text-center text-sm text-slate-400">Laden...</div> :
-              filtered.length === 0 ? <div className="p-4 text-center text-sm text-slate-400">Geen berichten</div> :
-              filtered.map(m => (
-                <button key={m.id} onClick={() => { setSelectedMsg(m); if (!m.is_read) markRead(m.id); }} className={`w-full text-left p-4 hover:bg-slate-50/50 transition-colors ${selectedMsg?.id === m.id ? 'bg-amber-50 border-l-2 border-amber-500' : ''} ${!m.is_read ? 'bg-amber-50/30' : ''}`}>
+              {loading ? <div className="p-8 text-center text-sm text-warm-gray/70">Laden...</div> :
+              filtered.length === 0 ? <div className="p-8 text-center text-sm text-warm-gray/70">Geen gesprekken</div> :
+              filtered.map(c => (
+                <button key={c.id} onClick={() => openConversation(c)} className={`w-full text-left p-4 hover:bg-sand/30 transition-colors ${selectedConv?.id === c.id ? 'bg-warning/10 border-l-2 border-warning' : ''} ${Number(c.unread_count) > 0 ? 'bg-warning/10/30' : ''}`}>
                   <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        {!m.is_read && <div className="w-2 h-2 bg-amber-500 rounded-full flex-shrink-0" />}
-                        <span className={`text-sm truncate ${!m.is_read ? 'font-semibold text-slate-800' : 'text-slate-600'}`}>{m.name}</span>
+                        {Number(c.unread_count) > 0 && <span className="w-5 h-5 bg-warning/100 text-white rounded-full text-[10px] font-bold flex items-center justify-center flex-shrink-0">{c.unread_count}</span>}
+                        <span className={`text-sm truncate ${Number(c.unread_count) > 0 ? 'font-semibold text-surface-dark' : 'text-warm-gray'}`}>{c.customer_name || 'Onbekend'}</span>
                       </div>
-                      <p className="text-xs text-slate-400 mt-0.5 truncate">{m.subject || m.message.substring(0, 50)}</p>
+                      <p className="text-xs font-medium text-surface-dark mt-0.5 truncate">{c.subject}</p>
+                      <p className="text-xs text-warm-gray/70 mt-0.5 truncate">{c.last_message?.substring(0, 60)}</p>
                     </div>
-                    <span className="text-xs text-slate-400 flex-shrink-0">{fmtDate(m.created_at)}</span>
+                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                      <span className="text-xs text-warm-gray/70">{fmtDate(c.last_message_at)}</span>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${c.status === 'open' ? 'bg-accent/15 text-primary-dark' : 'bg-sand text-warm-gray'}`}>{c.status}</span>
+                    </div>
                   </div>
                 </button>
               ))}
@@ -79,34 +187,65 @@ export default function BerichtenPage() {
           </div>
         </div>
 
+        {/* Conversation thread */}
         <div className="lg:col-span-2">
-          {selectedMsg ? (
-            <div className="bg-white rounded-2xl border border-slate-100">
-              <div className="p-6 border-b border-slate-100">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h2 className="text-lg font-bold text-slate-900">{selectedMsg.subject || 'Geen onderwerp'}</h2>
-                    <div className="flex items-center gap-4 mt-2 text-sm text-slate-400">
-                      <span className="font-medium text-slate-800">{selectedMsg.name}</span>
-                      <span className="flex items-center gap-1"><Mail size={12}/> {selectedMsg.email}</span>
-                      {selectedMsg.phone && <span className="flex items-center gap-1"><Phone size={12}/> {selectedMsg.phone}</span>}
-                    </div>
-                    <div className="flex items-center gap-1 mt-1 text-xs text-slate-400"><Clock size={12}/> {new Date(selectedMsg.created_at).toLocaleString('nl-NL')}</div>
+          {selectedConv ? (
+            <div className="bg-surface rounded-2xl border border-sand-dark/20 flex flex-col h-[680px]">
+              {/* Header */}
+              <div className="p-4 border-b border-sand-dark/20 flex items-center justify-between">
+                <div>
+                  <h2 className="text-base font-bold text-surface-dark">{selectedConv.subject}</h2>
+                  <div className="flex items-center gap-3 mt-1 text-xs text-warm-gray/70">
+                    <span className="flex items-center gap-1"><User size={10} /> {selectedConv.customer_name || 'Admin'}</span>
+                    <span className="flex items-center gap-1"><Clock size={10} /> {new Date(selectedConv.created_at).toLocaleDateString('nl-NL')}</span>
                   </div>
-                  <button onClick={() => deleteMsg(selectedMsg.id)} className="text-red-400 hover:text-red-600 p-2"><Trash2 size={16}/></button>
                 </div>
+                <button onClick={() => toggleStatus(selectedConv)} className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${selectedConv.status === 'open' ? 'bg-sand hover:bg-sand-dark/30 text-warm-gray' : 'bg-accent/15 hover:bg-accent/20 text-primary-dark'}`}>
+                  {selectedConv.status === 'open' ? 'Archiveren' : 'Heropenen'}
+                </button>
               </div>
-              <div className="p-6">
-                <p className="text-sm whitespace-pre-wrap leading-relaxed text-slate-600">{selectedMsg.message}</p>
+
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                {msgLoading ? (
+                  <div className="text-center text-sm text-warm-gray/70 py-8">Laden...</div>
+                ) : messages.map(m => (
+                  <div key={m.id} className={`flex ${m.sender_type === 'admin' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[75%] rounded-2xl px-4 py-3 ${m.sender_type === 'admin' ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white' : 'bg-sand text-surface-dark'}`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`text-xs font-semibold ${m.sender_type === 'admin' ? 'text-white/80' : 'text-warm-gray'}`}>{m.sender_name}</span>
+                        <span className={`text-[10px] ${m.sender_type === 'admin' ? 'text-white/60' : 'text-warm-gray/70'}`}>
+                          {new Date(m.created_at).toLocaleString('nl-NL', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' })}
+                        </span>
+                      </div>
+                      <p className="text-sm whitespace-pre-wrap leading-relaxed">{m.message}</p>
+                    </div>
+                  </div>
+                ))}
+                <div ref={messagesEndRef} />
               </div>
-              <div className="p-6 border-t border-slate-100">
-                <a href={`mailto:${selectedMsg.email}?subject=Re: ${selectedMsg.subject || 'Uw bericht'}`} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm inline-flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all"><Mail size={16}/> Beantwoorden via e-mail</a>
+
+              {/* Reply input */}
+              <div className="p-4 border-t border-sand-dark/20">
+                <div className="flex gap-2">
+                  <textarea
+                    value={reply}
+                    onChange={e => setReply(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendReply(); } }}
+                    placeholder="Typ een antwoord... (Enter om te versturen)"
+                    rows={2}
+                    className="flex-1 px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none resize-none"
+                  />
+                  <button onClick={sendReply} disabled={sending || !reply.trim()} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white p-3 rounded-xl self-end disabled:opacity-50 transition-all">
+                    <Send size={18} />
+                  </button>
+                </div>
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl border border-slate-100 p-12 text-center">
-              <MessageSquare size={48} className="mx-auto text-slate-200 mb-4" />
-              <p className="text-slate-400">Selecteer een bericht om te lezen</p>
+            <div className="bg-surface rounded-2xl border border-sand-dark/20 p-12 text-center h-[680px] flex flex-col items-center justify-center">
+              <MessageSquare size={48} className="text-warm-gray/40 mb-4" />
+              <p className="text-warm-gray/70 text-sm">Selecteer een gesprek of start een nieuw gesprek</p>
             </div>
           )}
         </div>

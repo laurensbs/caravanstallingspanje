@@ -21,7 +21,7 @@ const diensten = [
     sub: 'Buiten & Binnen',
     desc: 'Veilige buiten- en binnenstalling op ons beveiligde terrein in Sant Climent de Peralta. Securitas Direct alarm, 24/7 camerabewaking en standaard verzekerd.',
     features: ['Buitenstalling vanaf €65/mnd', 'Binnenstalling (overdekt) vanaf €95/mnd', 'Securitas Direct alarmsysteem', '24/7 camerabewaking', 'Standaard verzekerd', 'Tweewekelijkse controle'],
-    color: 'bg-emerald-50 text-emerald-600',
+    color: 'bg-accent/10 text-accent',
   },
   {
     id: 'reparatie',
@@ -30,7 +30,7 @@ const diensten = [
     sub: 'Specialistisch onderhoud',
     desc: 'Van jaarlijkse onderhoudsbeurt tot complete reparaties. Onze ervaren monteurs hebben meer dan 20 jaar ervaring met alle merken en typen caravans.',
     features: ['Jaarlijkse technische keuring', 'Chassis onderhoud', 'Gasleidingen en elektra', 'Dakonderhoud en -reparatie', 'Interieur herstelwerk', 'Alle merken en typen'],
-    color: 'bg-blue-50 text-blue-600',
+    color: 'bg-ocean/10 text-ocean',
   },
   {
     id: 'caravanrepair',
@@ -39,7 +39,7 @@ const diensten = [
     sub: 'Masterdealer',
     desc: 'Als officieel CaravanRepair® Masterdealer gebruiken wij het gepatenteerde herstelsysteem voor wandreparaties. Levenslange garantie op wandherstel, onzichtbare resultaten.',
     features: ['Officieel Masterdealer', 'Gepatenteerd herstelsysteem', 'Levenslange garantie op wanden', 'Onzichtbare reparaties', 'Europees keurmerk', 'Hagelschade specialist'],
-    color: 'bg-amber-50 text-amber-600',
+    color: 'bg-warning/10 text-warning',
     badge: 'Masterdealer',
   },
   {
@@ -49,7 +49,7 @@ const diensten = [
     sub: '7 transporteenheden',
     desc: 'Met 7 eigen transporteenheden halen en brengen wij uw caravan door heel Europa. Van Nederland naar Spanje of onderling tussen campings aan de Costa Brava.',
     features: ['7 eigen transporteenheden', 'Door heel Europa', 'Ophalen bij uw thuis', 'Afleveren op camping', 'Gesloten transport mogelijk', 'Track & trace'],
-    color: 'bg-purple-50 text-purple-600',
+    color: 'bg-primary/10 text-primary',
   },
   {
     id: 'verkoop',
@@ -58,7 +58,7 @@ const diensten = [
     sub: 'Tweedehands caravans',
     desc: 'Wij bemiddelen bij de verkoop van uw caravan of camper. Of zoek in ons aanbod van gebruikte, volledig nagekeken caravans die direct klaar staan voor gebruik in Spanje.',
     features: ['Verkoopbemiddeling', 'Gebruikte caravans op voorraad', 'Volledig nagekeken', 'Eerlijke taxatie', 'Administratieve afhandeling', 'Directe levering mogelijk'],
-    color: 'bg-rose-50 text-rose-600',
+    color: 'bg-danger/10 text-danger',
   },
   {
     id: 'verhuur',
@@ -67,7 +67,7 @@ const diensten = [
     sub: 'Fietsen, koelkasten & airco',
     desc: 'Verhuur van hoogwaardige fietsen, koelkasten en mobiele airco\'s. Handige extra\'s voor uw verblijf aan de Costa Brava, direct leverbaar op uw terrein.',
     features: ['Elektrische fietsen', 'Stadsfietsen & kinderfietsen', 'Koelkasten (versch. formaten)', 'Mobiele airco-units', 'Bezorging op uw camping', 'Seizoens- of weekhuur'],
-    color: 'bg-teal-50 text-teal-600',
+    color: 'bg-accent/10 text-accent',
   },
   {
     id: 'schoonmaak',
@@ -76,7 +76,7 @@ const diensten = [
     sub: 'Professionele reiniging',
     desc: 'Laat uw caravan professioneel reinigen voor of na het seizoen. Van basiswas tot complete interieur- en exterieurbehandeling.',
     features: ['Exterieur handwas', 'Interieur reiniging', 'Polishbehandeling', 'Anti-mos & alg behandeling', 'Dakbehandeling', 'Seizoensklaar pakket'],
-    color: 'bg-cyan-50 text-cyan-600',
+    color: 'bg-ocean/10 text-ocean',
   },
 ];
 
@@ -86,12 +86,12 @@ export default function DienstenPage() {
       <Header />
 
       {/* Hero */}
-      <section className="relative bg-primary-dark text-white py-20 sm:py-28 overflow-hidden">
+      <section className="relative bg-surface-dark text-white py-20 sm:py-28 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-dark via-primary/80 to-primary-dark" />
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-4">Onze diensten</p>
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-4">Onze diensten</p>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] mb-6">
               Alles voor uw <span className="gradient-text">caravan</span>
             </h1>
@@ -114,11 +114,11 @@ export default function DienstenPage() {
                       <div className={`w-12 h-12 ${d.color} rounded-xl flex items-center justify-center`}>
                         <d.icon size={22} />
                       </div>
-                      {d.badge && <span className="text-[10px] font-bold bg-accent/10 text-accent px-3 py-1 rounded-full uppercase tracking-wider">{d.badge}</span>}
+                      {d.badge && <span className="text-[10px] font-bold bg-accent/10 text-primary px-3 py-1 rounded-full uppercase tracking-wider">{d.badge}</span>}
                     </div>
                     <h2 className="text-3xl sm:text-4xl font-black mb-2">{d.title}</h2>
-                    <p className="text-accent font-bold text-sm mb-4">{d.sub}</p>
-                    <p className="text-muted leading-relaxed mb-8">{d.desc}</p>
+                    <p className="text-primary font-bold text-sm mb-4">{d.sub}</p>
+                    <p className="text-warm-gray leading-relaxed mb-8">{d.desc}</p>
                     <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 mb-8">
                       {d.features.map(f => (
                         <li key={f} className="flex items-center gap-2.5 text-sm"><CheckCircle size={14} className="text-success shrink-0" /> {f}</li>
@@ -129,17 +129,17 @@ export default function DienstenPage() {
                         Bekijk stallingsopties <ArrowRight size={14} />
                       </Link>
                     ) : (
-                      <Link href="/contact" className="bg-primary-dark hover:bg-primary text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2">
+                      <Link href="/contact" className="bg-surface-dark hover:bg-primary text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2">
                         Meer informatie <ArrowRight size={14} />
                       </Link>
                     )}
                   </div>
-                  <div className={`bg-surface rounded-2xl aspect-[4/3] flex items-center justify-center border border-black/[0.04] ${i % 2 === 1 ? 'lg:[direction:ltr]' : ''}`}>
+                  <div className={`bg-surface rounded-2xl aspect-[4/3] flex items-center justify-center border border-sand-dark/[0.04] ${i % 2 === 1 ? 'lg:[direction:ltr]' : ''}`}>
                     <div className="text-center p-8">
                       <div className={`w-20 h-20 ${d.color} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
                         <d.icon size={36} />
                       </div>
-                      <p className="text-sm text-muted font-medium">{d.title}</p>
+                      <p className="text-sm text-warm-gray font-medium">{d.title}</p>
                     </div>
                   </div>
                 </div>
@@ -153,21 +153,21 @@ export default function DienstenPage() {
       <section className="py-16 bg-surface">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <A>
-            <div className="bg-white rounded-2xl p-8 sm:p-12 border border-black/[0.06] text-center">
+            <div className="bg-white rounded-2xl p-8 sm:p-12 border border-sand-dark/[0.06] text-center">
               <div className="flex items-center justify-center gap-2 mb-5">
-                <Star className="text-accent" size={24} fill="currentColor" />
-                <Star className="text-accent" size={24} fill="currentColor" />
-                <Star className="text-accent" size={24} fill="currentColor" />
+                <Star className="text-primary" size={24} fill="currentColor" />
+                <Star className="text-primary" size={24} fill="currentColor" />
+                <Star className="text-primary" size={24} fill="currentColor" />
               </div>
               <h2 className="text-2xl sm:text-3xl font-black mb-4">Officieel CaravanRepair® Masterdealer</h2>
-              <p className="text-muted max-w-xl mx-auto mb-6 leading-relaxed">
+              <p className="text-warm-gray max-w-xl mx-auto mb-6 leading-relaxed">
                 Als één van de weinige Masterdealers in Europa bieden wij het gepatenteerde CaravanRepair® herstelsysteem aan. 
                 Wandschade, hagelschade of vochtschade? Wij herstellen uw caravan onzichtbaar met levenslange garantie.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-3">
-                <span className="bg-accent/8 text-accent text-xs font-bold px-4 py-2 rounded-full">Gepatenteerd systeem</span>
-                <span className="bg-accent/8 text-accent text-xs font-bold px-4 py-2 rounded-full">Levenslange garantie</span>
-                <span className="bg-accent/8 text-accent text-xs font-bold px-4 py-2 rounded-full">Europees keurmerk</span>
+                <span className="bg-accent/8 text-primary text-xs font-bold px-4 py-2 rounded-full">Gepatenteerd systeem</span>
+                <span className="bg-accent/8 text-primary text-xs font-bold px-4 py-2 rounded-full">Levenslange garantie</span>
+                <span className="bg-accent/8 text-primary text-xs font-bold px-4 py-2 rounded-full">Europees keurmerk</span>
               </div>
             </div>
           </A>
@@ -175,7 +175,7 @@ export default function DienstenPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-primary-dark relative overflow-hidden">
+      <section className="bg-surface-dark relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
           <A>

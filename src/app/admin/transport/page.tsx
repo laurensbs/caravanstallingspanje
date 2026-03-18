@@ -7,7 +7,7 @@ interface TransportOrder { id: number; customer_name: string; caravan_brand: str
 interface CaravanOption { id: number; brand: string; model: string; license_plate: string; customer_name: string; }
 interface StaffOption { id: number; first_name: string; last_name: string; }
 
-const STATUS_COLORS: Record<string,string> = { aangevraagd: 'bg-blue-100 text-blue-700', gepland: 'bg-amber-100 text-amber-700', onderweg: 'bg-purple-100 text-purple-700', afgeleverd: 'bg-green-100 text-green-700', geannuleerd: 'bg-gray-100 text-gray-500' };
+const STATUS_COLORS: Record<string,string> = { aangevraagd: 'bg-ocean/15 text-ocean-dark', gepland: 'bg-warning/15 text-warning', onderweg: 'bg-primary/15 text-primary', afgeleverd: 'bg-accent/15 text-primary-dark', geannuleerd: 'bg-sand text-warm-gray' };
 
 export default function TransportPage() {
   const [orders, setOrders] = useState<TransportOrder[]>([]);
@@ -61,42 +61,42 @@ export default function TransportPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <div><h1 className="text-2xl font-black text-slate-900">Transport</h1><p className="text-sm text-slate-400 mt-1">{total} transportopdrachten</p></div>
+        <div><h1 className="text-2xl font-black text-surface-dark">Transport</h1><p className="text-sm text-warm-gray/70 mt-1">{total} transportopdrachten</p></div>
         <button onClick={openForm} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all"><Plus size={16} /> Nieuwe opdracht</button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 mb-6 p-4">
+      <div className="bg-surface rounded-2xl border border-sand-dark/20 mb-6 p-4">
         <div className="flex gap-2 flex-wrap">
           {['', 'aangevraagd', 'gepland', 'onderweg', 'afgeleverd', 'geannuleerd'].map(s => (
-            <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }} className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${statusFilter === s ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/20' : 'bg-slate-50 hover:bg-slate-100 text-slate-500'}`}>{s || 'Alle'}</button>
+            <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }} className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${statusFilter === s ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>{s || 'Alle'}</button>
           ))}
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+      <div className="bg-surface rounded-2xl border border-sand-dark/20 overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 border-b border-slate-100"><tr>
-            <th className="text-left px-4 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Caravan</th>
-            <th className="text-left px-4 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Route</th>
-            <th className="text-left px-4 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Klant</th>
-            <th className="text-left px-4 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Datum</th>
-            <th className="text-left px-4 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Chauffeur</th>
-            <th className="text-center px-4 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
-            <th className="text-right px-4 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Acties</th>
+          <thead className="bg-sand/40 border-b border-sand-dark/20"><tr>
+            <th className="text-left px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Caravan</th>
+            <th className="text-left px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Route</th>
+            <th className="text-left px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Klant</th>
+            <th className="text-left px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Datum</th>
+            <th className="text-left px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Chauffeur</th>
+            <th className="text-center px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Status</th>
+            <th className="text-right px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Acties</th>
           </tr></thead>
-          <tbody className="divide-y divide-slate-50">
-            {loading ? <tr><td colSpan={7} className="px-4 py-8 text-center text-slate-400">Laden...</td></tr> :
-            orders.length === 0 ? <tr><td colSpan={7} className="px-4 py-8 text-center text-slate-400">Geen transportopdrachten</td></tr> :
+          <tbody className="divide-y divide-sand-dark/10">
+            {loading ? <tr><td colSpan={7} className="px-4 py-8 text-center text-warm-gray/70">Laden...</td></tr> :
+            orders.length === 0 ? <tr><td colSpan={7} className="px-4 py-8 text-center text-warm-gray/70">Geen transportopdrachten</td></tr> :
             orders.map(o => (
-              <tr key={o.id} className="hover:bg-slate-50/50 transition-colors">
-                <td className="px-4 py-3"><div className="font-medium text-slate-800">{o.caravan_brand} {o.caravan_model}</div><div className="text-xs text-slate-400">{o.caravan_license_plate}</div></td>
-                <td className="px-4 py-3"><div className="flex items-center gap-1 text-xs text-slate-500"><MapPin size={12} className="text-slate-300 flex-shrink-0"/><span className="truncate max-w-[100px]">{o.pickup_address || 'Stalling'}</span><ArrowRight size={12} className="text-slate-300 flex-shrink-0"/><span className="truncate max-w-[100px]">{o.delivery_address || 'Stalling'}</span></div></td>
-                <td className="px-4 py-3 text-xs text-slate-500">{o.customer_name}</td>
-                <td className="px-4 py-3 text-xs text-slate-500">{fmtDate(o.scheduled_date)}</td>
-                <td className="px-4 py-3 text-xs text-slate-500">{o.assigned_staff_name || 'Niet toegewezen'}</td>
-                <td className="px-4 py-3 text-center"><span className={`text-xs font-medium px-2 py-1 rounded-full ${STATUS_COLORS[o.status] || 'bg-gray-100'}`}>{o.status}</span></td>
+              <tr key={o.id} className="hover:bg-sand/30 transition-colors">
+                <td className="px-4 py-3"><div className="font-medium text-surface-dark">{o.caravan_brand} {o.caravan_model}</div><div className="text-xs text-warm-gray/70">{o.caravan_license_plate}</div></td>
+                <td className="px-4 py-3"><div className="flex items-center gap-1 text-xs text-warm-gray"><MapPin size={12} className="text-warm-gray/50 flex-shrink-0"/><span className="truncate max-w-[100px]">{o.pickup_address || 'Stalling'}</span><ArrowRight size={12} className="text-warm-gray/50 flex-shrink-0"/><span className="truncate max-w-[100px]">{o.delivery_address || 'Stalling'}</span></div></td>
+                <td className="px-4 py-3 text-xs text-warm-gray">{o.customer_name}</td>
+                <td className="px-4 py-3 text-xs text-warm-gray">{fmtDate(o.scheduled_date)}</td>
+                <td className="px-4 py-3 text-xs text-warm-gray">{o.assigned_staff_name || 'Niet toegewezen'}</td>
+                <td className="px-4 py-3 text-center"><span className={`text-xs font-medium px-2 py-1 rounded-full ${STATUS_COLORS[o.status] || 'bg-sand'}`}>{o.status}</span></td>
                 <td className="px-4 py-3 text-right">
-                  <select value={o.status} onChange={e => updateStatus(o.id, e.target.value)} className="text-xs border border-slate-200 rounded-lg px-2 py-1 bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 outline-none">
+                  <select value={o.status} onChange={e => updateStatus(o.id, e.target.value)} className="text-xs border border-sand-dark/30 rounded-lg px-2 py-1 bg-sand/40 focus:ring-2 focus:ring-amber-400/20 outline-none">
                     <option value="aangevraagd">Aangevraagd</option>
                     <option value="gepland">Gepland</option>
                     <option value="onderweg">Onderweg</option>
@@ -109,35 +109,35 @@ export default function TransportPage() {
           </tbody>
         </table>
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100"><p className="text-xs text-slate-400">Pagina {page}/{totalPages}</p><div className="flex gap-1"><button disabled={page<=1} onClick={()=>setPage(p=>p-1)} className="p-1.5 rounded-lg hover:bg-slate-100 disabled:opacity-30 transition-colors"><ChevronLeft size={16} className="text-slate-400"/></button><button disabled={page>=totalPages} onClick={()=>setPage(p=>p+1)} className="p-1.5 rounded-lg hover:bg-slate-100 disabled:opacity-30 transition-colors"><ChevronRight size={16} className="text-slate-400"/></button></div></div>
+          <div className="flex items-center justify-between px-4 py-3 border-t border-sand-dark/20"><p className="text-xs text-warm-gray/70">Pagina {page}/{totalPages}</p><div className="flex gap-1"><button disabled={page<=1} onClick={()=>setPage(p=>p-1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors"><ChevronLeft size={16} className="text-warm-gray/70"/></button><button disabled={page>=totalPages} onClick={()=>setPage(p=>p+1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors"><ChevronRight size={16} className="text-warm-gray/70"/></button></div></div>
         )}
       </div>
 
       {showForm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="flex items-center justify-between p-6 border-b border-slate-100"><h2 className="text-lg font-bold text-slate-900">Nieuwe transportopdracht</h2><button onClick={()=>setShowForm(false)} className="text-slate-400 hover:text-slate-600"><X size={20}/></button></div>
+          <div className="bg-surface rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b border-sand-dark/20"><h2 className="text-lg font-bold text-surface-dark">Nieuwe transportopdracht</h2><button onClick={()=>setShowForm(false)} className="text-warm-gray/70 hover:text-warm-gray"><X size={20}/></button></div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="text-xs font-semibold text-slate-500 block mb-1">Caravan *</label>
-                <select required value={form.caravan_id} onChange={e=>setForm({...form,caravan_id:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all">
+                <label className="text-xs font-semibold text-warm-gray block mb-1">Caravan *</label>
+                <select required value={form.caravan_id} onChange={e=>setForm({...form,caravan_id:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-warning outline-none transition-all">
                   <option value="">Selecteer caravan...</option>
                   {caravans.map(c => <option key={c.id} value={c.id}>{c.brand} {c.model} — {c.license_plate} ({c.customer_name})</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-xs font-semibold text-slate-500 block mb-1">Chauffeur (optioneel)</label>
-                <select value={form.assigned_staff_id} onChange={e=>setForm({...form,assigned_staff_id:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all">
+                <label className="text-xs font-semibold text-warm-gray block mb-1">Chauffeur (optioneel)</label>
+                <select value={form.assigned_staff_id} onChange={e=>setForm({...form,assigned_staff_id:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all">
                   <option value="">Niet toegewezen</option>
                   {staffList.map(s => <option key={s.id} value={s.id}>{s.first_name} {s.last_name}</option>)}
                 </select>
               </div>
-              <div><label className="text-xs font-semibold text-slate-500 block mb-1">Ophaaladres</label><input value={form.pickup_address} onChange={e=>setForm({...form,pickup_address:e.target.value})} placeholder="Bijv. Stalling Costa del Sol" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
-              <div><label className="text-xs font-semibold text-slate-500 block mb-1">Afleveradres</label><input value={form.delivery_address} onChange={e=>setForm({...form,delivery_address:e.target.value})} placeholder="Bijv. Camping La Marina, Alicante" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
-              <div><label className="text-xs font-semibold text-slate-500 block mb-1">Geplande datum *</label><input type="date" required value={form.scheduled_date} onChange={e=>setForm({...form,scheduled_date:e.target.value})} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
-              <div><label className="text-xs font-semibold text-slate-500 block mb-1">Opmerkingen</label><textarea value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})} placeholder="Bijzonderheden voor transport..." className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50/50 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all" rows={3}/></div>
+              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Ophaaladres</label><input value={form.pickup_address} onChange={e=>setForm({...form,pickup_address:e.target.value})} placeholder="Bijv. Stalling Costa del Sol" className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-warning outline-none transition-all"/></div>
+              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Afleveradres</label><input value={form.delivery_address} onChange={e=>setForm({...form,delivery_address:e.target.value})} placeholder="Bijv. Camping La Marina, Alicante" className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-warning outline-none transition-all"/></div>
+              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Geplande datum *</label><input type="date" required value={form.scheduled_date} onChange={e=>setForm({...form,scheduled_date:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-warning outline-none transition-all"/></div>
+              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Opmerkingen</label><textarea value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})} placeholder="Bijzonderheden voor transport..." className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-warning outline-none transition-all" rows={3}/></div>
               <div className="flex gap-3 justify-end pt-2">
-                <button type="button" onClick={()=>setShowForm(false)} className="px-4 py-2.5 text-sm text-slate-400 hover:bg-slate-100 rounded-xl transition-colors">Annuleren</button>
+                <button type="button" onClick={()=>setShowForm(false)} className="px-4 py-2.5 text-sm text-warm-gray/70 hover:bg-sand-dark/20 rounded-xl transition-colors">Annuleren</button>
                 <button type="submit" className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-amber-500/20 transition-all">Aanmaken</button>
               </div>
             </form>
