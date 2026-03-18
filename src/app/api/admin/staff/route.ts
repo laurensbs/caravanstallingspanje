@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
-import { hashPassword } from '@/lib/auth';
+import { hashPassword } from '@/lib/passwords';
 import { validateBody, staffSchema } from '@/lib/validations';
 
 export async function GET() {

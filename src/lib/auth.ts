@@ -1,5 +1,4 @@
 import { SignJWT, jwtVerify } from 'jose';
-import bcrypt from 'bcryptjs';
 
 function requireEnv(name: string): Uint8Array {
   const val = process.env[name];
@@ -10,14 +9,6 @@ function requireEnv(name: string): Uint8Array {
 const ADMIN_SECRET = requireEnv('ADMIN_JWT_SECRET');
 const STAFF_SECRET = requireEnv('STAFF_JWT_SECRET');
 const CUSTOMER_SECRET = requireEnv('CUSTOMER_JWT_SECRET');
-
-export async function hashPassword(password: string) {
-  return bcrypt.hash(password, 12);
-}
-
-export async function verifyPassword(password: string, hash: string) {
-  return bcrypt.compare(password, hash);
-}
 
 // ── Admin auth ──
 

@@ -1,29 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createStaffToken } from '@/lib/auth';
-import { timingSafeEqual } from 'crypto';
-
-function safeCompare(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  return timingSafeEqual(Buffer.from(a), Buffer.from(b));
-}
+import { verifyPassword } from '@/lib/passwords';
+import { getStaffByEmail, recordLoginSuccess, recordLoginFailure, isAccountLocked } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
   try {
-    const { password } = await req.json();
-    if (!password) return NextResponse.json({ error: 'Vul een wachtwoord in' }, { status: 400 });
+    const { email, password } = await req.json();
+    if (!email || !password) return NextResponse.json({ error: 'Vul email en wachtwoord in' }, { status: 400 });
 
-    const STAFF_PASSWORD = process.env.STAFF_PASSWORD;
-    if (!STAFF_PASSWORD) {
-      return NextResponse.json({ error: 'Server configuratie onvolledig' }, { status: 500 });
+    const staff = await getStaffByEmail(email);
+    if (!staff) {
+      return NextResponse.json({ error: 'Ongeldige inloggegevens' }, { status: 401 });
     }
 
-    if (!safeCompare(password, STAFF_PASSWORD)) {
-      return NextResponse.json({ error: 'Ongeldig wachtwoord' }, { status: 401 });
+    if (await isAccountLocked('staff', staff.id)) {
+      return NextResponse.json({ error: 'Account tijdelijk vergrendeld. Probeer het over 15 minuten opnieuw.' }, { status: 423 });
     }
 
-    const token = await createStaffToken({ id: 1, name: 'Medewerker', email: 'staff@caravanstalling-spanje.com', role: 'medewerker' });
+    const valid = await verifyPassword(password, staff.password_hash);
+    if (!valid) {
+      await recordLoginFailure('staff', staff.id);
+      return NextResponse.json({ error: 'Ongeldige inloggegevens' }, { status: 401 });
+    }
 
-    const response = NextResponse.json({ success: true, name: 'Medewerker', role: 'medewerker' });
+    await recordLoginSuccess('staff', staff.id);
+
+    const token = await createStaffToken({
+      id: staff.id,
+      name: `${staff.first_name} ${staff.last_name}`,
+      email: staff.email,
+      role: staff.role,
+      locationId: staff.location_id,
+    });
+
+    const response = NextResponse.json({ success: true, name: `${staff.first_name} ${staff.last_name}`, role: staff.role });
     response.cookies.set('staff_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

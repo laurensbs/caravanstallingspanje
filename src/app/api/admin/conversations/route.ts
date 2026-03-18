@@ -35,40 +35,62 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const customerId = searchParams.get('customer_id');
 
+    // Optimized: use CTEs instead of correlated subqueries to avoid N+1
     let conversations;
     if (customerId) {
       conversations = await sql`
-        SELECT c.*, 
-          cu.first_name || ' ' || cu.last_name as customer_name,
-          cu.email as customer_email,
-          (SELECT COUNT(*) FROM conversation_messages cm WHERE cm.conversation_id = c.id AND cm.is_read = false AND cm.sender_type = 'customer') as unread_count,
-          (SELECT cm.message FROM conversation_messages cm WHERE cm.conversation_id = c.id ORDER BY cm.created_at DESC LIMIT 1) as last_message
+        WITH unread AS (
+          SELECT conversation_id, COUNT(*) as cnt
+          FROM conversation_messages WHERE is_read = false AND sender_type = 'customer'
+          GROUP BY conversation_id
+        ), latest_msg AS (
+          SELECT DISTINCT ON (conversation_id) conversation_id, message
+          FROM conversation_messages ORDER BY conversation_id, created_at DESC
+        )
+        SELECT c.*, cu.first_name || ' ' || cu.last_name as customer_name, cu.email as customer_email,
+          COALESCE(u.cnt, 0) as unread_count, lm.message as last_message
         FROM conversations c
         LEFT JOIN customers cu ON c.customer_id = cu.id
+        LEFT JOIN unread u ON u.conversation_id = c.id
+        LEFT JOIN latest_msg lm ON lm.conversation_id = c.id
         WHERE c.customer_id = ${Number(customerId)}
         ORDER BY c.last_message_at DESC
       `;
     } else if (status) {
       conversations = await sql`
-        SELECT c.*, 
-          cu.first_name || ' ' || cu.last_name as customer_name,
-          cu.email as customer_email,
-          (SELECT COUNT(*) FROM conversation_messages cm WHERE cm.conversation_id = c.id AND cm.is_read = false AND cm.sender_type = 'customer') as unread_count,
-          (SELECT cm.message FROM conversation_messages cm WHERE cm.conversation_id = c.id ORDER BY cm.created_at DESC LIMIT 1) as last_message
+        WITH unread AS (
+          SELECT conversation_id, COUNT(*) as cnt
+          FROM conversation_messages WHERE is_read = false AND sender_type = 'customer'
+          GROUP BY conversation_id
+        ), latest_msg AS (
+          SELECT DISTINCT ON (conversation_id) conversation_id, message
+          FROM conversation_messages ORDER BY conversation_id, created_at DESC
+        )
+        SELECT c.*, cu.first_name || ' ' || cu.last_name as customer_name, cu.email as customer_email,
+          COALESCE(u.cnt, 0) as unread_count, lm.message as last_message
         FROM conversations c
         LEFT JOIN customers cu ON c.customer_id = cu.id
+        LEFT JOIN unread u ON u.conversation_id = c.id
+        LEFT JOIN latest_msg lm ON lm.conversation_id = c.id
         WHERE c.status = ${status}
         ORDER BY c.last_message_at DESC
       `;
     } else {
       conversations = await sql`
-        SELECT c.*, 
-          cu.first_name || ' ' || cu.last_name as customer_name,
-          cu.email as customer_email,
-          (SELECT COUNT(*) FROM conversation_messages cm WHERE cm.conversation_id = c.id AND cm.is_read = false AND cm.sender_type = 'customer') as unread_count,
-          (SELECT cm.message FROM conversation_messages cm WHERE cm.conversation_id = c.id ORDER BY cm.created_at DESC LIMIT 1) as last_message
+        WITH unread AS (
+          SELECT conversation_id, COUNT(*) as cnt
+          FROM conversation_messages WHERE is_read = false AND sender_type = 'customer'
+          GROUP BY conversation_id
+        ), latest_msg AS (
+          SELECT DISTINCT ON (conversation_id) conversation_id, message
+          FROM conversation_messages ORDER BY conversation_id, created_at DESC
+        )
+        SELECT c.*, cu.first_name || ' ' || cu.last_name as customer_name, cu.email as customer_email,
+          COALESCE(u.cnt, 0) as unread_count, lm.message as last_message
         FROM conversations c
         LEFT JOIN customers cu ON c.customer_id = cu.id
+        LEFT JOIN unread u ON u.conversation_id = c.id
+        LEFT JOIN latest_msg lm ON lm.conversation_id = c.id
         ORDER BY c.last_message_at DESC
         LIMIT 100
       `;

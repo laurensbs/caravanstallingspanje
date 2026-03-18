@@ -1,6 +1,8 @@
 /// <reference lib="webworker" />
 
-const CACHE_NAME = 'cs-v1';
+const CACHE_VERSION = 2;
+const CACHE_NAME = `cs-v${CACHE_VERSION}`;
+const STATIC_CACHE = `cs-static-v${CACHE_VERSION}`;
 const OFFLINE_URL = '/offline';
 
 const PRECACHE_URLS = [
@@ -11,6 +13,7 @@ const PRECACHE_URLS = [
   '/tarieven',
   '/contact',
   '/locaties',
+  '/blog',
 ];
 
 const self = globalThis as unknown as ServiceWorkerGlobalScope;
@@ -25,13 +28,14 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Activate — clean old caches
+// Activate — clean old caches (any cache not matching current version)
 self.addEventListener('activate', (event) => {
+  const currentCaches = [CACHE_NAME, STATIC_CACHE];
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames
-          .filter((name) => name !== CACHE_NAME)
+          .filter((name) => !currentCaches.includes(name))
           .map((name) => caches.delete(name))
       );
     })
@@ -73,7 +77,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // For static assets — cache first, fallback to network
+  // For static assets — cache first, fallback to network (separate cache)
   if (
     url.pathname.startsWith('/_next/static/') ||
     url.pathname.startsWith('/icons/') ||
@@ -90,7 +94,7 @@ self.addEventListener('fetch', (event) => {
         return fetch(request).then((response) => {
           if (response.ok) {
             const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+            caches.open(STATIC_CACHE).then((cache) => cache.put(request, clone));
           }
           return response;
         });
@@ -146,3 +150,28 @@ self.addEventListener('notificationclick', (event) => {
     })
   );
 });
+
+// Background sync — retry failed form submissions when back online
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'contact-form-sync') {
+    event.waitUntil(replayQueuedRequests());
+  }
+});
+
+async function replayQueuedRequests() {
+  try {
+    const cache = await caches.open(CACHE_NAME);
+    const keys = await cache.keys();
+    const queued = keys.filter((r) => r.url.includes('/__queued/'));
+    for (const request of queued) {
+      const response = await cache.match(request);
+      if (!response) continue;
+      const body = await response.text();
+      const originalUrl = request.url.replace('/__queued/', '/api/');
+      await fetch(originalUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
+      await cache.delete(request);
+    }
+  } catch {
+    // Will retry on next sync event
+  }
+}

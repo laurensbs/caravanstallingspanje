@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { neon } from '@neondatabase/serverless';
 import { bookingSchema, validateBody } from '@/lib/validations';
-import { hashPassword, createCustomerToken } from '@/lib/auth';
+import { createCustomerToken } from '@/lib/auth';
+import { hashPassword } from '@/lib/passwords';
 import { createCheckoutSession, STORAGE_PRICES, formatCurrency } from '@/lib/stripe';
 import { sendBookingConfirmation, sendWelcomeEmail, sendEmail } from '@/lib/email';
 import crypto from 'crypto';

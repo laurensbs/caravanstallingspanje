@@ -7,7 +7,8 @@ import Image from 'next/image';
 import { ArrowRight, Clock, Calendar, Tag, BookOpen } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { BLOG_POSTS } from '@/lib/blog-data';
+import { getAllPostsLocalized } from '@/lib/blog-data';
+import { useLocale } from '@/lib/i18n';
 
 function A({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
@@ -21,8 +22,10 @@ const categoryColors: Record<string, string> = {
 };
 
 export default function BlogPage() {
-  const featured = BLOG_POSTS[0];
-  const rest = BLOG_POSTS.slice(1);
+  const { locale } = useLocale();
+  const posts = getAllPostsLocalized(locale);
+  const featured = posts[0];
+  const rest = posts.slice(1);
 
   return (
     <>
@@ -89,7 +92,7 @@ export default function BlogPage() {
                 <div className="section-divider mt-4" />
               </div>
               <div className="flex items-center gap-2 text-sm text-warm-gray">
-                <BookOpen size={15} /> {BLOG_POSTS.length} artikelen
+                <BookOpen size={15} /> {posts.length} artikelen
               </div>
             </div>
           </A>

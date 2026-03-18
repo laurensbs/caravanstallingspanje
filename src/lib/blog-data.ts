@@ -431,3 +431,102 @@ export const BLOG_POSTS: BlogPost[] = [
 export function getPostBySlug(slug: string): BlogPost | undefined {
   return BLOG_POSTS.find(p => p.slug === slug);
 }
+
+// ── Multi-language blog support ──
+// Translated metadata for each post — full content stays NL, translated title/excerpt for SEO
+type TranslatedMeta = { title: string; excerpt: string; };
+type BlogTranslations = Record<string, Record<string, TranslatedMeta>>;
+
+export const BLOG_TRANSLATIONS: BlogTranslations = {
+  'caravan-winterklaar-maken': {
+    en: { title: 'Winterizing your caravan: the complete checklist', excerpt: 'Prevent frost damage and spring surprises. Our step-by-step checklist to fully winterize your caravan.' },
+    es: { title: 'Preparar su caravana para el invierno: la lista completa', excerpt: 'Evite daños por heladas y sorpresas en primavera. Lista paso a paso para preparar su caravana para el invierno.' },
+    de: { title: 'Wohnwagen winterfest machen: die komplette Checkliste', excerpt: 'Vermeiden Sie Frostschäden und Überraschungen im Frühling. Unsere Schritt-für-Schritt-Checkliste.' },
+  },
+  'mooiste-campings-costa-brava': {
+    en: { title: 'The 8 most beautiful campsites on the Costa Brava', excerpt: 'From Blanes to the French border: our personal selection of the best campsites on the Spanish Costa Brava.' },
+    es: { title: 'Los 8 campings más bonitos de la Costa Brava', excerpt: 'Desde Blanes hasta la frontera francesa: nuestra selección personal de los mejores campings.' },
+    de: { title: 'Die 8 schönsten Campingplätze an der Costa Brava', excerpt: 'Von Blanes bis zur französischen Grenze: unsere persönliche Auswahl der besten Campingplätze.' },
+  },
+  'vochtschade-caravan-voorkomen': {
+    en: { title: 'Preventing moisture damage in your caravan', excerpt: 'Moisture is the number one enemy of every caravan. Learn how to detect and prevent damage.' },
+    es: { title: 'Prevenir daños por humedad en su caravana', excerpt: 'La humedad es el enemigo número uno de toda caravana. Aprenda a detectar y prevenir daños.' },
+    de: { title: 'Feuchtigkeitsschäden am Wohnwagen vermeiden', excerpt: 'Feuchtigkeit ist der Feind Nummer eins jedes Wohnwagens. So erkennen und vermeiden Sie Schäden.' },
+  },
+  'met-caravan-naar-spanje-wat-u-moet-weten': {
+    en: { title: 'Traveling to Spain with your caravan: what you need to know', excerpt: 'Essential rules, routes and equipment requirements for a safe trip to Spain.' },
+    es: { title: 'Viajar a España con su caravana: lo que necesita saber', excerpt: 'Normas esenciales, rutas y requisitos de equipamiento para un viaje seguro a España.' },
+    de: { title: 'Mit dem Wohnwagen nach Spanien: was Sie wissen müssen', excerpt: 'Wichtige Regeln, Routen und Ausrüstungsanforderungen für eine sichere Reise nach Spanien.' },
+  },
+  'caravan-onderhoud-tips': {
+    en: { title: '10 essential caravan maintenance tips', excerpt: 'A well-maintained caravan lasts longer and retains its value. Our top 10 maintenance tips.' },
+    es: { title: '10 consejos esenciales de mantenimiento de caravanas', excerpt: 'Una caravana bien mantenida dura más y conserva su valor. Nuestros 10 mejores consejos.' },
+    de: { title: '10 wichtige Wohnwagen-Wartungstipps', excerpt: 'Ein gut gewarteter Wohnwagen hält länger und behält seinen Wert. Unsere Top-10-Tipps.' },
+  },
+  'caravan-stallen-spanje-of-nederland': {
+    en: { title: 'Storing your caravan: Spain or the Netherlands?', excerpt: 'We compare costs, climate, convenience and safety between storing in Spain vs. home.' },
+    es: { title: '¿Estacionar su caravana en España o en los Países Bajos?', excerpt: 'Comparamos costes, clima, comodidad y seguridad entre estacionar en España o en casa.' },
+    de: { title: 'Wohnwagen in Spanien oder den Niederlanden unterstellen?', excerpt: 'Wir vergleichen Kosten, Klima, Komfort und Sicherheit.' },
+  },
+  'costa-brava-verborgen-parels': {
+    en: { title: 'Hidden gems of the Costa Brava', excerpt: 'Beyond the tourist beaches: discover the secret coves, villages and restaurants of the Costa Brava.' },
+    es: { title: 'Joyas escondidas de la Costa Brava', excerpt: 'Más allá de las playas turísticas: descubra las calas, pueblos y restaurantes secretos.' },
+    de: { title: 'Verborgene Schätze der Costa Brava', excerpt: 'Jenseits der Touristenstrände: entdecken Sie die geheimen Buchten, Dörfer und Restaurants.' },
+  },
+  'caravanrepair-schadeherstel-uitgelegd': {
+    en: { title: 'CaravanRepair®: professional damage repair explained', excerpt: 'From small dents to full panel replacement — how CaravanRepair® works and what it costs.' },
+    es: { title: 'CaravanRepair®: reparación profesional de daños', excerpt: 'Desde pequeños golpes hasta reemplazo completo de paneles — cómo funciona y cuánto cuesta.' },
+    de: { title: 'CaravanRepair®: professionelle Schadensreparatur erklärt', excerpt: 'Von kleinen Dellen bis zum kompletten Panelaustausch — so funktioniert es und was es kostet.' },
+  },
+  'gaskeuring-caravan-verplicht': {
+    en: { title: 'Gas inspection for caravans: what is mandatory?', excerpt: 'Everything about mandatory LPG inspections, regulations and safety for your caravan.' },
+    es: { title: 'Inspección de gas para caravanas: ¿qué es obligatorio?', excerpt: 'Todo sobre las inspecciones obligatorias de GLP, normativas y seguridad.' },
+    de: { title: 'Gasprüfung für Wohnwagen: was ist Pflicht?', excerpt: 'Alles über die Pflichtprüfung der Gasanlage, Vorschriften und Sicherheit.' },
+  },
+  'caravan-kopen-waar-op-letten': {
+    en: { title: 'Buying a caravan: what to look for', excerpt: 'Complete buyer\'s guide for new and used caravans. Focus points, pitfalls and smart tips.' },
+    es: { title: 'Comprar una caravana: qué tener en cuenta', excerpt: 'Guía completa para comprar caravanas nuevas y de segunda mano. Puntos clave y consejos.' },
+    de: { title: 'Wohnwagen kaufen: worauf achten?', excerpt: 'Kompletter Kaufratgeber für neue und gebrauchte Wohnwagen. Schwerpunkte, Fallstricke und Tipps.' },
+  },
+  'zonnepanelen-op-caravan': {
+    en: { title: 'Solar panels on your caravan: the complete guide', excerpt: 'Everything about solar panels for caravans: types, installation, capacity and costs.' },
+    es: { title: 'Paneles solares en su caravana: la guía completa', excerpt: 'Todo sobre paneles solares para caravanas: tipos, instalación, capacidad y costes.' },
+    de: { title: 'Solarmodule auf dem Wohnwagen: der komplette Leitfaden', excerpt: 'Alles über Solarmodule für Wohnwagen: Typen, Installation, Kapazität und Kosten.' },
+  },
+  'beste-restaurants-emporda': {
+    en: { title: 'The best restaurants in Empordà', excerpt: 'From Michelin-star cuisine to authentic tapas bars: the gastronomic highlights of the Empordà region.' },
+    es: { title: 'Los mejores restaurantes del Empordà', excerpt: 'Desde alta cocina con estrellas Michelin hasta bares de tapas auténticos: lo mejor del Empordà.' },
+    de: { title: 'Die besten Restaurants im Empordà', excerpt: 'Von Michelin-Stern-Küche bis authentischen Tapas-Bars: die gastronomischen Highlights.' },
+  },
+  'caravan-alarm-en-beveiliging': {
+    en: { title: 'Caravan security: alarms and anti-theft systems', excerpt: 'How to protect your caravan from theft and break-ins. Overview of alarm systems and GPS trackers.' },
+    es: { title: 'Seguridad de caravanas: alarmas y sistemas antirrobo', excerpt: 'Cómo proteger su caravana contra robos. Sistemas de alarma y rastreadores GPS.' },
+    de: { title: 'Wohnwagen-Sicherheit: Alarmanlagen und Diebstahlschutz', excerpt: 'So schützen Sie Ihren Wohnwagen vor Diebstahl. Alarmsysteme und GPS-Tracker.' },
+  },
+  'kampeerregels-spanje-2025': {
+    en: { title: 'Camping rules in Spain 2025', excerpt: 'Updated overview of all rules for camping and caravanning in Spain for the 2025 season.' },
+    es: { title: 'Normas de acampada en España 2025', excerpt: 'Resumen actualizado de todas las normas para acampar con caravana en España para 2025.' },
+    de: { title: 'Campingregeln in Spanien 2025', excerpt: 'Aktualisierte Übersicht aller Regeln für Camping und Caravaning in Spanien 2025.' },
+  },
+  'caravan-seizoensklaar-lente': {
+    en: { title: 'Getting your caravan spring-ready', excerpt: 'After winter storage, your caravan needs attention. Our complete spring preparation guide.' },
+    es: { title: 'Preparar su caravana para la primavera', excerpt: 'Después del almacenamiento invernal, su caravana necesita atención. Nuestra guía completa.' },
+    de: { title: 'Wohnwagen frühjahrsfit machen', excerpt: 'Nach dem Winterlager braucht Ihr Wohnwagen Aufmerksamkeit. Unser kompletter Frühjahrs-Leitfaden.' },
+  },
+};
+
+export function getLocalizedPost(slug: string, locale: string): BlogPost | undefined {
+  const post = BLOG_POSTS.find(p => p.slug === slug);
+  if (!post) return undefined;
+  if (locale === 'nl' || !BLOG_TRANSLATIONS[slug]?.[locale]) return post;
+  const t = BLOG_TRANSLATIONS[slug][locale];
+  return { ...post, title: t.title, excerpt: t.excerpt };
+}
+
+export function getAllPostsLocalized(locale: string): BlogPost[] {
+  return BLOG_POSTS.map(post => {
+    if (locale === 'nl' || !BLOG_TRANSLATIONS[post.slug]?.[locale]) return post;
+    const t = BLOG_TRANSLATIONS[post.slug][locale];
+    return { ...post, title: t.title, excerpt: t.excerpt };
+  });
+}

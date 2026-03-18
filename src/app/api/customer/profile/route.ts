@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
-import { getCustomerSession, hashPassword, verifyPassword } from '@/lib/auth';
+import { getCustomerSession } from '@/lib/auth';
+import { hashPassword, verifyPassword } from '@/lib/passwords';
 
 // PUT /api/customer/profile — update customer profile
 export async function PUT(req: NextRequest) {

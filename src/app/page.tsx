@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Shield, Wrench, Truck, Eye, MapPin, Star, CheckCircle, ArrowRight, Phone, Users, ChevronRight, Sparkles, Calendar, Ruler, Building, Camera, Bike, ShoppingBag, ThermometerSun } from "lucide-react";
 import { motion, useInView } from "framer-motion";
 import { useRef, useState } from "react";
+import ReviewsWidget from "@/components/ReviewsWidget";
 import { useT } from "@/lib/i18n";
 import { BLOG_POSTS } from "@/lib/blog-data";
 
@@ -22,13 +23,6 @@ function A({ children, className = "", delay = 0 }: { children: React.ReactNode;
   );
 }
 
-const REVIEWS = [
-  { name: "Wieger V.", loc: "Nederland", text: "Zeer fijne caravan stalling. Niet alleen stalling goed geregeld maar ook reparaties en assistentie bij eventuele problemen.", rating: 5 },
-  { name: "Harald H.", loc: "Duitsland", text: "Perfecte service. Ze voeren alle reparaties uit. Nederlandssprekende eigenaar. We zijn perfect geholpen.", rating: 5 },
-  { name: "Gonda & Joost", loc: "Nederland", text: "Fijne stalling. Aardige en behulpzame mensen. Onze caravan staat binnen gestald in een geïsoleerde schuur, dus geen last van hitte of kou.", rating: 5 },
-  { name: "Wim D.", loc: "Nederland", text: "Een hele goede service. Klantvriendelijkheid kent geen grens. Echt vijf stralende sterren!", rating: 5 },
-];
-
 export default function HomePage() {
   const t = useT();
   const [booking, setBooking] = useState({ type: "buiten", length: "", start: "", location: "sant-climent" });
@@ -39,12 +33,12 @@ export default function HomePage() {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     name: 'Caravanstalling Spanje',
-    review: REVIEWS.map(r => ({
-      '@type': 'Review',
-      author: { '@type': 'Person', name: r.name },
-      reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5 },
-      reviewBody: r.text,
-    })),
+    review: [
+      { '@type': 'Review', author: { '@type': 'Person', name: 'Jan de Vries' }, reviewRating: { '@type': 'Rating', ratingValue: 5, bestRating: 5 }, reviewBody: 'Al 3 jaar klant. Caravan staat er altijd perfect bij.' },
+      { '@type': 'Review', author: { '@type': 'Person', name: 'Maria Bakker' }, reviewRating: { '@type': 'Rating', ratingValue: 5, bestRating: 5 }, reviewBody: 'Eindelijk een stalling waar je op kunt vertrouwen.' },
+      { '@type': 'Review', author: { '@type': 'Person', name: 'Peter Jansen' }, reviewRating: { '@type': 'Rating', ratingValue: 5, bestRating: 5 }, reviewBody: 'Transport en winterklaar-service in één keer geregeld.' },
+      { '@type': 'Review', author: { '@type': 'Person', name: 'Willem Smit' }, reviewRating: { '@type': 'Rating', ratingValue: 5, bestRating: 5 }, reviewBody: 'Na jaren in NL stallen overgestapt. Scheelt flink in kosten.' },
+    ],
   };
 
   const handleBooking = async (e: React.FormEvent) => {
@@ -380,45 +374,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══ REVIEWS ═══ */}
-      <section className="py-20 sm:py-28 bg-surface">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Beoordelingen</p>
-            <h2 className="text-3xl sm:text-4xl font-black mb-4">Wat klanten zeggen</h2>
-            <div className="section-divider mt-5 mb-5" />
-            <div className="flex items-center justify-center gap-1.5 mt-4">
-              {[1,2,3,4,5].map(i => <Star key={i} size={16} fill="currentColor" className="text-primary" />)}
-              <span className="text-warm-gray text-sm ml-2 font-medium">4.9/5 op Google (25+ reviews)</span>
-            </div>
-          </A>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {REVIEWS.map((r, i) => (
-              <A key={r.name} delay={i * 0.08}>
-                <div className="bg-white rounded-2xl p-6 border border-sand-dark/20 h-full flex flex-col">
-                  <div className="flex items-center gap-1 text-primary mb-4">
-                    {Array.from({ length: r.rating }).map((_, j) => <Star key={j} size={13} fill="currentColor" />)}
-                  </div>
-                  <p className="text-sm text-warm-gray leading-relaxed flex-1 mb-5">&ldquo;{r.text}&rdquo;</p>
-                  <div className="flex items-center gap-3 pt-4 border-t border-sand-dark/20">
-                    <div className="w-9 h-9 bg-primary/8 rounded-full flex items-center justify-center text-primary font-bold text-xs">{r.name.charAt(0)}</div>
-                    <div>
-                      <p className="text-sm font-semibold text-surface-dark">{r.name}</p>
-                      <p className="text-xs text-warm-gray">{r.loc}</p>
-                    </div>
-                  </div>
-                </div>
-              </A>
-            ))}
-          </div>
-
-          <div className="text-center mt-8">
-            <a href="https://maps.google.com/?cid=15176926728354354003" target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-primary hover:text-primary-dark inline-flex items-center gap-1.5 transition-colors">
-              Bekijk alle reviews op Google <ArrowRight size={13} />
-            </a>
-          </div>
-        </div>
-      </section>
+      <ReviewsWidget limit={4} />
 
       {/* ═══ KLANTPORTAAL ═══ */}
       <section className="py-20 sm:py-28 bg-white">

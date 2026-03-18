@@ -8,6 +8,8 @@ import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import ExitIntentPopup from '@/components/ExitIntentPopup';
 import CookieConsent from '@/components/CookieConsent';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import Analytics from '@/components/Analytics';
+import LiveChat from '@/components/LiveChat';
 
 export const metadata: Metadata = {
   title: { default: 'Caravanstalling Spanje | Veilige Stalling Costa Brava', template: '%s | Caravanstalling Spanje' },
@@ -42,13 +44,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="nl">
       <head>
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark')}catch(e){}})()` }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <link rel="apple-touch-icon" href="/images/icon-192.png" />
       </head>
-      <body className="bg-surface text-[#3D3530] antialiased pb-16 md:pb-0">
+      <body className="bg-surface dark:bg-[#1a1714] text-[#3D3530] dark:text-[#e8e0d6] antialiased pb-16 md:pb-0">
         <a href="#main-content" className="skip-link">Ga naar inhoud</a>
         <script
           type="application/ld+json"
@@ -106,7 +109,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }),
           }}
         />
-        <LocaleProvider><Breadcrumbs />{children}<FloatingActions /><MobileNav /><ExitIntentPopup /><CookieConsent /><ToastProvider /><ServiceWorkerRegistration /></LocaleProvider>
+        <LocaleProvider><Analytics /><LiveChat /><Breadcrumbs />{children}<FloatingActions /><MobileNav /><ExitIntentPopup /><CookieConsent /><ToastProvider /><ServiceWorkerRegistration /></LocaleProvider>
       </body>
     </html>
   );

@@ -38,6 +38,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
   const [selectedRole, setSelectedRole] = useState<'admin' | 'staff'>('admin');
+  const [loginEmail, setLoginEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
@@ -130,7 +131,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       const res = await fetch('/api/admin/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user: selectedRole, password }),
+        body: JSON.stringify({ email: loginEmail, password }),
         credentials: 'include',
       });
       const data = await res.json();
@@ -153,6 +154,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     await fetch('/api/admin/auth/logout', { method: 'POST', credentials: 'include' });
     setAuthenticated(false);
     setPassword('');
+    setLoginEmail('');
     setUserName('');
   };
 
@@ -205,6 +207,24 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             </div>
 
             <form onSubmit={handleLogin} className="space-y-4">
+              {/* Email field */}
+              <div>
+                <label className="text-white/30 text-[10px] font-bold uppercase tracking-widest block mb-2.5">E-mailadres</label>
+                <div className="relative">
+                  <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/20" />
+                  <input
+                    type="email"
+                    required
+                    value={loginEmail}
+                    onChange={e => { setLoginEmail(e.target.value); setLoginError(''); }}
+                    className="w-full bg-surface/[0.04] border border-white/[0.08] rounded-xl pl-10 pr-4 py-3.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 placeholder:text-white/15 transition-all"
+                    placeholder="admin@example.com"
+                    autoFocus
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
+
               {/* Password field */}
               <div>
                 <label className="text-white/30 text-[10px] font-bold uppercase tracking-widest block mb-2.5">Wachtwoord</label>

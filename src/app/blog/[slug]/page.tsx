@@ -7,7 +7,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, ArrowRight, Clock, Calendar, Tag, Share2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { BLOG_POSTS, getPostBySlug } from '@/lib/blog-data';
+import { BLOG_POSTS, getLocalizedPost } from '@/lib/blog-data';
+import { useLocale } from '@/lib/i18n';
 
 const categoryColors: Record<string, string> = {
   'Onderhoud': 'bg-ocean/10 text-ocean',
@@ -16,8 +17,9 @@ const categoryColors: Record<string, string> = {
 
 export default function BlogPostPage() {
   const params = useParams();
+  const { locale } = useLocale();
   const slug = params.slug as string;
-  const post = getPostBySlug(slug);
+  const post = getLocalizedPost(slug, locale);
 
   if (!post) {
     return (

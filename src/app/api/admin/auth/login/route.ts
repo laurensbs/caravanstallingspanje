@@ -1,40 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminToken } from '@/lib/auth';
-import { timingSafeEqual } from 'crypto';
-
-function safeCompare(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  return timingSafeEqual(Buffer.from(a), Buffer.from(b));
-}
+import { verifyPassword } from '@/lib/passwords';
+import { getAdminByEmail, recordLoginSuccess, recordLoginFailure, isAccountLocked } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
   try {
-    const { user, password } = await req.json();
-    if (!user || !password) return NextResponse.json({ error: 'Vul een wachtwoord in' }, { status: 400 });
+    const { email, password } = await req.json();
+    if (!email || !password) return NextResponse.json({ error: 'Vul email en wachtwoord in' }, { status: 400 });
 
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-    const STAFF_PASSWORD = process.env.STAFF_PASSWORD;
-
-    if (!ADMIN_PASSWORD || !STAFF_PASSWORD) {
-      return NextResponse.json({ error: 'Server configuratie onvolledig' }, { status: 500 });
+    const admin = await getAdminByEmail(email);
+    if (!admin) {
+      return NextResponse.json({ error: 'Ongeldige inloggegevens' }, { status: 401 });
     }
 
-    let role: string;
-    let name: string;
-
-    if (user === 'admin' && safeCompare(password, ADMIN_PASSWORD)) {
-      role = 'admin';
-      name = 'Admin';
-    } else if (user === 'staff' && safeCompare(password, STAFF_PASSWORD)) {
-      role = 'staff';
-      name = 'Medewerker';
-    } else {
-      return NextResponse.json({ error: 'Ongeldig wachtwoord' }, { status: 401 });
+    // Check account lockout
+    if (await isAccountLocked('admin_users', admin.id)) {
+      return NextResponse.json({ error: 'Account tijdelijk vergrendeld. Probeer het over 15 minuten opnieuw.' }, { status: 423 });
     }
 
-    const token = await createAdminToken({ id: user === 'admin' ? 1 : 2, name, email: `${user}@caravanstalling-spanje.com`, role });
+    const valid = await verifyPassword(password, admin.password_hash);
+    if (!valid) {
+      await recordLoginFailure('admin_users', admin.id);
+      return NextResponse.json({ error: 'Ongeldige inloggegevens' }, { status: 401 });
+    }
 
-    const response = NextResponse.json({ success: true, name, role });
+    await recordLoginSuccess('admin_users', admin.id);
+
+    const token = await createAdminToken({ id: admin.id, name: admin.name, email: admin.email, role: admin.role });
+
+    const response = NextResponse.json({ success: true, name: admin.name, role: admin.role });
     response.cookies.set('admin_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

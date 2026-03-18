@@ -25,10 +25,23 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
   response.headers.set('X-XSS-Protection', '1; mode=block');
   response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
   response.headers.set('Permissions-Policy', 'camera=(self), microphone=(), geolocation=(self)');
-  response.headers.set(
-    'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com https://*.googleapis.com https://*.gstatic.com blob:; frame-src https://www.google.com https://maps.google.com https://js.stripe.com; connect-src 'self' https://api.stripe.com https://*.neon.tech; object-src 'none'; base-uri 'self'"
-  );
+  // CSP — strict domains. unsafe-inline required for Next.js inline scripts + Tailwind.
+  // TODO: migrate to nonce-based CSP when Next.js has stable support (currently experimental)
+  const csp = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://www.googletagmanager.com https://www.google-analytics.com https://embed.tawk.to",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "img-src 'self' data: https://images.unsplash.com https://*.googleapis.com https://*.gstatic.com https://www.google-analytics.com https://www.googletagmanager.com blob:",
+    "frame-src https://www.google.com https://maps.google.com https://js.stripe.com https://tawk.to",
+    "connect-src 'self' https://api.stripe.com https://*.neon.tech https://www.google-analytics.com https://analytics.google.com https://*.sentry.io https://*.tawk.to wss://*.tawk.to",
+    "worker-src 'self' blob:",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+  ].join('; ');
+  response.headers.set('Content-Security-Policy', csp);
   return response;
 }
 

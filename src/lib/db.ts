@@ -11,9 +11,14 @@ export async function initDatabase() {
     password_hash TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'admin',
     is_active BOOLEAN DEFAULT true,
+    failed_attempts INTEGER DEFAULT 0,
+    locked_until TIMESTAMP,
     last_login TIMESTAMP,
     created_at TIMESTAMP DEFAULT NOW()
   )`;
+  // Add columns if missing (for existing deployments)
+  await sql`ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS failed_attempts INTEGER DEFAULT 0`;
+  await sql`ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP`;
 
   await sql`CREATE TABLE IF NOT EXISTS staff (
     id SERIAL PRIMARY KEY,
@@ -25,9 +30,13 @@ export async function initDatabase() {
     role TEXT NOT NULL DEFAULT 'medewerker',
     location_id INTEGER,
     is_active BOOLEAN DEFAULT true,
+    failed_attempts INTEGER DEFAULT 0,
+    locked_until TIMESTAMP,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
   )`;
+  await sql`ALTER TABLE staff ADD COLUMN IF NOT EXISTS failed_attempts INTEGER DEFAULT 0`;
+  await sql`ALTER TABLE staff ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP`;
 
   await sql`CREATE TABLE IF NOT EXISTS locations (
     id SERIAL PRIMARY KEY,
@@ -255,12 +264,41 @@ export async function initDatabase() {
 
 // Admin Users
 export async function getAdminByEmail(email: string) {
-  const rows = await sql`SELECT * FROM admin_users WHERE email = ${email} LIMIT 1`;
+  const rows = await sql`SELECT * FROM admin_users WHERE email = ${email} AND is_active = true LIMIT 1`;
   return rows[0] || null;
 }
 
-export async function createAdmin(name: string, email: string, hash: string) {
-  await sql`INSERT INTO admin_users (name, email, password_hash) VALUES (${name}, ${email}, ${hash})`;
+export async function createAdmin(name: string, email: string, hash: string, role = 'admin') {
+  await sql`INSERT INTO admin_users (name, email, password_hash, role) VALUES (${name}, ${email}, ${hash}, ${role})`;
+}
+
+export async function recordLoginSuccess(table: 'admin_users' | 'staff', id: number) {
+  if (table === 'admin_users') {
+    await sql`UPDATE admin_users SET failed_attempts = 0, locked_until = NULL, last_login = NOW() WHERE id = ${id}`;
+  } else {
+    await sql`UPDATE staff SET failed_attempts = 0, locked_until = NULL, last_login = NOW() WHERE id = ${id}`;
+  }
+}
+
+export async function recordLoginFailure(table: 'admin_users' | 'staff', id: number) {
+  const MAX_ATTEMPTS = 5;
+  if (table === 'admin_users') {
+    await sql`UPDATE admin_users SET failed_attempts = failed_attempts + 1,
+      locked_until = CASE WHEN failed_attempts + 1 >= ${MAX_ATTEMPTS} THEN NOW() + INTERVAL '15 minutes' ELSE locked_until END
+      WHERE id = ${id}`;
+  } else {
+    await sql`UPDATE staff SET failed_attempts = failed_attempts + 1,
+      locked_until = CASE WHEN failed_attempts + 1 >= ${MAX_ATTEMPTS} THEN NOW() + INTERVAL '15 minutes' ELSE locked_until END
+      WHERE id = ${id}`;
+  }
+}
+
+export async function isAccountLocked(table: 'admin_users' | 'staff', id: number): Promise<boolean> {
+  const rows = table === 'admin_users'
+    ? await sql`SELECT locked_until FROM admin_users WHERE id = ${id}`
+    : await sql`SELECT locked_until FROM staff WHERE id = ${id}`;
+  if (!rows[0]?.locked_until) return false;
+  return new Date(rows[0].locked_until) > new Date();
 }
 
 // Staff

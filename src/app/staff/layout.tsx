@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, ReactNode } from 'react';
-import { LayoutDashboard, ClipboardList, Search as SearchIcon, MapPin, LogOut, Menu, X, Eye, EyeOff, Wrench, QrCode, Bell } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, Search as SearchIcon, MapPin, LogOut, Menu, X, Eye, EyeOff, Wrench, QrCode, Bell, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -20,6 +20,7 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [password, setPassword] = useState('');
+  const [loginEmail, setLoginEmail] = useState('');
   const [loginError, setLoginError] = useState('');
   const [showPw, setShowPw] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
@@ -59,7 +60,7 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
   const login = async (e: React.FormEvent) => {
     e.preventDefault(); setLoginError(''); setLoginLoading(true);
     try {
-      const res = await fetch('/api/staff/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }), credentials: 'include' });
+      const res = await fetch('/api/staff/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: loginEmail, password }), credentials: 'include' });
       if (res.ok) { const d = await res.json(); setAuthenticated(true); setStaffName(d.name || ''); }
       else { const d = await res.json(); setLoginError(d.error || 'Inloggen mislukt'); }
     } catch { setLoginError('Er is een fout opgetreden'); }
@@ -68,7 +69,7 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     await fetch('/api/staff/auth/logout', { method: 'POST', credentials: 'include' });
-    setAuthenticated(false); setStaffName(''); setPassword('');
+    setAuthenticated(false); setStaffName(''); setPassword(''); setLoginEmail('');
   };
 
   if (loading) return (
@@ -100,6 +101,13 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
               <span>{loginError}</span>
             </div>
           )}
+          <div>
+            <label className="text-white/30 text-[10px] font-bold uppercase tracking-widest block mb-2.5">E-mailadres</label>
+            <div className="relative">
+              <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/20" />
+              <input type="email" required value={loginEmail} onChange={e=>{ setLoginEmail(e.target.value); setLoginError(''); }} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl pl-10 pr-4 py-3.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 placeholder:text-white/15 transition-all" placeholder="medewerker@voorbeeld.com" autoFocus autoComplete="email" />
+            </div>
+          </div>
           <div>
             <label className="text-white/30 text-[10px] font-bold uppercase tracking-widest block mb-2.5">Wachtwoord</label>
             <div className="relative">

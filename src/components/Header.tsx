@@ -7,6 +7,7 @@ import { Menu, X, ChevronDown, Phone, Mail, Clock, Globe, Shield, Wrench, Truck,
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale, LOCALES } from '@/lib/i18n';
 import type { Locale } from '@/lib/i18n';
+import DarkModeToggle from './DarkModeToggle';
 
 const DIENSTEN_ITEMS = [
   { icon: Shield, label: 'Buiten- & Binnenstalling', desc: 'Beveiligd terrein, Securitas Direct', href: '/stalling' },
@@ -99,10 +100,10 @@ export default function Header() {
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}
-                    className="absolute right-0 top-8 bg-white rounded-xl shadow-xl border border-sand-dark/30 py-1.5 min-w-[140px] z-50"
+                    className="absolute right-0 top-8 bg-white dark:bg-[#231e1a] rounded-xl shadow-xl border border-sand-dark/30 dark:border-white/10 py-1.5 min-w-[140px] z-50"
                   >
                     {LOCALES.map(l => (
-                      <button key={l.code} onClick={() => { setLocale(l.code as Locale); setLangOpen(false); }} className={`w-full flex items-center gap-2.5 px-4 py-2 text-xs hover:bg-sand transition-colors ${locale === l.code ? 'text-primary font-semibold' : 'text-surface-dark'}`}>
+                      <button key={l.code} onClick={() => { setLocale(l.code as Locale); setLangOpen(false); }} className={`w-full flex items-center gap-2.5 px-4 py-2 text-xs hover:bg-sand dark:hover:bg-white/5 transition-colors ${locale === l.code ? 'text-primary font-semibold' : 'text-surface-dark'}`}>
                         <span className="text-base">{l.flag}</span> {l.label}
                       </button>
                     ))}
@@ -110,6 +111,7 @@ export default function Header() {
                 )}
               </AnimatePresence>
             </div>
+            <DarkModeToggle />
           </div>
         </div>
       </div>

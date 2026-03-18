@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { initDatabase } from '@/lib/db';
+import { initDatabase, getAdminByEmail, createAdmin } from '@/lib/db';
+import { hashPassword } from '@/lib/passwords';
 
 function verifySetupKey(request: NextRequest): boolean {
   const key = process.env.SETUP_SECRET_KEY;
@@ -15,6 +16,16 @@ async function handleSetup(request: NextRequest) {
   }
   try {
     await initDatabase();
+
+    // Seed default admin if no admin exists
+    const defaultEmail = process.env.ADMIN_EMAIL || 'admin@caravanstalling-spanje.com';
+    const defaultPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    const existing = await getAdminByEmail(defaultEmail);
+    if (!existing) {
+      const hash = await hashPassword(defaultPassword);
+      await createAdmin('Admin', defaultEmail, hash, 'admin');
+    }
+
     return NextResponse.json({ success: true, message: 'Database initialized successfully' });
   } catch (error) {
     console.error('Setup error:', error);
