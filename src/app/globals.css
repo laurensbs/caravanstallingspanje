@@ -292,3 +292,37 @@
 /* ── Touch action for mobile ── */
 .touch-pan-y { touch-action: pan-y; }
 .touch-manipulation { touch-action: manipulation; }
+
+/* ── No scrollbar ── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Prose custom (blog content) ── */
+.prose-custom {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--color-warm-gray);
+}
+.prose-custom h2 {
+  color: var(--color-surface-dark);
+  font-weight: 900;
+  line-height: 1.2;
+}
+.prose-custom p {
+  margin-bottom: 1rem;
+}
+.prose-custom strong {
+  color: var(--color-surface-dark);
+  font-weight: 600;
+}
+.prose-custom li {
+  margin-bottom: 0.25rem;
+}
+.prose-custom a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose-custom a:hover {
+  color: var(--color-primary-dark);
+}

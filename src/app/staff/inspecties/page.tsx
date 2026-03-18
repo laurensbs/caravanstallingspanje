@@ -400,7 +400,7 @@ export default function StaffInspectiesPage() {
             </div>
 
             {/* Navigation buttons */}
-            <div className="p-4 border-t border-sand-dark/20 flex gap-3 shrink-0 safe-area-pb">
+            <div className="p-4 border-t border-sand-dark/20 flex gap-3 shrink-0 safe-bottom">
               {formStep > 0 && (
                 <button type="button" onClick={() => { setFormStep(formStep - 1); if (formStep === 2) stopCamera(); }} className="flex-1 py-3.5 rounded-xl text-sm font-semibold text-warm-gray bg-sand hover:bg-sand-dark/30 transition-colors flex items-center justify-center gap-2">
                   <RotateCcw size={14}/> Vorige
@@ -424,7 +424,7 @@ export default function StaffInspectiesPage() {
       <style jsx global>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .safe-area-pb { padding-bottom: max(env(safe-area-inset-bottom), 1rem); }
+        .safe-bottom { padding-bottom: max(env(safe-area-inset-bottom), 1rem); }
       `}</style>
     </div>
   );

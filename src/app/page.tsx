@@ -98,7 +98,7 @@ export default function HomePage() {
               </p>
 
               {/* Stats */}
-              <div className="grid grid-cols-4 gap-3 max-w-md mx-auto lg:mx-0">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-md mx-auto lg:mx-0">
                 {[
                   { v: "2000+", l: "Caravans" },
                   { v: "20+", l: "Jaar ervaring" },
@@ -113,7 +113,7 @@ export default function HomePage() {
               </div>
 
               {/* Trust */}
-              <div className="hidden lg:flex items-center gap-6 mt-10 pt-8 border-t border-white/[0.06]">
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-10 pt-8 border-t border-white/[0.06] justify-center lg:justify-start">
                 {[
                   { icon: Shield, text: "Securitas Direct" },
                   { icon: Camera, text: "24/7 camera's" },
@@ -146,7 +146,7 @@ export default function HomePage() {
                   <form onSubmit={handleBooking} className="space-y-4">
                     <div>
                       <label className="text-[11px] font-semibold text-warm-gray block mb-2 uppercase tracking-wider">Type stalling</label>
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         {[
                           { val: "buiten", label: "Buitenstalling", price: "€65/mnd" },
                           { val: "binnen", label: "Binnenstalling", price: "€95/mnd" },
@@ -223,7 +223,7 @@ export default function HomePage() {
             ].map(s => (
               <Link key={s.label} href={s.href} className="flex items-center gap-2 text-warm-gray hover:text-primary transition-colors py-2 px-3 rounded-lg group text-sm font-medium">
                 <s.icon size={17} className="group-hover:text-primary transition-colors" />
-                <span className="hidden sm:inline">{s.label}</span>
+                <span>{s.label}</span>
               </Link>
             ))}
           </div>

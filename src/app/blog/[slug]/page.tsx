@@ -124,9 +124,18 @@ export default function BlogPostPage() {
             <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-dark transition-colors">
               <ArrowLeft size={14} /> Alle artikelen
             </Link>
-            <Link href="/contact" className="inline-flex items-center gap-2 text-sm font-semibold text-warm-gray hover:text-primary transition-colors">
-              Vragen? Neem contact op <ArrowRight size={14} />
-            </Link>
+            <button
+              onClick={() => {
+                if (navigator.share) {
+                  navigator.share({ title: post.title, text: post.excerpt, url: window.location.href });
+                } else {
+                  navigator.clipboard.writeText(window.location.href);
+                }
+              }}
+              className="inline-flex items-center gap-2 text-sm font-semibold text-warm-gray hover:text-primary transition-colors"
+            >
+              <Share2 size={14} /> Delen
+            </button>
           </div>
         </div>
       </section>

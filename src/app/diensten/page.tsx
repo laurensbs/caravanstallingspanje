@@ -54,8 +54,29 @@ export default function DienstenPage() {
         </div>
       </section>
 
+      {/* Sticky service nav */}
+      <nav className="sticky top-16 z-30 bg-white/95 backdrop-blur-xl border-b border-sand-dark/20 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex gap-1 overflow-x-auto py-2.5 no-scrollbar">
+            {[
+              { icon: Shield, label: 'Stalling', href: '#stalling' },
+              { icon: Wrench, label: 'Reparatie', href: '#reparatie' },
+              { icon: Sparkles, label: 'CaravanRepair®', href: '#caravanrepair' },
+              { icon: Truck, label: 'Transport', href: '#transport' },
+              { icon: ShoppingBag, label: 'Verkoop', href: '#verkoop' },
+              { icon: Bike, label: 'Verhuur', href: '#verhuur' },
+              { icon: SprayCan, label: 'Schoonmaak', href: '#schoonmaak' },
+            ].map(s => (
+              <a key={s.label} href={s.href} className="flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold text-warm-gray hover:text-primary hover:bg-primary/5 transition-all shrink-0">
+                <s.icon size={13} /> {s.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </nav>
+
       {/* ═══════════ STALLING ═══════════ */}
-      <section id="stalling" className="py-20 sm:py-28 bg-white">
+      <section id="stalling" className="py-20 sm:py-28 bg-white scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -119,7 +140,7 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ REPARATIE & ONDERHOUD ═══════════ */}
-      <section id="reparatie" className="py-20 sm:py-28 bg-surface">
+      <section id="reparatie" className="py-20 sm:py-28 bg-surface scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -175,7 +196,7 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ CARAVANREPAIR® ═══════════ */}
-      <section id="caravanrepair" className="py-20 sm:py-28 bg-white">
+      <section id="caravanrepair" className="py-20 sm:py-28 bg-white scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-3xl mx-auto mb-14">
             <div className="inline-flex items-center gap-2 bg-primary/8 text-primary px-4 py-1.5 rounded-full text-xs font-bold mb-4">
@@ -264,7 +285,7 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ TRANSPORT ═══════════ */}
-      <section id="transport" className="py-20 sm:py-28 bg-surface">
+      <section id="transport" className="py-20 sm:py-28 bg-surface scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -322,7 +343,7 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ VERKOOP ═══════════ */}
-      <section id="verkoop" className="py-20 sm:py-28 bg-white">
+      <section id="verkoop" className="py-20 sm:py-28 bg-white scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -385,7 +406,7 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ VERHUUR ═══════════ */}
-      <section id="verhuur" className="py-20 sm:py-28 bg-surface">
+      <section id="verhuur" className="py-20 sm:py-28 bg-surface scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-2xl mx-auto mb-14">
             <div className="w-12 h-12 bg-accent/10 text-accent rounded-xl flex items-center justify-center mx-auto mb-4"><Bike size={22} /></div>
@@ -444,7 +465,7 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ SCHOONMAAK ═══════════ */}
-      <section id="schoonmaak" className="py-20 sm:py-28 bg-white">
+      <section id="schoonmaak" className="py-20 sm:py-28 bg-white scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">

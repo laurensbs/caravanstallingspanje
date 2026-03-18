@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { MapPin, Phone, Mail, Clock, Facebook, Star, ArrowRight, Shield, Truck, Wrench } from 'lucide-react';
+import { useState } from 'react';
+import { MapPin, Phone, Mail, Clock, Facebook, Star, ArrowRight, Shield, Truck, Wrench, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useT } from '@/lib/i18n';
 
@@ -9,6 +10,11 @@ const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, tra
 
 export default function Footer() {
   const t = useT();
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+
+  const toggleSection = (key: string) => {
+    setOpenSections(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   return (
     <footer className="relative bg-surface-dark text-white/60 overflow-hidden">
@@ -64,10 +70,13 @@ export default function Footer() {
 
           {/* Services */}
           <motion.div variants={fadeUp}>
-            <h4 className="text-white font-bold text-sm mb-5 flex items-center gap-2">
-              <Wrench size={14} className="text-primary-light" /> {t('footer.services')}
-            </h4>
-            <ul className="space-y-2.5">
+            <button onClick={() => toggleSection('services')} className="w-full flex items-center justify-between sm:pointer-events-none mb-5">
+              <h4 className="text-white font-bold text-sm flex items-center gap-2">
+                <Wrench size={14} className="text-primary-light" /> {t('footer.services')}
+              </h4>
+              <ChevronDown size={14} className={`text-white/30 sm:hidden transition-transform ${openSections.services ? 'rotate-180' : ''}`} />
+            </button>
+            <ul className={`space-y-2.5 ${openSections.services ? 'block' : 'hidden sm:block'}`}>
               {[
                 { href: '/stalling', label: 'Caravanstalling' },
                 { href: '/diensten', label: 'Onderhoud & Reparatie' },
@@ -88,10 +97,13 @@ export default function Footer() {
 
           {/* Links */}
           <motion.div variants={fadeUp}>
-            <h4 className="text-white font-bold text-sm mb-5 flex items-center gap-2">
-              <Shield size={14} className="text-primary-light" /> {t('footer.quicklinks')}
-            </h4>
-            <ul className="space-y-2.5">
+            <button onClick={() => toggleSection('links')} className="w-full flex items-center justify-between sm:pointer-events-none mb-5">
+              <h4 className="text-white font-bold text-sm flex items-center gap-2">
+                <Shield size={14} className="text-primary-light" /> {t('footer.quicklinks')}
+              </h4>
+              <ChevronDown size={14} className={`text-white/30 sm:hidden transition-transform ${openSections.links ? 'rotate-180' : ''}`} />
+            </button>
+            <ul className={`space-y-2.5 ${openSections.links ? 'block' : 'hidden sm:block'}`}>
               {[
                 { href: '/locaties', label: 'Onze Locaties' },
                 { href: '/blog', label: 'Blog & Tips' },
@@ -113,13 +125,17 @@ export default function Footer() {
 
           {/* Contact */}
           <motion.div variants={fadeUp}>
-            <h4 className="text-white font-bold text-sm mb-5 flex items-center gap-2">
-              <Truck size={14} className="text-primary-light" /> {t('footer.contact')}
-            </h4>
+            <button onClick={() => toggleSection('contact')} className="w-full flex items-center justify-between sm:pointer-events-none mb-5">
+              <h4 className="text-white font-bold text-sm flex items-center gap-2">
+                <Truck size={14} className="text-primary-light" /> {t('footer.contact')}
+              </h4>
+              <ChevronDown size={14} className={`text-white/30 sm:hidden transition-transform ${openSections.contact ? 'rotate-180' : ''}`} />
+            </button>
+            <div className={`${openSections.contact ? 'block' : 'hidden sm:block'}`}>
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-2.5">
                 <MapPin size={14} className="shrink-0 mt-0.5 text-primary/40" />
-                <span>Ctra de Palamos, 91<br />17110 Sant Climent de Peralta<br />Girona, Spanje</span>
+                <a href="https://www.google.com/maps/search/?api=1&query=Ctra+de+Palamos+91+17110+Sant+Climent+de+Peralta+Girona" target="_blank" rel="noopener noreferrer" className="hover:text-primary-light transition-colors">Ctra de Palamos, 91<br />17110 Sant Climent de Peralta<br />Girona, Spanje</a>
               </li>
               <li className="flex items-center gap-2.5">
                 <Phone size={13} className="text-primary/40" />
@@ -144,12 +160,13 @@ export default function Footer() {
                 <Facebook size={16} />
               </a>
             </div>
+            </div>
           </motion.div>
         </motion.div>
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-white/5 py-5">
+      <div className="border-t border-white/5 py-5 pb-20 md:pb-5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/30">
           <p>&copy; {new Date().getFullYear()} Caravan Storage Spain S.L.</p>
           <div className="flex gap-5">

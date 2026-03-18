@@ -214,7 +214,7 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
       </div>
 
       {/* Mobile bottom tab bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface-dark z-40 border-t border-white/[0.06] safe-area-pb">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface-dark z-40 border-t border-white/[0.06] safe-bottom">
         <div className="grid grid-cols-5 gap-0">
           {NAV_ITEMS.map(item => {
             const active = pathname === item.href;

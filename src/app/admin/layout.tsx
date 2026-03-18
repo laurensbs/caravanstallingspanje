@@ -316,7 +316,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         <header className="h-16 bg-surface border-b border-sand-dark/30 flex items-center justify-between px-6 shrink-0">
           <div className="flex items-center gap-3">
             <button className="md:hidden text-warm-gray/70 hover:text-warm-gray" onClick={() => setSidebarOpen(true)}><Menu size={20} /></button>
-            <div className="hidden md:flex items-center gap-2 bg-sand/40 rounded-xl px-3.5 py-2.5 w-80 border border-sand-dark/20 relative">
+            <div className="flex items-center gap-2 bg-sand/40 rounded-xl px-3.5 py-2.5 w-full md:w-80 border border-sand-dark/20 relative">
               <Search size={15} className="text-warm-gray/50" />
               <input
                 placeholder="Zoek klanten, caravans, contracten..."
@@ -349,7 +349,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 {unreadCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[9px] font-bold rounded-full flex items-center justify-center">{unreadCount}</span>}
               </button>
               {showNotifications && (
-                <div className="absolute right-0 top-full mt-2 w-80 bg-surface rounded-xl border border-sand-dark/20 shadow-xl z-50 max-h-96 overflow-y-auto">
+                <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-surface rounded-xl border border-sand-dark/20 shadow-xl z-50 max-h-96 overflow-y-auto">
                   <div className="p-3 border-b border-sand-dark/20 flex items-center justify-between">
                     <span className="text-sm font-bold text-surface-dark">Notificaties</span>
                     {unreadCount > 0 && <span className="text-[10px] font-bold text-primary">{unreadCount} nieuw</span>}

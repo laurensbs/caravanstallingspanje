@@ -210,8 +210,9 @@ export default function Header() {
                 <span className="text-sm">{currentFlag}</span>
               </button>
 
-              <Link href="/stalling" className="hidden sm:inline-flex items-center gap-1.5 bg-primary hover:bg-primary-dark text-white text-[13px] font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md">
-                Stalling aanvragen
+              <Link href="/stalling" className="inline-flex items-center gap-1.5 bg-primary hover:bg-primary-dark text-white text-[13px] font-semibold px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md">
+                <span className="hidden sm:inline">Stalling aanvragen</span>
+                <span className="sm:hidden">Stalling</span>
               </Link>
 
               {/* Mobile menu button */}
@@ -222,7 +223,7 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile menu */}
+        {/* Mobile menu - unique items not in bottom nav */}
         <AnimatePresence>
           {open && (
             <motion.div
@@ -232,22 +233,25 @@ export default function Header() {
               className="lg:hidden bg-white border-t border-sand-dark/20 overflow-hidden"
             >
               <div className="px-4 py-4 space-y-1">
-                {navItems.map(item => (
+                {/* Only show items NOT in MobileNav bottom bar */}
+                {navItems.filter(item => !['/','/ ','/stalling','/diensten','/blog','/contact','/mijn-account'].includes(item.href)).map(item => (
                   <div key={item.href}>
                     <Link href={item.href} className={`block px-4 py-3 rounded-xl text-sm font-medium transition-colors ${pathname === item.href ? 'bg-primary/8 text-primary' : 'text-surface-dark hover:bg-sand/50'}`}>
                       {item.label}
                     </Link>
-                    {item.hasMega && (
-                      <div className="ml-4 mt-1 mb-2 space-y-0.5">
-                        {DIENSTEN_ITEMS.map(d => (
-                          <Link key={d.label} href={d.href} className="flex items-center gap-2.5 px-4 py-2 text-xs text-warm-gray hover:text-surface-dark transition-colors">
-                            <d.icon size={13} className="text-primary/50" /> {d.label}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 ))}
+                {/* Diensten sub-items */}
+                <div>
+                  <p className="px-4 pt-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-warm-gray/50">Onze diensten</p>
+                  <div className="space-y-0.5">
+                    {DIENSTEN_ITEMS.map(d => (
+                      <Link key={d.label} href={d.href} className="flex items-center gap-2.5 px-4 py-2 text-xs text-warm-gray hover:text-surface-dark transition-colors">
+                        <d.icon size={13} className="text-primary/50" /> {d.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
                 <div className="pt-3 border-t border-sand-dark/20 space-y-2">
                   <Link href="/mijn-account" className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-surface-dark hover:bg-sand/50 rounded-xl">
                     <User size={15} /> Mijn Account

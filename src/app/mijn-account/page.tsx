@@ -379,12 +379,16 @@ function MijnAccountContent() {
 
       <section className="max-w-6xl mx-auto px-4 sm:px-6 -mt-6 relative z-10 pb-16 sm:pb-24">
         {/* Tabs */}
-        <div className="flex gap-1.5 mb-8 overflow-x-auto pb-2 bg-surface rounded-2xl shadow-lg shadow-sand-dark/20 border border-sand-dark/20 p-1.5">
-          {TABS.map(t => (
-            <button key={t.id} onClick={()=>setTab(t.id)} className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${tab === t.id ? 'bg-primary text-white shadow-md shadow-primary/20' : 'text-warm-gray/70 hover:text-warm-gray hover:bg-sand/40'}`}>
-              <t.icon size={16}/>{t.label}
-            </button>
-          ))}
+        <div className="relative mb-8">
+          <div className="flex gap-1.5 overflow-x-auto pb-2 bg-surface rounded-2xl shadow-lg shadow-sand-dark/20 border border-sand-dark/20 p-1.5 no-scrollbar">
+            {TABS.map(t => (
+              <button key={t.id} onClick={()=>setTab(t.id)} className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${tab === t.id ? 'bg-primary text-white shadow-md shadow-primary/20' : 'text-warm-gray/70 hover:text-warm-gray hover:bg-sand/40'}`}>
+                <t.icon size={16}/>{t.label}
+              </button>
+            ))}
+          </div>
+          {/* Scroll hint fade on mobile */}
+          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-surface to-transparent rounded-r-2xl pointer-events-none sm:hidden" />
         </div>
 
         {tab === 'overzicht' && (
@@ -495,7 +499,8 @@ function MijnAccountContent() {
 
         {tab === 'contracten' && (
           <div className="bg-surface rounded-2xl border border-sand-dark/20 overflow-hidden">
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[600px]">
               <thead className="bg-sand/40 border-b border-sand-dark/20">
                 <tr>
                   <th className="text-left px-5 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Contract</th>
@@ -515,12 +520,14 @@ function MijnAccountContent() {
                 </tr>
               ))}</tbody>
             </table>
+            </div>
           </div>
         )}
 
         {tab === 'facturen' && (
           <div className="bg-surface rounded-2xl border border-sand-dark/20 overflow-hidden">
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[700px]">
               <thead className="bg-sand/40 border-b border-sand-dark/20">
                 <tr>
                   <th className="text-left px-5 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Factuur</th>
@@ -548,6 +555,7 @@ function MijnAccountContent() {
                 </tr>
               ))}</tbody>
             </table>
+            </div>
           </div>
         )}
 

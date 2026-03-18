@@ -48,7 +48,14 @@ export default function LocatiesPage() {
                   <span className="text-[10px] font-bold bg-accent/10 text-accent px-3 py-1 rounded-full uppercase tracking-wider">Hoofdvestiging</span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-black mb-2">Sant Climent de Peralta</h2>
-                <p className="text-primary font-bold text-sm mb-6">Ctra de Palamós, 91 · 17110 Girona</p>
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=Ctra+de+Palamos+91+17110+Sant+Climent+de+Peralta+Girona"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary font-bold text-sm mb-6 inline-flex items-center gap-1.5 hover:underline"
+                >
+                  <Navigation size={13} /> Ctra de Palamós, 91 · 17110 Girona
+                </a>
                 <p className="text-warm-gray leading-relaxed mb-4">
                   Ons hoofdterrein ligt aan de Ctra de Palamós in het rustige Sant Climent de Peralta, provincie Girona. 
                   Het terrein is centraal gelegen ten opzichte van de populairste badplaatsen aan de Costa Brava: Pals, Begur, L&apos;Estartit en Palamós liggen allemaal op slechts 6 tot 15 kilometer afstand. 

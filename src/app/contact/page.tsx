@@ -16,10 +16,12 @@ function A({ children, className = '', delay = 0 }: { children: React.ReactNode;
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState('');
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
+    setFormError('');
     const form = e.currentTarget;
     const data = {
       name: (form.elements.namedItem('name') as HTMLInputElement).value,
@@ -33,7 +35,7 @@ export default function ContactPage() {
       if (!res.ok) throw new Error('Verzenden mislukt');
       setSubmitted(true);
     } catch {
-      alert('Er ging iets mis bij het verzenden. Probeer het opnieuw of bel ons op +34 650 036 755.');
+      setFormError('Er ging iets mis bij het verzenden. Probeer het opnieuw of bel ons op +34 650 036 755.');
     } finally {
       setLoading(false);
     }
@@ -121,6 +123,12 @@ export default function ContactPage() {
                     <button type="submit" disabled={loading} className="bg-accent hover:bg-accent-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm disabled:opacity-60">
                       {loading ? 'Verzenden...' : 'Verstuur bericht'} <Send size={14} />
                     </button>
+                    {formError && (
+                      <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 text-sm p-4 rounded-xl">
+                        <MessageCircle size={16} className="shrink-0 mt-0.5" />
+                        <span>{formError}</span>
+                      </div>
+                    )}
                   </form>
                 </div>
               )}
