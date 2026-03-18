@@ -7,6 +7,7 @@ import { Menu, X, ChevronDown, Phone, Mail, Clock, Globe, Shield, Wrench, Truck,
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale, LOCALES } from '@/lib/i18n';
 import type { Locale } from '@/lib/i18n';
+import QuizModal from '@/components/QuizModal';
 
 
 const DIENSTEN_ITEMS = [
@@ -28,6 +29,7 @@ export default function Header() {
   const megaRef = useRef<HTMLDivElement>(null);
   const langRef = useRef<HTMLDivElement>(null);
   const megaTimeout = useRef<NodeJS.Timeout>(null);
+  const [quizOpen, setQuizOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -212,10 +214,10 @@ export default function Header() {
                 <span className="text-sm">{currentFlag}</span>
               </button>
 
-              <Link href="/stalling" className="inline-flex items-center gap-1.5 bg-primary hover:bg-primary-dark text-white text-[13px] font-semibold px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md">
+              <button onClick={() => { setQuizOpen(true); setOpen(false); }} className="inline-flex items-center gap-1.5 bg-primary hover:bg-primary-dark text-white text-[13px] font-semibold px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer">
                 <span className="hidden sm:inline">Stalling aanvragen</span>
                 <span className="sm:hidden">Stalling</span>
-              </Link>
+              </button>
 
               {/* Mobile menu button */}
               <button onClick={() => setOpen(!open)} className={`lg:hidden p-2 rounded-lg transition-colors ${textColor}`} aria-label="Menu">
@@ -258,15 +260,16 @@ export default function Header() {
                   <Link href="/mijn-account" className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-surface-dark hover:bg-sand/50 rounded-xl">
                     <User size={15} /> Mijn Account
                   </Link>
-                  <Link href="/stalling" className="block text-center bg-primary hover:bg-primary-dark text-white font-semibold py-3 rounded-xl text-sm transition-colors">
+                  <button onClick={() => { setQuizOpen(true); setOpen(false); }} className="block w-full text-center bg-primary hover:bg-primary-dark text-white font-semibold py-3 rounded-xl text-sm transition-colors cursor-pointer">
                     Stalling aanvragen
-                  </Link>
+                  </button>
                 </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </header>
+      <QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} source="header" />
     </>
   );
 }
