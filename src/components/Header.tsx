@@ -11,7 +11,7 @@ import type { Locale } from '@/lib/i18n';
 const DIENSTEN_ITEMS = [
   { icon: Shield, label: 'Buiten- & Binnenstalling', desc: 'Beveiligd terrein, Securitas Direct', href: '/stalling' },
   { icon: Wrench, label: 'Reparatie & Onderhoud', desc: 'Complete werkplaats, alle merken', href: '/diensten' },
-  { icon: Sparkles, label: 'CaravanRepair\u00ae', desc: 'Masterdealer schadeherstel', href: '/diensten' },
+  { icon: Sparkles, label: 'CaravanRepair®', desc: 'Masterdealer schadeherstel', href: '/diensten' },
   { icon: Truck, label: 'Transport', desc: '7 eenheden, heel Costa Brava', href: '/diensten' },
   { icon: ShoppingBag, label: 'Verkoop', desc: 'Tweedehands caravans', href: '/diensten' },
   { icon: Bike, label: 'Verhuur', desc: 'Fietsen, koelkasten & airco', href: '/diensten' },
@@ -60,6 +60,7 @@ export default function Header() {
     { href: '/diensten', label: 'Diensten', hasMega: true },
     { href: '/locaties', label: 'Locaties' },
     { href: '/tarieven', label: 'Tarieven' },
+    { href: '/blog', label: 'Blog' },
     { href: '/contact', label: 'Contact' },
   ];
 

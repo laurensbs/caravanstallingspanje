@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, MapPin, Wrench, User, Phone } from 'lucide-react';
+import { Home, MapPin, Wrench, User, Phone, BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const NAV_ITEMS = [
   { href: '/', icon: Home, label: 'Home' },
   { href: '/stalling', icon: MapPin, label: 'Stalling' },
   { href: '/diensten', icon: Wrench, label: 'Diensten' },
+  { href: '/blog', icon: BookOpen, label: 'Blog' },
   { href: '/contact', icon: Phone, label: 'Contact' },
   { href: '/mijn-account', icon: User, label: 'Account' },
 ];

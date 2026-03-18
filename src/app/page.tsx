@@ -7,6 +7,9 @@ import { Shield, Wrench, Truck, Eye, MapPin, Star, CheckCircle, ArrowRight, Phon
 import { motion, useInView } from "framer-motion";
 import { useRef, useState } from "react";
 import { useT } from "@/lib/i18n";
+import { BLOG_POSTS } from "@/lib/blog-data";
+
+const BLOG_PREVIEW = BLOG_POSTS.slice(0, 3);
 
 function A({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
@@ -21,7 +24,7 @@ function A({ children, className = "", delay = 0 }: { children: React.ReactNode;
 const REVIEWS = [
   { name: "Wieger V.", loc: "Nederland", text: "Zeer fijne caravan stalling. Niet alleen stalling goed geregeld maar ook reparaties en assistentie bij eventuele problemen.", rating: 5 },
   { name: "Harald H.", loc: "Duitsland", text: "Perfecte service. Ze voeren alle reparaties uit. Nederlandssprekende eigenaar. We zijn perfect geholpen.", rating: 5 },
-  { name: "Gonda & Joost", loc: "Nederland", text: "Fijne stalling. Aardige en behulpzame mensen. Onze caravan staat binnen gestald in een ge\u00efsoleerde schuur, dus geen last van hitte of kou.", rating: 5 },
+  { name: "Gonda & Joost", loc: "Nederland", text: "Fijne stalling. Aardige en behulpzame mensen. Onze caravan staat binnen gestald in een geïsoleerde schuur, dus geen last van hitte of kou.", rating: 5 },
   { name: "Wim D.", loc: "Nederland", text: "Een hele goede service. Klantvriendelijkheid kent geen grens. Echt vijf stralende sterren!", rating: 5 },
 ];
 
@@ -77,7 +80,7 @@ export default function HomePage() {
                 <span className="gradient-text">caravanstalling</span>
               </h1>
               <p className="text-white/50 text-base sm:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0 mb-10">
-                Stalling, onderhoud, reparatie, transport en verkoop. Al meer dan 20 jaar d\u00e9 specialist aan de Costa Brava. Nederlandstalig personeel.
+                Stalling, onderhoud, reparatie, transport en verkoop. Al meer dan 20 jaar dé specialist aan de Costa Brava. Nederlandstalig personeel.
               </p>
 
               {/* Stats */}
@@ -85,7 +88,7 @@ export default function HomePage() {
                 {[
                   { v: "2000+", l: "Caravans" },
                   { v: "20+", l: "Jaar ervaring" },
-                  { v: "4.9\u2605", l: "Google" },
+                  { v: "4.9★", l: "Google" },
                   { v: "12", l: "Medewerkers" },
                 ].map(s => (
                   <div key={s.l} className="text-center">
@@ -194,7 +197,7 @@ export default function HomePage() {
             {[
               { icon: Shield, label: "Stalling", href: "/stalling" },
               { icon: Wrench, label: "Reparatie", href: "/diensten" },
-              { icon: Sparkles, label: "CaravanRepair\u00ae", href: "/diensten" },
+              { icon: Sparkles, label: "CaravanRepair®", href: "/diensten" },
               { icon: Truck, label: "Transport", href: "/diensten" },
               { icon: ShoppingBag, label: "Verkoop", href: "/diensten" },
               { icon: Bike, label: "Verhuur", href: "/diensten" },
@@ -216,7 +219,7 @@ export default function HomePage() {
             <h2 className="text-3xl sm:text-4xl font-black mb-4">Meer dan alleen stalling</h2>
             <div className="section-divider mt-5 mb-5" />
             <p className="text-warm-gray leading-relaxed">
-              Wij ontzorgen u volledig. Van veilige stalling tot professionele reparatie, transport en verkoop. Alles onder \u00e9\u00e9n dak, met Nederlandstalig personeel.
+              Wij ontzorgen u volledig. Van veilige stalling tot professionele reparatie, transport en verkoop. Alles onder één dak, met Nederlandstalig personeel.
             </p>
           </A>
 
@@ -224,7 +227,7 @@ export default function HomePage() {
             {[
               { icon: Shield, title: "Beveiligde stalling", desc: "Securitas Direct alarm, 24/7 camerabewaking en standaard verzekerd. Buiten- en binnenstalling op ons afgesloten terrein in Sant Climent de Peralta.", color: "bg-ocean/10 text-ocean" },
               { icon: Wrench, title: "Reparatie & onderhoud", desc: "Goed uitgeruste werkplaats voor alle voorkomende reparaties. Banden, remmen, dakluiken, airco, gas, elektra en vochtschade.", color: "bg-warning/10 text-warning" },
-              { icon: Sparkles, title: "CaravanRepair\u00ae Masterdealer", desc: "Onzichtbaar schadeherstel van geprofileerde wanden met levenslange garantie. Erkend door alle verzekeraars. Hagel, storm en aanrijdingsschade.", color: "bg-primary/10 text-primary" },
+              { icon: Sparkles, title: "CaravanRepair® Masterdealer", desc: "Onzichtbaar schadeherstel van geprofileerde wanden met levenslange garantie. Erkend door alle verzekeraars. Hagel, storm en aanrijdingsschade.", color: "bg-primary/10 text-primary" },
               { icon: Truck, title: "Transport (7 eenheden)", desc: "Met ons wagenpark van 7 eenheden en 12 seizoensmedewerkers halen wij uw caravan op en leveren hem af op elke camping aan de Costa Brava.", color: "bg-accent/10 text-accent" },
               { icon: ShoppingBag, title: "Verkoop tweedehands", desc: "Gecontroleerde occasion caravans, al in Spanje. Eerlijk advies, werkplaatskeuring en verkoopbemiddeling. Geen transportkosten.", color: "bg-danger/10 text-danger" },
               { icon: Eye, title: "Tweewekelijkse controle", desc: "Elke 2 weken worden alle caravans gecontroleerd op weerschade. Jaarlijks volledige technische keuring met rapport via uw klantportaal.", color: "bg-info/10 text-info" },
@@ -266,7 +269,7 @@ export default function HomePage() {
           <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {[
               { title: "Buitenstalling", price: "65", desc: "Beveiligd buitenterrein met 24/7 bewaking", features: ["Securitas Direct alarm", "24/7 camerabewaking", "Standaard verzekerd", "Tweewekelijkse controle", "Jaarlijkse keuring"], popular: false },
-              { title: "Binnenstalling", price: "95", desc: "Overdekte hal met klimaatbescherming", features: ["Ge\u00efsoleerde hal", "Geen hitte of kou", "Alle voordelen buiten", "Premium locatie", "Beperkt beschikbaar"], popular: true },
+              { title: "Binnenstalling", price: "95", desc: "Overdekte hal met klimaatbescherming", features: ["Geïsoleerde hal", "Geen hitte of kou", "Alle voordelen buiten", "Premium locatie", "Beperkt beschikbaar"], popular: true },
               { title: "Seizoensstalling", price: "45", desc: "Flexibele stalling buiten het seizoen", features: ["Buitenstalling", "Beveiligd terrein", "Camerabewaking", "Min. 6 maanden", "Upgrade mogelijk"], popular: false },
             ].map((p, i) => (
               <A key={p.title} delay={i * 0.1}>
@@ -307,7 +310,7 @@ export default function HomePage() {
               { step: "01", icon: Phone, title: "Contact opnemen", desc: "Bel, mail of gebruik het formulier op onze website." },
               { step: "02", icon: MapPin, title: "Plek reserveren", desc: "Wij wijzen een vaste plek toe op uw gewenste locatie." },
               { step: "03", icon: Truck, title: "Caravan brengen", desc: "Breng uw caravan of wij halen hem op met ons transport." },
-              { step: "04", icon: Shield, title: "Wij zorgen ervoor", desc: "Bewaking, controles, onderhoud \u2013 wij regelen alles." },
+              { step: "04", icon: Shield, title: "Wij zorgen ervoor", desc: "Bewaking, controles, onderhoud – wij regelen alles." },
             ].map((s, i) => (
               <A key={s.step} delay={i * 0.1}>
                 <div className="text-center">
@@ -337,7 +340,7 @@ export default function HomePage() {
                   <Sparkles className="text-primary-light" size={24} />
                 </div>
                 <div>
-                  <h3 className="text-white text-xl sm:text-2xl font-black mb-1">CaravanRepair\u00ae Masterdealer</h3>
+                  <h3 className="text-white text-xl sm:text-2xl font-black mb-1">CaravanRepair® Masterdealer</h3>
                   <p className="text-white/40 max-w-lg text-sm">Onzichtbaar schadeherstel van geprofileerde wanden. Alle verzekeraars erkend. Levenslange garantie.</p>
                 </div>
               </div>
@@ -412,10 +415,10 @@ export default function HomePage() {
               <div className="bg-sand rounded-2xl p-6 sm:p-8 border border-sand-dark/30">
                 <div className="space-y-3.5">
                   {[
-                    { label: "Mijn Caravans", value: "Hobby De Luxe 490 KMF", sub: "Plek A-042 \u00b7 Buitenstalling" },
-                    { label: "Contract", value: "CS-000142", sub: "Actief \u00b7 Automatische verlenging" },
+                    { label: "Mijn Caravans", value: "Hobby De Luxe 490 KMF", sub: "Plek A-042 · Buitenstalling" },
+                    { label: "Contract", value: "CS-000142", sub: "Actief · Automatische verlenging" },
                     { label: "Volgende factuur", value: "€65,00", sub: "Vervaldatum: 01-04-2026" },
-                    { label: "Laatste inspectie", value: "Goedgekeurd", sub: "02-03-2026 \u00b7 Geen bijzonderheden" },
+                    { label: "Laatste inspectie", value: "Goedgekeurd", sub: "02-03-2026 · Geen bijzonderheden" },
                   ].map(item => (
                     <div key={item.label} className="bg-white rounded-xl p-4 border border-sand-dark/20">
                       <p className="text-[11px] text-warm-gray font-medium uppercase tracking-wider">{item.label}</p>
@@ -427,6 +430,46 @@ export default function HomePage() {
               </div>
             </div>
           </A>
+        </div>
+      </section>
+
+      {/* ═══ BLOG PREVIEW ═══ */}
+      <section className="py-20 sm:py-28 bg-surface">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <A className="text-center max-w-2xl mx-auto mb-14">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Blog & Tips</p>
+            <h2 className="text-3xl sm:text-4xl font-black mb-4">Kennis & reisgidsen</h2>
+            <div className="section-divider mt-5 mb-5" />
+            <p className="text-warm-gray leading-relaxed">Praktische tips van onze monteurs, reisgidsen voor de Costa Brava en alles over caravanonderhoud.</p>
+          </A>
+          <div className="grid sm:grid-cols-3 gap-6">
+            {BLOG_PREVIEW.map((post, i) => (
+              <A key={post.slug} delay={i * 0.08}>
+                <Link href={`/blog/${post.slug}`} className="group block h-full">
+                  <div className="bg-white rounded-2xl overflow-hidden border border-sand-dark/20 h-full flex flex-col card-hover">
+                    <div className="relative aspect-[16/10] overflow-hidden">
+                      <img src={post.image} alt={post.title} className="img-cover group-hover:scale-105 transition-transform duration-500" />
+                      <div className="absolute top-3 left-3">
+                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white/90 text-primary">{post.category}</span>
+                      </div>
+                    </div>
+                    <div className="p-6 flex flex-col flex-1">
+                      <h3 className="font-bold text-[15px] leading-snug mb-2 group-hover:text-primary transition-colors">{post.title}</h3>
+                      <p className="text-sm text-warm-gray leading-relaxed flex-1 mb-4">{post.excerpt}</p>
+                      <span className="inline-flex items-center gap-1.5 text-primary font-semibold text-xs group-hover:gap-2.5 transition-all">
+                        Lees meer <ArrowRight size={12} />
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              </A>
+            ))}
+          </div>
+          <div className="text-center mt-10">
+            <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:text-primary-dark transition-colors">
+              Alle artikelen bekijken <ArrowRight size={14} />
+            </Link>
+          </div>
         </div>
       </section>
 
