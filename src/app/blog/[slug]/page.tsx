@@ -40,8 +40,21 @@ export default function BlogPostPage() {
   const currentIndex = BLOG_POSTS.findIndex(p => p.slug === slug);
   const relatedPosts = BLOG_POSTS.filter((_, i) => i !== currentIndex).slice(0, 3);
 
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: post.excerpt,
+    image: post.image,
+    datePublished: post.date,
+    author: { '@type': 'Organization', name: 'Caravanstalling Spanje' },
+    publisher: { '@type': 'Organization', name: 'Caravanstalling Spanje', url: 'https://caravanstalling-spanje.com' },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `https://caravanstalling-spanje.com/blog/${slug}` },
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       <Header />
 
       {/* Hero */}

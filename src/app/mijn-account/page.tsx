@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { User, FileText, Receipt, Wrench, Truck, LogOut, Eye, EyeOff, Shield, Caravan, MapPin, Calendar, AlertCircle, CheckCircle2, Clock, Upload, CreditCard, Download, Bell, MessageSquare, Send, Activity } from 'lucide-react';
+import { User, FileText, Receipt, Wrench, Truck, LogOut, Eye, EyeOff, Shield, Caravan, MapPin, Calendar, AlertCircle, CheckCircle2, Clock, Upload, CreditCard, Download, Bell, MessageSquare, Send, Activity, KeyRound, ClipboardCheck, Settings } from 'lucide-react';
 
 interface CustomerData { name: string; email: string; phone: string; customer_number: string; }
 interface CaravanItem { id: number; brand: string; model: string; license_plate: string; status: string; location_name: string; spot_label: string; insurance_expiry: string; apk_expiry: string; }
@@ -129,7 +130,9 @@ function CustomerMessagesTab() {
   );
 }
 
-export default function MijnAccountPage() {
+function MijnAccountContent() {
+  const searchParams = useSearchParams();
+  const resetToken = searchParams.get('reset');
   const [auth, setAuth] = useState(false);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('overzicht');
@@ -145,6 +148,27 @@ export default function MijnAccountPage() {
   const [serviceForm, setServiceForm] = useState({ caravan_id: '', service_type: 'reparatie', description: '' });
   const [showServiceForm, setShowServiceForm] = useState(false);
 
+  // Forgot password state
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotMsg, setForgotMsg] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+
+  // Reset password state
+  const [resetForm, setResetForm] = useState({ password: '', confirm: '' });
+  const [resetMsg, setResetMsg] = useState('');
+  const [resetSuccess, setResetSuccess] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+
+  // Profile state
+  const [profileForm, setProfileForm] = useState({ phone: '', address: '', city: '', postal_code: '', country: '' });
+  const [profileMsg, setProfileMsg] = useState('');
+  const [pwChangeForm, setPwChangeForm] = useState({ current: '', newPw: '', confirm: '' });
+  const [pwChangeMsg, setPwChangeMsg] = useState('');
+
+  // Inspection reports
+  const [inspections, setInspections] = useState<{ id: number; caravan_name: string; inspection_date: string; type: string; status: string; notes: string }[]>([]);
+
   useEffect(() => {
     fetch('/api/customer/auth/me', { credentials: 'include' })
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
@@ -155,13 +179,19 @@ export default function MijnAccountPage() {
 
   useEffect(() => {
     if (!auth) return;
-    Promise.all([
-      fetch('/api/customer/caravans', { credentials: 'include' }).then(r => r.json()),
-      fetch('/api/customer/invoices', { credentials: 'include' }).then(r => r.json()),
-      fetch('/api/customer/contracts', { credentials: 'include' }).then(r => r.json()),
-    ]).then(([c, i, co]) => {
-      setCaravans(c.caravans || []); setInvoices(i.invoices || []); setContracts(co.contracts || []);
-    }).catch(() => {});
+    const loadData = () => {
+      Promise.all([
+        fetch('/api/customer/caravans', { credentials: 'include' }).then(r => r.json()),
+        fetch('/api/customer/invoices', { credentials: 'include' }).then(r => r.json()),
+        fetch('/api/customer/contracts', { credentials: 'include' }).then(r => r.json()),
+      ]).then(([c, i, co]) => {
+        setCaravans(c.caravans || []); setInvoices(i.invoices || []); setContracts(co.contracts || []);
+      }).catch(() => {});
+      fetch('/api/customer/inspections', { credentials: 'include' }).then(r => r.json()).then(d => setInspections(d.inspections || [])).catch(() => {});
+    };
+    loadData();
+    const iv = setInterval(loadData, 60000);
+    return () => clearInterval(iv);
   }, [auth]);
 
   const login = async (e: React.FormEvent) => {
@@ -186,13 +216,81 @@ export default function MijnAccountPage() {
     setShowServiceForm(false); alert('Serviceverzoek ingediend!');
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotLoading(true); setForgotMsg('');
+    try {
+      await fetch('/api/customer/auth/forgot-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: forgotEmail }) });
+      setForgotMsg('Als dit e-mailadres bij ons bekend is, ontvangt u een resetlink.');
+    } catch { setForgotMsg('Er ging iets mis. Probeer het opnieuw.'); }
+    setForgotLoading(false);
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (resetForm.password !== resetForm.confirm) { setResetMsg('Wachtwoorden komen niet overeen'); return; }
+    if (resetForm.password.length < 8) { setResetMsg('Wachtwoord moet minimaal 8 tekens zijn'); return; }
+    setResetLoading(true); setResetMsg('');
+    try {
+      const res = await fetch('/api/customer/auth/reset-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: resetToken, password: resetForm.password }), credentials: 'include' });
+      if (res.ok) {
+        setResetSuccess(true); setResetMsg('Wachtwoord succesvol ingesteld! U wordt doorgestuurd...');
+        setTimeout(() => { window.location.href = '/mijn-account'; }, 2000);
+      } else { const d = await res.json(); setResetMsg(d.error || 'Ongeldige of verlopen link'); }
+    } catch { setResetMsg('Er ging iets mis'); }
+    setResetLoading(false);
+  };
+
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault(); setProfileMsg('');
+    try {
+      const res = await fetch('/api/customer/profile', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(profileForm), credentials: 'include' });
+      if (res.ok) setProfileMsg('Profiel bijgewerkt!');
+      else { const d = await res.json(); setProfileMsg(d.error || 'Bijwerken mislukt'); }
+    } catch { setProfileMsg('Er ging iets mis'); }
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault(); setPwChangeMsg('');
+    if (pwChangeForm.newPw !== pwChangeForm.confirm) { setPwChangeMsg('Wachtwoorden komen niet overeen'); return; }
+    try {
+      const res = await fetch('/api/customer/profile', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ currentPassword: pwChangeForm.current, newPassword: pwChangeForm.newPw }), credentials: 'include' });
+      if (res.ok) { setPwChangeMsg('Wachtwoord gewijzigd!'); setPwChangeForm({ current: '', newPw: '', confirm: '' }); }
+      else { const d = await res.json(); setPwChangeMsg(d.error || 'Wijzigen mislukt'); }
+    } catch { setPwChangeMsg('Er ging iets mis'); }
+  };
+
   const fmt = (n: number) => new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n);
   const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString('nl-NL') : '-';
   const STATUS_COLORS: Record<string,string> = { betaald: 'bg-accent/10 text-primary-dark border-accent/30', open: 'bg-ocean/10 text-ocean-dark border-ocean/30', verzonden: 'bg-warning/10 text-warning border-warning/30', actief: 'bg-accent/10 text-primary-dark border-accent/30', verlopen: 'bg-danger/10 text-danger border-danger/30' };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-sand/40"><div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" /></div>;
 
-  if (!auth) return (
+  if (!auth) {
+    // Password reset form
+    if (resetToken && !resetSuccess) return (
+      <>
+        <Header />
+        <div className="min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-sand/40 via-surface to-sand/60 p-4">
+          <div className="bg-surface rounded-3xl shadow-xl shadow-sand-dark/20 border border-sand-dark/20 p-8 sm:p-10 w-full max-w-md">
+            <div className="text-center mb-8">
+              <div className="w-14 h-14 bg-gradient-to-br from-primary to-primary-light rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/20"><KeyRound className="text-white" size={24}/></div>
+              <h1 className="text-2xl font-black text-surface-dark">Wachtwoord instellen</h1>
+              <p className="text-sm text-warm-gray/70 mt-1">Stel uw nieuwe wachtwoord in</p>
+            </div>
+            {resetMsg && <div className={`text-sm p-3 rounded-xl mb-5 flex items-center gap-2 ${resetSuccess ? 'bg-accent/10 border border-accent/30 text-primary-dark' : 'bg-danger/10 border border-danger/30 text-danger'}`}>{resetSuccess ? <CheckCircle2 size={14}/> : <AlertCircle size={14}/>}{resetMsg}</div>}
+            <form onSubmit={handleResetPassword} className="space-y-4">
+              <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Nieuw wachtwoord</label><input type="password" required minLength={8} value={resetForm.password} onChange={e=>setResetForm({...resetForm,password:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
+              <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Herhaal wachtwoord</label><input type="password" required minLength={8} value={resetForm.confirm} onChange={e=>setResetForm({...resetForm,confirm:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
+              <button type="submit" disabled={resetLoading} className="w-full bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-primary/20 disabled:opacity-50">{resetLoading ? 'Bezig...' : 'Wachtwoord instellen'}</button>
+            </form>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+
+    return (
     <>
       <Header />
       <div className="min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-sand/40 via-surface to-sand/60 p-4 relative overflow-hidden">
@@ -203,11 +301,20 @@ export default function MijnAccountPage() {
             <div className="w-14 h-14 bg-gradient-to-br from-primary to-primary-light rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/20">
               <Shield className="text-white" size={24}/>
             </div>
-            <h1 className="text-2xl font-black text-surface-dark">{isRegister ? 'Account aanmaken' : 'Mijn Account'}</h1>
+            <h1 className="text-2xl font-black text-surface-dark">{showForgot ? 'Wachtwoord vergeten' : isRegister ? 'Account aanmaken' : 'Mijn Account'}</h1>
             <p className="text-sm text-warm-gray/70 mt-1">Caravanstalling Spanje</p>
           </div>
           {loginError && <div className="bg-danger/10 border border-danger/30 text-danger text-sm p-3 rounded-xl mb-5 flex items-center gap-2"><AlertCircle size={14}/>{loginError}</div>}
-          {isRegister ? (
+          {showForgot ? (
+            <div className="space-y-4">
+              {forgotMsg && <div className="bg-accent/10 border border-accent/30 text-primary-dark text-sm p-3 rounded-xl flex items-center gap-2"><CheckCircle2 size={14}/>{forgotMsg}</div>}
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">E-mailadres</label><input type="email" required value={forgotEmail} onChange={e=>setForgotEmail(e.target.value)} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
+                <button type="submit" disabled={forgotLoading} className="w-full bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-primary/20 disabled:opacity-50">{forgotLoading ? 'Verzenden...' : 'Resetlink versturen'}</button>
+              </form>
+              <p className="text-center text-sm text-warm-gray/70">Weet u uw wachtwoord? <button type="button" onClick={()=>{setShowForgot(false);setForgotMsg('');}} className="text-primary font-semibold hover:underline">Inloggen</button></p>
+            </div>
+          ) : isRegister ? (
             <form onSubmit={register} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Voornaam *</label><input required value={registerForm.first_name} onChange={e=>setRegisterForm({...registerForm,first_name:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
@@ -224,7 +331,10 @@ export default function MijnAccountPage() {
               <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">E-mail</label><input type="email" required value={loginForm.email} onChange={e=>setLoginForm({...loginForm,email:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
               <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Wachtwoord</label><div className="relative"><input type={showPw?'text':'password'} required value={loginForm.password} onChange={e=>setLoginForm({...loginForm,password:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm pr-10 bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/><button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-warm-gray/50 hover:text-warm-gray">{showPw?<EyeOff size={16}/>:<Eye size={16}/>}</button></div></div>
               <button type="submit" className="w-full bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-primary/20">Inloggen</button>
-              <p className="text-center text-sm text-warm-gray/70">Nog geen account? <button type="button" onClick={()=>setIsRegister(true)} className="text-primary font-semibold hover:underline">Registreren</button></p>
+              <div className="flex items-center justify-between text-sm">
+                <button type="button" onClick={()=>setShowForgot(true)} className="text-primary font-semibold hover:underline">Wachtwoord vergeten?</button>
+                <button type="button" onClick={()=>setIsRegister(true)} className="text-primary font-semibold hover:underline">Registreren</button>
+              </div>
             </form>
           )}
         </div>
@@ -232,6 +342,7 @@ export default function MijnAccountPage() {
       <Footer />
     </>
   );
+  }
 
   const TABS = [
     { id: 'overzicht', label: 'Overzicht', icon: User },
@@ -240,7 +351,9 @@ export default function MijnAccountPage() {
     { id: 'facturen', label: 'Facturen', icon: Receipt },
     { id: 'berichten', label: 'Berichten', icon: MessageSquare },
     { id: 'documenten', label: 'Documenten', icon: Upload },
+    { id: 'inspecties', label: 'Inspecties', icon: ClipboardCheck },
     { id: 'diensten', label: 'Diensten aanvragen', icon: Wrench },
+    { id: 'profiel', label: 'Profiel & Wachtwoord', icon: Settings },
   ];
 
   return (
@@ -501,8 +614,73 @@ export default function MijnAccountPage() {
             )}
           </div>
         )}
+
+        {tab === 'inspecties' && (
+          <div className="space-y-4">
+            <h2 className="font-bold text-surface-dark text-lg">Inspectierapporten</h2>
+            <p className="text-sm text-warm-gray/70">Bekijk de inspectierapporten van uw gestalde caravans.</p>
+            {inspections.length === 0 ? (
+              <div className="bg-surface rounded-2xl border border-sand-dark/20 p-12 text-center">
+                <ClipboardCheck size={32} className="text-warm-gray/40 mx-auto mb-3" />
+                <p className="text-sm text-warm-gray/70">Nog geen inspectierapporten beschikbaar</p>
+              </div>
+            ) : inspections.map(ins => (
+              <div key={ins.id} className="bg-surface rounded-2xl border border-sand-dark/20 p-6 hover:shadow-lg hover:shadow-sand-dark/20 transition-all">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-ocean/10 rounded-xl flex items-center justify-center"><ClipboardCheck size={18} className="text-ocean" /></div>
+                    <div><h3 className="font-bold text-surface-dark text-sm">{ins.caravan_name}</h3><p className="text-xs text-warm-gray/70">{fmtDate(ins.inspection_date)}</p></div>
+                  </div>
+                  <span className={`text-xs font-semibold px-3 py-1.5 rounded-full border ${ins.status === 'goedgekeurd' ? 'bg-accent/10 text-primary-dark border-accent/30' : ins.status === 'afgekeurd' ? 'bg-danger/10 text-danger border-danger/30' : 'bg-ocean/10 text-ocean-dark border-ocean/30'}`}>{ins.status}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="bg-sand/60 rounded-xl p-3"><span className="text-warm-gray/70 text-[11px] font-medium block mb-0.5">Type</span><span className="font-medium text-surface-dark">{ins.type}</span></div>
+                  <div className="bg-sand/60 rounded-xl p-3"><span className="text-warm-gray/70 text-[11px] font-medium block mb-0.5">Opmerkingen</span><span className="font-medium text-surface-dark">{ins.notes || '-'}</span></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {tab === 'profiel' && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-surface rounded-2xl border border-sand-dark/20 p-8">
+              <h2 className="font-bold text-surface-dark text-lg mb-6 flex items-center gap-2"><User size={18} className="text-primary"/> Profiel bewerken</h2>
+              {profileMsg && <div className={`text-sm p-3 rounded-xl mb-4 ${profileMsg.includes('bijgewerkt') ? 'bg-accent/10 text-primary-dark border border-accent/30' : 'bg-danger/10 text-danger border border-danger/30'}`}>{profileMsg}</div>}
+              <form onSubmit={handleProfileUpdate} className="space-y-4">
+                <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Telefoon</label><input value={profileForm.phone} onChange={e=>setProfileForm({...profileForm,phone:e.target.value})} placeholder={customer?.phone || 'Telefoonnummer'} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
+                <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Adres</label><input value={profileForm.address} onChange={e=>setProfileForm({...profileForm,address:e.target.value})} placeholder="Straat en huisnummer" className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Postcode</label><input value={profileForm.postal_code} onChange={e=>setProfileForm({...profileForm,postal_code:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
+                  <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Plaats</label><input value={profileForm.city} onChange={e=>setProfileForm({...profileForm,city:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
+                </div>
+                <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Land</label><input value={profileForm.country} onChange={e=>setProfileForm({...profileForm,country:e.target.value})} placeholder="NL" className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
+                <button type="submit" className="bg-primary hover:bg-primary-light text-white font-bold px-6 py-3 rounded-xl text-sm transition-all shadow-lg shadow-primary/10">Opslaan</button>
+              </form>
+            </div>
+
+            <div className="bg-surface rounded-2xl border border-sand-dark/20 p-8">
+              <h2 className="font-bold text-surface-dark text-lg mb-6 flex items-center gap-2"><KeyRound size={18} className="text-primary"/> Wachtwoord wijzigen</h2>
+              {pwChangeMsg && <div className={`text-sm p-3 rounded-xl mb-4 ${pwChangeMsg.includes('gewijzigd') ? 'bg-accent/10 text-primary-dark border border-accent/30' : 'bg-danger/10 text-danger border border-danger/30'}`}>{pwChangeMsg}</div>}
+              <form onSubmit={handlePasswordChange} className="space-y-4">
+                <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Huidig wachtwoord</label><input type="password" required value={pwChangeForm.current} onChange={e=>setPwChangeForm({...pwChangeForm,current:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
+                <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Nieuw wachtwoord</label><input type="password" required minLength={8} value={pwChangeForm.newPw} onChange={e=>setPwChangeForm({...pwChangeForm,newPw:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
+                <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Herhaal nieuw wachtwoord</label><input type="password" required minLength={8} value={pwChangeForm.confirm} onChange={e=>setPwChangeForm({...pwChangeForm,confirm:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
+                <button type="submit" className="bg-primary hover:bg-primary-light text-white font-bold px-6 py-3 rounded-xl text-sm transition-all shadow-lg shadow-primary/10">Wachtwoord wijzigen</button>
+              </form>
+            </div>
+          </div>
+        )}
       </section>
       <Footer />
     </>
+  );
+}
+
+export default function MijnAccountPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-sand/40"><div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" /></div>}>
+      <MijnAccountContent />
+    </Suspense>
   );
 }

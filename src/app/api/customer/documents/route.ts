@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { neon } from '@neondatabase/serverless';
-
-function getDb() {
-  return neon(process.env.DATABASE_URL!);
-}
+import { sql } from '@/lib/db';
+import { getCustomerSession } from '@/lib/auth';
 
 // POST /api/customer/documents — upload a document
 export async function POST(req: NextRequest) {
-  const customerId = req.headers.get('x-customer-id');
-  if (!customerId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const token = req.cookies.get('customer_token')?.value;
+  if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const session = await getCustomerSession(token);
+  if (!session) return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+  const customerId = session.id;
 
   try {
     const formData = await req.formData();
@@ -30,9 +30,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Ongeldig bestandstype. Alleen PDF, JPG en PNG zijn toegestaan.' }, { status: 400 });
     }
 
-    // For now, store metadata in DB — actual file storage would use Vercel Blob or S3
-    // In production: const blob = await put(file.name, file, { access: 'public' });
-    const sql = getDb();
+    // Store file as base64 in DB (for small files) — for large-scale, use Vercel Blob or S3
+    const buffer = await file.arrayBuffer();
+    const base64Data = Buffer.from(buffer).toString('base64');
+    const fileUrl = `data:${file.type};base64,${base64Data}`;
 
     // Create documents table if not exists
     await sql`
@@ -49,8 +50,8 @@ export async function POST(req: NextRequest) {
     `;
 
     await sql`
-      INSERT INTO documents (customer_id, file_name, file_type, document_type, file_size)
-      VALUES (${customerId}, ${file.name}, ${file.type}, ${type}, ${file.size})
+      INSERT INTO documents (customer_id, file_name, file_type, document_type, file_size, file_url)
+      VALUES (${customerId}, ${file.name}, ${file.type}, ${type}, ${file.size}, ${fileUrl})
     `;
 
     return NextResponse.json({ success: true, message: 'Document geüpload' });
@@ -62,12 +63,13 @@ export async function POST(req: NextRequest) {
 
 // GET /api/customer/documents — list uploaded documents
 export async function GET(req: NextRequest) {
-  const customerId = req.headers.get('x-customer-id');
-  if (!customerId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const token = req.cookies.get('customer_token')?.value;
+  if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const session = await getCustomerSession(token);
+  if (!session) return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+  const customerId = session.id;
 
   try {
-    const sql = getDb();
-
     // Ensure table exists
     await sql`
       CREATE TABLE IF NOT EXISTS documents (
@@ -83,7 +85,7 @@ export async function GET(req: NextRequest) {
     `;
 
     const documents = await sql`
-      SELECT id, file_name, file_type, document_type, file_size, created_at
+      SELECT id, file_name, file_type, document_type, file_size, file_url, created_at
       FROM documents
       WHERE customer_id = ${customerId}
       ORDER BY created_at DESC

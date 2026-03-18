@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, ReactNode } from 'react';
-import { LayoutDashboard, ClipboardList, Search as SearchIcon, MapPin, LogOut, Menu, X, Eye, EyeOff, Wrench, QrCode } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, Search as SearchIcon, MapPin, LogOut, Menu, X, Eye, EyeOff, Wrench, QrCode, Bell } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -23,6 +23,9 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
   const [loginError, setLoginError] = useState('');
   const [showPw, setShowPw] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<{type:string;text:string}[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     fetch('/api/staff/auth/me', { credentials: 'include' })
@@ -31,6 +34,27 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
       .catch(() => setAuthenticated(false))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!authenticated) return;
+    const loadNotifications = async () => {
+      try {
+        const res = await fetch('/api/staff/dashboard', { credentials: 'include' });
+        if (!res.ok) return;
+        const data = await res.json();
+        const items: {type:string;text:string}[] = [];
+        if (data.stats?.tasks_open > 0) items.push({ type: 'taak', text: `${data.stats.tasks_open} open taken` });
+        if (data.stats?.tasks_today > 0) items.push({ type: 'urgent', text: `${data.stats.tasks_today} taken voor vandaag` });
+        if (data.stats?.inspections_due > 0) items.push({ type: 'inspectie', text: `${data.stats.inspections_due} geplande inspecties` });
+        if (data.stats?.transports_today > 0) items.push({ type: 'transport', text: `${data.stats.transports_today} transporten vandaag` });
+        setNotifications(items);
+        setUnreadCount(items.length);
+      } catch {}
+    };
+    loadNotifications();
+    const iv = setInterval(loadNotifications, 30000);
+    return () => clearInterval(iv);
+  }, [authenticated]);
 
   const login = async (e: React.FormEvent) => {
     e.preventDefault(); setLoginError(''); setLoginLoading(true);
@@ -121,6 +145,31 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-3 mb-3 px-3">
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-dark rounded-lg flex items-center justify-center text-white text-xs font-bold">{staffName.charAt(0)}</div>
             <p className="text-white text-xs font-semibold truncate flex-1">{staffName}</p>
+            <div className="relative">
+              <button onClick={() => { setShowNotifications(!showNotifications); setUnreadCount(0); }} className="relative text-white/30 hover:text-white/60 transition-colors">
+                <Bell size={17} />
+                {unreadCount > 0 && <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 rounded-full text-[9px] text-white font-bold flex items-center justify-center">{unreadCount}</span>}
+              </button>
+              {showNotifications && (
+                <div className="absolute bottom-full right-0 mb-2 w-64 bg-surface-dark border border-white/[0.08] rounded-xl shadow-2xl overflow-hidden z-50">
+                  <div className="p-3 border-b border-white/[0.06]">
+                    <p className="text-white text-xs font-bold">Meldingen</p>
+                  </div>
+                  {notifications.length === 0 ? (
+                    <p className="text-white/30 text-xs p-3">Geen meldingen</p>
+                  ) : (
+                    <div className="max-h-48 overflow-y-auto">
+                      {notifications.map((n, i) => (
+                        <div key={i} className="px-3 py-2 border-b border-white/[0.04] last:border-0 flex items-center gap-2">
+                          <span className={`w-2 h-2 rounded-full flex-shrink-0 ${n.type === 'urgent' ? 'bg-red-400' : n.type === 'inspectie' ? 'bg-blue-400' : n.type === 'transport' ? 'bg-amber-400' : 'bg-primary-light'}`} />
+                          <span className="text-white/60 text-xs">{n.text}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
           <button onClick={logout} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-white/30 hover:text-red-400 hover:bg-red-400/5 w-full transition-all">
             <LogOut size={17}/> Uitloggen
@@ -136,7 +185,32 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
           </div>
           <span className="text-white font-bold text-sm">{staffName || 'Staff'}</span>
         </div>
-        <button onClick={logout} className="text-white/30 hover:text-red-400 transition-colors"><LogOut size={18}/></button>
+        <div className="flex items-center gap-3">
+          <button onClick={() => { setShowNotifications(!showNotifications); setUnreadCount(0); }} className="relative text-white/30 hover:text-white/60 transition-colors">
+            <Bell size={18} />
+            {unreadCount > 0 && <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 rounded-full text-[9px] text-white font-bold flex items-center justify-center">{unreadCount}</span>}
+          </button>
+          <button onClick={logout} className="text-white/30 hover:text-red-400 transition-colors"><LogOut size={18}/></button>
+        </div>
+        {showNotifications && (
+          <div className="absolute top-full right-4 mt-1 w-64 bg-surface-dark border border-white/[0.08] rounded-xl shadow-2xl overflow-hidden z-50">
+            <div className="p-3 border-b border-white/[0.06]">
+              <p className="text-white text-xs font-bold">Meldingen</p>
+            </div>
+            {notifications.length === 0 ? (
+              <p className="text-white/30 text-xs p-3">Geen meldingen</p>
+            ) : (
+              <div className="max-h-48 overflow-y-auto">
+                {notifications.map((n, i) => (
+                  <div key={i} className="px-3 py-2 border-b border-white/[0.04] last:border-0 flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${n.type === 'urgent' ? 'bg-red-400' : n.type === 'inspectie' ? 'bg-blue-400' : n.type === 'transport' ? 'bg-amber-400' : 'bg-primary-light'}`} />
+                    <span className="text-white/60 text-xs">{n.text}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Mobile bottom tab bar */}

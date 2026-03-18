@@ -1,7 +1,18 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { initDatabase } from '@/lib/db';
 
-async function handleSetup() {
+function verifySetupKey(request: NextRequest): boolean {
+  const key = process.env.SETUP_SECRET_KEY;
+  if (!key) return false;
+  const provided = request.headers.get('x-setup-key') || new URL(request.url).searchParams.get('key');
+  if (!provided) return false;
+  return key === provided;
+}
+
+async function handleSetup(request: NextRequest) {
+  if (!verifySetupKey(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   try {
     await initDatabase();
     return NextResponse.json({ success: true, message: 'Database initialized successfully' });
@@ -11,10 +22,10 @@ async function handleSetup() {
   }
 }
 
-export async function GET() {
-  return handleSetup();
+export async function GET(request: NextRequest) {
+  return handleSetup(request);
 }
 
-export async function POST() {
-  return handleSetup();
+export async function POST(request: NextRequest) {
+  return handleSetup(request);
 }

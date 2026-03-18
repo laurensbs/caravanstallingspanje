@@ -3,7 +3,8 @@ import { neon } from '@neondatabase/serverless';
 import { bookingSchema, validateBody } from '@/lib/validations';
 import { hashPassword, createCustomerToken } from '@/lib/auth';
 import { createCheckoutSession, STORAGE_PRICES, formatCurrency } from '@/lib/stripe';
-import { sendBookingConfirmation, sendWelcomeEmail } from '@/lib/email';
+import { sendBookingConfirmation, sendWelcomeEmail, sendEmail } from '@/lib/email';
+import crypto from 'crypto';
 
 const sql = neon(process.env.DATABASE_URL || '');
 
@@ -29,7 +30,8 @@ export async function POST(request: NextRequest) {
       // Generate customer number
       const countRes = await sql`SELECT COUNT(*) as count FROM customers`;
       const num = 'KL-' + String(Number(countRes[0].count) + 1).padStart(6, '0');
-      const passwordHash = await hashPassword(data.email + Date.now()); // Temporary password — user should reset
+      const tempPassword = crypto.randomBytes(6).toString('base64url');
+      const passwordHash = await hashPassword(tempPassword);
 
       const res = await sql`
         INSERT INTO customers (customer_number, first_name, last_name, email, password_hash, phone, country)
@@ -38,6 +40,19 @@ export async function POST(request: NextRequest) {
       `;
       customerId = res[0].id;
       isNewCustomer = true;
+
+      // Create password reset token so customer can set their own password
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7 days for new accounts
+      await sql`CREATE TABLE IF NOT EXISTS password_reset_tokens (
+        id SERIAL PRIMARY KEY,
+        customer_id INTEGER NOT NULL,
+        token TEXT NOT NULL UNIQUE,
+        expires_at TIMESTAMPTZ NOT NULL,
+        used BOOLEAN DEFAULT false,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )`;
+      await sql`INSERT INTO password_reset_tokens (customer_id, token, expires_at) VALUES (${customerId}, ${resetToken}, ${expiresAt})`;
     }
 
     // 2. Create caravan record
@@ -115,6 +130,21 @@ export async function POST(request: NextRequest) {
 
     if (isNewCustomer) {
       await sendWelcomeEmail(data.email, { name: data.firstName });
+      // Send password setup email
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://caravanstalling-spanje.com';
+      const resetRes = await sql`SELECT token FROM password_reset_tokens WHERE customer_id = ${customerId} AND used = false ORDER BY created_at DESC LIMIT 1`;
+      if (resetRes.length > 0) {
+        await sendEmail({
+          to: data.email,
+          subject: 'Stel uw wachtwoord in — Caravanstalling Spanje',
+          html: `<p>Beste ${data.firstName},</p>
+          <p>Welkom bij Caravanstalling Spanje! Uw boeking is aangemaakt.</p>
+          <p>Klik op de onderstaande link om uw wachtwoord in te stellen en toegang te krijgen tot uw persoonlijke dashboard:</p>
+          <p><a href="${baseUrl}/mijn-account?reset=${resetRes[0].token}" style="background:#C4653A;color:white;padding:12px 24px;text-decoration:none;border-radius:8px;display:inline-block;">Wachtwoord instellen</a></p>
+          <p>Deze link is 7 dagen geldig.</p>
+          <p>Met vriendelijke groet,<br/>Caravanstalling Spanje</p>`,
+        });
+      }
     }
 
     // 8. Optionally create Stripe checkout session

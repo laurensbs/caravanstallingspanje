@@ -35,6 +35,18 @@ export default function HomePage() {
   const [checkingAvail, setCheckingAvail] = useState(false);
   const [availSpots, setAvailSpots] = useState<number | null>(null);
 
+  const reviewSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: 'Caravanstalling Spanje',
+    review: REVIEWS.map(r => ({
+      '@type': 'Review',
+      author: { '@type': 'Person', name: r.name },
+      reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5 },
+      reviewBody: r.text,
+    })),
+  };
+
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     setCheckingAvail(true);
@@ -59,6 +71,7 @@ export default function HomePage() {
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(reviewSchema) }} />
       <Header />
 
       {/* ═══ HERO ═══ */}

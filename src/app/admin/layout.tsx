@@ -43,6 +43,17 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const [loginLoading, setLoginLoading] = useState(false);
   const [showPw, setShowPw] = useState(false);
 
+  // Notifications
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<{ id: number; message: string; type: string; created_at: string; read: boolean }[]>([]);
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  // Global search
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<{ type: string; label: string; id: number | string; href: string }[]>([]);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searching, setSearching] = useState(false);
+
   const checkAuth = useCallback(() => {
     fetch('/api/admin/auth/me', { credentials: 'include' })
       .then(r => r.ok ? r.json() : Promise.reject())
@@ -55,6 +66,61 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     if (savedRole === 'admin' || savedRole === 'staff') setSelectedRole(savedRole);
     checkAuth();
   }, [checkAuth]);
+
+  // Load notifications
+  useEffect(() => {
+    if (!authenticated) return;
+    const loadNotifs = () => {
+      fetch('/api/admin/dashboard', { credentials: 'include' })
+        .then(r => r.json())
+        .then(d => {
+          const notifs: typeof notifications = [];
+          if (d.stats?.openInvoices > 0) notifs.push({ id: 1, message: `${d.stats.openInvoices} openstaande facturen`, type: 'factuur', created_at: new Date().toISOString(), read: false });
+          if (d.stats?.pendingTasks > 0) notifs.push({ id: 2, message: `${d.stats.pendingTasks} openstaande taken`, type: 'taak', created_at: new Date().toISOString(), read: false });
+          if (d.stats?.pendingServices > 0) notifs.push({ id: 3, message: `${d.stats.pendingServices} dienstaanvragen wachten op actie`, type: 'dienst', created_at: new Date().toISOString(), read: false });
+          if ((d.recent || []).length > 0) {
+            d.recent.slice(0, 5).forEach((a: { id: number; action: string; entity_label: string; created_at: string }, i: number) => {
+              notifs.push({ id: 10 + i, message: `${a.action}: ${a.entity_label}`, type: 'activiteit', created_at: a.created_at, read: true });
+            });
+          }
+          setNotifications(notifs);
+        })
+        .catch(() => {});
+    };
+    loadNotifs();
+    const interval = setInterval(loadNotifs, 30000);
+    return () => clearInterval(interval);
+  }, [authenticated]);
+
+  // Global search
+  useEffect(() => {
+    if (!searchQuery.trim() || searchQuery.length < 2) { setSearchResults([]); setShowSearch(false); return; }
+    const timer = setTimeout(async () => {
+      setSearching(true);
+      setShowSearch(true);
+      try {
+        const q = encodeURIComponent(searchQuery);
+        const [custRes, caravRes, contRes] = await Promise.all([
+          fetch(`/api/admin/customers?search=${q}`, { credentials: 'include' }).then(r => r.json()).catch(() => ({ customers: [] })),
+          fetch(`/api/admin/caravans?search=${q}`, { credentials: 'include' }).then(r => r.json()).catch(() => ({ caravans: [] })),
+          fetch(`/api/admin/contracts?search=${q}`, { credentials: 'include' }).then(r => r.json()).catch(() => ({ contracts: [] })),
+        ]);
+        const results: typeof searchResults = [];
+        (custRes.customers || []).slice(0, 5).forEach((c: { id: number; first_name: string; last_name: string; email: string }) => {
+          results.push({ type: 'Klant', label: `${c.first_name} ${c.last_name} (${c.email})`, id: c.id, href: `/admin/klanten` });
+        });
+        (caravRes.caravans || []).slice(0, 5).forEach((c: { id: number; brand: string; model: string; license_plate: string }) => {
+          results.push({ type: 'Caravan', label: `${c.brand} ${c.model || ''} — ${c.license_plate || ''}`, id: c.id, href: `/admin/caravans` });
+        });
+        (contRes.contracts || []).slice(0, 5).forEach((c: { id: number; contract_number: string }) => {
+          results.push({ type: 'Contract', label: c.contract_number, id: c.id, href: `/admin/contracten` });
+        });
+        setSearchResults(results);
+      } catch { setSearchResults([]); }
+      setSearching(false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -250,15 +316,60 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         <header className="h-16 bg-surface border-b border-sand-dark/30 flex items-center justify-between px-6 shrink-0">
           <div className="flex items-center gap-3">
             <button className="md:hidden text-warm-gray/70 hover:text-warm-gray" onClick={() => setSidebarOpen(true)}><Menu size={20} /></button>
-            <div className="hidden md:flex items-center gap-2 bg-sand/40 rounded-xl px-3.5 py-2.5 w-80 border border-sand-dark/20">
+            <div className="hidden md:flex items-center gap-2 bg-sand/40 rounded-xl px-3.5 py-2.5 w-80 border border-sand-dark/20 relative">
               <Search size={15} className="text-warm-gray/50" />
-              <input placeholder="Zoeken..." className="bg-transparent text-sm outline-none flex-1 text-warm-gray placeholder:text-warm-gray/50" />
+              <input
+                placeholder="Zoek klanten, caravans, contracten..."
+                className="bg-transparent text-sm outline-none flex-1 text-warm-gray placeholder:text-warm-gray/50"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                onFocus={() => { if (searchResults.length > 0) setShowSearch(true); }}
+                onBlur={() => setTimeout(() => setShowSearch(false), 200)}
+              />
+              {showSearch && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-surface rounded-xl border border-sand-dark/20 shadow-xl z-50 max-h-80 overflow-y-auto">
+                  {searching ? (
+                    <div className="p-4 text-center text-sm text-warm-gray/70">Zoeken...</div>
+                  ) : searchResults.length === 0 ? (
+                    <div className="p-4 text-center text-sm text-warm-gray/70">Geen resultaten</div>
+                  ) : searchResults.map((r, i) => (
+                    <Link key={i} href={r.href} className="flex items-center gap-3 px-4 py-3 hover:bg-sand/40 transition-colors border-b border-sand-dark/10 last:border-0">
+                      <span className="text-[10px] font-bold text-warm-gray/50 uppercase w-16 shrink-0">{r.type}</span>
+                      <span className="text-sm text-surface-dark truncate">{r.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <button className="relative text-warm-gray/50 hover:text-warm-gray transition-colors">
-              <Bell size={19} />
-            </button>
+            <div className="relative">
+              <button onClick={() => setShowNotifications(!showNotifications)} className="relative text-warm-gray/50 hover:text-warm-gray transition-colors">
+                <Bell size={19} />
+                {unreadCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[9px] font-bold rounded-full flex items-center justify-center">{unreadCount}</span>}
+              </button>
+              {showNotifications && (
+                <div className="absolute right-0 top-full mt-2 w-80 bg-surface rounded-xl border border-sand-dark/20 shadow-xl z-50 max-h-96 overflow-y-auto">
+                  <div className="p-3 border-b border-sand-dark/20 flex items-center justify-between">
+                    <span className="text-sm font-bold text-surface-dark">Notificaties</span>
+                    {unreadCount > 0 && <span className="text-[10px] font-bold text-primary">{unreadCount} nieuw</span>}
+                  </div>
+                  {notifications.length === 0 ? (
+                    <div className="p-6 text-center text-sm text-warm-gray/70">Geen notificaties</div>
+                  ) : notifications.map(n => (
+                    <div key={n.id} className={`px-4 py-3 border-b border-sand-dark/10 last:border-0 ${!n.read ? 'bg-primary/[0.03]' : ''}`}>
+                      <div className="flex items-start gap-2">
+                        {!n.read && <div className="w-2 h-2 bg-primary rounded-full mt-1.5 shrink-0" />}
+                        <div>
+                          <p className="text-sm text-surface-dark">{n.message}</p>
+                          <p className="text-[10px] text-warm-gray/50 mt-0.5">{new Date(n.created_at).toLocaleString('nl-NL', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' })}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <div className="h-6 w-px bg-sand" />
             <div className="flex items-center gap-2.5 text-sm">
               <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-sm shadow-primary/20">{userName.charAt(0)}</div>

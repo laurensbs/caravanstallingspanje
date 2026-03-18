@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Receipt, Plus, X, ChevronLeft, ChevronRight, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Receipt, Plus, X, ChevronLeft, ChevronRight, CheckCircle, AlertTriangle, Download } from 'lucide-react';
 
 interface Invoice { id: number; invoice_number: string; customer_name: string; customer_email: string; description: string; subtotal: number; tax_amount: number; total: number; status: string; due_date: string; paid_date: string; payment_method: string; created_at: string; }
 interface CustomerOption { id: number; first_name: string; last_name: string; email: string; }
@@ -106,9 +106,12 @@ export default function FacturenPage() {
                   <td className="px-4 py-3 text-xs text-warm-gray">{fmtDate(i.due_date)} {overdue && <AlertTriangle size={12} className="inline text-danger ml-1" />}</td>
                   <td className="px-4 py-3 text-center"><span className={`text-xs font-medium px-2 py-1 rounded-full ${STATUS_COLORS[overdue && i.status !== 'betaald' ? 'achterstallig' : i.status] || 'bg-sand'}`}>{overdue && i.status !== 'betaald' ? 'achterstallig' : i.status}</span></td>
                   <td className="px-4 py-3 text-right">
-                    {i.status !== 'betaald' && i.status !== 'geannuleerd' && (
-                      <button onClick={() => markPaid(i.id)} className="text-xs text-accent font-medium flex items-center gap-1 ml-auto"><CheckCircle size={12} /> Betaald</button>
-                    )}
+                    <div className="flex items-center justify-end gap-2">
+                      <a href={`/api/admin/invoices/${i.id}/pdf`} target="_blank" rel="noopener noreferrer" className="text-xs text-ocean font-medium flex items-center gap-1 hover:text-ocean-dark transition-colors"><Download size={12} /> PDF</a>
+                      {i.status !== 'betaald' && i.status !== 'geannuleerd' && (
+                        <button onClick={() => markPaid(i.id)} className="text-xs text-accent font-medium flex items-center gap-1"><CheckCircle size={12} /> Betaald</button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               );

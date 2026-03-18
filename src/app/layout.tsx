@@ -5,6 +5,7 @@ import FloatingActions from '@/components/FloatingActions';
 import MobileNav from '@/components/MobileNav';
 import ToastProvider from '@/components/ui/Toast';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: { default: 'Caravanstalling Spanje | Veilige Stalling Costa Brava', template: '%s | Caravanstalling Spanje' },
@@ -28,6 +29,10 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: 'https://caravanstalling-spanje.com',
+    languages: {
+      'nl': 'https://caravanstalling-spanje.com',
+      'x-default': 'https://caravanstalling-spanje.com',
+    },
   },
 };
 
@@ -75,10 +80,31 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 bestRating: '5',
               },
               priceRange: '€45 - €95 per maand',
+              hasOfferCatalog: {
+                '@type': 'OfferCatalog',
+                name: 'Stallingsdiensten',
+                itemListElement: [
+                  { '@type': 'Offer', name: 'Buitenstalling', price: '65', priceCurrency: 'EUR', description: 'Veilige buitenstalling met 24/7 bewaking' },
+                  { '@type': 'Offer', name: 'Binnenstalling', price: '95', priceCurrency: 'EUR', description: 'Overdekte stalling in geïsoleerde hal' },
+                  { '@type': 'Offer', name: 'Seizoensstalling', price: '45', priceCurrency: 'EUR', description: 'Voordelig tarief buiten het kampeerseizoen' },
+                ],
+              },
             }),
           }}
         />
-        <LocaleProvider>{children}<FloatingActions /><MobileNav /><ToastProvider /><ServiceWorkerRegistration /></LocaleProvider>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              name: 'Caravanstalling Spanje',
+              url: 'https://caravanstalling-spanje.com',
+              inLanguage: 'nl',
+            }),
+          }}
+        />
+        <LocaleProvider><Breadcrumbs />{children}<FloatingActions /><MobileNav /><ToastProvider /><ServiceWorkerRegistration /></LocaleProvider>
       </body>
     </html>
   );

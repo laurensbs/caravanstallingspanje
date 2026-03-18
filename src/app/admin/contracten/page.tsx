@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { FileText, Plus, X, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
+import { FileText, Plus, X, ChevronLeft, ChevronRight, RefreshCw, Edit2 } from 'lucide-react';
 
 interface Contract { id: number; contract_number: string; customer_name: string; caravan_name: string; license_plate: string; location_name: string; start_date: string; end_date: string; monthly_rate: number; status: string; auto_renew: boolean; }
 interface CustomerOption { id: number; first_name: string; last_name: string; }
@@ -23,6 +23,7 @@ export default function ContractenPage() {
   const [locations, setLocations] = useState<LocationOption[]>([]);
   const [spots, setSpots] = useState<SpotOption[]>([]);
   const [form, setForm] = useState({ customer_id: '', caravan_id: '', location_id: '', spot_id: '', start_date: '', end_date: '', monthly_rate: '', deposit: '0', auto_renew: true });
+  const [editing, setEditing] = useState<Contract | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -60,8 +61,26 @@ export default function ContractenPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch('/api/admin/contracts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form), credentials: 'include' });
-    setShowForm(false); fetchData();
+    if (editing) {
+      await fetch(`/api/admin/contracts/${editing.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form), credentials: 'include' });
+    } else {
+      await fetch('/api/admin/contracts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form), credentials: 'include' });
+    }
+    setShowForm(false); setEditing(null); fetchData();
+  };
+
+  const openEdit = async (c: Contract) => {
+    setEditing(c);
+    const [custRes, caravRes, locRes] = await Promise.all([
+      fetch('/api/admin/customers?limit=500', { credentials: 'include' }),
+      fetch('/api/admin/caravans?limit=500', { credentials: 'include' }),
+      fetch('/api/admin/locations', { credentials: 'include' }),
+    ]);
+    setCustomers((await custRes.json()).customers || []);
+    setCaravans((await caravRes.json()).caravans || []);
+    setLocations((await locRes.json()).locations || []);
+    setForm({ customer_id: '', caravan_id: '', location_id: '', spot_id: '', start_date: c.start_date?.split('T')[0] || '', end_date: c.end_date?.split('T')[0] || '', monthly_rate: String(c.monthly_rate), deposit: '0', auto_renew: c.auto_renew });
+    setShowForm(true);
   };
 
   const filteredCaravans = form.customer_id ? caravans.filter(c => String(c.customer_id) === form.customer_id) : caravans;
@@ -95,9 +114,10 @@ export default function ContractenPage() {
             <th className="text-left px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Periode</th>
             <th className="text-right px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Maandtarief</th>
             <th className="text-center px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Status</th>
+            <th className="text-right px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Acties</th>
           </tr></thead>
           <tbody className="divide-y divide-sand-dark/10">
-            {loading ? <tr><td colSpan={7} className="px-4 py-8 text-center text-warm-gray/70">Laden...</td></tr> :
+            {loading ? <tr><td colSpan={8} className="px-4 py-8 text-center text-warm-gray/70">Laden...</td></tr> :
             contracts.length === 0 ? <tr><td colSpan={7} className="px-4 py-8 text-center text-warm-gray/70">Geen contracten</td></tr> :
             contracts.map(c => (
               <tr key={c.id} className="hover:bg-sand/30 transition-colors">
@@ -110,6 +130,9 @@ export default function ContractenPage() {
                 <td className="px-4 py-3 text-center">
                   <span className={`text-xs font-medium px-2 py-1 rounded-full ${STATUS_COLORS[c.status] || 'bg-sand'}`}>{c.status}</span>
                   {c.auto_renew && <span title="Auto-verlenging"><RefreshCw size={12} className="inline ml-1 text-warm-gray/70" /></span>}
+                </td>
+                <td className="px-4 py-3 text-right">
+                  <button onClick={() => openEdit(c)} className="p-1.5 hover:bg-sand-dark/20 rounded-lg text-warm-gray/70 hover:text-warm-gray transition-colors" title="Bewerken"><Edit2 size={14} /></button>
                 </td>
               </tr>
             ))}
@@ -124,7 +147,7 @@ export default function ContractenPage() {
       {showForm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-surface rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="flex items-center justify-between p-6 border-b border-sand-dark/20"><h2 className="text-lg font-bold text-surface-dark">Nieuw contract</h2><button onClick={() => setShowForm(false)} className="text-warm-gray/70 hover:text-warm-gray"><X size={20}/></button></div>
+            <div className="flex items-center justify-between p-6 border-b border-sand-dark/20"><h2 className="text-lg font-bold text-surface-dark">{editing ? 'Contract bewerken' : 'Nieuw contract'}</h2><button onClick={() => setShowForm(false)} className="text-warm-gray/70 hover:text-warm-gray"><X size={20}/></button></div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
                 <label className="text-xs font-semibold text-warm-gray block mb-1">Klant *</label>

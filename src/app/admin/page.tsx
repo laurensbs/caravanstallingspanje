@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Users, Caravan, MapPin, FileText, Receipt, Truck, ClipboardList, TrendingUp, AlertTriangle, ArrowUpRight, Activity } from 'lucide-react';
+import { Users, Caravan, MapPin, FileText, Receipt, Truck, ClipboardList, TrendingUp, AlertTriangle, ArrowUpRight, Activity, BarChart3 } from 'lucide-react';
 
 interface Stats {
   totalCustomers: number; totalCaravans: number; storedCaravans: number; onSiteCaravans: number;
@@ -62,6 +62,74 @@ export default function AdminDashboard() {
             {c.sub && <p className="text-xs text-warm-gray/50 mt-1">{c.sub}</p>}
           </Link>
         ))}
+      </div>
+
+      {/* Charts */}
+      <div className="grid lg:grid-cols-2 gap-6 mb-8">
+        {/* Occupancy */}
+        <div className="bg-surface rounded-2xl p-6 border border-sand-dark/20">
+          <h2 className="font-bold text-surface-dark flex items-center gap-2 mb-5"><BarChart3 size={16} className="text-ocean" /> Bezettingsgraad</h2>
+          <div className="space-y-4">
+            {(() => {
+              const stored = stats.storedCaravans || 0;
+              const total = stats.totalCaravans || 1;
+              const pct = Math.round((stored / total) * 100);
+              return (
+                <>
+                  <div className="flex items-end justify-between">
+                    <div><p className="text-3xl font-black text-surface-dark">{pct}%</p><p className="text-xs text-warm-gray/70">{stored} van {total} plekken bezet</p></div>
+                  </div>
+                  <div className="w-full h-4 bg-sand/60 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-ocean to-ocean-dark rounded-full transition-all duration-700" style={{ width: `${pct}%` }} />
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="bg-sand/40 rounded-xl p-3 text-center"><p className="text-lg font-black text-surface-dark">{stored}</p><p className="text-[10px] text-warm-gray/70">Gestald</p></div>
+                    <div className="bg-sand/40 rounded-xl p-3 text-center"><p className="text-lg font-black text-surface-dark">{stats.onSiteCaravans || 0}</p><p className="text-[10px] text-warm-gray/70">Op camping</p></div>
+                    <div className="bg-sand/40 rounded-xl p-3 text-center"><p className="text-lg font-black text-surface-dark">{total - stored - (stats.onSiteCaravans || 0)}</p><p className="text-[10px] text-warm-gray/70">In transit</p></div>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        </div>
+
+        {/* Revenue */}
+        <div className="bg-surface rounded-2xl p-6 border border-sand-dark/20">
+          <h2 className="font-bold text-surface-dark flex items-center gap-2 mb-5"><TrendingUp size={16} className="text-accent" /> Financieel overzicht</h2>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-accent/[0.06] rounded-xl p-4 border border-accent/20">
+                <p className="text-xs text-warm-gray/70 mb-1">Jaaromzet {new Date().getFullYear()}</p>
+                <p className="text-xl font-black text-surface-dark">{fmt(stats.yearRevenue)}</p>
+              </div>
+              <div className="bg-warning/[0.06] rounded-xl p-4 border border-warning/20">
+                <p className="text-xs text-warm-gray/70 mb-1">Openstaand</p>
+                <p className="text-xl font-black text-surface-dark">{fmt(stats.openInvoiceAmount)}</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {[
+                { label: 'Betaald', value: stats.yearRevenue, color: 'bg-accent', pct: stats.yearRevenue / (stats.yearRevenue + stats.openInvoiceAmount + stats.overdueAmount || 1) * 100 },
+                { label: 'Openstaand', value: stats.openInvoiceAmount, color: 'bg-warning', pct: stats.openInvoiceAmount / (stats.yearRevenue + stats.openInvoiceAmount + stats.overdueAmount || 1) * 100 },
+                { label: 'Achterstallig', value: stats.overdueAmount, color: 'bg-danger', pct: stats.overdueAmount / (stats.yearRevenue + stats.openInvoiceAmount + stats.overdueAmount || 1) * 100 },
+              ].map(b => (
+                <div key={b.label} className="flex items-center gap-3">
+                  <span className="text-xs text-warm-gray/70 w-24">{b.label}</span>
+                  <div className="flex-1 h-3 bg-sand/60 rounded-full overflow-hidden">
+                    <div className={`h-full ${b.color} rounded-full transition-all duration-700`} style={{ width: `${Math.max(b.pct, 1)}%` }} />
+                  </div>
+                  <span className="text-xs font-semibold text-surface-dark w-20 text-right">{fmt(b.value)}</span>
+                </div>
+              ))}
+            </div>
+            {stats.activeContracts > 0 && (
+              <div className="bg-sand/40 rounded-xl p-3 text-center mt-2">
+                <p className="text-xs text-warm-gray/70">Gemiddelde maandelijkse omzet per contract</p>
+                <p className="text-lg font-black text-surface-dark">{fmt(stats.yearRevenue / 12 / stats.activeContracts)}</p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Quick Actions + Activity */}
