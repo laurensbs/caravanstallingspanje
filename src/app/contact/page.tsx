@@ -29,10 +29,11 @@ export default function ContactPage() {
       message: (form.elements.namedItem('message') as HTMLTextAreaElement).value,
     };
     try {
-      await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const res = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      if (!res.ok) throw new Error('Verzenden mislukt');
       setSubmitted(true);
     } catch {
-      setSubmitted(true);
+      alert('Er ging iets mis bij het verzenden. Probeer het opnieuw of bel ons op +34 650 036 755.');
     } finally {
       setLoading(false);
     }

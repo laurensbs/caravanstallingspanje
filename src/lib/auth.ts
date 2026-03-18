@@ -1,9 +1,15 @@
 import { SignJWT, jwtVerify } from 'jose';
 import bcrypt from 'bcryptjs';
 
-const ADMIN_SECRET = new TextEncoder().encode(process.env.ADMIN_JWT_SECRET || 'admin-fallback-secret');
-const STAFF_SECRET = new TextEncoder().encode(process.env.STAFF_JWT_SECRET || 'staff-fallback-secret');
-const CUSTOMER_SECRET = new TextEncoder().encode(process.env.CUSTOMER_JWT_SECRET || 'customer-fallback-secret');
+function requireEnv(name: string): Uint8Array {
+  const val = process.env[name];
+  if (!val) throw new Error(`Missing required environment variable: ${name}`);
+  return new TextEncoder().encode(val);
+}
+
+const ADMIN_SECRET = requireEnv('ADMIN_JWT_SECRET');
+const STAFF_SECRET = requireEnv('STAFF_JWT_SECRET');
+const CUSTOMER_SECRET = requireEnv('CUSTOMER_JWT_SECRET');
 
 export async function hashPassword(password: string) {
   return bcrypt.hash(password, 12);

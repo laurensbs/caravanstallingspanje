@@ -94,8 +94,11 @@ export default function Footer() {
             <ul className="space-y-2.5">
               {[
                 { href: '/locaties', label: 'Onze Locaties' },
+                { href: '/blog', label: 'Blog & Tips' },
                 { href: '/mijn-account', label: 'Mijn Account' },
                 { href: '/contact', label: 'Contact' },
+                { href: '/privacy', label: 'Privacybeleid' },
+                { href: '/voorwaarden', label: 'Voorwaarden' },
                 { href: '/stalling', label: t('footer.cta.btn') },
               ].map(l => (
                 <li key={l.label}>

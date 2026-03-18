@@ -65,6 +65,31 @@
   ::selection { background: rgba(196,101,58,0.18); color: var(--color-surface-dark); }
 
   input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; }
+
+  /* Accessible focus styles */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Skip-to-content link for keyboard users */
+  .skip-link {
+    position: absolute;
+    top: -50px;
+    left: 16px;
+    background: var(--color-primary);
+    color: white;
+    padding: 8px 16px;
+    z-index: 100;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 0 0 8px 8px;
+    transition: top 0.2s;
+  }
+  .skip-link:focus {
+    top: 0;
+  }
 }
 
 /* ── Keyframes ── */

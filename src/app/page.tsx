@@ -61,7 +61,7 @@ export default function HomePage() {
       <Header />
 
       {/* ═══ HERO ═══ */}
-      <section className="relative min-h-[92vh] flex items-center bg-surface-dark overflow-hidden">
+      <section id="main-content" className="relative min-h-[92vh] flex items-center bg-surface-dark overflow-hidden">
         <div className="absolute inset-0">
           <img src="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1920&q=80" alt="" className="img-cover opacity-25" />
           <div className="hero-overlay absolute inset-0" />

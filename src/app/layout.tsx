@@ -13,6 +13,22 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   themeColor: '#C4653A',
   appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Caravanstalling' },
+  openGraph: {
+    type: 'website',
+    locale: 'nl_NL',
+    siteName: 'Caravanstalling Spanje',
+    title: 'Caravanstalling Spanje | Veilige Stalling Costa Brava',
+    description: 'Dé specialist in het veilig stallen, onderhouden, repareren en transporteren van uw caravan aan de Costa Brava.',
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Caravanstalling Spanje — Costa Brava' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Caravanstalling Spanje',
+    description: 'Veilige caravanstalling aan de Costa Brava. Stalling, onderhoud, reparatie en transport.',
+  },
+  alternates: {
+    canonical: 'https://caravanstalling-spanje.com',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -26,6 +42,42 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/images/icon-192.png" />
       </head>
       <body className="bg-surface text-[#3D3530] antialiased pb-16 md:pb-0">
+        <a href="#main-content" className="skip-link">Ga naar inhoud</a>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'LocalBusiness',
+              name: 'Caravanstalling Spanje',
+              description: 'Specialist in veilige caravanstalling, onderhoud, reparatie en transport aan de Costa Brava.',
+              url: 'https://caravanstalling-spanje.com',
+              telephone: '+34650036755',
+              email: 'info@caravanstalling-spanje.com',
+              address: {
+                '@type': 'PostalAddress',
+                streetAddress: 'Ctra de Palamos 91',
+                addressLocality: 'Sant Climent de Peralta',
+                addressRegion: 'Girona',
+                postalCode: '17110',
+                addressCountry: 'ES',
+              },
+              openingHoursSpecification: {
+                '@type': 'OpeningHoursSpecification',
+                dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+                opens: '09:30',
+                closes: '16:30',
+              },
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: '4.9',
+                reviewCount: '25',
+                bestRating: '5',
+              },
+              priceRange: '€45 - €95 per maand',
+            }),
+          }}
+        />
         <LocaleProvider>{children}<FloatingActions /><MobileNav /><ToastProvider /><ServiceWorkerRegistration /></LocaleProvider>
       </body>
     </html>
