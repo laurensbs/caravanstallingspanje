@@ -69,7 +69,7 @@ export default function HomePage() {
       <Header />
 
       {/* ═══ HERO ═══ */}
-      <section id="main-content" className="relative min-h-[92vh] flex items-center bg-surface-dark overflow-hidden">
+      <section id="main-content" className="relative min-h-[92vh] flex items-center bg-hero overflow-hidden">
         <div className="absolute inset-0">
           <Image src="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1920&q=80" alt="" fill className="object-cover opacity-25" priority />
           <div className="hero-overlay absolute inset-0" />
@@ -204,7 +204,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══ DIENSTEN BAR ═══ */}
-      <section className="bg-white border-b border-sand-dark/20">
+      <section className="bg-card border-b border-sand-dark/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5">
           <div className="flex flex-wrap justify-center gap-3 sm:gap-8 lg:gap-12">
             {[
@@ -225,7 +225,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══ WAAROM WIJ ═══ */}
-      <section className="py-20 sm:py-28 bg-white">
+      <section className="py-20 sm:py-28 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-2xl mx-auto mb-14">
             <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Waarom Caravanstalling Spanje</p>
@@ -246,7 +246,7 @@ export default function HomePage() {
               { icon: Eye, title: "Tweewekelijkse controle", desc: "Elke 2 weken worden alle caravans gecontroleerd op weerschade. Jaarlijks volledige technische keuring met rapport via uw klantportaal.", color: "bg-info/10 text-info" },
             ].map((f, i) => (
               <A key={f.title} delay={i * 0.08}>
-                <div className="bg-white rounded-2xl p-7 border border-sand-dark/30 hover:border-primary/20 card-hover h-full group">
+                <div className="bg-card rounded-2xl p-7 border border-sand-dark/30 hover:border-primary/20 card-hover h-full group">
                   <div className={`w-12 h-12 ${f.color} rounded-xl flex items-center justify-center mb-5 transition-transform group-hover:scale-110 duration-300`}>
                     <f.icon size={21} />
                   </div>
@@ -286,7 +286,7 @@ export default function HomePage() {
               { title: "Seizoensstalling", price: "45", desc: "Flexibele stalling buiten het seizoen", features: ["Buitenstalling", "Beveiligd terrein", "Camerabewaking", "Min. 6 maanden", "Upgrade mogelijk"], popular: false },
             ].map((p, i) => (
               <A key={p.title} delay={i * 0.1}>
-                <div className={`relative bg-white rounded-2xl p-7 h-full flex flex-col text-center ${p.popular ? 'border-2 border-primary shadow-lg shadow-primary/10 ring-1 ring-primary/10' : 'border border-sand-dark/30'}`}>
+                <div className={`relative bg-card rounded-2xl p-7 h-full flex flex-col text-center ${p.popular ? 'border-2 border-primary shadow-lg shadow-primary/10 ring-1 ring-primary/10' : 'border border-sand-dark/30'}`}>
                   {p.popular && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-bold px-4 py-1 rounded-full shadow-sm">Meest gekozen</span>}
                   <h3 className="text-lg font-bold mt-1">{p.title}</h3>
                   <p className="text-xs text-warm-gray mt-1 mb-5">{p.desc}</p>
@@ -299,7 +299,7 @@ export default function HomePage() {
                       <li key={f} className="flex items-center gap-2.5 text-sm"><CheckCircle size={14} className="text-success shrink-0" /> {f}</li>
                     ))}
                   </ul>
-                  <Link href="/reserveren" className={`block py-3 rounded-xl text-sm font-bold transition-all duration-200 ${p.popular ? 'bg-primary hover:bg-primary-dark text-white shadow-sm' : 'bg-surface-dark hover:bg-surface-dark/90 text-white'}`}>
+                  <Link href="/reserveren" className={`block py-3 rounded-xl text-sm font-bold transition-all duration-200 ${p.popular ? 'bg-primary hover:bg-primary-dark text-white shadow-sm' : 'bg-hero hover:bg-hero/90 text-white'}`}>
                     Direct reserveren
                   </Link>
                 </div>
@@ -318,7 +318,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══ HOE HET WERKT ═══ */}
-      <section className="py-20 sm:py-28 bg-white">
+      <section className="py-20 sm:py-28 bg-card">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-2xl mx-auto mb-14">
             <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">In 4 stappen</p>
@@ -351,7 +351,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══ CARAVANREPAIR BANNER ═══ */}
-      <section className="bg-surface-dark relative overflow-hidden">
+      <section className="bg-hero relative overflow-hidden">
         <div className="absolute inset-0 line-pattern" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-16 relative">
           <A>
@@ -377,7 +377,7 @@ export default function HomePage() {
       <ReviewsWidget limit={4} />
 
       {/* ═══ KLANTPORTAAL ═══ */}
-      <section className="py-20 sm:py-28 bg-white">
+      <section className="py-20 sm:py-28 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -391,7 +391,7 @@ export default function HomePage() {
                     <li key={f} className="flex items-center gap-3 text-sm"><CheckCircle size={15} className="text-success shrink-0" /><span>{f}</span></li>
                   ))}
                 </ul>
-                <Link href="/mijn-account" className="inline-flex items-center gap-2 bg-surface-dark hover:bg-surface-dark/90 text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all duration-200">
+                <Link href="/mijn-account" className="inline-flex items-center gap-2 bg-hero hover:bg-hero/90 text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all duration-200">
                   <Users size={15} /> Naar mijn account
                 </Link>
               </div>
@@ -403,7 +403,7 @@ export default function HomePage() {
                     { label: "Volgende factuur", value: "€65,00", sub: "Vervaldatum: 01-04-2026" },
                     { label: "Laatste inspectie", value: "Goedgekeurd", sub: "02-03-2026 · Geen bijzonderheden" },
                   ].map(item => (
-                    <div key={item.label} className="bg-white rounded-xl p-4 border border-sand-dark/20">
+                    <div key={item.label} className="bg-card rounded-xl p-4 border border-sand-dark/20">
                       <p className="text-[11px] text-warm-gray font-medium uppercase tracking-wider">{item.label}</p>
                       <p className="text-sm font-bold text-surface-dark mt-1">{item.value}</p>
                       <p className="text-xs text-warm-gray mt-0.5">{item.sub}</p>
@@ -429,7 +429,7 @@ export default function HomePage() {
             {BLOG_PREVIEW.map((post, i) => (
               <A key={post.slug} delay={i * 0.08}>
                 <Link href={`/blog/${post.slug}`} className="group block h-full">
-                  <div className="bg-white rounded-2xl overflow-hidden border border-sand-dark/20 h-full flex flex-col card-hover">
+                  <div className="bg-card rounded-2xl overflow-hidden border border-sand-dark/20 h-full flex flex-col card-hover">
                     <div className="relative aspect-[16/10] overflow-hidden">
                       <Image src={post.image} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                       <div className="absolute top-3 left-3">
@@ -457,7 +457,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══ CTA ═══ */}
-      <section className="bg-surface-dark relative overflow-hidden">
+      <section className="bg-hero relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
           <A>

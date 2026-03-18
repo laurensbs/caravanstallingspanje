@@ -36,7 +36,7 @@ export default function CookieConsent() {
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
           className="fixed bottom-0 left-0 right-0 z-[60] p-4 sm:p-6"
         >
-          <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl border border-sand-dark/10 p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="max-w-4xl mx-auto bg-card rounded-2xl shadow-xl border border-sand-dark/10 p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <Shield size={20} className="text-accent shrink-0 mt-0.5" />
             <div className="flex-1 text-sm text-warm-gray leading-relaxed">
               Wij gebruiken cookies om uw ervaring te verbeteren en onze website te analyseren.

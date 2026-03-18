@@ -29,7 +29,7 @@ export default function LocatiesPage() {
       <Header />
 
       {/* Hero */}
-      <section className="relative bg-surface-dark text-white py-20 sm:py-28 overflow-hidden">
+      <section className="relative bg-hero text-white py-20 sm:py-28 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-dark via-primary/80 to-primary-dark" />
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
@@ -169,7 +169,7 @@ export default function LocatiesPage() {
       </section>
 
       {/* Facts */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20 bg-card">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
@@ -206,7 +206,7 @@ export default function LocatiesPage() {
               { icon: Navigation, title: 'Navigatie', desc: 'Voer in uw navigatie in: Ctra de Palamós 91, 17110 Sant Climent de Peralta, Girona. Google Maps en Waze kennen ons adres. Parkeren is mogelijk op het terrein.', color: 'bg-primary/10 text-primary' },
             ].map((f, i) => (
               <A key={f.title} delay={i * 0.08}>
-                <div className="bg-white rounded-2xl p-6 border border-sand-dark/20 card-hover h-full">
+                <div className="bg-card rounded-2xl p-6 border border-sand-dark/20 card-hover h-full">
                   <div className={`w-12 h-12 ${f.color} rounded-xl flex items-center justify-center mb-4`}>
                     <f.icon size={22} />
                   </div>
@@ -220,7 +220,7 @@ export default function LocatiesPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 sm:py-28 bg-white">
+      <section className="py-20 sm:py-28 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-2xl mx-auto mb-14">
             <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Veelgestelde vragen</p>
@@ -228,7 +228,7 @@ export default function LocatiesPage() {
             <div className="section-divider mt-5" />
           </A>
           <A>
-            <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">
+            <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">
               {locatieFaqs.map(f => <FaqItem key={f.q} q={f.q} a={f.a} />)}
             </div>
           </A>
@@ -245,7 +245,7 @@ export default function LocatiesPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-surface-dark relative overflow-hidden">
+      <section className="bg-hero relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
           <A>

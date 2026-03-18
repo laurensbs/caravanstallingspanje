@@ -30,7 +30,7 @@ export default function DienstenPage() {
       <Header />
 
       {/* Hero */}
-      <section className="relative bg-surface-dark text-white py-20 sm:py-28 overflow-hidden">
+      <section className="relative bg-hero text-white py-20 sm:py-28 overflow-hidden">
         <div className="absolute inset-0">
           <Image src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1920&q=80" alt="" fill className="object-cover opacity-20" priority />
           <div className="hero-overlay absolute inset-0" />
@@ -65,7 +65,7 @@ export default function DienstenPage() {
       </section>
 
       {/* Sticky service nav */}
-      <nav className="sticky top-16 z-30 bg-white/95 backdrop-blur-xl border-b border-sand-dark/20 shadow-sm">
+      <nav className="sticky top-16 z-30 bg-card/95 backdrop-blur-xl border-b border-sand-dark/20 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex gap-1 overflow-x-auto py-2.5 no-scrollbar">
             {[
@@ -86,7 +86,7 @@ export default function DienstenPage() {
       </nav>
 
       {/* ═══════════ STALLING ═══════════ */}
-      <section id="stalling" className="py-20 sm:py-28 bg-white scroll-mt-28">
+      <section id="stalling" className="py-20 sm:py-28 bg-card scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -206,7 +206,7 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ CARAVANREPAIR® ═══════════ */}
-      <section id="caravanrepair" className="py-20 sm:py-28 bg-white scroll-mt-28">
+      <section id="caravanrepair" className="py-20 sm:py-28 bg-card scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-3xl mx-auto mb-14">
             <div className="inline-flex items-center gap-2 bg-primary/8 text-primary px-4 py-1.5 rounded-full text-xs font-bold mb-4">
@@ -339,7 +339,7 @@ export default function DienstenPage() {
                     { route: 'Camping → Stalling (regionaal)', time: 'Zelfde dag' },
                     { route: 'Stalling → Camping (regionaal)', time: 'Zelfde dag' },
                   ].map(r => (
-                    <div key={r.route} className="flex items-center justify-between p-3 bg-white rounded-xl border border-sand-dark/20">
+                    <div key={r.route} className="flex items-center justify-between p-3 bg-card rounded-xl border border-sand-dark/20">
                       <span className="text-sm font-medium">{r.route}</span>
                       <span className="text-xs text-primary font-bold">{r.time}</span>
                     </div>
@@ -353,7 +353,7 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ VERKOOP ═══════════ */}
-      <section id="verkoop" className="py-20 sm:py-28 bg-white scroll-mt-28">
+      <section id="verkoop" className="py-20 sm:py-28 bg-card scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -367,7 +367,7 @@ export default function DienstenPage() {
                     { model: 'Knaus Sport', year: '1997', beds: '4 slaapplaatsen', price: '€ 5.250' },
                     { model: 'Adria 430 Unica', year: '2001', beds: '4 slaapplaatsen', price: '€ 5.250' },
                   ].map(c => (
-                    <div key={c.model} className="flex items-center justify-between p-3 bg-white rounded-xl border border-sand-dark/20">
+                    <div key={c.model} className="flex items-center justify-between p-3 bg-card rounded-xl border border-sand-dark/20">
                       <div>
                         <p className="text-sm font-bold">{c.model}</p>
                         <p className="text-xs text-warm-gray">{c.year} · {c.beds}</p>
@@ -406,7 +406,7 @@ export default function DienstenPage() {
                   ))}
                 </div>
 
-                <Link href="/contact" className="bg-surface-dark hover:bg-primary text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2">
+                <Link href="/contact" className="bg-hero hover:bg-primary text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2">
                   Aanbod bekijken <ArrowRight size={14} />
                 </Link>
               </div>
@@ -453,7 +453,7 @@ export default function DienstenPage() {
               },
             ].map((v, i) => (
               <A key={v.title} delay={i * 0.1}>
-                <div className="bg-white rounded-2xl p-7 border border-sand-dark/20 h-full flex flex-col card-hover">
+                <div className="bg-card rounded-2xl p-7 border border-sand-dark/20 h-full flex flex-col card-hover">
                   <div className={`w-12 h-12 ${v.color} rounded-xl flex items-center justify-center mb-5`}>
                     <v.icon size={22} />
                   </div>
@@ -475,7 +475,7 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ SCHOONMAAK ═══════════ */}
-      <section id="schoonmaak" className="py-20 sm:py-28 bg-white scroll-mt-28">
+      <section id="schoonmaak" className="py-20 sm:py-28 bg-card scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -529,7 +529,7 @@ export default function DienstenPage() {
                     <div key={f} className="flex items-center gap-2.5 text-sm"><CheckCircle size={13} className="text-success shrink-0" /> {f}</div>
                   ))}
                 </div>
-                <div className="mt-6 p-4 bg-white rounded-xl border border-sand-dark/20 text-center">
+                <div className="mt-6 p-4 bg-card rounded-xl border border-sand-dark/20 text-center">
                   <p className="text-3xl font-black">€245</p>
                   <p className="text-xs text-warm-gray">Compleet pakket</p>
                 </div>
@@ -540,7 +540,7 @@ export default function DienstenPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 sm:py-28 bg-white">
+      <section className="py-20 sm:py-28 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-2xl mx-auto mb-14">
             <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Veelgestelde vragen</p>
@@ -548,7 +548,7 @@ export default function DienstenPage() {
             <div className="section-divider mt-5" />
           </A>
           <A>
-            <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">
+            <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">
               {dienstenFaqs.map(f => <FaqItem key={f.q} q={f.q} a={f.a} />)}
             </div>
           </A>
@@ -565,7 +565,7 @@ export default function DienstenPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-surface-dark relative overflow-hidden">
+      <section className="bg-hero relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
           <A>

@@ -23,6 +23,10 @@
   --color-danger: #C44B4B;
   --color-warning: #D4935A;
   --color-info: #4A7B9D;
+  /* Dark-bg sections (hero, footer, CTA) — always dark */
+  --color-hero: #2C2520;
+  /* Card / elevated surface — white in light, dark in dark mode */
+  --color-card: #FFFFFF;
   --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
   --font-heading: 'Playfair Display', Georgia, serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
@@ -122,6 +126,9 @@
   --color-surface-dark: #F5F0EA;
   --color-sand: #2a2420;
   --color-sand-dark: #342e28;
+  --color-hero: #151210;
+  --color-card: #231e1a;
+  --color-warm-gray: #a09a94;
   color: #e8e0d6;
   background: #1a1714;
 }
@@ -129,7 +136,7 @@
   color: #F5F0EA;
 }
 .dark .card-warm {
-  background: #231e1a;
+  background: var(--color-card);
   border-color: rgba(228,216,200,0.1);
 }
 .dark .glass-light {
@@ -137,7 +144,7 @@
   border-color: rgba(255,255,255,0.06);
 }
 .dark .booking-widget {
-  background: rgba(30,26,22,0.98);
+  background: var(--color-card);
   border-color: rgba(228,216,200,0.12);
 }
 .dark input, .dark textarea, .dark select {
@@ -192,7 +199,7 @@
   .card-hover:hover { transform: translateY(-6px); box-shadow: var(--shadow-xl); }
 
   .card-warm {
-    background: white;
+    background: var(--color-card);
     border: 1px solid rgba(228,216,200,0.5);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
@@ -214,7 +221,7 @@
   }
 
   .booking-widget {
-    background: rgba(255,255,255,0.98);
+    background: var(--color-card);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(228,216,200,0.4);

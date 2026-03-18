@@ -90,7 +90,7 @@ export default function TarievenPage() {
       <Header />
 
       {/* Hero */}
-      <section className="relative bg-surface-dark text-white py-20 sm:py-28 overflow-hidden">
+      <section className="relative bg-hero text-white py-20 sm:py-28 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-dark via-primary/80 to-primary-dark" />
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
@@ -107,12 +107,12 @@ export default function TarievenPage() {
       </section>
 
       {/* Pricing Cards */}
-      <section className="py-20 sm:py-28 bg-white">
+      <section className="py-20 sm:py-28 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {plans.map((p, i) => (
               <A key={p.title} delay={i * 0.1}>
-                <div className={`relative bg-white rounded-2xl p-7 sm:p-8 border h-full flex flex-col ${p.popular ? 'border-accent/30 ring-1 ring-accent/10 shadow-lg' : 'border-sand-dark/[0.06]'}`}>
+                <div className={`relative bg-card rounded-2xl p-7 sm:p-8 border h-full flex flex-col ${p.popular ? 'border-accent/30 ring-1 ring-accent/10 shadow-lg' : 'border-sand-dark/[0.06]'}`}>
                   {p.popular && <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-accent text-white text-[10px] font-bold px-4 py-1.5 rounded-full shadow-sm uppercase tracking-wider">Populair</span>}
                   <div className={`w-12 h-12 ${p.color} rounded-xl flex items-center justify-center mb-5`}>
                     <Shield size={20} />
@@ -129,7 +129,7 @@ export default function TarievenPage() {
                       <li key={f} className="flex items-center gap-2.5 text-sm"><CheckCircle size={14} className="text-success shrink-0" /> {f}</li>
                     ))}
                   </ul>
-                  <Link href="/contact" className={`w-full font-bold px-6 py-3.5 rounded-xl text-sm transition-all inline-flex items-center justify-center gap-2 ${p.popular ? 'bg-accent hover:bg-accent-dark text-white shadow-sm' : 'bg-surface-dark/[0.04] hover:bg-sand-dark/[0.08] text-surface-dark'}`}>
+                  <Link href="/contact" className={`w-full font-bold px-6 py-3.5 rounded-xl text-sm transition-all inline-flex items-center justify-center gap-2 ${p.popular ? 'bg-accent hover:bg-accent-dark text-white shadow-sm' : 'bg-hero/[0.04] hover:bg-sand-dark/[0.08] text-surface-dark'}`}>
                     {p.cta} <ArrowRight size={14} />
                   </Link>
                 </div>
@@ -149,7 +149,7 @@ export default function TarievenPage() {
           </A>
           <A>
             <div className="overflow-x-auto">
-              <table className="w-full bg-white rounded-2xl border border-sand-dark/[0.06] overflow-hidden text-sm">
+              <table className="w-full bg-card rounded-2xl border border-sand-dark/[0.06] overflow-hidden text-sm">
                 <thead>
                   <tr className="border-b border-sand-dark/10">
                     <th className="text-left px-5 py-4 font-bold">Kenmerk</th>
@@ -197,7 +197,7 @@ export default function TarievenPage() {
           </A>
 
           <A>
-            <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-sand-dark/[0.06] overflow-hidden">
+            <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-sand-dark/[0.06] overflow-hidden">
               {extras.map((e, i) => (
                 <div key={e.service} className={`flex items-center justify-between px-6 py-4 text-sm ${i !== extras.length - 1 ? 'border-b border-sand-dark/[0.04]' : ''}`}>
                   <span className="font-medium">{e.service}</span>
@@ -210,7 +210,7 @@ export default function TarievenPage() {
       </section>
 
       {/* CaravanRepair */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-card">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <A>
             <div className="bg-surface rounded-2xl p-8 sm:p-10 border border-sand-dark/[0.04] flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
@@ -230,7 +230,7 @@ export default function TarievenPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 sm:py-28 bg-white">
+      <section className="py-20 sm:py-28 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-2xl mx-auto mb-14">
             <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Veelgestelde vragen</p>
@@ -239,7 +239,7 @@ export default function TarievenPage() {
           </A>
 
           <A>
-            <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">
+            <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">
               {faqs.map(f => <FaqItem key={f.q} q={f.q} a={f.a} />)}
             </div>
           </A>
@@ -247,7 +247,7 @@ export default function TarievenPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-surface-dark relative overflow-hidden">
+      <section className="bg-hero relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
           <A>

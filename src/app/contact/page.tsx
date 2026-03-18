@@ -76,7 +76,7 @@ export default function ContactPage() {
       <Header />
 
       {/* Hero */}
-      <section className="relative bg-surface-dark text-white py-20 sm:py-28 overflow-hidden">
+      <section className="relative bg-hero text-white py-20 sm:py-28 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-dark via-primary/80 to-primary-dark" />
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
@@ -200,7 +200,7 @@ export default function ContactPage() {
                 <div className="bg-surface rounded-2xl p-7 border border-sand-dark/[0.04]">
                   <h3 className="font-black text-lg mb-3">Liever direct bellen?</h3>
                   <p className="text-sm text-warm-gray leading-relaxed mb-4">Wij spreken Nederlands, Engels en Spaans. Bel ons gerust tijdens openingstijden (ma-vr 09:30-16:30). U spreekt direct met een medewerker.</p>
-                  <a href="tel:+34650036755" className="bg-surface-dark hover:bg-primary text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 w-full justify-center">
+                  <a href="tel:+34650036755" className="bg-hero hover:bg-primary text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 w-full justify-center">
                     <Phone size={15} /> Bel +34 650 036 755
                   </a>
                 </div>

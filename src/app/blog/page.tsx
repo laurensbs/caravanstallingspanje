@@ -32,7 +32,7 @@ export default function BlogPage() {
       <Header />
 
       {/* Hero */}
-      <section className="relative bg-surface-dark text-white py-20 sm:py-28 overflow-hidden">
+      <section className="relative bg-hero text-white py-20 sm:py-28 overflow-hidden">
         <div className="absolute inset-0">
           <Image src="https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&w=1920&q=80" alt="" fill className="img-cover opacity-20" priority />
           <div className="hero-overlay absolute inset-0" />
@@ -52,7 +52,7 @@ export default function BlogPage() {
       </section>
 
       {/* Featured post */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
             <Link href={`/blog/${featured.slug}`} className="group block">
@@ -101,7 +101,7 @@ export default function BlogPage() {
             {rest.map((post, i) => (
               <A key={post.slug} delay={i * 0.08}>
                 <Link href={`/blog/${post.slug}`} className="group block h-full">
-                  <div className="bg-white rounded-2xl overflow-hidden border border-sand-dark/20 h-full flex flex-col card-hover">
+                  <div className="bg-card rounded-2xl overflow-hidden border border-sand-dark/20 h-full flex flex-col card-hover">
                     <div className="relative aspect-[16/10] overflow-hidden">
                       <Image src={post.image} alt={post.title} fill className="img-cover group-hover:scale-105 transition-transform duration-500" />
                       <div className="absolute top-3 left-3">
@@ -130,7 +130,7 @@ export default function BlogPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-surface-dark relative overflow-hidden">
+      <section className="bg-hero relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
           <A>

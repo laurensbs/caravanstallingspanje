@@ -181,3 +181,51 @@ export async function sendInspectionReport(to: string, data: {
     `),
   });
 }
+
+export async function sendContactConfirmation(to: string, data: { name: string; subject: string }) {
+  return sendEmail({
+    to,
+    subject: 'Uw bericht is ontvangen — Caravanstalling Spanje',
+    html: layout(`
+      <h2 style="margin:0 0 8px;font-size:20px;color:#1C2B3A;">Bericht ontvangen ✓</h2>
+      <p style="color:#71717A;margin:0 0 24px;line-height:1.6;">Beste ${data.name}, bedankt voor uw bericht${data.subject ? ` over "${data.subject}"` : ''}.</p>
+      <p style="font-size:13px;color:#71717A;line-height:1.6;">Wij nemen zo spoedig mogelijk contact met u op, meestal <strong>binnen 1 werkdag</strong>.</p>
+      <div style="background:#FAF9F7;border-radius:12px;padding:20px;margin:24px 0;">
+        <p style="margin:0 0 4px;font-size:13px;color:#71717A;">Tussentijds bereikbaar?</p>
+        <p style="margin:0;font-size:14px;color:#1C2B3A;">Bel ons op <a href="tel:+34650036755" style="color:#C17A3A;text-decoration:none;font-weight:600;">+34 650 036 755</a> (ma-vr 09:30-16:30)</p>
+      </div>
+      <p style="font-size:12px;color:#A1A1AA;">Dit is een automatische bevestiging. U hoeft niet te reageren op deze e-mail.</p>
+    `),
+  });
+}
+
+export async function sendContactNotificationToAdmin(data: {
+  name: string;
+  email: string;
+  phone?: string;
+  subject: string;
+  message: string;
+}) {
+  const adminEmail = process.env.ADMIN_EMAIL || 'info@caravanstalling-spanje.com';
+  return sendEmail({
+    to: adminEmail,
+    subject: `Nieuw contactbericht: ${data.subject || 'Algemeen'} — ${data.name}`,
+    replyTo: data.email,
+    html: layout(`
+      <h2 style="margin:0 0 8px;font-size:20px;color:#1C2B3A;">Nieuw contactbericht</h2>
+      <div style="background:#FAF9F7;border-radius:12px;padding:20px;margin-bottom:24px;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tr><td style="padding:8px 0;color:#71717A;font-size:13px;">Naam</td><td style="padding:8px 0;text-align:right;font-weight:600;color:#1C2B3A;font-size:13px;">${data.name}</td></tr>
+          <tr><td style="padding:8px 0;color:#71717A;font-size:13px;">E-mail</td><td style="padding:8px 0;text-align:right;font-weight:600;color:#1C2B3A;font-size:13px;"><a href="mailto:${data.email}" style="color:#C17A3A;">${data.email}</a></td></tr>
+          ${data.phone ? `<tr><td style="padding:8px 0;color:#71717A;font-size:13px;">Telefoon</td><td style="padding:8px 0;text-align:right;font-weight:600;color:#1C2B3A;font-size:13px;"><a href="tel:${data.phone}" style="color:#C17A3A;">${data.phone}</a></td></tr>` : ''}
+          <tr><td style="padding:8px 0;color:#71717A;font-size:13px;">Onderwerp</td><td style="padding:8px 0;text-align:right;font-weight:600;color:#1C2B3A;font-size:13px;">${data.subject || 'Algemeen'}</td></tr>
+        </table>
+      </div>
+      <div style="background:#FAFAFA;border-radius:12px;padding:20px;border:1px solid rgba(0,0,0,0.04);">
+        <p style="margin:0 0 8px;font-size:11px;font-weight:700;color:#71717A;text-transform:uppercase;letter-spacing:0.5px;">Bericht</p>
+        <p style="margin:0;font-size:14px;color:#27272A;line-height:1.7;white-space:pre-wrap;">${data.message}</p>
+      </div>
+      <a href="https://caravanstalling-spanje.com/admin/berichten" style="display:block;text-align:center;background:#C17A3A;color:white;padding:14px 24px;border-radius:12px;text-decoration:none;font-weight:700;font-size:14px;margin-top:24px;">Beantwoorden in admin →</a>
+    `),
+  });
+}

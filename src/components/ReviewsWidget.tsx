@@ -28,7 +28,7 @@ export default function ReviewsWidget({ limit = 4 }: { limit?: number }) {
   const displayed = REVIEWS.slice(0, limit);
 
   return (
-    <section ref={ref} className="py-20 bg-white dark:bg-[#1e1a16]">
+    <section ref={ref} className="py-20 bg-card">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <motion.div
@@ -52,7 +52,7 @@ export default function ReviewsWidget({ limit = 4 }: { limit?: number }) {
               initial={{ opacity: 0, y: 20 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.4, delay: 0.1 * i }}
-              className="bg-surface dark:bg-[#231e1a] rounded-2xl p-6 border border-sand-dark/20 dark:border-white/5"
+              className="bg-surface rounded-2xl p-6 border border-sand-dark/20 dark:border-white/5"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-2">

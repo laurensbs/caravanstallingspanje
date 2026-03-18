@@ -50,7 +50,7 @@ export default function Header() {
 
   const isHome = pathname === '/';
   const headerBg = scrolled || !isHome
-    ? 'bg-white/95 backdrop-blur-xl border-b border-sand-dark/30 shadow-[0_1px_3px_rgba(139,134,128,0.08)]'
+    ? 'bg-card/95 backdrop-blur-xl border-b border-sand-dark/30 shadow-[0_1px_3px_rgba(139,134,128,0.08)]'
     : 'bg-transparent';
   const textColor = scrolled || !isHome ? 'text-surface-dark' : 'text-white';
   const mutedColor = scrolled || !isHome ? 'text-warm-gray' : 'text-white/60';
@@ -70,7 +70,7 @@ export default function Header() {
   return (
     <>
       {/* Top bar - desktop only */}
-      <div className={`hidden lg:block transition-all duration-300 ${scrolled ? 'h-0 opacity-0 overflow-hidden' : 'h-auto opacity-100'} ${isHome ? 'bg-surface-dark/40 backdrop-blur-sm' : 'bg-sand/50 border-b border-sand-dark/30'}`}>
+      <div className={`hidden lg:block transition-all duration-300 ${scrolled ? 'h-0 opacity-0 overflow-hidden' : 'h-auto opacity-100'} ${isHome ? 'bg-hero/40 backdrop-blur-sm' : 'bg-sand/50 border-b border-sand-dark/30'}`}>
         <div className="max-w-7xl mx-auto px-6 py-2 flex items-center justify-between">
           <div className={`flex items-center gap-6 text-xs ${isHome ? 'text-white/50' : 'text-warm-gray'}`}>
             <a href="tel:+34650036755" className="flex items-center gap-1.5 hover:text-primary transition-colors">
@@ -100,7 +100,7 @@ export default function Header() {
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}
-                    className="absolute right-0 top-8 bg-white dark:bg-[#231e1a] rounded-xl shadow-xl border border-sand-dark/30 dark:border-white/10 py-1.5 min-w-[140px] z-50"
+                    className="absolute right-0 top-8 bg-card rounded-xl shadow-xl border border-sand-dark/30 dark:border-white/10 py-1.5 min-w-[140px] z-50"
                   >
                     {LOCALES.map(l => (
                       <button key={l.code} onClick={() => { setLocale(l.code as Locale); setLangOpen(false); }} className={`w-full flex items-center gap-2.5 px-4 py-2 text-xs hover:bg-sand dark:hover:bg-white/5 transition-colors ${locale === l.code ? 'text-primary font-semibold' : 'text-surface-dark'}`}>
@@ -172,7 +172,7 @@ export default function Header() {
                           onMouseEnter={() => { if (megaTimeout.current) clearTimeout(megaTimeout.current); setMegaOpen(true); }}
                           onMouseLeave={() => { megaTimeout.current = setTimeout(() => setMegaOpen(false), 200); }}
                         >
-                          <div className="bg-white rounded-2xl shadow-2xl border border-sand-dark/20 p-5 w-[520px]">
+                          <div className="bg-card rounded-2xl shadow-2xl border border-sand-dark/20 p-5 w-[520px]">
                             <p className="text-[10px] font-bold text-warm-gray uppercase tracking-widest mb-3 px-1">Onze diensten</p>
                             <div className="grid grid-cols-2 gap-1">
                               {DIENSTEN_ITEMS.map(d => (
@@ -232,7 +232,7 @@ export default function Header() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden bg-white border-t border-sand-dark/20 overflow-hidden"
+              className="lg:hidden bg-card border-t border-sand-dark/20 overflow-hidden"
             >
               <div className="px-4 py-4 space-y-1">
                 {/* Only show items NOT in MobileNav bottom bar */}

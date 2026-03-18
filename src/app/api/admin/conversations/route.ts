@@ -8,11 +8,15 @@ async function ensureConversationsTable() {
   await sql`CREATE TABLE IF NOT EXISTS conversations (
     id SERIAL PRIMARY KEY,
     customer_id INTEGER REFERENCES customers(id),
+    contact_name TEXT,
+    contact_email TEXT,
     subject TEXT NOT NULL,
     status TEXT DEFAULT 'open',
     last_message_at TIMESTAMP DEFAULT NOW(),
     created_at TIMESTAMP DEFAULT NOW()
   )`;
+  await sql`ALTER TABLE conversations ADD COLUMN IF NOT EXISTS contact_name TEXT`;
+  await sql`ALTER TABLE conversations ADD COLUMN IF NOT EXISTS contact_email TEXT`;
   await sql`CREATE TABLE IF NOT EXISTS conversation_messages (
     id SERIAL PRIMARY KEY,
     conversation_id INTEGER NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
@@ -47,7 +51,9 @@ export async function GET(request: NextRequest) {
           SELECT DISTINCT ON (conversation_id) conversation_id, message
           FROM conversation_messages ORDER BY conversation_id, created_at DESC
         )
-        SELECT c.*, cu.first_name || ' ' || cu.last_name as customer_name, cu.email as customer_email,
+        SELECT c.*,
+          COALESCE(cu.first_name || ' ' || cu.last_name, c.contact_name, 'Onbekend') as customer_name,
+          COALESCE(cu.email, c.contact_email) as customer_email,
           COALESCE(u.cnt, 0) as unread_count, lm.message as last_message
         FROM conversations c
         LEFT JOIN customers cu ON c.customer_id = cu.id
@@ -66,7 +72,9 @@ export async function GET(request: NextRequest) {
           SELECT DISTINCT ON (conversation_id) conversation_id, message
           FROM conversation_messages ORDER BY conversation_id, created_at DESC
         )
-        SELECT c.*, cu.first_name || ' ' || cu.last_name as customer_name, cu.email as customer_email,
+        SELECT c.*,
+          COALESCE(cu.first_name || ' ' || cu.last_name, c.contact_name, 'Onbekend') as customer_name,
+          COALESCE(cu.email, c.contact_email) as customer_email,
           COALESCE(u.cnt, 0) as unread_count, lm.message as last_message
         FROM conversations c
         LEFT JOIN customers cu ON c.customer_id = cu.id
@@ -85,7 +93,9 @@ export async function GET(request: NextRequest) {
           SELECT DISTINCT ON (conversation_id) conversation_id, message
           FROM conversation_messages ORDER BY conversation_id, created_at DESC
         )
-        SELECT c.*, cu.first_name || ' ' || cu.last_name as customer_name, cu.email as customer_email,
+        SELECT c.*,
+          COALESCE(cu.first_name || ' ' || cu.last_name, c.contact_name, 'Onbekend') as customer_name,
+          COALESCE(cu.email, c.contact_email) as customer_email,
           COALESCE(u.cnt, 0) as unread_count, lm.message as last_message
         FROM conversations c
         LEFT JOIN customers cu ON c.customer_id = cu.id

@@ -21,7 +21,7 @@ export default function MobileNav() {
   if (pathname.startsWith('/admin') || pathname.startsWith('/staff')) return null;
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-xl border-t border-sand-dark/30 safe-bottom md:hidden no-print">
+    <nav className="fixed bottom-0 inset-x-0 z-50 bg-card/95 backdrop-blur-xl border-t border-sand-dark/30 safe-bottom md:hidden no-print">
       <div className="flex items-center justify-around px-2 py-2">
         {NAV_ITEMS.map(item => {
           const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));

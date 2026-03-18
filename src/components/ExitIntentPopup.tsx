@@ -42,7 +42,7 @@ export default function ExitIntentPopup() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ duration: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
-            className="relative bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl"
+            className="relative bg-card rounded-2xl max-w-md w-full p-8 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button

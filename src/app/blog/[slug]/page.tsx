@@ -60,7 +60,7 @@ export default function BlogPostPage() {
       <Header />
 
       {/* Hero */}
-      <section className="relative bg-surface-dark text-white py-16 sm:py-24 overflow-hidden">
+      <section className="relative bg-hero text-white py-16 sm:py-24 overflow-hidden">
         <div className="absolute inset-0">
           <Image src={post.image} alt="" fill className="img-cover opacity-20" priority />
           <div className="hero-overlay absolute inset-0" />
@@ -85,7 +85,7 @@ export default function BlogPostPage() {
       </section>
 
       {/* Content */}
-      <section className="py-12 sm:py-16 bg-white">
+      <section className="py-12 sm:py-16 bg-card">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <motion.article initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }} className="prose-custom">
             {post.content.map((block, i) => {
@@ -162,7 +162,7 @@ export default function BlogPostPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {relatedPosts.map(rp => (
                 <Link key={rp.slug} href={`/blog/${rp.slug}`} className="group block">
-                  <div className="bg-white rounded-2xl overflow-hidden border border-sand-dark/20 card-hover">
+                  <div className="bg-card rounded-2xl overflow-hidden border border-sand-dark/20 card-hover">
                     <div className="relative aspect-[16/10] overflow-hidden">
                       <Image src={rp.image} alt={rp.title} fill className="img-cover group-hover:scale-105 transition-transform duration-500" />
                     </div>
@@ -182,7 +182,7 @@ export default function BlogPostPage() {
       )}
 
       {/* CTA */}
-      <section className="bg-surface-dark relative overflow-hidden">
+      <section className="bg-hero relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-14 sm:py-16 text-center relative">
           <h2 className="text-2xl font-black text-white mb-4">Uw caravan veilig stallen?</h2>

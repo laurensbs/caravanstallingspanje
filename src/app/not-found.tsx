@@ -33,7 +33,7 @@ export default function NotFound() {
             <Link
               key={page.href}
               href={page.href}
-              className="inline-flex items-center gap-2 bg-white hover:bg-sand border border-sand-dark/30 text-dark font-semibold px-5 py-2.5 rounded-xl text-sm transition-all duration-200 shadow-sm hover:shadow-md"
+              className="inline-flex items-center gap-2 bg-card hover:bg-sand border border-sand-dark/30 text-dark font-semibold px-5 py-2.5 rounded-xl text-sm transition-all duration-200 shadow-sm hover:shadow-md"
             >
               <page.icon size={14} className="text-primary" /> {page.label}
             </Link>

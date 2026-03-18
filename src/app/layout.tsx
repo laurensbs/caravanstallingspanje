@@ -51,7 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <link rel="apple-touch-icon" href="/images/icon-192.png" />
       </head>
-      <body className="bg-surface dark:bg-[#1a1714] text-[#3D3530] dark:text-[#e8e0d6] antialiased pb-16 md:pb-0">
+      <body className="bg-surface text-surface-dark antialiased pb-16 md:pb-0">
         <a href="#main-content" className="skip-link">Ga naar inhoud</a>
         <script
           type="application/ld+json"

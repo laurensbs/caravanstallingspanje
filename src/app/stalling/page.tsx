@@ -30,7 +30,7 @@ export default function StallingPage() {
       <Header />
 
       {/* Hero */}
-      <section className="relative bg-surface-dark text-white py-20 sm:py-28 overflow-hidden">
+      <section className="relative bg-hero text-white py-20 sm:py-28 overflow-hidden">
         <div className="absolute inset-0">
           <Image src="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1920&q=80" alt="" fill className="object-cover opacity-20" priority />
           <div className="hero-overlay absolute inset-0" />
@@ -50,7 +50,7 @@ export default function StallingPage() {
       </section>
 
       {/* Intro / Waarom bij ons stallen */}
-      <section className="py-20 sm:py-28 bg-white">
+      <section className="py-20 sm:py-28 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -130,7 +130,7 @@ export default function StallingPage() {
               },
             ].map((t, i) => (
               <A key={t.title} delay={i * 0.1}>
-                <div className="relative bg-white rounded-2xl p-7 sm:p-8 border border-sand-dark/20 card-hover h-full flex flex-col">
+                <div className="relative bg-card rounded-2xl p-7 sm:p-8 border border-sand-dark/20 card-hover h-full flex flex-col">
                   {t.tag && <span className="absolute top-6 right-6 bg-primary/8 text-primary text-[10px] font-bold px-3 py-1 rounded-full">{t.tag}</span>}
                   <div className={`w-12 h-12 ${t.gradient} rounded-xl flex items-center justify-center mb-5`}>
                     <t.icon size={22} />
@@ -158,7 +158,7 @@ export default function StallingPage() {
       </section>
 
       {/* Wat wij doen tijdens stalling */}
-      <section className="py-20 sm:py-28 bg-white">
+      <section className="py-20 sm:py-28 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-3xl mx-auto mb-14">
             <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Onze zorg</p>
@@ -242,7 +242,7 @@ export default function StallingPage() {
                   { icon: Eye, title: 'Dagelijks toezicht', desc: 'Ons personeel is dagelijks aanwezig op het terrein voor toezicht en onderhoud.', color: 'bg-warning/10 text-warning' },
                 ].map((f, i) => (
                   <A key={f.title} delay={i * 0.08}>
-                    <div className="bg-white rounded-2xl p-5 border border-sand-dark/20 card-hover h-full text-center">
+                    <div className="bg-card rounded-2xl p-5 border border-sand-dark/20 card-hover h-full text-center">
                       <div className={`w-12 h-12 ${f.color} rounded-xl flex items-center justify-center mx-auto mb-3`}>
                         <f.icon size={20} />
                       </div>
@@ -258,7 +258,7 @@ export default function StallingPage() {
       </section>
 
       {/* Spot System */}
-      <section className="py-20 sm:py-28 bg-white">
+      <section className="py-20 sm:py-28 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -308,7 +308,7 @@ export default function StallingPage() {
               { type: 'Boten & trailers', desc: 'Op aanvraag' },
             ].map((v, i) => (
               <A key={v.type} delay={i * 0.08}>
-                <div className="bg-white rounded-xl p-5 border border-sand-dark/20 text-center card-hover">
+                <div className="bg-card rounded-xl p-5 border border-sand-dark/20 text-center card-hover">
                   <p className="font-bold text-sm mb-1">{v.type}</p>
                   <p className="text-xs text-warm-gray">{v.desc}</p>
                 </div>
@@ -319,7 +319,7 @@ export default function StallingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 sm:py-28 bg-white">
+      <section className="py-20 sm:py-28 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-2xl mx-auto mb-14">
             <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Veelgestelde vragen</p>
@@ -327,7 +327,7 @@ export default function StallingPage() {
             <div className="section-divider mt-5" />
           </A>
           <A>
-            <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">
+            <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">
               {stallingFaqs.map(f => <FaqItem key={f.q} q={f.q} a={f.a} />)}
             </div>
           </A>
@@ -344,7 +344,7 @@ export default function StallingPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-surface-dark relative overflow-hidden">
+      <section className="bg-hero relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
           <A>
