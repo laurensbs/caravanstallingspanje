@@ -131,9 +131,9 @@ export default function HomePage() {
                       <label className="text-[11px] font-semibold text-warm-gray block mb-2 uppercase tracking-wider">Type stalling</label>
                       <div className="grid grid-cols-3 gap-2">
                         {[
-                          { val: "buiten", label: "Buitenstalling", price: "\u20ac65/mnd" },
-                          { val: "binnen", label: "Binnenstalling", price: "\u20ac95/mnd" },
-                          { val: "seizoen", label: "Seizoensstalling", price: "\u20ac45/mnd" },
+                          { val: "buiten", label: "Buitenstalling", price: "€65/mnd" },
+                          { val: "binnen", label: "Binnenstalling", price: "€95/mnd" },
+                          { val: "seizoen", label: "Seizoensstalling", price: "€45/mnd" },
                         ].map(o => (
                           <button key={o.val} type="button" onClick={() => setBooking({ ...booking, type: o.val })} className={`p-3 rounded-xl text-center transition-all text-xs border ${booking.type === o.val ? "bg-primary/[0.07] border-primary text-primary font-bold ring-1 ring-primary/20" : "bg-sand/50 border-sand-dark/30 text-warm-gray hover:border-primary/20"}`}>
                             <div className="font-semibold text-[12px]">{o.label}</div>
@@ -275,7 +275,7 @@ export default function HomePage() {
                   <h3 className="text-lg font-bold mt-1">{p.title}</h3>
                   <p className="text-xs text-warm-gray mt-1 mb-5">{p.desc}</p>
                   <div className="mb-6">
-                    <span className="text-4xl font-black">\u20ac{p.price}</span>
+                    <span className="text-4xl font-black">€{p.price}</span>
                     <span className="text-warm-gray text-sm">/mnd</span>
                   </div>
                   <ul className="space-y-2.5 mb-8 flex-1 text-left">
@@ -414,7 +414,7 @@ export default function HomePage() {
                   {[
                     { label: "Mijn Caravans", value: "Hobby De Luxe 490 KMF", sub: "Plek A-042 \u00b7 Buitenstalling" },
                     { label: "Contract", value: "CS-000142", sub: "Actief \u00b7 Automatische verlenging" },
-                    { label: "Volgende factuur", value: "\u20ac65,00", sub: "Vervaldatum: 01-04-2026" },
+                    { label: "Volgende factuur", value: "€65,00", sub: "Vervaldatum: 01-04-2026" },
                     { label: "Laatste inspectie", value: "Goedgekeurd", sub: "02-03-2026 \u00b7 Geen bijzonderheden" },
                   ].map(item => (
                     <div key={item.label} className="bg-white rounded-xl p-4 border border-sand-dark/20">
