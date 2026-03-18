@@ -103,6 +103,16 @@
 @keyframes sway { 0%, 100% { transform: rotate(-1deg); } 50% { transform: rotate(1deg); } }
 @keyframes upsell-shine { 0% { left: -100%; } 50% { left: 100%; } 100% { left: 100%; } }
 
+/* ── Reduced motion: disable all animations for users who prefer it ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* ── Custom components ── */
 @layer components {
   .animate-float { animation: float 6s ease-in-out infinite; }

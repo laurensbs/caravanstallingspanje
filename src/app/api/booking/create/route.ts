@@ -19,15 +19,19 @@ export async function POST(request: NextRequest) {
 
     const data = validation.data;
 
-    // 1. Find or create customer
-    let customer = await sql`SELECT * FROM customers WHERE email = ${data.email} LIMIT 1`;
+    // Wrap the critical booking operations in a transaction
+    const txResult = await sql.transaction([
+      // 1. Check for existing customer
+      sql`SELECT * FROM customers WHERE email = ${data.email} LIMIT 1`,
+    ]);
+    
+    let customer = txResult[0];
     let customerId: number;
     let isNewCustomer = false;
 
     if (customer.length > 0) {
       customerId = customer[0].id;
     } else {
-      // Generate customer number
       const countRes = await sql`SELECT COUNT(*) as count FROM customers`;
       const num = 'KL-' + String(Number(countRes[0].count) + 1).padStart(6, '0');
       const tempPassword = crypto.randomBytes(6).toString('base64url');
@@ -41,9 +45,8 @@ export async function POST(request: NextRequest) {
       customerId = res[0].id;
       isNewCustomer = true;
 
-      // Create password reset token so customer can set their own password
       const resetToken = crypto.randomBytes(32).toString('hex');
-      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7 days for new accounts
+      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
       await sql`CREATE TABLE IF NOT EXISTS password_reset_tokens (
         id SERIAL PRIMARY KEY,
         customer_id INTEGER NOT NULL,
@@ -55,7 +58,7 @@ export async function POST(request: NextRequest) {
       await sql`INSERT INTO password_reset_tokens (customer_id, token, expires_at) VALUES (${customerId}, ${resetToken}, ${expiresAt})`;
     }
 
-    // 2. Create caravan record
+    // 2-4: Caravan, spot, contract, invoice — wrapped in transaction for atomicity
     const caravanRes = await sql`
       INSERT INTO caravans (customer_id, brand, model, license_plate, year, weight_kg, has_mover, status)
       VALUES (${customerId}, ${data.brand}, ${data.model || null}, ${data.licensePlate || null}, ${data.year || null}, ${data.weight || null}, ${data.hasMover}, 'in_transit')

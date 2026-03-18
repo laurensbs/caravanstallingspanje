@@ -89,11 +89,11 @@ export default function ContactPage() {
                     <div className="grid sm:grid-cols-2 gap-5">
                       <div>
                         <label htmlFor="name" className="block text-xs font-bold mb-1.5">Naam *</label>
-                        <input id="name" name="name" type="text" required className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" placeholder="Uw naam" />
+                        <input id="name" name="name" type="text" required aria-required="true" className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" placeholder="Uw naam" />
                       </div>
                       <div>
                         <label htmlFor="email" className="block text-xs font-bold mb-1.5">E-mail *</label>
-                        <input id="email" name="email" type="email" required className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" placeholder="uw@email.com" />
+                        <input id="email" name="email" type="email" required aria-required="true" className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" placeholder="uw@email.com" />
                       </div>
                     </div>
                     <div className="grid sm:grid-cols-2 gap-5">
@@ -103,7 +103,7 @@ export default function ContactPage() {
                       </div>
                       <div>
                         <label htmlFor="subject" className="block text-xs font-bold mb-1.5">Onderwerp *</label>
-                        <select id="subject" name="subject" required className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all bg-surface">
+                        <select id="subject" name="subject" required aria-required="true" className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all bg-surface">
                           <option value="">Kies een onderwerp</option>
                           <option value="stalling">Stalling aanvragen</option>
                           <option value="reparatie">Reparatie & Onderhoud</option>
@@ -118,9 +118,9 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <label htmlFor="message" className="block text-xs font-bold mb-1.5">Bericht *</label>
-                      <textarea id="message" name="message" rows={5} required className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all resize-none" placeholder="Waar kunnen wij u mee helpen?" />
+                      <textarea id="message" name="message" rows={5} required aria-required="true" className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all resize-none" placeholder="Waar kunnen wij u mee helpen?" />
                     </div>
-                    <button type="submit" disabled={loading} className="bg-accent hover:bg-accent-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm disabled:opacity-60">
+                    <button type="submit" disabled={loading} aria-busy={loading} className="bg-accent hover:bg-accent-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm disabled:opacity-60">
                       {loading ? 'Verzenden...' : 'Verstuur bericht'} <Send size={14} />
                     </button>
                     {formError && (

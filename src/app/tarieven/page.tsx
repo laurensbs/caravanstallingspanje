@@ -3,33 +3,15 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
-import { CheckCircle, ArrowRight, Phone, Shield, HelpCircle, ChevronDown, Sparkles } from 'lucide-react';
-import { motion, useInView, AnimatePresence } from 'framer-motion';
-import { useRef, useState } from 'react';
+import { CheckCircle, ArrowRight, Phone, Shield, HelpCircle, Sparkles } from 'lucide-react';
+import { motion, useInView } from 'framer-motion';
+import { useRef } from 'react';
+import { FaqItem } from '@/components/FaqAccordion';
 
 function A({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
   const v = useInView(ref, { once: true, margin: '-60px' });
   return <motion.div ref={ref} initial={{ opacity: 0, y: 32 }} animate={v ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6, delay, ease: [0.25, 0.4, 0.25, 1] }} className={className}>{children}</motion.div>;
-}
-
-function FaqItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border-b border-sand-dark/[0.06] last:border-0">
-      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between py-5 text-left group">
-        <span className="font-bold text-sm pr-6">{q}</span>
-        <ChevronDown size={18} className={`text-warm-gray shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
-      </button>
-      <AnimatePresence>
-        {open && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
-            <p className="text-sm text-warm-gray leading-relaxed pb-5">{a}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
 }
 
 const plans = [

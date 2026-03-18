@@ -3,28 +3,10 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
-import { MapPin, Shield, Wrench, Sun, ArrowRight, Phone, CheckCircle, Star, Clock, Navigation, Plane, Car, Palmtree, ChevronDown, HelpCircle } from 'lucide-react';
-import { motion, useInView, AnimatePresence } from 'framer-motion';
-import { useRef, useState } from 'react';
-
-function FaqItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border-b border-sand-dark/[0.06] last:border-0">
-      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between py-5 text-left group">
-        <span className="font-bold text-sm pr-6">{q}</span>
-        <ChevronDown size={18} className={`text-warm-gray shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
-      </button>
-      <AnimatePresence>
-        {open && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
-            <p className="text-sm text-warm-gray leading-relaxed pb-5">{a}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
+import { MapPin, Shield, Wrench, Sun, ArrowRight, Phone, CheckCircle, Star, Clock, Navigation, Plane, Car, Palmtree, HelpCircle } from 'lucide-react';
+import { motion, useInView } from 'framer-motion';
+import { useRef } from 'react';
+import { FaqItem } from '@/components/FaqAccordion';
 
 const locatieFaqs = [
   { q: 'Waar ligt de stalling precies?', a: 'Onze stalling ligt in Sant Climent de Peralta, een klein dorp in de gemeente Forallac, provincie Girona. Centraal aan de Costa Brava, op 25 minuten van Pals en L\'Estartit, 35 minuten van Begur en 45 minuten van Girona Airport.' },

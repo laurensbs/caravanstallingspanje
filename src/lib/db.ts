@@ -238,6 +238,18 @@ export async function initDatabase() {
   await sql`CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_type, user_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_activity_log_created ON activity_log(created_at DESC)`;
 
+  // Additional performance indexes
+  await sql`CREATE INDEX IF NOT EXISTS idx_notifications_created ON notifications(created_at DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(status)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_invoices_due_date ON invoices(due_date)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_contracts_status ON contracts(status)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_caravans_status ON caravans(status)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_inspections_status ON inspections(status)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_service_requests_status ON service_requests(status)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_transport_status ON transport_orders(status)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email)`;
+
   return { success: true };
 }
 

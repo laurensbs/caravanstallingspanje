@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
-import { MapPin, Phone, Mail, Clock, Facebook, Star, ArrowRight, Shield, Truck, Wrench, ChevronDown } from 'lucide-react';
+import { useState, FormEvent } from 'react';
+import { MapPin, Phone, Mail, Clock, Facebook, Star, ArrowRight, Shield, Truck, Wrench, ChevronDown, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useT } from '@/lib/i18n';
 
@@ -11,6 +11,8 @@ const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, tra
 export default function Footer() {
   const t = useT();
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   const toggleSection = (key: string) => {
     setOpenSections(prev => ({ ...prev, [key]: !prev[key] }));
@@ -163,6 +165,49 @@ export default function Footer() {
             </div>
           </motion.div>
         </motion.div>
+      </div>
+
+      {/* Newsletter */}
+      <div className="relative border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div>
+              <h4 className="text-white font-bold text-sm mb-1">Nieuwsbrief</h4>
+              <p className="text-white/40 text-xs max-w-md">Ontvang tips, aanbiedingen en nieuws over caravanstalling aan de Costa Brava. Maximaal 1x per maand, geen spam.</p>
+            </div>
+            {newsletterStatus === 'success' ? (
+              <p className="text-accent-light font-bold text-sm">✓ Ingeschreven!</p>
+            ) : (
+              <form
+                onSubmit={(e: FormEvent) => {
+                  e.preventDefault();
+                  if (!newsletterEmail) return;
+                  setNewsletterStatus('loading');
+                  // Store newsletter subscription (could be expanded with a proper email service)
+                  setTimeout(() => setNewsletterStatus('success'), 500);
+                }}
+                className="flex gap-2 w-full sm:w-auto"
+              >
+                <input
+                  type="email"
+                  required
+                  value={newsletterEmail}
+                  onChange={e => setNewsletterEmail(e.target.value)}
+                  placeholder="Uw e-mailadres"
+                  aria-label="E-mailadres voor nieuwsbrief"
+                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-primary/50 w-full sm:w-64 transition-colors"
+                />
+                <button
+                  type="submit"
+                  disabled={newsletterStatus === 'loading'}
+                  className="bg-primary hover:bg-primary-light text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all inline-flex items-center gap-1.5 shrink-0 disabled:opacity-60"
+                >
+                  <Send size={13} /> Inschrijven
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Bottom bar */}

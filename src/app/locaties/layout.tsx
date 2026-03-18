@@ -18,6 +18,39 @@ export const metadata: Metadata = {
   },
 };
 
+const placeSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Place',
+  name: 'Caravanstalling Spanje — Sant Climent de Peralta',
+  description: 'Professionele caravanstallinglocatie aan de Costa Brava met 24/7 bewaking, Securitas alarm en ruime stalplaatsen.',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Ctra de Palamós, 91',
+    addressLocality: 'Sant Climent de Peralta',
+    addressRegion: 'Girona',
+    postalCode: '17110',
+    addressCountry: 'ES',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: 41.9983,
+    longitude: 3.1142,
+  },
+  telephone: '+34650036755',
+  url: 'https://caravanstalling-spanje.com/locaties',
+  openingHoursSpecification: {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+    opens: '09:30',
+    closes: '16:30',
+  },
+};
+
 export default function LocatiesLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(placeSchema) }} />
+      {children}
+    </>
+  );
 }

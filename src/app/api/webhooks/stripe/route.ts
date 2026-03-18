@@ -14,6 +14,19 @@ export async function POST(request: NextRequest) {
 
     const event = constructWebhookEvent(body, signature);
 
+    // Idempotency: ensure we never process the same event twice
+    await sql`CREATE TABLE IF NOT EXISTS processed_webhook_events (
+      id SERIAL PRIMARY KEY,
+      event_id TEXT UNIQUE NOT NULL,
+      event_type TEXT NOT NULL,
+      processed_at TIMESTAMPTZ DEFAULT NOW()
+    )`;
+    const existing = await sql`SELECT id FROM processed_webhook_events WHERE event_id = ${event.id}`;
+    if (existing.length > 0) {
+      return NextResponse.json({ received: true, duplicate: true });
+    }
+    await sql`INSERT INTO processed_webhook_events (event_id, event_type) VALUES (${event.id}, ${event.type})`;
+
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object;

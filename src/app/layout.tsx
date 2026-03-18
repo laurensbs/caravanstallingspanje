@@ -6,6 +6,7 @@ import MobileNav from '@/components/MobileNav';
 import ToastProvider from '@/components/ui/Toast';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import ExitIntentPopup from '@/components/ExitIntentPopup';
+import CookieConsent from '@/components/CookieConsent';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -105,7 +106,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }),
           }}
         />
-        <LocaleProvider><Breadcrumbs />{children}<FloatingActions /><MobileNav /><ExitIntentPopup /><ToastProvider /><ServiceWorkerRegistration /></LocaleProvider>
+        <LocaleProvider><Breadcrumbs />{children}<FloatingActions /><MobileNav /><ExitIntentPopup /><CookieConsent /><ToastProvider /><ServiceWorkerRegistration /></LocaleProvider>
       </body>
     </html>
   );

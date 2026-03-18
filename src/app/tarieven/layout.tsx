@@ -18,6 +18,55 @@ export const metadata: Metadata = {
   },
 };
 
+const productSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: 'Caravanstalling Spanje',
+  description: 'Professionele caravanstalling aan de Costa Brava met 24/7 bewaking, inclusief verzekering.',
+  brand: { '@type': 'Organization', name: 'Caravan Storage Spain S.L.' },
+  url: 'https://caravanstalling-spanje.com/tarieven',
+  offers: [
+    {
+      '@type': 'Offer',
+      name: 'Seizoensstalling (apr-okt)',
+      price: '45',
+      priceCurrency: 'EUR',
+      unitText: 'maand',
+      availability: 'https://schema.org/InStock',
+      url: 'https://caravanstalling-spanje.com/reserveren',
+    },
+    {
+      '@type': 'Offer',
+      name: 'Buitenstalling (jaarrond)',
+      price: '65',
+      priceCurrency: 'EUR',
+      unitText: 'maand',
+      availability: 'https://schema.org/InStock',
+      url: 'https://caravanstalling-spanje.com/reserveren',
+    },
+    {
+      '@type': 'Offer',
+      name: 'Binnenstalling (jaarrond)',
+      price: '95',
+      priceCurrency: 'EUR',
+      unitText: 'maand',
+      availability: 'https://schema.org/InStock',
+      url: 'https://caravanstalling-spanje.com/reserveren',
+    },
+  ],
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.9',
+    bestRating: '5',
+    ratingCount: '25',
+  },
+};
+
 export default function TarievenLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
+      {children}
+    </>
+  );
 }

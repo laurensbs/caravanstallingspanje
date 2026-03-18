@@ -4,28 +4,10 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Shield, Thermometer, Camera, CheckCircle, ArrowRight, Lock, Eye, Sparkles, Truck, Phone, Sun, Droplets, Wind, FileCheck, MapPin, Clock, Wrench, ChevronDown, HelpCircle } from 'lucide-react';
-import { motion, useInView, AnimatePresence } from 'framer-motion';
-import { useRef, useState } from 'react';
-
-function FaqItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border-b border-sand-dark/[0.06] last:border-0">
-      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between py-5 text-left group">
-        <span className="font-bold text-sm pr-6">{q}</span>
-        <ChevronDown size={18} className={`text-warm-gray shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
-      </button>
-      <AnimatePresence>
-        {open && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
-            <p className="text-sm text-warm-gray leading-relaxed pb-5">{a}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
+import { Shield, Thermometer, Camera, CheckCircle, ArrowRight, Lock, Eye, Sparkles, Truck, Phone, Sun, Droplets, Wind, FileCheck, MapPin, Clock, Wrench, HelpCircle } from 'lucide-react';
+import { motion, useInView } from 'framer-motion';
+import { useRef } from 'react';
+import { FaqItem } from '@/components/FaqAccordion';
 
 const stallingFaqs = [
   { q: 'Hoe is de beveiliging van het terrein geregeld?', a: 'Ons terrein is volledig omsloten en beveiligd met het Securitas Direct professioneel alarmsysteem met directe alarmopvolging. Daarnaast filmt een geavanceerd camerasysteem 24/7 alle bewegingen. Ons personeel is dagelijks aanwezig voor toezicht.' },
