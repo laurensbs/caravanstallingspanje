@@ -157,6 +157,53 @@ export default function TarievenPage() {
         </div>
       </section>
 
+      {/* Comparison Table */}
+      <section className="py-16 sm:py-20 bg-surface">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <A className="text-center max-w-2xl mx-auto mb-10">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Vergelijking</p>
+            <h2 className="text-2xl sm:text-3xl font-black mb-4">Wat is inbegrepen?</h2>
+            <div className="section-divider mt-5 mb-5" />
+          </A>
+          <A>
+            <div className="overflow-x-auto">
+              <table className="w-full bg-white rounded-2xl border border-sand-dark/[0.06] overflow-hidden text-sm">
+                <thead>
+                  <tr className="border-b border-sand-dark/10">
+                    <th className="text-left px-5 py-4 font-bold">Kenmerk</th>
+                    <th className="text-center px-4 py-4 font-bold">Seizoen <span className="block text-xs font-normal text-warm-gray">€45/mnd</span></th>
+                    <th className="text-center px-4 py-4 font-bold bg-accent/5">Buiten <span className="block text-xs font-normal text-warm-gray">€65/mnd</span></th>
+                    <th className="text-center px-4 py-4 font-bold">Binnen <span className="block text-xs font-normal text-warm-gray">€95/mnd</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { feature: 'Securitas Direct alarm', seizoen: true, buiten: true, binnen: true },
+                    { feature: '24/7 camerabewaking', seizoen: true, buiten: true, binnen: true },
+                    { feature: 'Standaard verzekerd', seizoen: true, buiten: true, binnen: true },
+                    { feature: 'Eigen vaste plek', seizoen: true, buiten: true, binnen: true },
+                    { feature: 'Tweewekelijkse controle', seizoen: true, buiten: true, binnen: true },
+                    { feature: 'Jaarlijkse technische keuring', seizoen: false, buiten: true, binnen: true },
+                    { feature: 'Jaarrond beschikbaar', seizoen: false, buiten: true, binnen: true },
+                    { feature: 'Overdekte hal', seizoen: false, buiten: false, binnen: true },
+                    { feature: 'Geen UV-schade', seizoen: false, buiten: false, binnen: true },
+                    { feature: 'Stabiele temperatuur', seizoen: false, buiten: false, binnen: true },
+                    { feature: 'Geen mos/algvorming', seizoen: false, buiten: false, binnen: true },
+                  ].map((row, i) => (
+                    <tr key={row.feature} className={i % 2 === 0 ? 'bg-surface/50' : ''}>
+                      <td className="px-5 py-3 font-medium">{row.feature}</td>
+                      <td className="text-center px-4 py-3">{row.seizoen ? <CheckCircle size={16} className="text-success mx-auto" /> : <span className="text-warm-gray/40">—</span>}</td>
+                      <td className="text-center px-4 py-3 bg-accent/5">{row.buiten ? <CheckCircle size={16} className="text-success mx-auto" /> : <span className="text-warm-gray/40">—</span>}</td>
+                      <td className="text-center px-4 py-3">{row.binnen ? <CheckCircle size={16} className="text-success mx-auto" /> : <span className="text-warm-gray/40">—</span>}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </A>
+        </div>
+      </section>
+
       {/* Extra Services */}
       <section className="py-20 sm:py-28 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">

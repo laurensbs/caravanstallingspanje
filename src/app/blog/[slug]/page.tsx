@@ -119,6 +119,17 @@ export default function BlogPostPage() {
             })}
           </motion.article>
 
+          {/* Service CTA */}
+          {post.cta && (
+            <div className="mt-10 p-6 sm:p-8 bg-sand/50 rounded-2xl border border-sand-dark/20 text-center">
+              <p className="text-xs font-bold text-primary tracking-[0.15em] uppercase mb-2">Tip</p>
+              <p className="font-black text-lg mb-4">Laat het ons voor u regelen</p>
+              <Link href={post.cta.href} className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all shadow-sm">
+                {post.cta.label} <ArrowRight size={14} />
+              </Link>
+            </div>
+          )}
+
           {/* Share */}
           <div className="mt-12 pt-8 border-t border-sand-dark/20 flex items-center justify-between">
             <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-dark transition-colors">

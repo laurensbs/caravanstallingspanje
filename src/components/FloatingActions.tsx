@@ -42,7 +42,7 @@ export default function FloatingActions() {
             className="flex flex-col gap-2 mb-1"
           >
             <a
-              href="https://wa.me/34650036755"
+              href="https://wa.me/34650036755?text=Hallo%2C%20ik%20heb%20een%20vraag%20over%20caravanstalling%20aan%20de%20Costa%20Brava."
               target="_blank"
               rel="noopener noreferrer"
               className="w-12 h-12 rounded-full bg-[#25D366] shadow-lg shadow-[#25D366]/20 flex items-center justify-center text-white hover:scale-110 transition-transform duration-300"

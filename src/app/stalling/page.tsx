@@ -4,9 +4,37 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Shield, Thermometer, Camera, CheckCircle, ArrowRight, Lock, Eye, Sparkles, Truck, Phone, Sun, Droplets, Wind, FileCheck, MapPin, Clock, Wrench } from 'lucide-react';
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { Shield, Thermometer, Camera, CheckCircle, ArrowRight, Lock, Eye, Sparkles, Truck, Phone, Sun, Droplets, Wind, FileCheck, MapPin, Clock, Wrench, ChevronDown, HelpCircle } from 'lucide-react';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { useRef, useState } from 'react';
+
+function FaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border-b border-sand-dark/[0.06] last:border-0">
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between py-5 text-left group">
+        <span className="font-bold text-sm pr-6">{q}</span>
+        <ChevronDown size={18} className={`text-warm-gray shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
+            <p className="text-sm text-warm-gray leading-relaxed pb-5">{a}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+const stallingFaqs = [
+  { q: 'Hoe is de beveiliging van het terrein geregeld?', a: 'Ons terrein is volledig omsloten en beveiligd met het Securitas Direct professioneel alarmsysteem met directe alarmopvolging. Daarnaast filmt een geavanceerd camerasysteem 24/7 alle bewegingen. Ons personeel is dagelijks aanwezig voor toezicht.' },
+  { q: 'Is mijn caravan verzekerd tijdens de stalling?', a: 'Ja, alle gestalde caravans zijn via onze collectieve polis standaard verzekerd tegen schade en diefstal op ons terrein. De kosten zijn inbegrepen in de stallingsprijs. Voor uitgebreidere dekking kunt u bij ons informeren.' },
+  { q: 'Hoe vaak wordt mijn caravan gecontroleerd?', a: 'Elke twee weken lopen onze medewerkers langs alle gestalde caravans voor een visuele controle op storm-, hagel- en weerschade. Jaarlijks voeren wij een volledige technische keuring uit inclusief vochtmeting.' },
+  { q: 'Kan ik mijn caravan op elk moment ophalen?', a: 'Tijdens onze openingstijden (ma-vr 09:30-16:30) kunt u uw caravan ophalen. Wij vragen wel om minimaal 48 uur van tevoren contact op te nemen, zodat wij uw caravan kunnen voorbereiden en rijklaar zetten.' },
+  { q: 'Kan ik ook een camper, vouwwagen of boot stallen?', a: 'Ja, wij stallen naast caravans ook campers (integraal en halfintegraal), vouwwagens, boten en trailers. Tarieven zijn afhankelijk van de afmetingen. Neem contact op voor een offerte op maat.' },
+  { q: 'Wat kost binnenstalling versus buitenstalling?', a: 'Buitenstalling begint vanaf €65 per maand, binnenstalling vanaf €95 per maand en seizoensstalling (oktober-april) vanaf €45 per maand. Alle prijzen zijn inclusief beveiliging, verzekering en controles.' },
+];
 
 function A({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
@@ -306,6 +334,31 @@ export default function StallingPage() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-20 sm:py-28 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <A className="text-center max-w-2xl mx-auto mb-14">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Veelgestelde vragen</p>
+            <h2 className="text-3xl sm:text-4xl font-black mb-4">Vragen over stalling?</h2>
+            <div className="section-divider mt-5" />
+          </A>
+          <A>
+            <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">
+              {stallingFaqs.map(f => <FaqItem key={f.q} q={f.q} a={f.a} />)}
+            </div>
+          </A>
+        </div>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: stallingFaqs.map(f => ({
+            '@type': 'Question',
+            name: f.q,
+            acceptedAnswer: { '@type': 'Answer', text: f.a },
+          })),
+        }) }} />
       </section>
 
       {/* CTA */}

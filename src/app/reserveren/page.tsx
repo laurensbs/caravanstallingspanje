@@ -222,9 +222,17 @@ function BookingPageInner() {
                   </div>
 
                   {/* Urgency bar */}
-                  <div className="bg-warning/10 border border-warning/25 rounded-xl px-4 py-3 flex items-center gap-3">
-                    <div className="w-2 h-2 bg-warning rounded-full animate-pulse shrink-0" />
-                    <p className="text-xs text-warning font-medium">Momenteel hoge vraag &mdash; reserveer tijdig om uw voorkeursplek te garanderen.</p>
+                  <div className={`${availability && availability.available < 10 ? 'bg-danger/10 border-danger/25' : 'bg-warning/10 border-warning/25'} border rounded-xl px-4 py-3 flex items-center gap-3`}>
+                    <div className={`w-2 h-2 ${availability && availability.available < 10 ? 'bg-danger' : 'bg-warning'} rounded-full animate-pulse shrink-0`} />
+                    <p className={`text-xs ${availability && availability.available < 10 ? 'text-danger' : 'text-warning'} font-medium`}>
+                      {availability
+                        ? availability.available < 5
+                          ? `Nog slechts ${availability.available} plekken beschikbaar — bijna vol!`
+                          : availability.available < 15
+                            ? `Nog ${availability.available} van de ${availability.total} plekken beschikbaar — reserveer snel.`
+                            : `${availability.available} plekken beschikbaar — reserveer tijdig om uw voorkeursplek te garanderen.`
+                        : 'Momenteel hoge vraag \u2014 reserveer tijdig om uw voorkeursplek te garanderen.'}
+                    </p>
                   </div>
 
                   <div className="grid sm:grid-cols-3 gap-4">

@@ -7,7 +7,7 @@ interface IllustrationProps {
 
 export function CaravanScene({ className = '', size = 200 }: IllustrationProps) {
   return (
-    <svg viewBox="0 0 200 140" width={size} height={size * 0.7} className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 200 140" width={size} height={size * 0.7} className={className} fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Caravan in Spaans landschap">
       {/* Sky */}
       <circle cx="160" cy="30" r="18" fill="#D4935A" opacity="0.3" />
       {/* Mountains */}
@@ -43,7 +43,7 @@ export function CaravanScene({ className = '', size = 200 }: IllustrationProps) 
 
 export function SunMountains({ className = '', size = 200 }: IllustrationProps) {
   return (
-    <svg viewBox="0 0 200 140" width={size} height={size * 0.7} className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 120 80" width={size} height={size * 0.67} className={className} fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Zon en bergen">
       {/* Sun */}
       <circle cx="150" cy="35" r="22" fill="#D4935A" opacity="0.25" />
       <circle cx="150" cy="35" r="14" fill="#C4653A" opacity="0.2" />
@@ -71,7 +71,7 @@ export function SunMountains({ className = '', size = 200 }: IllustrationProps) 
 
 export function SpainMap({ className = '', size = 120 }: IllustrationProps) {
   return (
-    <svg viewBox="0 0 120 100" width={size} height={size * 0.83} className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 120 100" width={size} height={size * 0.83} className={className} fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Kaart van Spanje met Costa Brava">
       {/* Simplified Spain shape */}
       <path d="M25 15 Q30 10 50 12 Q70 8 85 15 Q95 20 95 35 Q100 50 90 60 Q85 70 75 75 Q65 85 50 80 Q35 85 25 75 Q15 65 15 50 Q10 35 20 25Z" fill="#C4653A" opacity="0.12" stroke="#C4653A" strokeWidth="1.5" strokeOpacity="0.3" />
       {/* Costa Brava pin */}
@@ -86,7 +86,7 @@ export function SpainMap({ className = '', size = 120 }: IllustrationProps) {
 
 export function ShieldCheck({ className = '', size = 80 }: IllustrationProps) {
   return (
-    <svg viewBox="0 0 80 90" width={size} height={size * 1.125} className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 80 90" width={size} height={size * 1.125} className={className} fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Veiligheidsschild met vinkje">
       <path d="M40 8 L68 22 Q70 50 56 68 Q48 78 40 82 Q32 78 24 68 Q10 50 12 22Z" fill="#3D5A3E" opacity="0.1" stroke="#3D5A3E" strokeWidth="1.5" />
       <path d="M30 45 L37 52 L52 36" stroke="#3D5A3E" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
@@ -95,7 +95,7 @@ export function ShieldCheck({ className = '', size = 80 }: IllustrationProps) {
 
 export function StorageIcon({ className = '', size = 80 }: IllustrationProps) {
   return (
-    <svg viewBox="0 0 80 80" width={size} height={size} className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 80 80" width={size} height={size} className={className} fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Opslaggebouw">
       {/* Roof */}
       <path d="M10 35 L40 12 L70 35" stroke="#C4653A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
       {/* Building */}
@@ -112,7 +112,7 @@ export function StorageIcon({ className = '', size = 80 }: IllustrationProps) {
 
 export function ToolsIcon({ className = '', size = 80 }: IllustrationProps) {
   return (
-    <svg viewBox="0 0 80 80" width={size} height={size} className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 80 80" width={size} height={size} className={className} fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Gereedschap">
       {/* Wrench */}
       <path d="M20 60 L45 35 Q50 25 60 20 Q55 28 55 35 L60 40 L50 30 L25 55Z" fill="#D4935A" opacity="0.2" stroke="#D4935A" strokeWidth="1.5" />
       {/* Screwdriver */}
@@ -125,7 +125,7 @@ export function ToolsIcon({ className = '', size = 80 }: IllustrationProps) {
 
 export function TransportIcon({ className = '', size = 80 }: IllustrationProps) {
   return (
-    <svg viewBox="0 0 100 60" width={size} height={size * 0.6} className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 100 60" width={size} height={size * 0.6} className={className} fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Transportvrachtwagen">
       {/* Road */}
       <rect x="0" y="42" width="100" height="12" rx="2" fill="#E4D8C8" />
       <line x1="10" y1="48" x2="25" y2="48" stroke="white" strokeWidth="1.5" strokeDasharray="4 3" />

@@ -3,9 +3,37 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
-import { MapPin, Shield, Wrench, Sun, ArrowRight, Phone, CheckCircle, Star, Clock, Navigation, Plane, Car, Palmtree } from 'lucide-react';
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { MapPin, Shield, Wrench, Sun, ArrowRight, Phone, CheckCircle, Star, Clock, Navigation, Plane, Car, Palmtree, ChevronDown, HelpCircle } from 'lucide-react';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { useRef, useState } from 'react';
+
+function FaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border-b border-sand-dark/[0.06] last:border-0">
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between py-5 text-left group">
+        <span className="font-bold text-sm pr-6">{q}</span>
+        <ChevronDown size={18} className={`text-warm-gray shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
+            <p className="text-sm text-warm-gray leading-relaxed pb-5">{a}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+const locatieFaqs = [
+  { q: 'Waar ligt de stalling precies?', a: 'Onze stalling ligt in Sant Climent de Peralta, een klein dorp in de gemeente Forallac, provincie Girona. Centraal aan de Costa Brava, op 25 minuten van Pals en L\'Estartit, 35 minuten van Begur en 45 minuten van Girona Airport.' },
+  { q: 'Hoe kom ik vanaf Girona Airport naar de stalling?', a: 'Vanaf Girona Airport (GRO) is het circa 45 minuten rijden via de C-66. Neem de afslag richting La Bisbal d\'Empordà en volg de borden naar Peratallada/Forallac. Sant Climent de Peralta ligt net ten noorden van Peratallada.' },
+  { q: 'Is er parkeergelegenheid voor mijn auto?', a: 'Ja, er is ruim parkeergelegenheid voor uw auto op ons terrein terwijl u uw caravan ophaalt of brengt. U kunt uw auto ook bij ons achterlaten als u met de caravan naar een camping gaat.' },
+  { q: 'Kan ik de stalling bezichtigen?', a: 'Natuurlijk! U bent van harte welkom voor een bezichtiging of rondleiding. Wij vragen u wel om vooraf een afspraak te maken, zodat wij u persoonlijk kunnen ontvangen en rondleiden. Bel +34 650 036 755 of mail info@caravanstalling-spanje.com.' },
+  { q: 'Welke campings liggen in de buurt?', a: 'Binnen een uur rijden vanaf onze stalling bevinden zich tientallen campings, waaronder Camping Interpals (Pals), Camping Castell Montgri (L\'Estartit), Camping Begur en Camping La Ballena Alegre (Sant Pere Pescador). Wij transporteren uw caravan graag naar de camping van uw keuze.' },
+  { q: 'Zijn er voorzieningen in de omgeving?', a: 'Sant Climent de Peralta ligt dicht bij het middeleeuwse dorp Peratallada (10 min), La Bisbal d\'Empordà (15 min) met winkels en supermarkten, en de stranden van de Costa Brava (20-30 min). Het is een prachtige, rustige locatie te midden van olijfbomen en wijnranken.' },
+];
 
 function A({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
@@ -207,6 +235,31 @@ export default function LocatiesPage() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-20 sm:py-28 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <A className="text-center max-w-2xl mx-auto mb-14">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Veelgestelde vragen</p>
+            <h2 className="text-3xl sm:text-4xl font-black mb-4">Vragen over onze locatie?</h2>
+            <div className="section-divider mt-5" />
+          </A>
+          <A>
+            <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">
+              {locatieFaqs.map(f => <FaqItem key={f.q} q={f.q} a={f.a} />)}
+            </div>
+          </A>
+        </div>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: locatieFaqs.map(f => ({
+            '@type': 'Question',
+            name: f.q,
+            acceptedAnswer: { '@type': 'Answer', text: f.a },
+          })),
+        }) }} />
       </section>
 
       {/* CTA */}

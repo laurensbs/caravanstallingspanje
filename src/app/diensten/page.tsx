@@ -4,9 +4,37 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Shield, Wrench, Truck, ShoppingBag, Bike, SprayCan, ArrowRight, CheckCircle, Phone, Sparkles, ThermometerSnowflake, Wind, Eye, Camera, Lock, Zap, Award, Clock, MapPin, Users, FileCheck } from 'lucide-react';
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { Shield, Wrench, Truck, ShoppingBag, Bike, SprayCan, ArrowRight, CheckCircle, Phone, Sparkles, ThermometerSnowflake, Wind, Eye, Camera, Lock, Zap, Award, Clock, MapPin, Users, FileCheck, ChevronDown, HelpCircle } from 'lucide-react';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { useRef, useState } from 'react';
+
+function FaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border-b border-sand-dark/[0.06] last:border-0">
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between py-5 text-left group">
+        <span className="font-bold text-sm pr-6">{q}</span>
+        <ChevronDown size={18} className={`text-warm-gray shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
+            <p className="text-sm text-warm-gray leading-relaxed pb-5">{a}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+const dienstenFaqs = [
+  { q: 'Welke reparaties kunnen jullie uitvoeren?', a: 'Wij voeren vrijwel alle reparaties uit: remmen, banden, verlichting, gasinstallatie, waterleiding, dakluiken, ramen, vloer, elektra en carrosserie. Van kleine klussen tot complete renovaties. Onze werkplaats is volledig uitgerust voor alle merken caravans en campers.' },
+  { q: 'Wat is CaravanRepair® precies?', a: 'CaravanRepair® is het gepatenteerde schadeherstelsysteem voor geprofileerde buitenwanden. Deuken, barsten en vochtschade worden onzichtbaar hersteld zonder spuiten of verven. Als officieel Masterdealer bieden wij levenslange garantie. Alle verzekeraars erkennen dit systeem.' },
+  { q: 'Hoe werkt het transport van Nederland naar Spanje?', a: 'Wij beschikken over 7 eigen transporteenheden. Wij halen uw caravan op in Nederland, België of Duitsland en leveren hem af op onze stalling of rechtstreeks op uw camping aan de Costa Brava. Retour is natuurlijk ook mogelijk. Neem contact op voor een offerte.' },
+  { q: 'Kan ik een fiets of koelkast huren?', a: 'Ja, wij verhuren elektrische fietsen (€65/week), koelkasten (€120/seizoen) en mobiele airco-units (€85/week). Ideaal als aanvulling bij uw vakantie aan de Costa Brava. U kunt verhuurdiensten aanvragen via het klantportaal of telefonisch.' },
+  { q: 'Regelen jullie de verzekeringsafhandeling bij schade?', a: 'Ja. Bij CaravanRepair® schadeherstel verzorgen wij de volledige afhandeling met uw verzekeraar, inclusief schaderapportage, foto\'s en offertes. U hoeft alleen uw polisnummer door te geven.' },
+  { q: 'Hoe snel kunnen reparaties worden uitgevoerd?', a: 'Kleine reparaties (bandenwissel, lampen, simpele lekkages) voeren wij meestal dezelfde dag of volgende dag uit. Grotere reparaties plannen wij in overleg met u in. CaravanRepair® herstel duurt gemiddeld 2-5 werkdagen, afhankelijk van de omvang.' },
+];
 
 function A({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
@@ -527,6 +555,31 @@ export default function DienstenPage() {
             </div>
           </A>
         </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-20 sm:py-28 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <A className="text-center max-w-2xl mx-auto mb-14">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Veelgestelde vragen</p>
+            <h2 className="text-3xl sm:text-4xl font-black mb-4">Vragen over onze diensten?</h2>
+            <div className="section-divider mt-5" />
+          </A>
+          <A>
+            <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">
+              {dienstenFaqs.map(f => <FaqItem key={f.q} q={f.q} a={f.a} />)}
+            </div>
+          </A>
+        </div>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: dienstenFaqs.map(f => ({
+            '@type': 'Question',
+            name: f.q,
+            acceptedAnswer: { '@type': 'Answer', text: f.a },
+          })),
+        }) }} />
       </section>
 
       {/* CTA */}
