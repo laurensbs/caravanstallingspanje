@@ -1,4 +1,5 @@
 'use client';
+import { fmt, fmtDate } from "@/lib/format";
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -106,7 +107,7 @@ function CustomerMessagesTab() {
                     <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${m.sender_type === 'customer' ? 'bg-primary text-white' : 'bg-sand text-surface-dark'}`}>
                       <p className={`text-xs font-semibold mb-1 ${m.sender_type === 'customer' ? 'text-white/70' : 'text-warm-gray'}`}>{m.sender_name}</p>
                       <p className="text-sm whitespace-pre-wrap">{m.message}</p>
-                      <p className={`text-[10px] mt-1 ${m.sender_type === 'customer' ? 'text-white/50' : 'text-warm-gray/70'}`}>
+                      <p className={`text-[10px] mt-1 ${m.sender_type === 'customer' ? 'text-white/70' : 'text-warm-gray/70'}`}>
                         {new Date(m.created_at).toLocaleString('nl-NL', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' })}
                       </p>
                     </div>
@@ -260,8 +261,6 @@ function MijnAccountContent() {
     } catch { setPwChangeMsg('Er ging iets mis'); }
   };
 
-  const fmt = (n: number) => new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n);
-  const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString('nl-NL') : '-';
   const STATUS_COLORS: Record<string,string> = { betaald: 'bg-accent/10 text-primary-dark border-accent/30', open: 'bg-ocean/10 text-ocean-dark border-ocean/30', verzonden: 'bg-warning/10 text-warning border-warning/30', actief: 'bg-accent/10 text-primary-dark border-accent/30', verlopen: 'bg-danger/10 text-danger border-danger/30' };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-sand/40"><div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" /></div>;
@@ -369,9 +368,9 @@ function MijnAccountContent() {
                 <div className="w-8 h-px bg-primary" /> MIJN ACCOUNT
               </div>
               <h1 className="text-3xl md:text-4xl font-black">Welkom, {customer?.name}</h1>
-              <p className="text-white/50 text-sm mt-2">Klantnummer: {customer?.customer_number}</p>
+              <p className="text-white/70 text-sm mt-2">Klantnummer: {customer?.customer_number}</p>
             </div>
-            <button onClick={logout} className="flex items-center gap-2 text-sm text-white/40 hover:text-white bg-surface/5 border border-white/10 px-4 py-2.5 rounded-xl transition-all hover:bg-surface/10">
+            <button onClick={logout} className="flex items-center gap-2 text-sm text-white/60 hover:text-white bg-surface/5 border border-white/10 px-4 py-2.5 rounded-xl transition-all hover:bg-surface/10">
               <LogOut size={16}/> Uitloggen
             </button>
           </div>

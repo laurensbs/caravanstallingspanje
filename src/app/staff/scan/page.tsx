@@ -118,7 +118,7 @@ export default function StaffScanPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3">Staff Tools</p>
             <h1 className="text-3xl font-black text-white mb-3">QR Check-in / Check-out</h1>
-            <p className="text-white/40 text-sm">Scan een QR-code of voer een contractnummer in.</p>
+            <p className="text-white/60 text-sm">Scan een QR-code of voer een contractnummer in.</p>
           </motion.div>
         </div>
       </section>

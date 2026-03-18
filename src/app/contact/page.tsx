@@ -4,14 +4,10 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { MapPin, Phone, Mail, Clock, Send, ArrowRight, MessageCircle, CheckCircle } from 'lucide-react';
-import { motion, useInView } from 'framer-motion';
-import { useRef, useState, FormEvent } from 'react';
+import { useState, FormEvent } from 'react';
+import A from '@/components/AnimateIn';
+import PageHero from '@/components/PageHero';
 
-function A({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
-  const ref = useRef(null);
-  const v = useInView(ref, { once: true, margin: '-60px' });
-  return <motion.div ref={ref} initial={{ opacity: 0, y: 32 }} animate={v ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6, delay, ease: [0.25, 0.4, 0.25, 1] }} className={className}>{children}</motion.div>;
-}
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -75,22 +71,7 @@ export default function ContactPage() {
     <>
       <Header />
 
-      {/* Hero */}
-      <section className="relative bg-hero text-white py-20 sm:py-28 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-dark via-primary/80 to-primary-dark" />
-        <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
-          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-4">Contact</p>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] mb-6">
-              Neem <span className="gradient-text">contact</span> op
-            </h1>
-            <p className="text-white/50 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-              Heeft u vragen over stalling, reparatie, transport of een van onze andere diensten? Wilt u een offerte of een afspraak maken? Wij staan graag voor u klaar. Wij spreken Nederlands, Engels en Spaans.
-            </p>
-          </motion.div>
-        </div>
-      </section>
+      <PageHero badge="Contact" title={<>Neem <span className="gradient-text">contact</span> op</>} subtitle="Heeft u vragen over stalling, reparatie, transport of een van onze andere diensten? Wilt u een offerte of een afspraak maken? Wij staan graag voor u klaar. Wij spreken Nederlands, Engels en Spaans." />
 
       {/* Contact Grid */}
       <section className="py-20 sm:py-28 bg-surface">

@@ -5,23 +5,15 @@ import Footer from "@/components/Footer";
 import Link from "next/link";
 import Image from "next/image";
 import { Shield, Wrench, Truck, Eye, MapPin, Star, CheckCircle, ArrowRight, Phone, Users, ChevronRight, Sparkles, Calendar, Ruler, Building, Camera, Bike, ShoppingBag, ThermometerSun } from "lucide-react";
-import { motion, useInView } from "framer-motion";
-import { useRef, useState } from "react";
+import { motion } from "framer-motion";
+import { useState } from "react";
+import A from "@/components/AnimateIn";
 import ReviewsWidget from "@/components/ReviewsWidget";
 import { useT } from "@/lib/i18n";
 import { BLOG_POSTS } from "@/lib/blog-data";
 
 const BLOG_PREVIEW = BLOG_POSTS.slice(0, 3);
 
-function A({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-  return (
-    <motion.div ref={ref} initial={{ opacity: 0, y: 32 }} animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 32 }} transition={{ duration: 0.6, delay, ease: [0.25, 0.4, 0.25, 1] }} className={className}>
-      {children}
-    </motion.div>
-  );
-}
 
 export default function HomePage() {
   const t = useT();
@@ -87,7 +79,7 @@ export default function HomePage() {
                 Meer dan alleen{" "}
                 <span className="gradient-text">caravanstalling</span>
               </h1>
-              <p className="text-white/50 text-base sm:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0 mb-10">
+              <p className="text-white/70 text-base sm:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0 mb-10">
                 Stalling, onderhoud, reparatie, transport en verkoop. Al meer dan 20 jaar dé specialist aan de Costa Brava. Nederlandstalig personeel.
               </p>
 
@@ -101,7 +93,7 @@ export default function HomePage() {
                 ].map(s => (
                   <div key={s.l} className="text-center">
                     <div className="text-xl sm:text-2xl font-black text-white">{s.v}</div>
-                    <div className="text-[10px] text-white/30 mt-0.5 font-medium">{s.l}</div>
+                    <div className="text-[10px] text-white/70 mt-0.5 font-medium">{s.l}</div>
                   </div>
                 ))}
               </div>
@@ -115,7 +107,7 @@ export default function HomePage() {
                 ].map(b => (
                   <div key={b.text} className="flex items-center gap-2">
                     <b.icon size={14} className="text-primary-light/70" />
-                    <span className="text-white/40 text-xs">{b.text}</span>
+                    <span className="text-white/60 text-xs">{b.text}</span>
                   </div>
                 ))}
               </div>
@@ -264,7 +256,7 @@ export default function HomePage() {
         <Image src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1920&q=80" alt="Costa Brava terrein" fill className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-surface-dark/80 via-surface-dark/20 to-transparent" />
         <div className="absolute bottom-0 inset-x-0 max-w-7xl mx-auto px-4 sm:px-6 pb-10 sm:pb-14 text-center">
-          <p className="text-white/50 text-sm font-medium mb-2">Sant Climent de Peralta, Girona</p>
+          <p className="text-white/70 text-sm font-medium mb-2">Sant Climent de Peralta, Girona</p>
           <h3 className="text-white text-2xl sm:text-3xl font-black">3 beveiligde locaties aan de Costa Brava</h3>
         </div>
       </section>
@@ -362,7 +354,7 @@ export default function HomePage() {
                 </div>
                 <div>
                   <h3 className="text-white text-xl sm:text-2xl font-black mb-1">CaravanRepair® Masterdealer</h3>
-                  <p className="text-white/40 max-w-lg text-sm">Onzichtbaar schadeherstel van geprofileerde wanden. Alle verzekeraars erkend. Levenslange garantie.</p>
+                  <p className="text-white/60 max-w-lg text-sm">Onzichtbaar schadeherstel van geprofileerde wanden. Alle verzekeraars erkend. Levenslange garantie.</p>
                 </div>
               </div>
               <Link href="/diensten" className="shrink-0 bg-primary hover:bg-primary-light text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all duration-200 inline-flex items-center gap-2 shadow-sm">
@@ -462,7 +454,7 @@ export default function HomePage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
           <A>
             <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">Klaar om uw caravan veilig te stallen?</h2>
-            <p className="text-white/40 mb-8 max-w-lg mx-auto">Neem contact op of vraag direct een stallingsplek aan. Wij reageren binnen 24 uur.</p>
+            <p className="text-white/60 mb-8 max-w-lg mx-auto">Neem contact op of vraag direct een stallingsplek aan. Wij reageren binnen 24 uur.</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link href="/reserveren" className="bg-primary hover:bg-primary-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all duration-200 inline-flex items-center gap-2 shadow-sm">
                 Direct reserveren <ArrowRight size={15} />

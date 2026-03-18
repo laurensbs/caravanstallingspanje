@@ -1,4 +1,5 @@
 'use client';
+import { fmt, fmtDate } from "@/lib/format";
 
 import { useState, useEffect, useCallback } from 'react';
 import { Receipt, Plus, X, ChevronLeft, ChevronRight, CheckCircle, AlertTriangle, Download } from 'lucide-react';
@@ -59,8 +60,6 @@ export default function FacturenPage() {
   };
 
   const filteredContracts = form.customer_id ? contracts.filter(c => String(c.customer_id) === form.customer_id) : contracts;
-  const fmt = (n: number) => new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n);
-  const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString('nl-NL') : '-';
   const totalPages = Math.ceil(total / 50);
 
   const totalOpen = invoices.filter(i => i.status === 'open' || i.status === 'verzonden').reduce((s, i) => s + Number(i.total), 0);
@@ -69,13 +68,13 @@ export default function FacturenPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div><h1 className="text-2xl font-black text-surface-dark">Facturen</h1><p className="text-sm text-warm-gray/70 mt-1">{total} facturen · Openstaand: {fmt(totalOpen)}</p></div>
-        <button onClick={openForm} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all"><Plus size={16} /> Nieuwe factuur</button>
+        <button onClick={openForm} className="bg-primary hover:bg-primary-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all"><Plus size={16} /> Nieuwe factuur</button>
       </div>
 
       <div className="bg-surface rounded-2xl border border-sand-dark/20 mb-6 p-4">
         <div className="flex gap-2 flex-wrap">
           {['', 'open', 'verzonden', 'betaald', 'achterstallig', 'geannuleerd'].map(s => (
-            <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }} className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${statusFilter === s ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>{s || 'Alle'}</button>
+            <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }} className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${statusFilter === s ? 'bg-primary text-white shadow-md shadow-primary/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>{s || 'Alle'}</button>
           ))}
         </div>
       </div>
@@ -131,28 +130,28 @@ export default function FacturenPage() {
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
                 <label className="text-xs font-semibold text-warm-gray block mb-1">Klant *</label>
-                <select required value={form.customer_id} onChange={e => setForm({...form, customer_id: e.target.value, contract_id: ''})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all">
+                <select required value={form.customer_id} onChange={e => setForm({...form, customer_id: e.target.value, contract_id: ''})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                   <option value="">Selecteer klant...</option>
                   {customers.map(c => <option key={c.id} value={c.id}>{c.first_name} {c.last_name} ({c.email})</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-xs font-semibold text-warm-gray block mb-1">Contract (optioneel)</label>
-                <select value={form.contract_id} onChange={e => { const ct = contracts.find(c => String(c.id) === e.target.value); setForm({...form, contract_id: e.target.value, subtotal: ct ? String(ct.monthly_rate) : form.subtotal, description: ct ? `Stalling ${ct.contract_number}` : form.description }); }} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all">
+                <select value={form.contract_id} onChange={e => { const ct = contracts.find(c => String(c.id) === e.target.value); setForm({...form, contract_id: e.target.value, subtotal: ct ? String(ct.monthly_rate) : form.subtotal, description: ct ? `Stalling ${ct.contract_number}` : form.description }); }} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 outline-none transition-all">
                   <option value="">Geen contract</option>
                   {filteredContracts.map(c => <option key={c.id} value={c.id}>{c.contract_number} (€{c.monthly_rate}/mnd)</option>)}
                 </select>
               </div>
-              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Omschrijving</label><input value={form.description} onChange={e=>setForm({...form,description:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
+              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Omschrijving</label><input value={form.description} onChange={e=>setForm({...form,description:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"/></div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Subtotaal (€) *</label><input type="number" step="0.01" required value={form.subtotal} onChange={e=>setForm({...form,subtotal:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
-                <div><label className="text-xs font-semibold text-warm-gray block mb-1">BTW % *</label><input type="number" step="0.01" required value={form.tax_rate} onChange={e=>setForm({...form,tax_rate:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
+                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Subtotaal (€) *</label><input type="number" step="0.01" required value={form.subtotal} onChange={e=>setForm({...form,subtotal:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"/></div>
+                <div><label className="text-xs font-semibold text-warm-gray block mb-1">BTW % *</label><input type="number" step="0.01" required value={form.tax_rate} onChange={e=>setForm({...form,tax_rate:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"/></div>
               </div>
               {form.subtotal && <p className="text-xs text-warm-gray/70">Totaal incl. BTW: {fmt(parseFloat(form.subtotal) * (1 + parseFloat(form.tax_rate) / 100))}</p>}
-              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Vervaldatum *</label><input type="date" required value={form.due_date} onChange={e=>setForm({...form,due_date:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
+              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Vervaldatum *</label><input type="date" required value={form.due_date} onChange={e=>setForm({...form,due_date:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"/></div>
               <div className="flex gap-3 justify-end pt-2">
                 <button type="button" onClick={()=>setShowForm(false)} className="px-4 py-2.5 text-sm text-warm-gray/70 hover:bg-sand-dark/20 rounded-xl transition-colors">Annuleren</button>
-                <button type="submit" className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-amber-500/20 transition-all">Aanmaken</button>
+                <button type="submit" className="bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-primary/20 transition-all">Aanmaken</button>
               </div>
             </form>
           </div>

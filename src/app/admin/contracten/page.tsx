@@ -1,4 +1,5 @@
 'use client';
+import { fmt, fmtDate } from "@/lib/format";
 
 import { useState, useEffect, useCallback } from 'react';
 import { FileText, Plus, X, ChevronLeft, ChevronRight, RefreshCw, Edit2 } from 'lucide-react';
@@ -84,21 +85,19 @@ export default function ContractenPage() {
   };
 
   const filteredCaravans = form.customer_id ? caravans.filter(c => String(c.customer_id) === form.customer_id) : caravans;
-  const fmt = (n: number) => new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n);
-  const fmtDate = (d: string) => new Date(d).toLocaleDateString('nl-NL');
   const totalPages = Math.ceil(total / 50);
 
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
         <div><h1 className="text-2xl font-black text-surface-dark">Contracten</h1><p className="text-sm text-warm-gray/70 mt-1">{total} contracten</p></div>
-        <button onClick={openForm} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all"><Plus size={16} /> Nieuw contract</button>
+        <button onClick={openForm} className="bg-primary hover:bg-primary-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all"><Plus size={16} /> Nieuw contract</button>
       </div>
 
       <div className="bg-surface rounded-2xl border border-sand-dark/20 mb-6 p-4">
         <div className="flex gap-2">
           {['', 'actief', 'verlopen', 'opgezegd', 'concept'].map(s => (
-            <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }} className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${statusFilter === s ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>{s || 'Alle'}</button>
+            <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }} className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${statusFilter === s ? 'bg-primary text-white shadow-md shadow-primary/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>{s || 'Alle'}</button>
           ))}
         </div>
       </div>
@@ -151,14 +150,14 @@ export default function ContractenPage() {
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
                 <label className="text-xs font-semibold text-warm-gray block mb-1">Klant *</label>
-                <select required value={form.customer_id} onChange={e => setForm({...form, customer_id: e.target.value, caravan_id: ''})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all">
+                <select required value={form.customer_id} onChange={e => setForm({...form, customer_id: e.target.value, caravan_id: ''})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                   <option value="">Selecteer klant...</option>
                   {customers.map(c => <option key={c.id} value={c.id}>{c.first_name} {c.last_name}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-xs font-semibold text-warm-gray block mb-1">Caravan *</label>
-                <select required value={form.caravan_id} onChange={e => setForm({...form, caravan_id: e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all">
+                <select required value={form.caravan_id} onChange={e => setForm({...form, caravan_id: e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                   <option value="">Selecteer caravan...</option>
                   {filteredCaravans.map(c => <option key={c.id} value={c.id}>{c.brand} {c.model} {c.license_plate ? `(${c.license_plate})` : ''}</option>)}
                 </select>
@@ -166,31 +165,31 @@ export default function ContractenPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-semibold text-warm-gray block mb-1">Locatie *</label>
-                  <select required value={form.location_id} onChange={e => { setForm({...form, location_id: e.target.value, spot_id: ''}); loadSpots(e.target.value); }} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all">
+                  <select required value={form.location_id} onChange={e => { setForm({...form, location_id: e.target.value, spot_id: ''}); loadSpots(e.target.value); }} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                     <option value="">Selecteer locatie...</option>
                     {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-warm-gray block mb-1">Stallingplek</label>
-                  <select value={form.spot_id} onChange={e => setForm({...form, spot_id: e.target.value})} disabled={!form.location_id} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all disabled:opacity-50">
+                  <select value={form.spot_id} onChange={e => setForm({...form, spot_id: e.target.value})} disabled={!form.location_id} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 outline-none transition-all disabled:opacity-50">
                     <option value="">Geen plek</option>
                     {spots.map(s => <option key={s.id} value={s.id}>{s.label} (Zone {s.zone})</option>)}
                   </select>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Startdatum *</label><input type="date" required value={form.start_date} onChange={e=>setForm({...form,start_date:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
-                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Einddatum *</label><input type="date" required value={form.end_date} onChange={e=>setForm({...form,end_date:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
+                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Startdatum *</label><input type="date" required value={form.start_date} onChange={e=>setForm({...form,start_date:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"/></div>
+                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Einddatum *</label><input type="date" required value={form.end_date} onChange={e=>setForm({...form,end_date:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"/></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Maandtarief (€) *</label><input type="number" step="0.01" required value={form.monthly_rate} onChange={e=>setForm({...form,monthly_rate:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 outline-none transition-all"/></div>
-                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Borg (€)</label><input type="number" step="0.01" value={form.deposit} onChange={e=>setForm({...form,deposit:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all"/></div>
+                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Maandtarief (€) *</label><input type="number" step="0.01" required value={form.monthly_rate} onChange={e=>setForm({...form,monthly_rate:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"/></div>
+                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Borg (€)</label><input type="number" step="0.01" value={form.deposit} onChange={e=>setForm({...form,deposit:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 outline-none transition-all"/></div>
               </div>
               <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.auto_renew} onChange={e=>setForm({...form,auto_renew:e.target.checked})} className="rounded"/> Automatisch verlengen</label>
               <div className="flex gap-3 justify-end pt-2">
                 <button type="button" onClick={()=>setShowForm(false)} className="px-4 py-2.5 text-sm text-warm-gray/70 hover:bg-sand-dark/20 rounded-xl transition-colors">Annuleren</button>
-                <button type="submit" className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-amber-500/20 transition-all">Opslaan</button>
+                <button type="submit" className="bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-primary/20 transition-all">Opslaan</button>
               </div>
             </form>
           </div>

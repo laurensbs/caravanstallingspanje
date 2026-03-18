@@ -178,7 +178,7 @@ export default function StaffInspectiesPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl md:text-2xl font-black text-surface-dark">Inspecties</h1>
-        <button onClick={startInspection} className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition-all">
+        <button onClick={startInspection} className="bg-accent hover:bg-accent-dark text-white font-bold px-4 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-accent/20 transition-all">
           <Plus size={16} /> <span className="hidden sm:inline">Nieuwe inspectie</span><span className="sm:hidden">Nieuw</span>
         </button>
       </div>
@@ -187,7 +187,7 @@ export default function StaffInspectiesPage() {
       <div className="bg-surface rounded-2xl border border-sand-dark/20 mb-5 p-3">
         <div className="flex gap-2 overflow-x-auto no-scrollbar">
           {['', 'gepland', 'afgerond'].map(s => (
-            <button key={s} onClick={() => setFilter(s)} className={`px-3.5 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${filter === s ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md shadow-emerald-500/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>
+            <button key={s} onClick={() => setFilter(s)} className={`px-3.5 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${filter === s ? 'bg-accent text-white shadow-md shadow-accent/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>
               {s || 'Alle'}
             </button>
           ))}
@@ -198,7 +198,7 @@ export default function StaffInspectiesPage() {
       <div className="space-y-3">
         {loading ? (
           <div className="bg-surface rounded-2xl border border-sand-dark/20 p-8 text-center">
-            <div className="animate-spin w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full mx-auto" />
+            <div className="animate-spin w-6 h-6 border-2 border-accent border-t-transparent rounded-full mx-auto" />
           </div>
         ) : inspections.length === 0 ? (
           <div className="bg-surface rounded-2xl border border-sand-dark/20 p-10 text-center">
@@ -269,7 +269,7 @@ export default function StaffInspectiesPage() {
                 <div className="space-y-4">
                   <div>
                     <label className="text-xs font-bold text-warm-gray uppercase tracking-wider block mb-2">Caravan *</label>
-                    <select required value={form.caravan_id} onChange={e=>setForm({...form,caravan_id:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:ring-2 focus:ring-emerald-400/20 outline-none">
+                    <select required value={form.caravan_id} onChange={e=>setForm({...form,caravan_id:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:ring-2 focus:ring-accent/20 outline-none">
                       <option value="">Selecteer caravan</option>
                       {caravans.map(c => <option key={c.id} value={c.id}>{c.brand} {c.model} — {c.license_plate}</option>)}
                     </select>
@@ -296,7 +296,7 @@ export default function StaffInspectiesPage() {
                 <div className="space-y-2">
                   <p className="text-sm text-warm-gray/70 mb-3">Tik op elk item dat in orde is</p>
                   {CHECKLIST_ITEMS.map(item => (
-                    <button key={item.key} type="button" onClick={() => setChecklist({...checklist, [item.key]: !checklist[item.key]})} className={`w-full flex items-center gap-3 p-4 rounded-xl text-left transition-all ${checklist[item.key] ? 'bg-accent/10 border-2 border-emerald-300' : 'bg-sand/40 border-2 border-transparent'}`}>
+                    <button key={item.key} type="button" onClick={() => setChecklist({...checklist, [item.key]: !checklist[item.key]})} className={`w-full flex items-center gap-3 p-4 rounded-xl text-left transition-all ${checklist[item.key] ? 'bg-accent/10 border-2 border-accent-light' : 'bg-sand/40 border-2 border-transparent'}`}>
                       <span className="text-xl">{item.emoji}</span>
                       <span className={`text-sm font-medium flex-1 ${checklist[item.key] ? 'text-accent-dark' : 'text-warm-gray'}`}>{item.label}</span>
                       {checklist[item.key] ? (
@@ -348,7 +348,7 @@ export default function StaffInspectiesPage() {
                             <Trash2 size={12}/>
                           </button>
                           <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1">
-                            <input type="text" placeholder="Notitie..." value={photo.caption} onChange={e => { const newPhotos = [...photos]; newPhotos[i].caption = e.target.value; setPhotos(newPhotos); }} className="w-full text-[10px] text-white bg-transparent outline-none placeholder:text-white/40" />
+                            <input type="text" placeholder="Notitie..." value={photo.caption} onChange={e => { const newPhotos = [...photos]; newPhotos[i].caption = e.target.value; setPhotos(newPhotos); }} className="w-full text-[10px] text-white bg-transparent outline-none placeholder:text-white/60" />
                           </div>
                         </div>
                       ))}
@@ -364,7 +364,7 @@ export default function StaffInspectiesPage() {
                 <div className="space-y-4">
                   <div>
                     <label className="text-xs font-bold text-warm-gray uppercase tracking-wider block mb-2">Opmerkingen</label>
-                    <textarea value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:ring-2 focus:ring-emerald-400/20 outline-none" rows={4} placeholder="Eventuele bijzonderheden, schade, etc." />
+                    <textarea value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:ring-2 focus:ring-accent/20 outline-none" rows={4} placeholder="Eventuele bijzonderheden, schade, etc." />
                   </div>
 
                   {/* Summary */}
@@ -407,11 +407,11 @@ export default function StaffInspectiesPage() {
                 </button>
               )}
               {formStep < STEPS.length - 1 ? (
-                <button type="button" onClick={() => { if (formStep === 0 && !form.caravan_id) { alert('Selecteer eerst een caravan'); return; } setFormStep(formStep + 1); if (formStep === 1) stopCamera(); }} className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-3.5 rounded-xl text-sm shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                <button type="button" onClick={() => { if (formStep === 0 && !form.caravan_id) { alert('Selecteer eerst een caravan'); return; } setFormStep(formStep + 1); if (formStep === 1) stopCamera(); }} className="flex-1 bg-accent hover:bg-accent-dark text-white font-bold py-3.5 rounded-xl text-sm shadow-lg shadow-accent/20 transition-all flex items-center justify-center gap-2">
                   Volgende <ChevronRight size={14}/>
                 </button>
               ) : (
-                <button type="button" onClick={handleSubmit} className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-3.5 rounded-xl text-sm shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                <button type="button" onClick={handleSubmit} className="flex-1 bg-accent hover:bg-accent-dark text-white font-bold py-3.5 rounded-xl text-sm shadow-lg shadow-accent/20 transition-all flex items-center justify-center gap-2">
                   <CheckCircle size={14}/> Inspectie afronden
                 </button>
               )}

@@ -3,10 +3,10 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
-import Image from 'next/image';
-import { Shield, Thermometer, Camera, CheckCircle, ArrowRight, Lock, Eye, Sparkles, Truck, Phone, Sun, Droplets, Wind, FileCheck, MapPin, Clock, Wrench, HelpCircle } from 'lucide-react';
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { Shield, Thermometer, Camera, CheckCircle, ArrowRight, Lock, Eye, Sparkles, Truck,  Sun, Droplets, Wind, FileCheck, MapPin, Clock, Wrench, HelpCircle } from 'lucide-react';
+import A from '@/components/AnimateIn';
+import CtaSection from '@/components/CtaSection';
+import PageHero from '@/components/PageHero';
 import { FaqItem } from '@/components/FaqAccordion';
 
 const stallingFaqs = [
@@ -18,36 +18,13 @@ const stallingFaqs = [
   { q: 'Wat kost binnenstalling versus buitenstalling?', a: 'Buitenstalling begint vanaf €65 per maand, binnenstalling vanaf €95 per maand en seizoensstalling (oktober-april) vanaf €45 per maand. Alle prijzen zijn inclusief beveiliging, verzekering en controles.' },
 ];
 
-function A({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
-  const ref = useRef(null);
-  const v = useInView(ref, { once: true, margin: '-60px' });
-  return <motion.div ref={ref} initial={{ opacity: 0, y: 32 }} animate={v ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6, delay, ease: [0.25, 0.4, 0.25, 1] }} className={className}>{children}</motion.div>;
-}
 
 export default function StallingPage() {
   return (
     <>
       <Header />
 
-      {/* Hero */}
-      <section className="relative bg-hero text-white py-20 sm:py-28 overflow-hidden">
-        <div className="absolute inset-0">
-          <Image src="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1920&q=80" alt="" fill className="object-cover opacity-20" priority />
-          <div className="hero-overlay absolute inset-0" />
-        </div>
-        <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
-          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <p className="text-primary-light text-xs font-bold tracking-[0.2em] uppercase mb-4">Caravanstalling</p>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] mb-6">
-              Veilige stalling aan de <span className="gradient-text">Costa Brava</span>
-            </h1>
-            <p className="text-white/50 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-              Al meer dan 20 jaar dé specialist in het veilig en betrouwbaar stallen van caravans, campers, vouwwagens en boten in Sant Climent de Peralta. Securitas Direct bewaking, 24/7 camerabewaking en standaard verzekerd.
-            </p>
-          </motion.div>
-        </div>
-      </section>
+      <PageHero badge="Caravanstalling" title={<>Veilige stalling aan de <span className="gradient-text">Costa Brava</span></>} subtitle="Al meer dan 20 jaar dé specialist in het veilig en betrouwbaar stallen van caravans, campers, vouwwagens en boten in Sant Climent de Peralta. Securitas Direct bewaking, 24/7 camerabewaking en standaard verzekerd." image="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1920&q=80" />
 
       {/* Intro / Waarom bij ons stallen */}
       <section className="py-20 sm:py-28 bg-card">
@@ -343,25 +320,7 @@ export default function StallingPage() {
         }) }} />
       </section>
 
-      {/* CTA */}
-      <section className="bg-hero relative overflow-hidden">
-        <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
-          <A>
-            <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">Wilt u uw caravan bij ons stallen?</h2>
-            <p className="text-white/40 mb-4 max-w-lg mx-auto">Neem contact op voor een vrijblijvende offerte of bel voor direct advies. Wij spreken Nederlands, Engels en Spaans.</p>
-            <p className="text-white/30 text-sm mb-8">Op werkdagen bereikbaar van 09:30 tot 16:30 uur</p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link href="/contact" className="bg-primary hover:bg-primary-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm">
-                Stalling aanvragen <ArrowRight size={15} />
-              </Link>
-              <a href="tel:+34650036755" className="text-white/60 hover:text-white font-medium px-6 py-3.5 rounded-xl text-sm transition-colors inline-flex items-center gap-2 border border-white/10 hover:border-white/20">
-                <Phone size={15} /> +34 650 036 755
-              </a>
-            </div>
-          </A>
-        </div>
-      </section>
+      <CtaSection title="Wilt u uw caravan bij ons stallen?" subtitle="Neem contact op voor een vrijblijvende offerte of bel voor direct advies. Wij spreken Nederlands, Engels en Spaans." hours="Op werkdagen bereikbaar van 09:30 tot 16:30 uur" primaryLabel="Stalling aanvragen" />
 
       <Footer />
     </>

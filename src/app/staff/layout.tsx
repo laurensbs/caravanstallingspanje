@@ -75,8 +75,8 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-surface-dark">
       <div className="flex flex-col items-center gap-4">
-        <div className="animate-spin w-10 h-10 border-2 border-emerald-400 border-t-transparent rounded-full" />
-        <p className="text-white/40 text-sm">Laden...</p>
+        <div className="animate-spin w-10 h-10 border-2 border-accent-light border-t-transparent rounded-full" />
+        <p className="text-white/60 text-sm">Laden...</p>
       </div>
     </div>
   );
@@ -93,7 +93,7 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
             <Wrench className="text-white" size={28}/>
           </div>
           <h1 className="text-white font-black text-3xl tracking-tight">Staff Portal</h1>
-          <p className="text-white/30 text-sm mt-3">Caravanstalling Spanje</p>
+          <p className="text-white/70 text-sm mt-3">Caravanstalling Spanje</p>
         </div>
         <form onSubmit={login} className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-3xl p-8 space-y-5 shadow-2xl">
           {loginError && (
@@ -102,17 +102,17 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
             </div>
           )}
           <div>
-            <label className="text-white/30 text-[10px] font-bold uppercase tracking-widest block mb-2.5">E-mailadres</label>
+            <label className="text-white/70 text-[10px] font-bold uppercase tracking-widest block mb-2.5">E-mailadres</label>
             <div className="relative">
               <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/20" />
               <input type="email" required value={loginEmail} onChange={e=>{ setLoginEmail(e.target.value); setLoginError(''); }} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl pl-10 pr-4 py-3.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 placeholder:text-white/15 transition-all" placeholder="medewerker@voorbeeld.com" autoFocus autoComplete="email" />
             </div>
           </div>
           <div>
-            <label className="text-white/30 text-[10px] font-bold uppercase tracking-widest block mb-2.5">Wachtwoord</label>
+            <label className="text-white/70 text-[10px] font-bold uppercase tracking-widest block mb-2.5">Wachtwoord</label>
             <div className="relative">
               <input type={showPw ? 'text' : 'password'} required value={password} onChange={e=>{ setPassword(e.target.value); setLoginError(''); }} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3.5 text-white text-sm pr-10 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 placeholder:text-white/15 transition-all" placeholder="••••••••" autoFocus autoComplete="current-password" />
-              <button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/40 transition-colors">{showPw ? <EyeOff size={16}/> : <Eye size={16}/>}</button>
+              <button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/60 transition-colors">{showPw ? <EyeOff size={16}/> : <Eye size={16}/>}</button>
             </div>
           </div>
           <button type="submit" disabled={loginLoading} className="w-full bg-gradient-to-r from-primary to-primary-dark hover:from-primary hover:to-primary-dark text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-primary/20 disabled:opacity-60">
@@ -134,7 +134,7 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
             </div>
             <div>
               <h2 className="text-white font-bold text-sm">Staff Portal</h2>
-              <p className="text-white/30 text-[10px]">Caravanstalling Spanje</p>
+              <p className="text-white/70 text-[10px]">Caravanstalling Spanje</p>
             </div>
           </div>
         </div>
@@ -142,7 +142,7 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
           {NAV_ITEMS.map(item => {
             const active = pathname === item.href;
             return (
-              <Link key={item.href} href={item.href} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${active ? 'bg-white/[0.08] text-white shadow-sm' : 'text-white/40 hover:text-white/80 hover:bg-white/[0.03]'}`}>
+              <Link key={item.href} href={item.href} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${active ? 'bg-white/[0.08] text-white shadow-sm' : 'text-white/60 hover:text-white/80 hover:bg-white/[0.03]'}`}>
                 <item.icon size={17} className={active ? 'text-primary-light' : ''}/>{item.label}
                 {active && <div className="w-1.5 h-1.5 rounded-full bg-primary-light ml-auto" />}
               </Link>
@@ -154,7 +154,7 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-dark rounded-lg flex items-center justify-center text-white text-xs font-bold">{staffName.charAt(0)}</div>
             <p className="text-white text-xs font-semibold truncate flex-1">{staffName}</p>
             <div className="relative">
-              <button onClick={() => { setShowNotifications(!showNotifications); setUnreadCount(0); }} className="relative text-white/30 hover:text-white/60 transition-colors">
+              <button onClick={() => { setShowNotifications(!showNotifications); setUnreadCount(0); }} className="relative text-white/70 hover:text-white/60 transition-colors">
                 <Bell size={17} />
                 {unreadCount > 0 && <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 rounded-full text-[9px] text-white font-bold flex items-center justify-center">{unreadCount}</span>}
               </button>
@@ -164,12 +164,12 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
                     <p className="text-white text-xs font-bold">Meldingen</p>
                   </div>
                   {notifications.length === 0 ? (
-                    <p className="text-white/30 text-xs p-3">Geen meldingen</p>
+                    <p className="text-white/70 text-xs p-3">Geen meldingen</p>
                   ) : (
                     <div className="max-h-48 overflow-y-auto">
                       {notifications.map((n, i) => (
                         <div key={i} className="px-3 py-2 border-b border-white/[0.04] last:border-0 flex items-center gap-2">
-                          <span className={`w-2 h-2 rounded-full flex-shrink-0 ${n.type === 'urgent' ? 'bg-red-400' : n.type === 'inspectie' ? 'bg-blue-400' : n.type === 'transport' ? 'bg-amber-400' : 'bg-primary-light'}`} />
+                          <span className={`w-2 h-2 rounded-full flex-shrink-0 ${n.type === 'urgent' ? 'bg-red-400' : n.type === 'inspectie' ? 'bg-blue-400' : n.type === 'transport' ? 'bg-warning' : 'bg-primary-light'}`} />
                           <span className="text-white/60 text-xs">{n.text}</span>
                         </div>
                       ))}
@@ -179,7 +179,7 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
               )}
             </div>
           </div>
-          <button onClick={logout} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-white/30 hover:text-red-400 hover:bg-red-400/5 w-full transition-all">
+          <button onClick={logout} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-white/70 hover:text-red-400 hover:bg-red-400/5 w-full transition-all">
             <LogOut size={17}/> Uitloggen
           </button>
         </div>
@@ -194,11 +194,11 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
           <span className="text-white font-bold text-sm">{staffName || 'Staff'}</span>
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={() => { setShowNotifications(!showNotifications); setUnreadCount(0); }} className="relative text-white/30 hover:text-white/60 transition-colors">
+          <button onClick={() => { setShowNotifications(!showNotifications); setUnreadCount(0); }} className="relative text-white/70 hover:text-white/60 transition-colors">
             <Bell size={18} />
             {unreadCount > 0 && <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 rounded-full text-[9px] text-white font-bold flex items-center justify-center">{unreadCount}</span>}
           </button>
-          <button onClick={logout} className="text-white/30 hover:text-red-400 transition-colors"><LogOut size={18}/></button>
+          <button onClick={logout} className="text-white/70 hover:text-red-400 transition-colors"><LogOut size={18}/></button>
         </div>
         {showNotifications && (
           <div className="absolute top-full right-4 mt-1 w-64 bg-surface-dark border border-white/[0.08] rounded-xl shadow-2xl overflow-hidden z-50">
@@ -206,12 +206,12 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
               <p className="text-white text-xs font-bold">Meldingen</p>
             </div>
             {notifications.length === 0 ? (
-              <p className="text-white/30 text-xs p-3">Geen meldingen</p>
+              <p className="text-white/70 text-xs p-3">Geen meldingen</p>
             ) : (
               <div className="max-h-48 overflow-y-auto">
                 {notifications.map((n, i) => (
                   <div key={i} className="px-3 py-2 border-b border-white/[0.04] last:border-0 flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${n.type === 'urgent' ? 'bg-red-400' : n.type === 'inspectie' ? 'bg-blue-400' : n.type === 'transport' ? 'bg-amber-400' : 'bg-primary-light'}`} />
+                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${n.type === 'urgent' ? 'bg-red-400' : n.type === 'inspectie' ? 'bg-blue-400' : n.type === 'transport' ? 'bg-warning' : 'bg-primary-light'}`} />
                     <span className="text-white/60 text-xs">{n.text}</span>
                   </div>
                 ))}
@@ -227,7 +227,7 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
           {NAV_ITEMS.map(item => {
             const active = pathname === item.href;
             return (
-              <Link key={item.href} href={item.href} className={`flex flex-col items-center justify-center py-2.5 gap-0.5 transition-colors ${active ? 'text-primary-light' : 'text-white/30 active:text-white/60'}`}>
+              <Link key={item.href} href={item.href} className={`flex flex-col items-center justify-center py-2.5 gap-0.5 transition-colors ${active ? 'text-primary-light' : 'text-white/70 active:text-white/60'}`}>
                 <item.icon size={20} strokeWidth={active ? 2.5 : 1.5} />
                 <span className={`text-[10px] font-medium ${active ? 'text-primary-light' : ''}`}>{item.label}</span>
                 {active && <div className="w-1 h-1 rounded-full bg-primary-light mt-0.5" />}

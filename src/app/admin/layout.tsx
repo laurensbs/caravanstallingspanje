@@ -162,7 +162,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     <div className="h-screen flex items-center justify-center bg-surface-dark">
       <div className="flex flex-col items-center gap-4">
         <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-        <p className="text-white/30 text-sm">Laden...</p>
+        <p className="text-white/70 text-sm">Laden...</p>
       </div>
     </div>
   );
@@ -180,13 +180,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               <Shield className="text-white" size={28} />
             </div>
             <h1 className="text-white font-black text-3xl tracking-tight">Beheerportaal</h1>
-            <p className="text-white/30 text-sm mt-3">Caravanstalling Spanje</p>
+            <p className="text-white/70 text-sm mt-3">Caravanstalling Spanje</p>
           </div>
 
           <div className="bg-surface/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-3xl p-8 space-y-5 shadow-2xl">
             {/* Role selector tabs */}
             <div>
-              <label className="text-white/30 text-[10px] font-bold uppercase tracking-widest block mb-2.5">Inloggen als</label>
+              <label className="text-white/70 text-[10px] font-bold uppercase tracking-widest block mb-2.5">Inloggen als</label>
               <div className="flex bg-surface/[0.04] rounded-xl p-1 border border-white/[0.06]">
                 {(['admin', 'staff'] as const).map(r => (
                   <button
@@ -196,7 +196,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                     className={`flex-1 py-3 text-sm font-semibold rounded-lg transition-all flex items-center justify-center gap-2 ${
                       selectedRole === r
                         ? 'bg-gradient-to-r from-primary to-primary-light text-white shadow-lg shadow-primary/20'
-                        : 'text-white/30 hover:text-white/50'
+                        : 'text-white/70 hover:text-white/70'
                     }`}
                   >
                     {r === 'admin' ? <Shield size={15} /> : <User size={15} />}
@@ -209,7 +209,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <form onSubmit={handleLogin} className="space-y-4">
               {/* Email field */}
               <div>
-                <label className="text-white/30 text-[10px] font-bold uppercase tracking-widest block mb-2.5">E-mailadres</label>
+                <label className="text-white/70 text-[10px] font-bold uppercase tracking-widest block mb-2.5">E-mailadres</label>
                 <div className="relative">
                   <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/20" />
                   <input
@@ -227,7 +227,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
               {/* Password field */}
               <div>
-                <label className="text-white/30 text-[10px] font-bold uppercase tracking-widest block mb-2.5">Wachtwoord</label>
+                <label className="text-white/70 text-[10px] font-bold uppercase tracking-widest block mb-2.5">Wachtwoord</label>
                 <div className="relative">
                   <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/20" />
                   <input
@@ -240,7 +240,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                     autoFocus
                     autoComplete="current-password"
                   />
-                  <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/40 transition-colors">
+                  <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/60 transition-colors">
                     {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
@@ -292,10 +292,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-lg flex items-center justify-center text-white text-[10px] font-black">CS</div>
             <div>
               <span className="text-white font-bold text-sm block leading-tight">Caravanstalling</span>
-              <span className="text-white/30 text-[10px]">{role === 'admin' ? 'Admin Panel' : 'Staff Portal'}</span>
+              <span className="text-white/70 text-[10px]">{role === 'admin' ? 'Admin Panel' : 'Staff Portal'}</span>
             </div>
           </div>
-          <button className="md:hidden text-white/50" onClick={() => setSidebarOpen(false)}><X size={20} /></button>
+          <button className="md:hidden text-white/70" onClick={() => setSidebarOpen(false)}><X size={20} /></button>
         </div>
         <nav className="p-3 space-y-0.5 overflow-y-auto h-[calc(100vh-8rem)] custom-scrollbar">
           {filteredNav.map(n => {
@@ -308,7 +308,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             return (
               <div key={n.href}>
                 {sectionHeader}
-                <Link href={n.href} onClick={() => setSidebarOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${active ? 'bg-surface/[0.08] text-white shadow-sm' : 'text-white/40 hover:text-white/80 hover:bg-surface/[0.03]'}`}>
+                <Link href={n.href} onClick={() => setSidebarOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${active ? 'bg-surface/[0.08] text-white shadow-sm' : 'text-white/60 hover:text-white/80 hover:bg-surface/[0.03]'}`}>
                   <n.icon size={17} className={active ? 'text-primary' : ''} /> {n.label}
                   {active && <div className="w-1.5 h-1.5 rounded-full bg-primary ml-auto" />}
                 </Link>
@@ -321,10 +321,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-lg flex items-center justify-center text-white text-xs font-bold">{userName.charAt(0)}</div>
             <div className="flex-1 min-w-0">
               <p className="text-white text-xs font-semibold truncate">{userName}</p>
-              <p className="text-white/30 text-[10px]">{role}</p>
+              <p className="text-white/70 text-[10px]">{role}</p>
             </div>
           </div>
-          <button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-white/30 hover:text-danger hover:bg-red-400/5 w-full transition-all">
+          <button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-white/70 hover:text-danger hover:bg-red-400/5 w-full transition-all">
             <LogOut size={17} /> Uitloggen
           </button>
         </div>

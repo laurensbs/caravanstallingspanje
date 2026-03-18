@@ -55,7 +55,7 @@ export default function LocatiesPage() {
           <h1 className="text-2xl font-black text-surface-dark">Locaties & Plekken</h1>
           <p className="text-sm text-warm-gray/70 mt-1">Beheer uw terreinen en stallingplekken</p>
         </div>
-        <button onClick={() => setShowForm(true)} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all">
+        <button onClick={() => setShowForm(true)} className="bg-primary hover:bg-primary-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all">
           <Plus size={16} /> Nieuwe locatie
         </button>
       </div>
@@ -108,7 +108,7 @@ export default function LocatiesPage() {
                       <input placeholder="Prefix" value={bulkForm.prefix} onChange={e => setBulkForm({ ...bulkForm, prefix: e.target.value })} className="border border-sand-dark/30 rounded-lg px-3 py-2 text-sm w-20 bg-surface" />
                       <input type="number" placeholder="Aantal" value={bulkForm.count} onChange={e => setBulkForm({ ...bulkForm, count: e.target.value })} className="border border-sand-dark/30 rounded-lg px-3 py-2 text-sm w-24 bg-surface" />
                       <select value={bulkForm.spot_type} onChange={e => setBulkForm({ ...bulkForm, spot_type: e.target.value })} className="border border-sand-dark/30 rounded-lg px-3 py-2 text-sm w-28 bg-surface"><option value="buiten">Buiten</option><option value="binnen">Binnen</option></select>
-                      <button onClick={() => handleBulkSpots(loc.id)} className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-md shadow-amber-500/20">Aanmaken</button>
+                      <button onClick={() => handleBulkSpots(loc.id)} className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium shadow-md shadow-primary/20">Aanmaken</button>
                       <button onClick={() => setShowBulk(null)} className="text-warm-gray/70 text-sm">Annuleren</button>
                     </div>
                   )}
@@ -145,16 +145,16 @@ export default function LocatiesPage() {
           <div className="bg-surface rounded-2xl w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b border-sand-dark/20"><h2 className="text-lg font-bold text-surface-dark">Nieuwe locatie</h2><button onClick={() => setShowForm(false)} className="text-warm-gray/70 hover:text-warm-gray"><X size={20} /></button></div>
             <form onSubmit={handleAddLocation} className="p-6 space-y-4">
-              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Naam *</label><input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-warning outline-none transition-all" /></div>
-              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Adres</label><input value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-warning outline-none transition-all" /></div>
+              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Naam *</label><input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none transition-all" /></div>
+              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Adres</label><input value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none transition-all" /></div>
               <div className="grid grid-cols-3 gap-4">
-                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Stad</label><input value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 outline-none" /></div>
-                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Binnen capaciteit</label><input type="number" value={form.capacity_inside} onChange={e => setForm({ ...form, capacity_inside: e.target.value })} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 outline-none" /></div>
-                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Buiten capaciteit</label><input type="number" value={form.capacity_outside} onChange={e => setForm({ ...form, capacity_outside: e.target.value })} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 outline-none" /></div>
+                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Stad</label><input value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 outline-none" /></div>
+                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Binnen capaciteit</label><input type="number" value={form.capacity_inside} onChange={e => setForm({ ...form, capacity_inside: e.target.value })} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 outline-none" /></div>
+                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Buiten capaciteit</label><input type="number" value={form.capacity_outside} onChange={e => setForm({ ...form, capacity_outside: e.target.value })} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 outline-none" /></div>
               </div>
               <div className="flex gap-3 justify-end pt-2">
                 <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2.5 text-sm text-warm-gray/70 hover:bg-sand-dark/20 rounded-xl transition-colors">Annuleren</button>
-                <button type="submit" className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-amber-500/20 transition-all">Opslaan</button>
+                <button type="submit" className="bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-primary/20 transition-all">Opslaan</button>
               </div>
             </form>
           </div>

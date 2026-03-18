@@ -1,11 +1,11 @@
 'use client';
+import { PRIORITY_COLORS } from "@/lib/format";
 
 import { useState, useEffect, useCallback } from 'react';
 import { ClipboardList, Plus, X, CheckCircle, Clock, AlertCircle, User } from 'lucide-react';
 
 interface Task { id: number; title: string; description: string; priority: string; status: string; assigned_to: number; assigned_staff_name: string; location_name: string; due_date: string; completed_at: string; created_at: string; }
 
-const PRIORITY_COLORS: Record<string,string> = { laag: 'bg-ocean/15 text-ocean-dark', normaal: 'bg-sand text-surface-dark', hoog: 'bg-warning/15 text-warning', urgent: 'bg-danger/15 text-danger' };
 const STATUS_COLORS: Record<string,string> = { open: 'bg-ocean/15 text-ocean-dark', in_uitvoering: 'bg-warning/15 text-warning', afgerond: 'bg-accent/15 text-primary-dark' };
 const STATUS_ICONS: Record<string, typeof Clock> = { open: Clock, in_uitvoering: AlertCircle, afgerond: CheckCircle };
 
@@ -55,13 +55,13 @@ export default function TakenPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div><h1 className="text-2xl font-black text-surface-dark">Taken</h1><p className="text-sm text-warm-gray/70 mt-1">{counts.open} open · {counts.in_uitvoering} in uitvoering · {counts.afgerond} afgerond</p></div>
-        <button onClick={openForm} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all"><Plus size={16} /> Nieuwe taak</button>
+        <button onClick={openForm} className="bg-primary hover:bg-primary-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all"><Plus size={16} /> Nieuwe taak</button>
       </div>
 
       <div className="bg-surface rounded-2xl border border-sand-dark/20 mb-6 p-4">
         <div className="flex gap-2 flex-wrap">
           {['', 'open', 'in_uitvoering', 'afgerond'].map(s => (
-            <button key={s} onClick={() => setStatusFilter(s)} className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${statusFilter === s ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>{s === 'in_uitvoering' ? 'In uitvoering' : s || 'Alle'}</button>
+            <button key={s} onClick={() => setStatusFilter(s)} className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${statusFilter === s ? 'bg-primary text-white shadow-md shadow-primary/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>{s === 'in_uitvoering' ? 'In uitvoering' : s || 'Alle'}</button>
           ))}
         </div>
       </div>
@@ -93,7 +93,7 @@ export default function TakenPage() {
                 </div>
               </div>
               <div className="flex-shrink-0">
-                <select value={t.status} onChange={e => updateStatus(t.id, e.target.value)} className="text-xs border border-sand-dark/30 rounded-lg px-2 py-1.5 bg-sand/40 focus:ring-2 focus:ring-amber-400/20 outline-none">
+                <select value={t.status} onChange={e => updateStatus(t.id, e.target.value)} className="text-xs border border-sand-dark/30 rounded-lg px-2 py-1.5 bg-sand/40 focus:ring-2 focus:ring-primary/20 outline-none">
                   <option value="open">Open</option>
                   <option value="in_uitvoering">In uitvoering</option>
                   <option value="afgerond">Afgerond</option>
@@ -109,16 +109,16 @@ export default function TakenPage() {
           <div className="bg-surface rounded-2xl w-full max-w-md shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b border-sand-dark/20"><h2 className="text-lg font-bold text-surface-dark">Nieuwe taak</h2><button onClick={()=>setShowForm(false)} className="text-warm-gray/70 hover:text-warm-gray"><X size={20}/></button></div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Titel *</label><input required value={form.title} onChange={e=>setForm({...form,title:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-warning outline-none transition-all"/></div>
-              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Omschrijving</label><textarea value={form.description} onChange={e=>setForm({...form,description:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-warning outline-none transition-all" rows={3}/></div>
+              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Titel *</label><input required value={form.title} onChange={e=>setForm({...form,title:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none transition-all"/></div>
+              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Omschrijving</label><textarea value={form.description} onChange={e=>setForm({...form,description:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none transition-all" rows={3}/></div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Prioriteit</label><select value={form.priority} onChange={e=>setForm({...form,priority:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 outline-none"><option value="laag">Laag</option><option value="normaal">Normaal</option><option value="hoog">Hoog</option><option value="urgent">Urgent</option></select></div>
-                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Deadline</label><input type="date" value={form.due_date} onChange={e=>setForm({...form,due_date:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 outline-none"/></div>
+                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Prioriteit</label><select value={form.priority} onChange={e=>setForm({...form,priority:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 outline-none"><option value="laag">Laag</option><option value="normaal">Normaal</option><option value="hoog">Hoog</option><option value="urgent">Urgent</option></select></div>
+                <div><label className="text-xs font-semibold text-warm-gray block mb-1">Deadline</label><input type="date" value={form.due_date} onChange={e=>setForm({...form,due_date:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 outline-none"/></div>
               </div>
-              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Toewijzen aan</label><select value={form.assigned_to} onChange={e=>setForm({...form,assigned_to:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 outline-none"><option value="">Niet toewijzen</option>{staff.map(s=><option key={s.id} value={s.id}>{s.first_name} {s.last_name}</option>)}</select></div>
+              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Toewijzen aan</label><select value={form.assigned_to} onChange={e=>setForm({...form,assigned_to:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 outline-none"><option value="">Niet toewijzen</option>{staff.map(s=><option key={s.id} value={s.id}>{s.first_name} {s.last_name}</option>)}</select></div>
               <div className="flex gap-3 justify-end pt-2">
                 <button type="button" onClick={()=>setShowForm(false)} className="px-4 py-2.5 text-sm text-warm-gray/70 hover:bg-sand-dark/20 rounded-xl transition-colors">Annuleren</button>
-                <button type="submit" className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-amber-500/20 transition-all">Aanmaken</button>
+                <button type="submit" className="bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-primary/20 transition-all">Aanmaken</button>
               </div>
             </form>
           </div>

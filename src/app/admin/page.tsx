@@ -1,4 +1,5 @@
 'use client';
+import { fmt, fmtDate } from "@/lib/format";
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -21,8 +22,6 @@ export default function AdminDashboard() {
       .then(r => r.json()).then(d => { setStats(d.stats); setActivity(d.activity || []); }).catch(() => {});
   }, []);
 
-  const fmt = (n: number) => new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n);
-  const fmtDate = (d: string) => new Date(d).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
   if (!stats) return <div className="flex items-center justify-center h-64"><div className="w-6 h-6 border-2 border-warning border-t-transparent rounded-full animate-spin" /></div>;
 

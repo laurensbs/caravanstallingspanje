@@ -7,7 +7,7 @@ import { Menu, X, ChevronDown, Phone, Mail, Clock, Globe, Shield, Wrench, Truck,
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale, LOCALES } from '@/lib/i18n';
 import type { Locale } from '@/lib/i18n';
-import DarkModeToggle from './DarkModeToggle';
+
 
 const DIENSTEN_ITEMS = [
   { icon: Shield, label: 'Buiten- & Binnenstalling', desc: 'Beveiligd terrein, Securitas Direct', href: '/stalling' },
@@ -72,7 +72,7 @@ export default function Header() {
       {/* Top bar - desktop only */}
       <div className={`hidden lg:block transition-all duration-300 ${scrolled ? 'h-0 opacity-0 overflow-hidden' : 'h-auto opacity-100'} ${isHome ? 'bg-hero/40 backdrop-blur-sm' : 'bg-sand/50 border-b border-sand-dark/30'}`}>
         <div className="max-w-7xl mx-auto px-6 py-2 flex items-center justify-between">
-          <div className={`flex items-center gap-6 text-xs ${isHome ? 'text-white/50' : 'text-warm-gray'}`}>
+          <div className={`flex items-center gap-6 text-xs ${isHome ? 'text-white/70' : 'text-warm-gray'}`}>
             <a href="tel:+34650036755" className="flex items-center gap-1.5 hover:text-primary transition-colors">
               <Phone size={11} /> +34 650 036 755
             </a>
@@ -84,12 +84,12 @@ export default function Header() {
             </span>
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/mijn-account" className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${isHome ? 'text-white/50 hover:text-white' : 'text-warm-gray hover:text-surface-dark'}`}>
+            <Link href="/mijn-account" className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${isHome ? 'text-white/70 hover:text-white' : 'text-warm-gray hover:text-surface-dark'}`}>
               <User size={12} /> Mijn Account
             </Link>
             <div className="w-px h-3.5 bg-current opacity-15" />
             <div ref={langRef} className="relative">
-              <button onClick={() => setLangOpen(!langOpen)} className={`flex items-center gap-1.5 text-xs ${isHome ? 'text-white/50 hover:text-white' : 'text-warm-gray hover:text-surface-dark'} transition-colors`}>
+              <button onClick={() => setLangOpen(!langOpen)} className={`flex items-center gap-1.5 text-xs ${isHome ? 'text-white/70 hover:text-white' : 'text-warm-gray hover:text-surface-dark'} transition-colors`}>
                 <Globe size={12} />
                 <span>{currentFlag}</span>
                 <ChevronDown size={10} className={`transition-transform ${langOpen ? 'rotate-180' : ''}`} />
@@ -100,10 +100,10 @@ export default function Header() {
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}
-                    className="absolute right-0 top-8 bg-card rounded-xl shadow-xl border border-sand-dark/30 dark:border-white/10 py-1.5 min-w-[140px] z-50"
+                    className="absolute right-0 top-8 bg-card rounded-xl shadow-xl border border-sand-dark/30 py-1.5 min-w-[140px] z-50"
                   >
                     {LOCALES.map(l => (
-                      <button key={l.code} onClick={() => { setLocale(l.code as Locale); setLangOpen(false); }} className={`w-full flex items-center gap-2.5 px-4 py-2 text-xs hover:bg-sand dark:hover:bg-white/5 transition-colors ${locale === l.code ? 'text-primary font-semibold' : 'text-surface-dark'}`}>
+                      <button key={l.code} onClick={() => { setLocale(l.code as Locale); setLangOpen(false); }} className={`w-full flex items-center gap-2.5 px-4 py-2 text-xs hover:bg-sand transition-colors ${locale === l.code ? 'text-primary font-semibold' : 'text-surface-dark'}`}>
                         <span className="text-base">{l.flag}</span> {l.label}
                       </button>
                     ))}
@@ -111,7 +111,7 @@ export default function Header() {
                 )}
               </AnimatePresence>
             </div>
-            <DarkModeToggle />
+
           </div>
         </div>
       </div>

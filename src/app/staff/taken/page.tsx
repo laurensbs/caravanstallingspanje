@@ -1,11 +1,11 @@
 'use client';
+import { PRIORITY_COLORS } from "@/lib/format";
 
 import { useState, useEffect, useCallback } from 'react';
 import { CheckCircle, Clock, AlertCircle, AlertTriangle, Play, Check } from 'lucide-react';
 
 interface Task { id: number; title: string; description: string; priority: string; status: string; location_name: string; due_date: string; completed_at: string; created_at: string; }
 
-const PRIORITY_COLORS: Record<string,string> = { laag: 'bg-ocean/15 text-ocean-dark', normaal: 'bg-sand text-surface-dark', hoog: 'bg-warning/15 text-warning', urgent: 'bg-danger/15 text-danger' };
 const PRIORITY_DOT: Record<string,string> = { laag: 'bg-ocean', normaal: 'bg-warm-gray', hoog: 'bg-warning', urgent: 'bg-danger/100' };
 
 export default function StaffTakenPage() {
@@ -47,7 +47,7 @@ export default function StaffTakenPage() {
             { v: 'afgerond', label: 'Klaar' },
             { v: '', label: 'Alle' },
           ].map(s => (
-            <button key={s.v} onClick={() => setStatusFilter(s.v)} className={`px-3.5 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${statusFilter === s.v ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md shadow-emerald-500/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>
+            <button key={s.v} onClick={() => setStatusFilter(s.v)} className={`px-3.5 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${statusFilter === s.v ? 'bg-accent text-white shadow-md shadow-accent/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>
               {s.label}
             </button>
           ))}
@@ -63,7 +63,7 @@ export default function StaffTakenPage() {
       <div className="space-y-2">
         {loading ? (
           <div className="bg-surface rounded-2xl border border-sand-dark/20 p-8 text-center">
-            <div className="animate-spin w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full mx-auto" />
+            <div className="animate-spin w-6 h-6 border-2 border-accent border-t-transparent rounded-full mx-auto" />
           </div>
         ) : tasks.length === 0 ? (
           <div className="bg-surface rounded-2xl border border-sand-dark/20 p-10 text-center">

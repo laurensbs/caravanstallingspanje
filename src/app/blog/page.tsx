@@ -5,16 +5,12 @@ import Footer from '@/components/Footer';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Clock, Calendar, Tag, BookOpen } from 'lucide-react';
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import A from '@/components/AnimateIn';
+import CtaSection from '@/components/CtaSection';
+import PageHero from '@/components/PageHero';
 import { getAllPostsLocalized } from '@/lib/blog-data';
 import { useLocale } from '@/lib/i18n';
 
-function A({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
-  const ref = useRef(null);
-  const v = useInView(ref, { once: true, margin: '-60px' });
-  return <motion.div ref={ref} initial={{ opacity: 0, y: 32 }} animate={v ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6, delay, ease: [0.25, 0.4, 0.25, 1] }} className={className}>{children}</motion.div>;
-}
 
 const categoryColors: Record<string, string> = {
   'Onderhoud': 'bg-ocean/10 text-ocean',
@@ -31,25 +27,7 @@ export default function BlogPage() {
     <>
       <Header />
 
-      {/* Hero */}
-      <section className="relative bg-hero text-white py-20 sm:py-28 overflow-hidden">
-        <div className="absolute inset-0">
-          <Image src="https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&w=1920&q=80" alt="" fill className="img-cover opacity-20" priority />
-          <div className="hero-overlay absolute inset-0" />
-        </div>
-        <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
-          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <p className="text-primary-light text-xs font-bold tracking-[0.2em] uppercase mb-4">Blog & Reisgidsen</p>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] mb-6">
-              Tips, gidsen & <span className="gradient-text">caravankennis</span>
-            </h1>
-            <p className="text-white/50 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-              Praktische onderhoudstips, reisgidsen voor de Costa Brava en alles wat u moet weten over het stallen van uw caravan in Spanje.
-            </p>
-          </motion.div>
-        </div>
-      </section>
+      <PageHero badge="Blog & Reisgidsen" title={<>Tips, gidsen & <span className="gradient-text">caravankennis</span></>} subtitle="Praktische onderhoudstips, reisgidsen voor de Costa Brava en alles wat u moet weten over het stallen van uw caravan in Spanje." image="https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&w=1920&q=80" />
 
       {/* Featured post */}
       <section className="py-16 sm:py-20 bg-card">
@@ -129,24 +107,7 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-hero relative overflow-hidden">
-        <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
-          <A>
-            <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">Uw caravan in goede handen</h2>
-            <p className="text-white/40 mb-8 max-w-lg mx-auto">Wilt u uw caravan veilig stallen aan de Costa Brava? Neem contact op of vraag direct een plek aan.</p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link href="/reserveren" className="bg-primary hover:bg-primary-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all duration-200 inline-flex items-center gap-2 shadow-sm">
-                Direct reserveren <ArrowRight size={15} />
-              </Link>
-              <Link href="/contact" className="text-white/60 hover:text-white font-medium px-6 py-3.5 rounded-xl text-sm transition-colors inline-flex items-center gap-2 border border-white/10 hover:border-white/20">
-                Contact opnemen
-              </Link>
-            </div>
-          </A>
-        </div>
-      </section>
+      <CtaSection title="Uw caravan in goede handen" subtitle="Wilt u uw caravan veilig stallen aan de Costa Brava? Neem contact op of vraag direct een plek aan." primaryLabel="Direct reserveren" primaryHref="/reserveren" secondaryPhone={false} secondaryLabel="Contact opnemen" secondaryHref="/contact" />
 
       <Footer />
     </>

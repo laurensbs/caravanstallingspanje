@@ -3,16 +3,12 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
-import { CheckCircle, ArrowRight, Phone, Shield, HelpCircle, Sparkles } from 'lucide-react';
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { CheckCircle, ArrowRight,  Shield, HelpCircle, Sparkles } from 'lucide-react';
+import A from '@/components/AnimateIn';
+import CtaSection from '@/components/CtaSection';
+import PageHero from '@/components/PageHero';
 import { FaqItem } from '@/components/FaqAccordion';
 
-function A({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
-  const ref = useRef(null);
-  const v = useInView(ref, { once: true, margin: '-60px' });
-  return <motion.div ref={ref} initial={{ opacity: 0, y: 32 }} animate={v ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6, delay, ease: [0.25, 0.4, 0.25, 1] }} className={className}>{children}</motion.div>;
-}
 
 const plans = [
   {
@@ -89,22 +85,7 @@ export default function TarievenPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <Header />
 
-      {/* Hero */}
-      <section className="relative bg-hero text-white py-20 sm:py-28 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-dark via-primary/80 to-primary-dark" />
-        <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
-          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-4">Tarieven</p>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] mb-6">
-              Transparante <span className="gradient-text">tarieven</span>
-            </h1>
-            <p className="text-white/50 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-              Geen verborgen kosten. Bewaking, verzekering, tweewekelijkse controles en jaarlijkse technische keuring zijn bij elk stallingstype inbegrepen. U betaalt een vast maandtarief en weet precies waar u aan toe bent.
-            </p>
-          </motion.div>
-        </div>
-      </section>
+      <PageHero badge="Tarieven" title={<>Transparante <span className="gradient-text">tarieven</span></>} subtitle="Geen verborgen kosten. Bewaking, verzekering, tweewekelijkse controles en jaarlijkse technische keuring zijn bij elk stallingstype inbegrepen. U betaalt een vast maandtarief en weet precies waar u aan toe bent." />
 
       {/* Pricing Cards */}
       <section className="py-20 sm:py-28 bg-card">
@@ -246,24 +227,7 @@ export default function TarievenPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-hero relative overflow-hidden">
-        <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
-          <A>
-            <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">Klaar om uw caravan te stallen?</h2>
-            <p className="text-white/40 mb-8">Vraag vrijblijvend een offerte aan of bel voor direct advies.</p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link href="/contact" className="bg-accent hover:bg-accent-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm">
-                Offerte aanvragen <ArrowRight size={15} />
-              </Link>
-              <a href="tel:+34650036755" className="text-white/60 hover:text-white font-medium px-6 py-3.5 rounded-xl text-sm transition-colors inline-flex items-center gap-2 border border-white/10 hover:border-white/20">
-                <Phone size={15} /> +34 650 036 755
-              </a>
-            </div>
-          </A>
-        </div>
-      </section>
+      <CtaSection title="Klaar om uw caravan te stallen?" subtitle="Vraag vrijblijvend een offerte aan of bel voor direct advies." primaryLabel="Offerte aanvragen" primaryColor="accent" />
 
       <Footer />
     </>

@@ -1,4 +1,5 @@
 'use client';
+import { fmt, fmtDate } from "@/lib/format";
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
@@ -36,8 +37,6 @@ export default function CustomerDetailPage() {
     }).catch(() => {}).finally(() => setLoading(false));
   }, [id]);
 
-  const fmt = (n: number) => new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n);
-  const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString('nl-NL') : '-';
   const STATUS_COLORS: Record<string, string> = {
     betaald: 'bg-accent/10 text-primary-dark border-accent/30',
     open: 'bg-ocean/10 text-ocean-dark border-ocean/30',

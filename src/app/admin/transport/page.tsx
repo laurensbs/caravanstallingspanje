@@ -62,13 +62,13 @@ export default function TransportPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div><h1 className="text-2xl font-black text-surface-dark">Transport</h1><p className="text-sm text-warm-gray/70 mt-1">{total} transportopdrachten</p></div>
-        <button onClick={openForm} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all"><Plus size={16} /> Nieuwe opdracht</button>
+        <button onClick={openForm} className="bg-primary hover:bg-primary-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all"><Plus size={16} /> Nieuwe opdracht</button>
       </div>
 
       <div className="bg-surface rounded-2xl border border-sand-dark/20 mb-6 p-4">
         <div className="flex gap-2 flex-wrap">
           {['', 'aangevraagd', 'gepland', 'onderweg', 'afgeleverd', 'geannuleerd'].map(s => (
-            <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }} className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${statusFilter === s ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>{s || 'Alle'}</button>
+            <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }} className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${statusFilter === s ? 'bg-primary text-white shadow-md shadow-primary/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>{s || 'Alle'}</button>
           ))}
         </div>
       </div>
@@ -97,7 +97,7 @@ export default function TransportPage() {
                 <td className="px-4 py-3 text-xs text-warm-gray">{o.assigned_staff_name || 'Niet toegewezen'}</td>
                 <td className="px-4 py-3 text-center"><span className={`text-xs font-medium px-2 py-1 rounded-full ${STATUS_COLORS[o.status] || 'bg-sand'}`}>{o.status}</span></td>
                 <td className="px-4 py-3 text-right">
-                  <select value={o.status} onChange={e => updateStatus(o.id, e.target.value)} className="text-xs border border-sand-dark/30 rounded-lg px-2 py-1 bg-sand/40 focus:ring-2 focus:ring-amber-400/20 outline-none">
+                  <select value={o.status} onChange={e => updateStatus(o.id, e.target.value)} className="text-xs border border-sand-dark/30 rounded-lg px-2 py-1 bg-sand/40 focus:ring-2 focus:ring-primary/20 outline-none">
                     <option value="aangevraagd">Aangevraagd</option>
                     <option value="gepland">Gepland</option>
                     <option value="onderweg">Onderweg</option>
@@ -122,25 +122,25 @@ export default function TransportPage() {
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
                 <label className="text-xs font-semibold text-warm-gray block mb-1">Caravan *</label>
-                <select required value={form.caravan_id} onChange={e=>setForm({...form,caravan_id:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-warning outline-none transition-all">
+                <select required value={form.caravan_id} onChange={e=>setForm({...form,caravan_id:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none transition-all">
                   <option value="">Selecteer caravan...</option>
                   {caravans.map(c => <option key={c.id} value={c.id}>{c.brand} {c.model} — {c.license_plate} ({c.customer_name})</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-xs font-semibold text-warm-gray block mb-1">Chauffeur (optioneel)</label>
-                <select value={form.assigned_staff_id} onChange={e=>setForm({...form,assigned_staff_id:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all">
+                <select value={form.assigned_staff_id} onChange={e=>setForm({...form,assigned_staff_id:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 outline-none transition-all">
                   <option value="">Niet toegewezen</option>
                   {staffList.map(s => <option key={s.id} value={s.id}>{s.first_name} {s.last_name}</option>)}
                 </select>
               </div>
-              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Ophaaladres</label><input value={form.pickup_address} onChange={e=>setForm({...form,pickup_address:e.target.value})} placeholder="Bijv. Stalling Costa del Sol" className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-warning outline-none transition-all"/></div>
-              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Afleveradres</label><input value={form.delivery_address} onChange={e=>setForm({...form,delivery_address:e.target.value})} placeholder="Bijv. Camping La Marina, Alicante" className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-warning outline-none transition-all"/></div>
-              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Geplande datum *</label><input type="date" required value={form.scheduled_date} onChange={e=>setForm({...form,scheduled_date:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-warning outline-none transition-all"/></div>
-              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Opmerkingen</label><textarea value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})} placeholder="Bijzonderheden voor transport..." className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-warning outline-none transition-all" rows={3}/></div>
+              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Ophaaladres</label><input value={form.pickup_address} onChange={e=>setForm({...form,pickup_address:e.target.value})} placeholder="Bijv. Stalling Costa del Sol" className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none transition-all"/></div>
+              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Afleveradres</label><input value={form.delivery_address} onChange={e=>setForm({...form,delivery_address:e.target.value})} placeholder="Bijv. Camping La Marina, Alicante" className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none transition-all"/></div>
+              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Geplande datum *</label><input type="date" required value={form.scheduled_date} onChange={e=>setForm({...form,scheduled_date:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none transition-all"/></div>
+              <div><label className="text-xs font-semibold text-warm-gray block mb-1">Opmerkingen</label><textarea value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})} placeholder="Bijzonderheden voor transport..." className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none transition-all" rows={3}/></div>
               <div className="flex gap-3 justify-end pt-2">
                 <button type="button" onClick={()=>setShowForm(false)} className="px-4 py-2.5 text-sm text-warm-gray/70 hover:bg-sand-dark/20 rounded-xl transition-colors">Annuleren</button>
-                <button type="submit" className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-amber-500/20 transition-all">Aanmaken</button>
+                <button type="submit" className="bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-primary/20 transition-all">Aanmaken</button>
               </div>
             </form>
           </div>

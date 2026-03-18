@@ -146,7 +146,7 @@ function SigningContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FAF9F7] flex items-center justify-center">
+      <div className="min-h-screen bg-surface flex items-center justify-center">
         <div className="animate-pulse text-warm-gray/70">Contract laden...</div>
       </div>
     );
@@ -154,7 +154,7 @@ function SigningContent() {
 
   if (error && !signed) {
     return (
-      <div className="min-h-screen bg-[#FAF9F7] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-surface flex items-center justify-center p-4">
         <div className="bg-surface rounded-2xl p-8 shadow-lg text-center max-w-md">
           <AlertTriangle size={48} className="mx-auto text-warning mb-4" />
           <h1 className="text-xl font-bold text-surface-dark mb-2">Ondertekening niet mogelijk</h1>
@@ -166,12 +166,12 @@ function SigningContent() {
 
   if (signed) {
     return (
-      <div className="min-h-screen bg-[#FAF9F7] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-surface flex items-center justify-center p-4">
         <div className="bg-surface rounded-2xl p-8 shadow-lg text-center max-w-md">
           <CheckCircle size={64} className="mx-auto text-accent mb-4" />
           <h1 className="text-2xl font-bold text-surface-dark mb-2">Contract ondertekend!</h1>
           <p className="text-warm-gray text-sm mb-6">Uw contract is succesvol digitaal ondertekend. U ontvangt een bevestiging per e-mail.</p>
-          <a href="/mijn-account" className="inline-block bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold px-8 py-3 rounded-xl shadow-lg shadow-amber-500/20 hover:from-amber-600 hover:to-amber-700 transition-all">Naar mijn account</a>
+          <a href="/mijn-account" className="inline-block bg-primary text-white font-semibold px-8 py-3 rounded-xl shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all">Naar mijn account</a>
         </div>
       </div>
     );
@@ -181,7 +181,7 @@ function SigningContent() {
   const cust = contractData!.customer;
 
   return (
-    <div className="min-h-screen bg-[#FAF9F7] py-8 px-4">
+    <div className="min-h-screen bg-surface py-8 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -245,7 +245,7 @@ function SigningContent() {
         <button
           onClick={signContract}
           disabled={signing || !agreedTerms || !hasSignature}
-          className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-4 rounded-2xl text-base shadow-xl shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+          className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-4 rounded-2xl text-base shadow-xl shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
         >
           {signing ? 'Ondertekenen...' : <><PenTool size={18} /> Contract ondertekenen</>}
         </button>
@@ -260,7 +260,7 @@ function SigningContent() {
 
 export default function ContractSigningPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#FAF9F7] flex items-center justify-center"><div className="animate-pulse text-warm-gray/70">Laden...</div></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-surface flex items-center justify-center"><div className="animate-pulse text-warm-gray/70">Laden...</div></div>}>
       <SigningContent />
     </Suspense>
   );

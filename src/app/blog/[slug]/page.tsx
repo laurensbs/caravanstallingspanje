@@ -68,18 +68,18 @@ export default function BlogPostPage() {
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <Link href="/blog" className="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-xs font-medium transition-colors mb-6">
+            <Link href="/blog" className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-xs font-medium transition-colors mb-6">
               <ArrowLeft size={12} /> Terug naar blog
             </Link>
             <div className="flex items-center gap-3 mb-5">
               <span className={`text-[11px] font-bold px-3 py-1 rounded-full ${categoryColors[post.category] || 'bg-primary/10 text-primary'}`}>
                 {post.category}
               </span>
-              <span className="flex items-center gap-1.5 text-white/40 text-xs"><Calendar size={11} /> {new Date(post.date).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-              <span className="flex items-center gap-1.5 text-white/40 text-xs"><Clock size={11} /> {post.readTime} leestijd</span>
+              <span className="flex items-center gap-1.5 text-white/60 text-xs"><Calendar size={11} /> {new Date(post.date).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+              <span className="flex items-center gap-1.5 text-white/60 text-xs"><Clock size={11} /> {post.readTime} leestijd</span>
             </div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.1] mb-4">{post.title}</h1>
-            <p className="text-white/50 text-base sm:text-lg leading-relaxed max-w-3xl">{post.excerpt}</p>
+            <p className="text-white/70 text-base sm:text-lg leading-relaxed max-w-3xl">{post.excerpt}</p>
           </motion.div>
         </div>
       </section>
@@ -186,7 +186,7 @@ export default function BlogPostPage() {
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-14 sm:py-16 text-center relative">
           <h2 className="text-2xl font-black text-white mb-4">Uw caravan veilig stallen?</h2>
-          <p className="text-white/40 mb-6 max-w-md mx-auto text-sm">Neem contact op of vraag direct een stallingsplek aan. Wij reageren binnen 24 uur.</p>
+          <p className="text-white/60 mb-6 max-w-md mx-auto text-sm">Neem contact op of vraag direct een stallingsplek aan. Wij reageren binnen 24 uur.</p>
           <Link href="/reserveren" className="bg-primary hover:bg-primary-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all duration-200 inline-flex items-center gap-2 shadow-sm">
             Direct reserveren <ArrowRight size={15} />
           </Link>

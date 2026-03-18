@@ -4,8 +4,9 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { MapPin, Shield, Wrench, Sun, ArrowRight, Phone, CheckCircle, Star, Clock, Navigation, Plane, Car, Palmtree, HelpCircle } from 'lucide-react';
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import A from '@/components/AnimateIn';
+import CtaSection from '@/components/CtaSection';
+import PageHero from '@/components/PageHero';
 import { FaqItem } from '@/components/FaqAccordion';
 
 const locatieFaqs = [
@@ -17,33 +18,13 @@ const locatieFaqs = [
   { q: 'Zijn er voorzieningen in de omgeving?', a: 'Sant Climent de Peralta ligt dicht bij het middeleeuwse dorp Peratallada (10 min), La Bisbal d\'Empordà (15 min) met winkels en supermarkten, en de stranden van de Costa Brava (20-30 min). Het is een prachtige, rustige locatie te midden van olijfbomen en wijnranken.' },
 ];
 
-function A({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
-  const ref = useRef(null);
-  const v = useInView(ref, { once: true, margin: '-60px' });
-  return <motion.div ref={ref} initial={{ opacity: 0, y: 32 }} animate={v ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6, delay, ease: [0.25, 0.4, 0.25, 1] }} className={className}>{children}</motion.div>;
-}
 
 export default function LocatiesPage() {
   return (
     <>
       <Header />
 
-      {/* Hero */}
-      <section className="relative bg-hero text-white py-20 sm:py-28 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-dark via-primary/80 to-primary-dark" />
-        <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
-          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-4">Onze locatie</p>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] mb-6">
-              <span className="gradient-text">Costa Brava</span>, Spanje
-            </h1>
-            <p className="text-white/50 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-              Ons stallingsterrein en werkplaats liggen centraal aan de Costa Brava, in het rustige Sant Climent de Peralta, provincie Girona. Op korte afstand van Pals, Begur, L&apos;Estartit en Palamós.
-            </p>
-          </motion.div>
-        </div>
-      </section>
+      <PageHero badge="Onze locatie" title={<><span className="gradient-text">Costa Brava</span>, Spanje</>} subtitle="Ons stallingsterrein en werkplaats liggen centraal aan de Costa Brava, in het rustige Sant Climent de Peralta, provincie Girona. Op korte afstand van Pals, Begur, L'Estartit en Palamós." />
 
       {/* Main Location */}
       <section className="py-20 sm:py-28 bg-surface">
@@ -244,24 +225,7 @@ export default function LocatiesPage() {
         }) }} />
       </section>
 
-      {/* CTA */}
-      <section className="bg-hero relative overflow-hidden">
-        <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
-          <A>
-            <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">Bezoek onze stalling</h2>
-            <p className="text-white/40 mb-8">Maak een afspraak voor een rondleiding of neem vrijblijvend contact op.</p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link href="/contact" className="bg-accent hover:bg-accent-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm">
-                Neem contact op <ArrowRight size={15} />
-              </Link>
-              <a href="tel:+34650036755" className="text-white/60 hover:text-white font-medium px-6 py-3.5 rounded-xl text-sm transition-colors inline-flex items-center gap-2 border border-white/10 hover:border-white/20">
-                <Phone size={15} /> +34 650 036 755
-              </a>
-            </div>
-          </A>
-        </div>
-      </section>
+      <CtaSection title="Bezoek onze stalling" subtitle="Maak een afspraak voor een rondleiding of neem vrijblijvend contact op." primaryLabel="Neem contact op" primaryColor="accent" />
 
       <Footer />
     </>

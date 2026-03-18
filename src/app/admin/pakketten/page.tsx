@@ -1,4 +1,5 @@
 'use client';
+import { fmt, fmtDate } from "@/lib/format";
 
 import { useState, useEffect, useCallback } from 'react';
 import { Package, Plus, Pencil, Trash2, Check, X, Euro, Tag, ToggleLeft, ToggleRight } from 'lucide-react';
@@ -103,7 +104,6 @@ export default function DienstenPakkettenPage() {
   const resetForm = () => setForm({ name: '', slug: '', category: 'service', description: '', price: '', price_type: 'eenmalig', features: '', sort_order: '0' });
 
   const filtered = filterCat === 'all' ? packages : packages.filter(p => p.category === filterCat);
-  const fmt = (n: number) => new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n);
 
   return (
     <div>
@@ -112,7 +112,7 @@ export default function DienstenPakkettenPage() {
           <h1 className="text-2xl font-black text-surface-dark">Diensten & Pakketten</h1>
           <p className="text-sm text-warm-gray/70 mt-1">{packages.length} pakketten • {packages.filter(p => p.is_active).length} actief</p>
         </div>
-        <button onClick={() => { resetForm(); setEditing(null); setShowForm(true); }} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all">
+        <button onClick={() => { resetForm(); setEditing(null); setShowForm(true); }} className="bg-primary hover:bg-primary-dark text-white font-semibold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all">
           <Plus size={16} /> Nieuw pakket
         </button>
       </div>
@@ -179,7 +179,7 @@ export default function DienstenPakkettenPage() {
             </div>
             <div className="p-6 border-t border-sand-dark/20 flex justify-end gap-3">
               <button onClick={() => { setShowForm(false); setEditing(null); }} className="px-5 py-2.5 rounded-xl text-sm font-medium text-warm-gray hover:bg-sand/40">Annuleren</button>
-              <button onClick={savePackage} disabled={!form.name || !form.slug || !form.price} className="bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold px-6 py-2.5 rounded-xl text-sm disabled:opacity-50 flex items-center gap-2">
+              <button onClick={savePackage} disabled={!form.name || !form.slug || !form.price} className="bg-primary text-white font-semibold px-6 py-2.5 rounded-xl text-sm disabled:opacity-50 flex items-center gap-2">
                 <Check size={14} /> Opslaan
               </button>
             </div>

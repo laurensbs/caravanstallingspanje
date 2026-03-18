@@ -52,7 +52,7 @@ export default function InstellingenPage() {
   const Input = ({ label, field, type = 'text' }: { label: string; field: string; type?: string }) => (
     <div>
       <label className="text-xs font-semibold text-warm-gray block mb-1">{label}</label>
-      <input type={type} value={(settings as Record<string,string|number|boolean>)[field] as string || ''} onChange={e => setSettings(s => ({...s, [field]: e.target.value}))} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-amber-400/20 focus:border-warning outline-none transition-all" />
+      <input type={type} value={(settings as Record<string,string|number|boolean>)[field] as string || ''} onChange={e => setSettings(s => ({...s, [field]: e.target.value}))} className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none transition-all" />
     </div>
   );
 
@@ -69,14 +69,14 @@ export default function InstellingenPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-black text-surface-dark">Instellingen</h1>
-        <button onClick={save} disabled={saving} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50"><Save size={16} />{saving ? 'Opslaan...' : 'Opslaan'}</button>
+        <button onClick={save} disabled={saving} className="bg-primary hover:bg-primary-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all disabled:opacity-50"><Save size={16} />{saving ? 'Opslaan...' : 'Opslaan'}</button>
       </div>
 
       <div className="flex gap-6">
         <div className="w-56 flex-shrink-0">
           <div className="bg-surface rounded-2xl border border-sand-dark/20 p-2 space-y-1">
             {tabs.map(t => (
-              <button key={t.id} onClick={() => setActiveTab(t.id)} className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-left transition-all ${activeTab === t.id ? 'bg-gradient-to-r from-amber-50 to-amber-100/50 text-warning font-semibold border border-warning/30/50' : 'hover:bg-sand/40 text-warm-gray/70 hover:text-warm-gray'}`}><t.icon size={16} />{t.label}</button>
+              <button key={t.id} onClick={() => setActiveTab(t.id)} className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-left transition-all ${activeTab === t.id ? 'bg-gradient-to-r from-primary/10 to-primary/5 text-primary font-semibold border border-primary/20' : 'hover:bg-sand/40 text-warm-gray/70 hover:text-warm-gray'}`}><t.icon size={16} />{t.label}</button>
             ))}
           </div>
         </div>
@@ -141,10 +141,10 @@ export default function InstellingenPage() {
               <div className="p-4 bg-sand/40 rounded-xl">
                 <h3 className="font-medium text-sm text-surface-dark mb-2">Wachtwoord wijzigen</h3>
                 <div className="space-y-3">
-                  <input type="password" placeholder="Huidig wachtwoord" className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-surface focus:ring-2 focus:ring-amber-400/20 outline-none" />
-                  <input type="password" placeholder="Nieuw wachtwoord" className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-surface focus:ring-2 focus:ring-amber-400/20 outline-none" />
-                  <input type="password" placeholder="Bevestig nieuw wachtwoord" className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-surface focus:ring-2 focus:ring-amber-400/20 outline-none" />
-                  <button className="bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold px-4 py-2 rounded-xl text-sm shadow-md shadow-amber-500/20">Wijzigen</button>
+                  <input type="password" placeholder="Huidig wachtwoord" className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-surface focus:ring-2 focus:ring-primary/20 outline-none" />
+                  <input type="password" placeholder="Nieuw wachtwoord" className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-surface focus:ring-2 focus:ring-primary/20 outline-none" />
+                  <input type="password" placeholder="Bevestig nieuw wachtwoord" className="w-full border border-sand-dark/30 rounded-xl px-3 py-2.5 text-sm bg-surface focus:ring-2 focus:ring-primary/20 outline-none" />
+                  <button className="bg-primary text-white font-semibold px-4 py-2 rounded-xl text-sm shadow-md shadow-primary/20">Wijzigen</button>
                 </div>
               </div>
               <div className="p-4 bg-sand/40 rounded-xl">

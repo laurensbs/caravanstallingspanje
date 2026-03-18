@@ -114,7 +114,7 @@ export default function BerichtenPage() {
           <h1 className="text-2xl font-black text-surface-dark">Berichten</h1>
           <p className="text-sm text-warm-gray/70 mt-1">{totalUnread} ongelezen • {conversations.length} gesprekken</p>
         </div>
-        <button onClick={() => setShowNew(true)} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all">
+        <button onClick={() => setShowNew(true)} className="bg-primary hover:bg-primary-dark text-white font-semibold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all">
           <Plus size={16} /> Nieuw gesprek
         </button>
       </div>
@@ -143,7 +143,7 @@ export default function BerichtenPage() {
             </div>
             <div className="p-6 border-t border-sand-dark/20 flex justify-end gap-3">
               <button onClick={() => setShowNew(false)} className="px-5 py-2.5 rounded-xl text-sm font-medium text-warm-gray hover:bg-sand/40">Annuleren</button>
-              <button onClick={createConversation} disabled={sending || !newSubject.trim() || !newMessage.trim()} className="bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold px-6 py-2.5 rounded-xl text-sm disabled:opacity-50 flex items-center gap-2">
+              <button onClick={createConversation} disabled={sending || !newSubject.trim() || !newMessage.trim()} className="bg-primary text-white font-semibold px-6 py-2.5 rounded-xl text-sm disabled:opacity-50 flex items-center gap-2">
                 <Send size={14} /> Versturen
               </button>
             </div>
@@ -157,7 +157,7 @@ export default function BerichtenPage() {
           <div className="bg-surface rounded-2xl border border-sand-dark/20 overflow-hidden">
             <div className="p-3 border-b border-sand-dark/20 flex gap-2">
               {([['all', 'Alle', Inbox], ['open', 'Open', MailOpen], ['gesloten', 'Archief', Archive]] as const).map(([key, label, Icon]) => (
-                <button key={key} onClick={() => setFilter(key as typeof filter)} className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex-1 transition-all flex items-center justify-center gap-1.5 ${filter === key ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>
+                <button key={key} onClick={() => setFilter(key as typeof filter)} className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex-1 transition-all flex items-center justify-center gap-1.5 ${filter === key ? 'bg-primary text-white shadow-md shadow-primary/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>
                   <Icon size={12} /> {label}
                 </button>
               ))}
@@ -211,7 +211,7 @@ export default function BerichtenPage() {
                   <div className="text-center text-sm text-warm-gray/70 py-8">Laden...</div>
                 ) : messages.map(m => (
                   <div key={m.id} className={`flex ${m.sender_type === 'admin' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[75%] rounded-2xl px-4 py-3 ${m.sender_type === 'admin' ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white' : 'bg-sand text-surface-dark'}`}>
+                    <div className={`max-w-[75%] rounded-2xl px-4 py-3 ${m.sender_type === 'admin' ? 'bg-primary text-white' : 'bg-sand text-surface-dark'}`}>
                       <div className="flex items-center gap-2 mb-1">
                         <span className={`text-xs font-semibold ${m.sender_type === 'admin' ? 'text-white/80' : 'text-warm-gray'}`}>{m.sender_name}</span>
                         <span className={`text-[10px] ${m.sender_type === 'admin' ? 'text-white/60' : 'text-warm-gray/70'}`}>
@@ -236,7 +236,7 @@ export default function BerichtenPage() {
                     rows={2}
                     className="flex-1 px-4 py-2.5 border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-warning outline-none resize-none"
                   />
-                  <button onClick={sendReply} disabled={sending || !reply.trim()} className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white p-3 rounded-xl self-end disabled:opacity-50 transition-all">
+                  <button onClick={sendReply} disabled={sending || !reply.trim()} className="bg-primary hover:bg-primary-dark text-white p-3 rounded-xl self-end disabled:opacity-50 transition-all">
                     <Send size={18} />
                   </button>
                 </div>

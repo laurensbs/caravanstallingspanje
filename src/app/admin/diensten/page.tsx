@@ -1,4 +1,5 @@
 'use client';
+import { fmt, fmtDate } from "@/lib/format";
 
 import { useState, useEffect, useCallback } from 'react';
 import { Wrench, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
@@ -31,8 +32,6 @@ export default function DienstenPage() {
     fetchData();
   };
 
-  const fmt = (n: number) => n ? new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(n) : '-';
-  const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString('nl-NL') : '-';
   const totalPages = Math.ceil(total / 50);
 
   return (
@@ -44,7 +43,7 @@ export default function DienstenPage() {
       <div className="bg-surface rounded-2xl border border-sand-dark/20 mb-6 p-4">
         <div className="flex gap-2 flex-wrap">
           {['', 'aangevraagd', 'goedgekeurd', 'in_uitvoering', 'afgerond', 'geannuleerd'].map(s => (
-            <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }} className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${statusFilter === s ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>{s === 'in_uitvoering' ? 'In uitvoering' : s || 'Alle'}</button>
+            <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }} className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${statusFilter === s ? 'bg-primary text-white shadow-md shadow-primary/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>{s === 'in_uitvoering' ? 'In uitvoering' : s || 'Alle'}</button>
           ))}
         </div>
       </div>
@@ -75,7 +74,7 @@ export default function DienstenPage() {
                 <td className="px-4 py-3 text-xs text-warm-gray">{fmtDate(r.scheduled_date || r.created_at)}</td>
                 <td className="px-4 py-3 text-center"><span className={`text-xs font-medium px-2 py-1 rounded-full ${STATUS_COLORS[r.status] || 'bg-sand'}`}>{r.status === 'in_uitvoering' ? 'in uitvoering' : r.status}</span></td>
                 <td className="px-4 py-3 text-right">
-                  <select value={r.status} onChange={e => updateStatus(r.id, e.target.value)} className="text-xs border border-sand-dark/30 rounded-lg px-2 py-1 bg-sand/40 focus:ring-2 focus:ring-amber-400/20 outline-none">
+                  <select value={r.status} onChange={e => updateStatus(r.id, e.target.value)} className="text-xs border border-sand-dark/30 rounded-lg px-2 py-1 bg-sand/40 focus:ring-2 focus:ring-primary/20 outline-none">
                     <option value="aangevraagd">Aangevraagd</option>
                     <option value="goedgekeurd">Goedgekeurd</option>
                     <option value="in_uitvoering">In uitvoering</option>

@@ -30,7 +30,7 @@ export default function Footer() {
           <div className="bg-gradient-to-r from-primary/12 via-primary/6 to-transparent rounded-3xl p-6 sm:p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6 border border-primary/10">
             <div>
               <h3 className="text-white text-xl sm:text-2xl md:text-3xl font-bold mb-2">{t('footer.cta.title')}</h3>
-              <p className="text-white/50 text-sm max-w-lg">{t('footer.cta.desc')}</p>
+              <p className="text-white/70 text-sm max-w-lg">{t('footer.cta.desc')}</p>
             </div>
             <Link
               href="/stalling"
@@ -66,7 +66,7 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-1 text-primary-light mb-1">
               {[1,2,3,4,5].map(i => <Star key={i} size={13} fill="currentColor" />)}
-              <span className="text-white/40 text-xs ml-1.5 font-medium">4.9 / 5 Google</span>
+              <span className="text-white/60 text-xs ml-1.5 font-medium">4.9 / 5 Google</span>
             </div>
           </motion.div>
 
@@ -76,7 +76,7 @@ export default function Footer() {
               <h4 className="text-white font-bold text-sm flex items-center gap-2">
                 <Wrench size={14} className="text-primary-light" /> {t('footer.services')}
               </h4>
-              <ChevronDown size={14} className={`text-white/30 sm:hidden transition-transform ${openSections.services ? 'rotate-180' : ''}`} />
+              <ChevronDown size={14} className={`text-white/70 sm:hidden transition-transform ${openSections.services ? 'rotate-180' : ''}`} />
             </button>
             <ul className={`space-y-2.5 ${openSections.services ? 'block' : 'hidden sm:block'}`}>
               {[
@@ -103,7 +103,7 @@ export default function Footer() {
               <h4 className="text-white font-bold text-sm flex items-center gap-2">
                 <Shield size={14} className="text-primary-light" /> {t('footer.quicklinks')}
               </h4>
-              <ChevronDown size={14} className={`text-white/30 sm:hidden transition-transform ${openSections.links ? 'rotate-180' : ''}`} />
+              <ChevronDown size={14} className={`text-white/70 sm:hidden transition-transform ${openSections.links ? 'rotate-180' : ''}`} />
             </button>
             <ul className={`space-y-2.5 ${openSections.links ? 'block' : 'hidden sm:block'}`}>
               {[
@@ -131,7 +131,7 @@ export default function Footer() {
               <h4 className="text-white font-bold text-sm flex items-center gap-2">
                 <Truck size={14} className="text-primary-light" /> {t('footer.contact')}
               </h4>
-              <ChevronDown size={14} className={`text-white/30 sm:hidden transition-transform ${openSections.contact ? 'rotate-180' : ''}`} />
+              <ChevronDown size={14} className={`text-white/70 sm:hidden transition-transform ${openSections.contact ? 'rotate-180' : ''}`} />
             </button>
             <div className={`${openSections.contact ? 'block' : 'hidden sm:block'}`}>
             <ul className="space-y-3 text-sm">
@@ -157,7 +157,7 @@ export default function Footer() {
                 href="https://www.facebook.com/caravanstallingspanjecostabrava"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-xl bg-white/5 hover:bg-primary/10 flex items-center justify-center text-white/40 hover:text-primary-light transition-all duration-300"
+                className="w-9 h-9 rounded-xl bg-white/5 hover:bg-primary/10 flex items-center justify-center text-white/60 hover:text-primary-light transition-all duration-300"
               >
                 <Facebook size={16} />
               </a>
@@ -173,14 +173,14 @@ export default function Footer() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             <div>
               <h4 className="text-white font-bold text-sm mb-1">Nieuwsbrief</h4>
-              <p className="text-white/40 text-xs max-w-md">Ontvang tips, aanbiedingen en nieuws over caravanstalling aan de Costa Brava. Maximaal 1x per maand, geen spam.</p>
+              <p className="text-white/60 text-xs max-w-md">Ontvang tips, aanbiedingen en nieuws over caravanstalling aan de Costa Brava. Maximaal 1x per maand, geen spam.</p>
             </div>
             {newsletterStatus === 'success' ? (
               <p className="text-accent-light font-bold text-sm">✓ Ingeschreven!</p>
             ) : newsletterStatus === 'error' ? (
               <div className="text-center sm:text-left">
                 <p className="text-red-400 font-bold text-sm mb-1">Inschrijving mislukt</p>
-                <button onClick={() => setNewsletterStatus('idle')} className="text-white/50 text-xs underline hover:text-white/70 transition-colors">Probeer opnieuw</button>
+                <button onClick={() => setNewsletterStatus('idle')} className="text-white/70 text-xs underline hover:text-white/70 transition-colors">Probeer opnieuw</button>
               </div>
             ) : (
               <form
@@ -229,7 +229,7 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-white/5 py-5 pb-20 md:pb-5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/70">
           <p>&copy; {new Date().getFullYear()} Caravan Storage Spain S.L.</p>
           <div className="flex gap-5">
             <Link href="/privacy" className="hover:text-white/60 transition-colors">Privacy</Link>

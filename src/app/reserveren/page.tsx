@@ -212,11 +212,11 @@ function BookingPageInner() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <p className="text-accent-light text-xs font-bold tracking-[0.2em] uppercase mb-3">Online reserveren</p>
             <h1 className="text-3xl sm:text-4xl font-black text-white mb-3">Reserveer uw stallingsplek</h1>
-            <p className="text-white/40 text-sm max-w-lg mx-auto mb-6">In enkele stappen uw caravan veilig gestald aan de Costa Brava.</p>
-            <div className="flex items-center justify-center gap-4 text-xs text-white/30">
-              <span className="flex items-center gap-1.5"><Shield size={12} className="text-white/40" /> Gratis annuleren</span>
-              <span className="flex items-center gap-1.5"><Lock size={12} className="text-white/40" /> Veilig betalen via Stripe</span>
-              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-white/40" /> Direct bevestiging</span>
+            <p className="text-white/60 text-sm max-w-lg mx-auto mb-6">In enkele stappen uw caravan veilig gestald aan de Costa Brava.</p>
+            <div className="flex items-center justify-center gap-4 text-xs text-white/70">
+              <span className="flex items-center gap-1.5"><Shield size={12} className="text-white/60" /> Gratis annuleren</span>
+              <span className="flex items-center gap-1.5"><Lock size={12} className="text-white/60" /> Veilig betalen via Stripe</span>
+              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-white/60" /> Direct bevestiging</span>
             </div>
           </motion.div>
         </div>
@@ -284,7 +284,7 @@ function BookingPageInner() {
                       <label htmlFor="caravanLength" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Lengte caravan *</label>
                       <div className="relative">
                         <Ruler size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/40" />
-                        <select id="caravanLength" value={form.caravanLength} onChange={e => update("caravanLength", e.target.value)} required aria-required="true" aria-invalid={!!fieldErrors.caravanLength} aria-describedby={fieldErrors.caravanLength ? "err-caravanLength" : undefined} className="w-full pl-10 pr-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none appearance-none">
+                        <select id="caravanLength" value={form.caravanLength} onChange={e => update("caravanLength", e.target.value)} required aria-required="true" aria-invalid={!!fieldErrors.caravanLength} aria-describedby={fieldErrors.caravanLength ? "err-caravanLength" : undefined} className="w-full pl-10 pr-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none appearance-none">
                           <option value="">Selecteer...</option>
                           <option value="< 5m">&lt; 5 meter</option>
                           <option value="5-6m">5 - 6 meter</option>
@@ -299,7 +299,7 @@ function BookingPageInner() {
                       <label htmlFor="startDate" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Startdatum *</label>
                       <div className="relative">
                         <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/40" />
-                        <input id="startDate" type="date" value={form.startDate} onChange={e => update("startDate", e.target.value)} required aria-required="true" aria-invalid={!!fieldErrors.startDate} aria-describedby={fieldErrors.startDate ? "err-startDate" : undefined} className="w-full pl-10 pr-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="startDate" type="date" value={form.startDate} onChange={e => update("startDate", e.target.value)} required aria-required="true" aria-invalid={!!fieldErrors.startDate} aria-describedby={fieldErrors.startDate ? "err-startDate" : undefined} className="w-full pl-10 pr-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                       {fieldErrors.startDate && <p id="err-startDate" role="alert" className="text-danger text-xs mt-1">{fieldErrors.startDate}</p>}
                     </div>
@@ -307,7 +307,7 @@ function BookingPageInner() {
                       <label htmlFor="locationId" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Locatie *</label>
                       <div className="relative">
                         <MapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/40" />
-                        <select id="locationId" value={form.locationId} onChange={e => update("locationId", e.target.value)} aria-required="true" className="w-full pl-10 pr-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none appearance-none">
+                        <select id="locationId" value={form.locationId} onChange={e => update("locationId", e.target.value)} aria-required="true" className="w-full pl-10 pr-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none appearance-none">
                           <option value={1}>Sant Climent de Peralta</option>
                           <option value={2}>Pals</option>
                           <option value={3}>Blanes</option>
@@ -347,26 +347,26 @@ function BookingPageInner() {
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
                         <label htmlFor="brand" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Merk *</label>
-                        <input id="brand" value={form.brand} onChange={e => update("brand", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.brand} aria-describedby={fieldErrors.brand ? "err-brand" : undefined} placeholder="bijv. Hobby, Fendt, Knaus..." className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="brand" value={form.brand} onChange={e => update("brand", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.brand} aria-describedby={fieldErrors.brand ? "err-brand" : undefined} placeholder="bijv. Hobby, Fendt, Knaus..." className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                         {fieldErrors.brand && <p id="err-brand" role="alert" className="text-danger text-xs mt-1">{fieldErrors.brand}</p>}
                       </div>
                       <div>
                         <label htmlFor="model" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Model</label>
-                        <input id="model" value={form.model} onChange={e => update("model", e.target.value)} placeholder="bijv. De Luxe 490 KMF" className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="model" value={form.model} onChange={e => update("model", e.target.value)} placeholder="bijv. De Luxe 490 KMF" className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                     </div>
                     <div className="grid sm:grid-cols-3 gap-4">
                       <div>
                         <label htmlFor="licensePlate" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Kenteken</label>
-                        <input id="licensePlate" value={form.licensePlate} onChange={e => update("licensePlate", e.target.value)} placeholder="XX-YYY-Z" className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="licensePlate" value={form.licensePlate} onChange={e => update("licensePlate", e.target.value)} placeholder="XX-YYY-Z" className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                       <div>
                         <label htmlFor="year" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Bouwjaar</label>
-                        <input id="year" type="number" value={form.year} onChange={e => update("year", e.target.value)} placeholder="2020" className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="year" type="number" value={form.year} onChange={e => update("year", e.target.value)} placeholder="2020" className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                       <div>
                         <label htmlFor="weight" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Gewicht (kg)</label>
-                        <input id="weight" type="number" value={form.weight} onChange={e => update("weight", e.target.value)} placeholder="1500" className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="weight" type="number" value={form.weight} onChange={e => update("weight", e.target.value)} placeholder="1500" className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                     </div>
                     <label className="flex items-center gap-3 p-3 bg-surface rounded-xl cursor-pointer">
@@ -389,24 +389,24 @@ function BookingPageInner() {
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
                         <label htmlFor="firstName" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Voornaam *</label>
-                        <input id="firstName" value={form.firstName} onChange={e => update("firstName", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.firstName} aria-describedby={fieldErrors.firstName ? "err-firstName" : undefined} className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="firstName" value={form.firstName} onChange={e => update("firstName", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.firstName} aria-describedby={fieldErrors.firstName ? "err-firstName" : undefined} className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                         {fieldErrors.firstName && <p id="err-firstName" role="alert" className="text-danger text-xs mt-1">{fieldErrors.firstName}</p>}
                       </div>
                       <div>
                         <label htmlFor="lastName" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Achternaam *</label>
-                        <input id="lastName" value={form.lastName} onChange={e => update("lastName", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.lastName} aria-describedby={fieldErrors.lastName ? "err-lastName" : undefined} className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="lastName" value={form.lastName} onChange={e => update("lastName", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.lastName} aria-describedby={fieldErrors.lastName ? "err-lastName" : undefined} className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                         {fieldErrors.lastName && <p id="err-lastName" role="alert" className="text-danger text-xs mt-1">{fieldErrors.lastName}</p>}
                       </div>
                     </div>
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
                         <label htmlFor="bookingEmail" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">E-mailadres *</label>
-                        <input id="bookingEmail" type="email" value={form.email} onChange={e => update("email", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.email} aria-describedby={fieldErrors.email ? "err-email" : undefined} className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="bookingEmail" type="email" value={form.email} onChange={e => update("email", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.email} aria-describedby={fieldErrors.email ? "err-email" : undefined} className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                         {fieldErrors.email && <p id="err-email" role="alert" className="text-danger text-xs mt-1">{fieldErrors.email}</p>}
                       </div>
                       <div>
                         <label htmlFor="bookingPhone" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Telefoonnummer *</label>
-                        <input id="bookingPhone" type="tel" value={form.phone} onChange={e => update("phone", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.phone} aria-describedby={fieldErrors.phone ? "err-phone" : undefined} placeholder="+31 6 ..." className="w-full px-4 py-3 bg-surface border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="bookingPhone" type="tel" value={form.phone} onChange={e => update("phone", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.phone} aria-describedby={fieldErrors.phone ? "err-phone" : undefined} placeholder="+31 6 ..." className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                         {fieldErrors.phone && <p id="err-phone" role="alert" className="text-danger text-xs mt-1">{fieldErrors.phone}</p>}
                       </div>
                     </div>

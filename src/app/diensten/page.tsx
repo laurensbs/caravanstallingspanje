@@ -4,9 +4,10 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Shield, Wrench, Truck, ShoppingBag, Bike, SprayCan, ArrowRight, CheckCircle, Phone, Sparkles, ThermometerSnowflake, Wind, Eye, Camera, Lock, Zap, Award, Clock, MapPin, Users, FileCheck, HelpCircle } from 'lucide-react';
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { Shield, Wrench, Truck, ShoppingBag, Bike, SprayCan, ArrowRight, CheckCircle,  Sparkles, ThermometerSnowflake, Wind, Eye, Camera, Lock, Zap, Award, Clock, MapPin, Users, FileCheck, HelpCircle } from 'lucide-react';
+import A from '@/components/AnimateIn';
+import CtaSection from '@/components/CtaSection';
+import PageHero from '@/components/PageHero';
 import { FaqItem } from '@/components/FaqAccordion';
 
 const dienstenFaqs = [
@@ -18,51 +19,29 @@ const dienstenFaqs = [
   { q: 'Hoe snel kunnen reparaties worden uitgevoerd?', a: 'Kleine reparaties (bandenwissel, lampen, simpele lekkages) voeren wij meestal dezelfde dag of volgende dag uit. Grotere reparaties plannen wij in overleg met u in. CaravanRepair® herstel duurt gemiddeld 2-5 werkdagen, afhankelijk van de omvang.' },
 ];
 
-function A({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
-  const ref = useRef(null);
-  const v = useInView(ref, { once: true, margin: '-60px' });
-  return <motion.div ref={ref} initial={{ opacity: 0, y: 32 }} animate={v ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6, delay, ease: [0.25, 0.4, 0.25, 1] }} className={className}>{children}</motion.div>;
-}
 
 export default function DienstenPage() {
   return (
     <>
       <Header />
 
-      {/* Hero */}
-      <section className="relative bg-hero text-white py-20 sm:py-28 overflow-hidden">
-        <div className="absolute inset-0">
-          <Image src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1920&q=80" alt="" fill className="object-cover opacity-20" priority />
-          <div className="hero-overlay absolute inset-0" />
+      <PageHero badge="Onze diensten" title={<>Meer dan alleen <span className="gradient-text">stalling</span></>} subtitle="Caravanstalling Spanje is uw totaalaanbieder aan de Costa Brava. Van veilige stalling en professionele reparaties tot het gepatenteerde CaravanRepair® schadeherstel, transport door heel Europa en verhuur van fietsen en koelkasten." image="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1920&q=80">
+        <div className="flex flex-wrap justify-center gap-3 mt-8">
+          {[
+            { icon: Shield, label: 'Stalling', href: '#stalling' },
+            { icon: Wrench, label: 'Reparatie', href: '#reparatie' },
+            { icon: Sparkles, label: 'CaravanRepair®', href: '#caravanrepair' },
+            { icon: Truck, label: 'Transport', href: '#transport' },
+            { icon: ShoppingBag, label: 'Verkoop', href: '#verkoop' },
+            { icon: Bike, label: 'Verhuur', href: '#verhuur' },
+            { icon: SprayCan, label: 'Schoonmaak', href: '#schoonmaak' },
+          ].map(s => (
+            <a key={s.label} href={s.href} className="flex items-center gap-2 bg-white/[0.06] border border-white/10 text-white/70 hover:text-white hover:border-white/20 px-4 py-2 rounded-xl text-xs font-medium transition-all">
+              <s.icon size={14} /> {s.label}
+            </a>
+          ))}
         </div>
-        <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
-          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <p className="text-primary-light text-xs font-bold tracking-[0.2em] uppercase mb-4">Onze diensten</p>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] mb-6">
-              Meer dan alleen <span className="gradient-text">stalling</span>
-            </h1>
-            <p className="text-white/50 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed mb-8">
-              Caravanstalling Spanje is uw totaalaanbieder aan de Costa Brava. Van veilige stalling en professionele reparaties tot het gepatenteerde CaravanRepair® schadeherstel, transport door heel Europa en verhuur van fietsen en koelkasten.
-            </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              {[
-                { icon: Shield, label: 'Stalling', href: '#stalling' },
-                { icon: Wrench, label: 'Reparatie', href: '#reparatie' },
-                { icon: Sparkles, label: 'CaravanRepair®', href: '#caravanrepair' },
-                { icon: Truck, label: 'Transport', href: '#transport' },
-                { icon: ShoppingBag, label: 'Verkoop', href: '#verkoop' },
-                { icon: Bike, label: 'Verhuur', href: '#verhuur' },
-                { icon: SprayCan, label: 'Schoonmaak', href: '#schoonmaak' },
-              ].map(s => (
-                <a key={s.label} href={s.href} className="flex items-center gap-2 bg-white/[0.06] border border-white/10 text-white/70 hover:text-white hover:border-white/20 px-4 py-2 rounded-xl text-xs font-medium transition-all">
-                  <s.icon size={14} /> {s.label}
-                </a>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      </PageHero>
 
       {/* Sticky service nav */}
       <nav className="sticky top-16 z-30 bg-card/95 backdrop-blur-xl border-b border-sand-dark/20 shadow-sm">
@@ -564,25 +543,7 @@ export default function DienstenPage() {
         }) }} />
       </section>
 
-      {/* CTA */}
-      <section className="bg-hero relative overflow-hidden">
-        <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
-          <A>
-            <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">Hulp nodig? Wij staan voor u klaar</h2>
-            <p className="text-white/40 mb-4 max-w-lg mx-auto">Neem contact op voor een vrijblijvende offerte of meer informatie. Wij spreken Nederlands, Engels en Spaans.</p>
-            <p className="text-white/30 text-sm mb-8">Op werkdagen bereikbaar van 09:30 tot 16:30 uur</p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link href="/contact" className="bg-primary hover:bg-primary-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm">
-                Neem contact op <ArrowRight size={15} />
-              </Link>
-              <a href="tel:+34650036755" className="text-white/60 hover:text-white font-medium px-6 py-3.5 rounded-xl text-sm transition-colors inline-flex items-center gap-2 border border-white/10 hover:border-white/20">
-                <Phone size={15} /> +34 650 036 755
-              </a>
-            </div>
-          </A>
-        </div>
-      </section>
+      <CtaSection title="Hulp nodig? Wij staan voor u klaar" subtitle="Neem contact op voor een vrijblijvende offerte of meer informatie. Wij spreken Nederlands, Engels en Spaans." hours="Op werkdagen bereikbaar van 09:30 tot 16:30 uur" primaryLabel="Neem contact op" />
 
       <Footer />
     </>
