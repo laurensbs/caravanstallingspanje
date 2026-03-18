@@ -3,6 +3,7 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Shield, Thermometer, Camera, CheckCircle, ArrowRight, Lock, Eye, Sparkles, Truck, Phone, Sun, Droplets, Wind, FileCheck, MapPin, Clock, Wrench } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
@@ -21,7 +22,7 @@ export default function StallingPage() {
       {/* Hero */}
       <section className="relative bg-surface-dark text-white py-20 sm:py-28 overflow-hidden">
         <div className="absolute inset-0">
-          <img src="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1920&q=80" alt="" className="img-cover opacity-20" />
+          <Image src="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1920&q=80" alt="" fill className="object-cover opacity-20" priority />
           <div className="hero-overlay absolute inset-0" />
         </div>
         <div className="absolute inset-0 dot-pattern opacity-20" />

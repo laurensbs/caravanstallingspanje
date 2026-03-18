@@ -3,6 +3,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Link from "next/link";
+import Image from "next/image";
 import { Shield, Wrench, Truck, Eye, MapPin, Star, CheckCircle, ArrowRight, Phone, Users, ChevronRight, Sparkles, Calendar, Ruler, Building, Camera, Bike, ShoppingBag, ThermometerSun } from "lucide-react";
 import { motion, useInView } from "framer-motion";
 import { useRef, useState } from "react";
@@ -63,7 +64,7 @@ export default function HomePage() {
       {/* ═══ HERO ═══ */}
       <section id="main-content" className="relative min-h-[92vh] flex items-center bg-surface-dark overflow-hidden">
         <div className="absolute inset-0">
-          <img src="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1920&q=80" alt="" className="img-cover opacity-25" />
+          <Image src="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1920&q=80" alt="" fill className="object-cover opacity-25" priority />
           <div className="hero-overlay absolute inset-0" />
         </div>
         <div className="absolute inset-0 dot-pattern opacity-30" />
@@ -182,6 +183,11 @@ export default function HomePage() {
                     <button type="submit" disabled={checkingAvail} className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3.5 rounded-xl text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow-md disabled:opacity-60">
                       {checkingAvail ? <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg> Controleren...</> : <>Beschikbaarheid checken <ArrowRight size={15} /></>}
                     </button>
+                    <div className="flex items-center justify-center gap-3 mt-3 text-[10px] text-warm-gray/60">
+                      <span className="flex items-center gap-1"><Shield size={10} /> Gratis annuleren</span>
+                      <span className="flex items-center gap-1"><CheckCircle size={10} /> Direct bevestiging</span>
+                      <span className="flex items-center gap-1"><Star size={10} /> 4.9/5</span>
+                    </div>
                   </form>
                 )}
               </div>
@@ -248,7 +254,7 @@ export default function HomePage() {
 
       {/* ═══ IMAGE BREAK ═══ */}
       <section className="relative h-[320px] sm:h-[420px] overflow-hidden">
-        <img src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1920&q=80" alt="Costa Brava terrein" className="img-cover" />
+        <Image src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1920&q=80" alt="Costa Brava terrein" fill className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-surface-dark/80 via-surface-dark/20 to-transparent" />
         <div className="absolute bottom-0 inset-x-0 max-w-7xl mx-auto px-4 sm:px-6 pb-10 sm:pb-14 text-center">
           <p className="text-white/50 text-sm font-medium mb-2">Sant Climent de Peralta, Girona</p>
@@ -292,6 +298,14 @@ export default function HomePage() {
                 </div>
               </A>
             ))}
+          </div>
+
+          {/* Trust badges */}
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 mt-10 text-xs text-warm-gray">
+            <span className="flex items-center gap-1.5"><Shield size={13} className="text-success" /> Securitas Direct beveiligd</span>
+            <span className="flex items-center gap-1.5"><CheckCircle size={13} className="text-ocean" /> Standaard verzekerd</span>
+            <span className="flex items-center gap-1.5"><Eye size={13} className="text-primary" /> Tweewekelijkse controle</span>
+            <span className="flex items-center gap-1.5"><Star size={13} className="text-warning" /> 4.9/5 Google reviews</span>
           </div>
         </div>
       </section>
@@ -448,7 +462,7 @@ export default function HomePage() {
                 <Link href={`/blog/${post.slug}`} className="group block h-full">
                   <div className="bg-white rounded-2xl overflow-hidden border border-sand-dark/20 h-full flex flex-col card-hover">
                     <div className="relative aspect-[16/10] overflow-hidden">
-                      <img src={post.image} alt={post.title} className="img-cover group-hover:scale-105 transition-transform duration-500" />
+                      <Image src={post.image} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                       <div className="absolute top-3 left-3">
                         <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white/90 text-primary">{post.category}</span>
                       </div>

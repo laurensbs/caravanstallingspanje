@@ -3,6 +3,7 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, Clock, Calendar, Tag, BookOpen } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
@@ -30,7 +31,7 @@ export default function BlogPage() {
       {/* Hero */}
       <section className="relative bg-surface-dark text-white py-20 sm:py-28 overflow-hidden">
         <div className="absolute inset-0">
-          <img src="https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&w=1920&q=80" alt="" className="img-cover opacity-20" />
+          <Image src="https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&w=1920&q=80" alt="" fill className="img-cover opacity-20" priority />
           <div className="hero-overlay absolute inset-0" />
         </div>
         <div className="absolute inset-0 dot-pattern opacity-20" />
@@ -54,7 +55,7 @@ export default function BlogPage() {
             <Link href={`/blog/${featured.slug}`} className="group block">
               <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                 <div className="relative aspect-[16/10] rounded-2xl overflow-hidden">
-                  <img src={featured.image} alt={featured.title} className="img-cover group-hover:scale-105 transition-transform duration-500" />
+                  <Image src={featured.image} alt={featured.title} fill className="img-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute top-4 left-4">
                     <span className={`text-[11px] font-bold px-3 py-1 rounded-full ${categoryColors[featured.category] || 'bg-primary/10 text-primary'}`}>
                       {featured.category}
@@ -99,7 +100,7 @@ export default function BlogPage() {
                 <Link href={`/blog/${post.slug}`} className="group block h-full">
                   <div className="bg-white rounded-2xl overflow-hidden border border-sand-dark/20 h-full flex flex-col card-hover">
                     <div className="relative aspect-[16/10] overflow-hidden">
-                      <img src={post.image} alt={post.title} className="img-cover group-hover:scale-105 transition-transform duration-500" />
+                      <Image src={post.image} alt={post.title} fill className="img-cover group-hover:scale-105 transition-transform duration-500" />
                       <div className="absolute top-3 left-3">
                         <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${categoryColors[post.category] || 'bg-primary/10 text-primary'}`}>
                           {post.category}

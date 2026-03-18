@@ -74,7 +74,8 @@ export default function TransportPage() {
       </div>
 
       <div className="bg-surface rounded-2xl border border-sand-dark/20 overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="table-responsive">
+        <table className="w-full text-sm min-w-[800px]">
           <thead className="bg-sand/40 border-b border-sand-dark/20"><tr>
             <th className="text-left px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Caravan</th>
             <th className="text-left px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Route</th>
@@ -108,6 +109,7 @@ export default function TransportPage() {
             ))}
           </tbody>
         </table>
+        </div>
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-sand-dark/20"><p className="text-xs text-warm-gray/70">Pagina {page}/{totalPages}</p><div className="flex gap-1"><button disabled={page<=1} onClick={()=>setPage(p=>p-1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors"><ChevronLeft size={16} className="text-warm-gray/70"/></button><button disabled={page>=totalPages} onClick={()=>setPage(p=>p+1)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 disabled:opacity-30 transition-colors"><ChevronRight size={16} className="text-warm-gray/70"/></button></div></div>
         )}

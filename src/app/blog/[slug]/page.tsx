@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowLeft, ArrowRight, Clock, Calendar, Tag, Share2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { BLOG_POSTS, getPostBySlug } from '@/lib/blog-data';
@@ -46,7 +47,7 @@ export default function BlogPostPage() {
       {/* Hero */}
       <section className="relative bg-surface-dark text-white py-16 sm:py-24 overflow-hidden">
         <div className="absolute inset-0">
-          <img src={post.image} alt="" className="img-cover opacity-20" />
+          <Image src={post.image} alt="" fill className="img-cover opacity-20" priority />
           <div className="hero-overlay absolute inset-0" />
         </div>
         <div className="absolute inset-0 dot-pattern opacity-20" />
@@ -128,7 +129,7 @@ export default function BlogPostPage() {
                 <Link key={rp.slug} href={`/blog/${rp.slug}`} className="group block">
                   <div className="bg-white rounded-2xl overflow-hidden border border-sand-dark/20 card-hover">
                     <div className="relative aspect-[16/10] overflow-hidden">
-                      <img src={rp.image} alt={rp.title} className="img-cover group-hover:scale-105 transition-transform duration-500" />
+                      <Image src={rp.image} alt={rp.title} fill className="img-cover group-hover:scale-105 transition-transform duration-500" />
                     </div>
                     <div className="p-5">
                       <div className="flex items-center gap-3 text-[11px] text-warm-gray mb-2">

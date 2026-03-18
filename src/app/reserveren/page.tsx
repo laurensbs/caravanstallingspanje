@@ -25,11 +25,20 @@ const STORAGE_TYPES = [
 
 const EXTRAS = [
   { id: "cleaning_basic", label: "Basis schoonmaak", price: 75, icon: Droplets, desc: "Exterieur wassen + interieur stofzuigen" },
-  { id: "cleaning_premium", label: "Premium schoonmaak", price: 145, icon: Sparkles, desc: "Compleet binnen- en buitenreiniging" },
+  { id: "cleaning_premium", label: "Premium schoonmaak", price: 145, icon: Sparkles, desc: "Compleet binnen- en buitenreiniging", popular: true },
   { id: "ready_service", label: "Klaarzet-service", price: 50, icon: Zap, desc: "Caravan staat klaar bij aankomst" },
   { id: "maintenance_check", label: "Technische keuring", price: 125, icon: Shield, desc: "Volledige technische inspectie" },
-  { id: "transport", label: "Transport service", price: 0, icon: Truck, desc: "Ophalen/afzetten op camping — op aanvraag", onRequest: true },
+  { id: "transport", label: "Transport service", price: 0, icon: Truck, desc: "Ophalen/afzetten op camping \u2014 op aanvraag", onRequest: true },
 ];
+
+const BUNDLE_DEAL = {
+  id: "bundle_premium",
+  label: "Zorgeloos Pakket",
+  includes: ["cleaning_premium", "ready_service", "maintenance_check"],
+  normalPrice: 320,
+  bundlePrice: 269,
+  savings: 51,
+};
 
 function BookingPageInner() {
   const searchParams = useSearchParams();
@@ -75,6 +84,16 @@ function BookingPageInner() {
       ...f,
       extras: f.extras.includes(id) ? f.extras.filter(e => e !== id) : [...f.extras, id],
     }));
+  };
+
+  const toggleBundle = () => {
+    const bundleIds = BUNDLE_DEAL.includes;
+    const hasAll = bundleIds.every(id => form.extras.includes(id));
+    if (hasAll) {
+      setForm(f => ({ ...f, extras: f.extras.filter(e => !bundleIds.includes(e)) }));
+    } else {
+      setForm(f => ({ ...f, extras: [...new Set([...f.extras, ...bundleIds])] }));
+    }
   };
 
   const checkAvailability = async () => {
@@ -149,10 +168,16 @@ function BookingPageInner() {
   };
 
   const selectedType = STORAGE_TYPES.find(t => t.id === form.storageType);
-  const extrasTotal = form.extras.reduce((sum, id) => {
-    const extra = EXTRAS.find(e => e.id === id);
-    return sum + (extra?.price || 0);
-  }, 0);
+  const hasBundle = BUNDLE_DEAL.includes.every(id => form.extras.includes(id));
+  const extrasTotal = hasBundle
+    ? BUNDLE_DEAL.bundlePrice + form.extras.filter(id => !BUNDLE_DEAL.includes.includes(id)).reduce((sum, id) => {
+        const extra = EXTRAS.find(e => e.id === id);
+        return sum + (extra?.price || 0);
+      }, 0)
+    : form.extras.reduce((sum, id) => {
+        const extra = EXTRAS.find(e => e.id === id);
+        return sum + (extra?.price || 0);
+      }, 0);
 
   return (
     <>
@@ -163,9 +188,14 @@ function BookingPageInner() {
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3">Online reserveren</p>
+            <p className="text-accent-light text-xs font-bold tracking-[0.2em] uppercase mb-3">Online reserveren</p>
             <h1 className="text-3xl sm:text-4xl font-black text-white mb-3">Reserveer uw stallingsplek</h1>
-            <p className="text-white/40 text-sm max-w-lg mx-auto">In enkele stappen uw caravan veilig gestald aan de Costa Brava.</p>
+            <p className="text-white/40 text-sm max-w-lg mx-auto mb-6">In enkele stappen uw caravan veilig gestald aan de Costa Brava.</p>
+            <div className="flex items-center justify-center gap-4 text-xs text-white/30">
+              <span className="flex items-center gap-1.5"><Shield size={12} className="text-white/40" /> Gratis annuleren</span>
+              <span className="flex items-center gap-1.5"><Lock size={12} className="text-white/40" /> Veilig betalen via Stripe</span>
+              <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-white/40" /> Direct bevestiging</span>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -189,6 +219,12 @@ function BookingPageInner() {
                   <div>
                     <h2 className="text-xl font-black mb-1">Kies uw stallingtype</h2>
                     <p className="text-sm text-muted">Alle prijzen inclusief beveiliging, verzekering en tweewekelijkse controle.</p>
+                  </div>
+
+                  {/* Urgency bar */}
+                  <div className="bg-warning/10 border border-warning/25 rounded-xl px-4 py-3 flex items-center gap-3">
+                    <div className="w-2 h-2 bg-warning rounded-full animate-pulse shrink-0" />
+                    <p className="text-xs text-warning font-medium">Momenteel hoge vraag &mdash; reserveer tijdig om uw voorkeursplek te garanderen.</p>
                   </div>
 
                   <div className="grid sm:grid-cols-3 gap-4">
@@ -257,6 +293,13 @@ function BookingPageInner() {
                       </div>
                     </div>
                   )}
+
+                  {/* Trust signals */}
+                  <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 py-3 text-xs text-muted">
+                    <span className="flex items-center gap-1.5"><Shield size={12} className="text-success" /> Securitas Direct beveiligd</span>
+                    <span className="flex items-center gap-1.5"><Star size={12} className="text-primary" /> 4.9/5 Google reviews</span>
+                    <span className="flex items-center gap-1.5"><CheckCircle size={12} className="text-ocean" /> 2000+ caravans gestald</span>
+                  </div>
                 </div>
               )}
 
@@ -350,6 +393,39 @@ function BookingPageInner() {
                     <p className="text-sm text-muted">Optioneel: voeg extra services toe aan uw boeking.</p>
                   </div>
 
+                  {/* Bundle Deal */}
+                  {(() => {
+                    const hasBundle = BUNDLE_DEAL.includes.every(id => form.extras.includes(id));
+                    return (
+                      <button onClick={toggleBundle} className={`w-full text-left p-5 rounded-2xl border-2 transition-all duration-200 relative upsell-highlight ${hasBundle ? "border-primary bg-primary/[0.04] shadow-lg shadow-primary/10 ring-1 ring-primary/10" : "border-primary/30 bg-gradient-to-r from-primary/[0.03] to-surface hover:border-primary/50"}`}>
+                        <div className="absolute -top-3 left-4">
+                          <span className="bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">Bespaar \u20AC{BUNDLE_DEAL.savings}</span>
+                        </div>
+                        <div className="flex items-center gap-4 mt-1">
+                          <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                            <Star size={22} className="text-primary" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-bold text-sm flex items-center gap-2">{BUNDLE_DEAL.label} <span className="text-[10px] font-semibold bg-accent/10 text-accent px-2 py-0.5 rounded-full">Meest gekozen</span></h4>
+                            <p className="text-xs text-muted mt-0.5">Premium schoonmaak + klaarzet-service + technische keuring</p>
+                          </div>
+                          <div className="shrink-0 text-right">
+                            <span className="text-xs text-muted line-through">\u20AC{BUNDLE_DEAL.normalPrice}</span>
+                            <span className="text-lg font-black text-primary block">\u20AC{BUNDLE_DEAL.bundlePrice}</span>
+                          </div>
+                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${hasBundle ? "bg-primary border-primary" : "border-zinc-300"}`}>
+                            {hasBundle && <CheckCircle size={14} className="text-white" />}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })()}
+
+                  <div className="relative">
+                    <div className="absolute inset-x-0 top-1/2 border-t border-sand-dark/20" />
+                    <p className="relative text-center text-xs text-muted bg-surface px-3 mx-auto w-fit">of kies individuele services</p>
+                  </div>
+
                   <div className="space-y-3">
                     {EXTRAS.map(extra => (
                       <button
@@ -364,14 +440,17 @@ function BookingPageInner() {
                           <extra.icon size={22} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-bold text-sm">{extra.label}</h4>
+                          <h4 className="font-bold text-sm flex items-center gap-2">
+                            {extra.label}
+                            {extra.popular && <span className="text-[10px] font-semibold bg-warning/10 text-warning px-2 py-0.5 rounded-full">Populair</span>}
+                          </h4>
                           <p className="text-xs text-muted mt-0.5">{extra.desc}</p>
                         </div>
                         <div className="shrink-0 text-right">
                           {extra.onRequest ? (
                             <span className="text-xs font-semibold text-muted">Op aanvraag</span>
                           ) : (
-                            <span className="text-lg font-black">€{extra.price}</span>
+                            <span className="text-lg font-black">\u20AC{extra.price}</span>
                           )}
                         </div>
                         {!extra.onRequest && (
@@ -383,20 +462,43 @@ function BookingPageInner() {
                     ))}
                   </div>
 
+                  {/* Trust signal */}
+                  <div className="flex items-center justify-center gap-4 py-3 text-xs text-muted">
+                    <span className="flex items-center gap-1.5"><Shield size={12} className="text-success" /> Geen verborgen kosten</span>
+                    <span className="flex items-center gap-1.5"><Star size={12} className="text-primary" /> 4.9/5 beoordeling</span>
+                    <span className="flex items-center gap-1.5"><Lock size={12} className="text-ocean" /> Veilig betalen</span>
+                  </div>
+
                   {/* Summary */}
                   <div className="bg-surface rounded-2xl p-6 border border-black/[0.04]">
                     <h3 className="font-bold text-sm mb-4">Overzicht kosten</h3>
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted">{selectedType?.label}</span>
-                        <span className="font-semibold">€{selectedType?.price}/mnd</span>
+                        <span className="font-semibold">\u20AC{selectedType?.price}/mnd</span>
                       </div>
-                      {form.extras.map(id => {
+                      {hasBundle ? (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-primary font-medium flex items-center gap-1.5"><Star size={12} /> {BUNDLE_DEAL.label}</span>
+                          <span className="font-semibold"><span className="line-through text-muted text-xs mr-1">\u20AC{BUNDLE_DEAL.normalPrice}</span>\u20AC{BUNDLE_DEAL.bundlePrice} eenmalig</span>
+                        </div>
+                      ) : (
+                        form.extras.map(id => {
+                          const extra = EXTRAS.find(e => e.id === id);
+                          return extra ? (
+                            <div key={id} className="flex justify-between text-sm">
+                              <span className="text-muted">{extra.label}</span>
+                              <span className="font-semibold">\u20AC{extra.price} eenmalig</span>
+                            </div>
+                          ) : null;
+                        })
+                      )}
+                      {hasBundle && form.extras.filter(id => !BUNDLE_DEAL.includes.includes(id)).map(id => {
                         const extra = EXTRAS.find(e => e.id === id);
                         return extra ? (
                           <div key={id} className="flex justify-between text-sm">
                             <span className="text-muted">{extra.label}</span>
-                            <span className="font-semibold">€{extra.price} eenmalig</span>
+                            <span className="font-semibold">\u20AC{extra.price} eenmalig</span>
                           </div>
                         ) : null;
                       })}

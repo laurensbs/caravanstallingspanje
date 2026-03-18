@@ -3,6 +3,7 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Shield, Wrench, Truck, ShoppingBag, Bike, SprayCan, ArrowRight, CheckCircle, Phone, Sparkles, ThermometerSnowflake, Wind, Eye, Camera, Lock, Zap, Award, Clock, MapPin, Users, FileCheck } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
@@ -21,7 +22,7 @@ export default function DienstenPage() {
       {/* Hero */}
       <section className="relative bg-surface-dark text-white py-20 sm:py-28 overflow-hidden">
         <div className="absolute inset-0">
-          <img src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1920&q=80" alt="" className="img-cover opacity-20" />
+          <Image src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1920&q=80" alt="" fill className="object-cover opacity-20" priority />
           <div className="hero-overlay absolute inset-0" />
         </div>
         <div className="absolute inset-0 dot-pattern opacity-20" />
@@ -106,7 +107,7 @@ export default function DienstenPage() {
                 </Link>
               </div>
               <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
-                <img src="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=800&q=80" alt="Beveiligd stallingsterrein aan de Costa Brava" className="img-cover" />
+                <Image src="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=800&q=80" alt="Beveiligd stallingsterrein aan de Costa Brava" fill className="object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-surface-dark/40 to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4">
                   <p className="text-white text-xs font-medium bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-lg inline-block">Sant Climent de Peralta, Girona</p>
