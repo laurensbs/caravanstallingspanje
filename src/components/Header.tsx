@@ -70,9 +70,9 @@ export default function Header() {
   return (
     <>
       {/* Top bar - desktop only */}
-      <div className={`hidden lg:block transition-all duration-300 ${scrolled ? 'h-0 opacity-0 overflow-hidden' : 'h-auto opacity-100'} ${isHome ? 'bg-hero/40 backdrop-blur-sm' : 'bg-sand/50 border-b border-sand-dark/30'}`}>
+      <div className={`hidden lg:block transition-all duration-300 ${scrolled ? 'h-0 opacity-0 overflow-hidden' : 'h-auto opacity-100'} ${isHome ? 'bg-hero/80 backdrop-blur-md' : 'bg-hero border-b border-white/5'}`}>
         <div className="max-w-7xl mx-auto px-6 py-2 flex items-center justify-between">
-          <div className={`flex items-center gap-6 text-xs ${isHome ? 'text-white/70' : 'text-warm-gray'}`}>
+          <div className={`flex items-center gap-6 text-xs ${isHome ? 'text-white/80' : 'text-white/80'}`}>
             <a href="tel:+34650036755" className="flex items-center gap-1.5 hover:text-primary transition-colors">
               <Phone size={11} /> +34 650 036 755
             </a>
@@ -84,12 +84,12 @@ export default function Header() {
             </span>
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/mijn-account" className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${isHome ? 'text-white/70 hover:text-white' : 'text-warm-gray hover:text-surface-dark'}`}>
+            <Link href="/mijn-account" className={`flex items-center gap-1.5 text-xs font-medium transition-colors text-white/80 hover:text-white`}>
               <User size={12} /> Mijn Account
             </Link>
             <div className="w-px h-3.5 bg-current opacity-15" />
             <div ref={langRef} className="relative">
-              <button onClick={() => setLangOpen(!langOpen)} className={`flex items-center gap-1.5 text-xs ${isHome ? 'text-white/70 hover:text-white' : 'text-warm-gray hover:text-surface-dark'} transition-colors`}>
+              <button onClick={() => setLangOpen(!langOpen)} className={`flex items-center gap-1.5 text-xs text-white/80 hover:text-white transition-colors`}>
                 <Globe size={12} />
                 <span>{currentFlag}</span>
                 <ChevronDown size={10} className={`transition-transform ${langOpen ? 'rotate-180' : ''}`} />

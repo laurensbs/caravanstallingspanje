@@ -15,7 +15,7 @@ const stallingFaqs = [
   { q: 'Hoe vaak wordt mijn caravan gecontroleerd?', a: 'Elke twee weken lopen onze medewerkers langs alle gestalde caravans voor een visuele controle op storm-, hagel- en weerschade. Jaarlijks voeren wij een volledige technische keuring uit inclusief vochtmeting.' },
   { q: 'Kan ik mijn caravan op elk moment ophalen?', a: 'Tijdens onze openingstijden (ma-vr 09:30-16:30) kunt u uw caravan ophalen. Wij vragen wel om minimaal 48 uur van tevoren contact op te nemen, zodat wij uw caravan kunnen voorbereiden en rijklaar zetten.' },
   { q: 'Kan ik ook een camper, vouwwagen of boot stallen?', a: 'Ja, wij stallen naast caravans ook campers (integraal en halfintegraal), vouwwagens, boten en trailers. Tarieven zijn afhankelijk van de afmetingen. Neem contact op voor een offerte op maat.' },
-  { q: 'Wat kost binnenstalling versus buitenstalling?', a: 'Buitenstalling begint vanaf €65 per maand, binnenstalling vanaf €95 per maand en seizoensstalling (oktober-april) vanaf €45 per maand. Alle prijzen zijn inclusief beveiliging, verzekering en controles.' },
+  { q: 'Wat kost binnenstalling versus buitenstalling?', a: 'Buitenstalling begint vanaf €65 per maand, binnenstalling vanaf €95 per maand. Alle prijzen zijn inclusief beveiliging, verzekering en controles.' },
 ];
 
 
@@ -24,7 +24,7 @@ export default function StallingPage() {
     <>
       <Header />
 
-      <PageHero badge="Caravanstalling" title={<>Veilige stalling aan de <span className="gradient-text">Costa Brava</span></>} subtitle="Al meer dan 20 jaar dé specialist in het veilig en betrouwbaar stallen van caravans, campers, vouwwagens en boten in Sant Climent de Peralta. Securitas Direct bewaking, 24/7 camerabewaking en standaard verzekerd." image="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1920&q=80" />
+      <PageHero badge="Caravanstalling" title={<>Veilige stalling aan de <span className="gradient-text">Costa Brava</span></>} subtitle="Al meer dan 20 jaar dé specialist in het veilig en betrouwbaar stallen van caravans, campers, vouwwagens en boten in Sant Climent de Peralta. Securitas Direct bewaking, 24/7 camerabewaking en standaard verzekerd." image="https://u.cubeupload.com/laurensbos/caravanstoragespain3.jpg" />
 
       {/* Intro / Waarom bij ons stallen */}
       <section className="py-20 sm:py-28 bg-card">
@@ -85,7 +85,7 @@ export default function StallingPage() {
             <p className="text-warm-gray">Alle stallingstypen inclusief beveiliging, verzekering en tweewekelijkse controle.</p>
           </A>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {[
               {
                 title: 'Buitenstalling', icon: Shield, price: '65',
@@ -98,12 +98,6 @@ export default function StallingPage() {
                 desc: 'Maximale bescherming in onze geïsoleerde hal. Geen hitte, geen kou, geen UV-straling. Ideaal voor nieuwere of duurdere caravans die u optimaal wilt beschermen.',
                 features: ['Geïsoleerde overdekte hal', 'Geen UV-schade of verbleking', 'Stabiele temperatuur', 'Geen mos- of algvorming', 'Alle voordelen buitenstalling', 'Beperkte beschikbaarheid', 'Reserveer tijdig'],
                 tag: 'Premium', gradient: 'bg-ocean/10 text-ocean'
-              },
-              {
-                title: 'Seizoensstalling', icon: Clock, price: '45',
-                desc: 'Voordeliger tarief voor stalling uitsluitend buiten het kampeerseizoen (oktober t/m april). Ideaal als u uw caravan in de winter veilig wilt onderbrengen.',
-                features: ['Buitenstalling terrein', 'Oktober t/m april', 'Securitas Direct alarm', 'Standaard verzekerd', 'Camerabewaking', 'Controle tijdens stalling', 'Upgrade naar jaarcontract mogelijk'],
-                tag: 'Voordelig', gradient: 'bg-warning/10 text-warning'
               },
             ].map((t, i) => (
               <A key={t.title} delay={i * 0.1}>
@@ -245,9 +239,9 @@ export default function StallingPage() {
                 <div className="section-divider mt-0 mb-6 mx-auto lg:mx-0" />
                 <p className="text-warm-gray mb-4 leading-relaxed">Elke caravan krijgt bij ons een eigen, vaste plek met een uniek pleknummer. Zo weet u altijd precies waar uw caravan staat en kunnen wij efficiënt werken bij controles, reparaties en transport.</p>
                 <p className="text-warm-gray mb-4 leading-relaxed">Via uw persoonlijk klantportaal kunt u altijd uw pleknummer, contractstatus, inspectierapportages en facturen online inzien. U kunt ook service aanvragen indienen voor reparatie, schoonmaak of transport.</p>
-                <p className="text-warm-gray mb-8 leading-relaxed">Ons terrein is ingedeeld in overzichtelijke zones. De buitenstalling is verdeeld over zones A tot en met D, de binnenstalling is zone H, en de seizoensstalling heeft een eigen zone S.</p>
+                <p className="text-warm-gray mb-8 leading-relaxed">Ons terrein is ingedeeld in overzichtelijke zones. De buitenstalling is verdeeld over zones A tot en met D, en de binnenstalling is zone H.</p>
                 <div className="space-y-3 text-left max-w-sm mx-auto lg:mx-0">
-                  {['Zones A-D: Buitenstalling (jaarrond)', 'Zone H: Binnenstalling (geïsoleerde hal)', 'Zone S: Seizoensstalling (oktober-april)'].map(z => (
+                  {['Zones A-D: Buitenstalling (jaarrond)', 'Zone H: Binnenstalling (geïsoleerde hal)'].map(z => (
                     <div key={z} className="flex items-center gap-3 text-sm"><CheckCircle size={14} className="text-success shrink-0" /><span className="font-medium">{z}</span></div>
                   ))}
                 </div>

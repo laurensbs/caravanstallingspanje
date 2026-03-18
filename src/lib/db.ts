@@ -220,6 +220,26 @@ export async function initDatabase() {
     created_at TIMESTAMP DEFAULT NOW()
   )`;
 
+  await sql`CREATE TABLE IF NOT EXISTS leads (
+    id SERIAL PRIMARY KEY,
+    email TEXT NOT NULL,
+    name TEXT,
+    phone TEXT,
+    interest TEXT,
+    storage_type TEXT,
+    caravan_brand TEXT,
+    caravan_length TEXT,
+    services TEXT,
+    timeframe TEXT,
+    source TEXT DEFAULT 'quiz',
+    status TEXT DEFAULT 'nieuw',
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT NOW()
+  )`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_leads_email ON leads(email)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_leads_status ON leads(status)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_leads_created ON leads(created_at DESC)`;
+
   await sql`CREATE TABLE IF NOT EXISTS notifications (
     id SERIAL PRIMARY KEY,
     user_type TEXT NOT NULL,

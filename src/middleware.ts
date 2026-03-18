@@ -32,7 +32,7 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
     "script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://www.googletagmanager.com https://www.google-analytics.com https://embed.tawk.to",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
-    "img-src 'self' data: https://images.unsplash.com https://*.googleapis.com https://*.gstatic.com https://www.google-analytics.com https://www.googletagmanager.com blob:",
+    "img-src 'self' data: https://images.unsplash.com https://u.cubeupload.com https://*.googleapis.com https://*.gstatic.com https://www.google-analytics.com https://www.googletagmanager.com blob:",
     "frame-src https://www.google.com https://maps.google.com https://js.stripe.com https://tawk.to",
     "connect-src 'self' https://api.stripe.com https://*.neon.tech https://www.google-analytics.com https://analytics.google.com https://*.sentry.io https://*.tawk.to wss://*.tawk.to",
     "worker-src 'self' blob:",

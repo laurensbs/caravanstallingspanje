@@ -9,6 +9,8 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import A from "@/components/AnimateIn";
 import ReviewsWidget from "@/components/ReviewsWidget";
+import BrandSlider from "@/components/BrandSlider";
+import QuizModal from "@/components/QuizModal";
 import { useT } from "@/lib/i18n";
 import { BLOG_POSTS } from "@/lib/blog-data";
 
@@ -19,6 +21,7 @@ export default function HomePage() {
   const t = useT();
   const [booking, setBooking] = useState({ type: "buiten", length: "", start: "", location: "sant-climent" });
   const [checkingAvail, setCheckingAvail] = useState(false);
+  const [quizOpen, setQuizOpen] = useState(false);
   const [availSpots, setAvailSpots] = useState<number | null>(null);
 
   const reviewSchema = {
@@ -63,7 +66,7 @@ export default function HomePage() {
       {/* ═══ HERO ═══ */}
       <section id="main-content" className="relative min-h-[92vh] flex items-center bg-hero overflow-hidden">
         <div className="absolute inset-0">
-          <Image src="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1920&q=80" alt="Caravanstalling terrein" fill sizes="100vw" className="object-cover opacity-25" priority />
+          <Image src="https://u.cubeupload.com/laurensbos/caravanstoragespain.jpg" alt="Caravanstalling terrein" fill sizes="100vw" className="object-cover opacity-25" priority />
           <div className="hero-overlay absolute inset-0" />
         </div>
         <div className="absolute inset-0 dot-pattern opacity-30" />
@@ -132,11 +135,10 @@ export default function HomePage() {
                   <form onSubmit={handleBooking} className="space-y-4">
                     <div>
                       <label className="text-[11px] font-semibold text-warm-gray block mb-2 uppercase tracking-wider">Type stalling</label>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {[
                           { val: "buiten", label: "Buitenstalling", price: "€65/mnd" },
                           { val: "binnen", label: "Binnenstalling", price: "€95/mnd" },
-                          { val: "seizoen", label: "Seizoensstalling", price: "€45/mnd" },
                         ].map(o => (
                           <button key={o.val} type="button" onClick={() => setBooking({ ...booking, type: o.val })} className={`p-3 rounded-xl text-center transition-all text-xs border ${booking.type === o.val ? "bg-primary/[0.07] border-primary text-primary font-bold ring-1 ring-primary/20" : "bg-sand/50 border-sand-dark/30 text-warm-gray hover:border-primary/20"}`}>
                             <div className="font-semibold text-[12px]">{o.label}</div>
@@ -194,6 +196,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ═══ BRAND SLIDER ═══ */}
+      <BrandSlider />
 
       {/* ═══ DIENSTEN BAR ═══ */}
       <section className="bg-card border-b border-sand-dark/20">
@@ -253,7 +258,7 @@ export default function HomePage() {
 
       {/* ═══ IMAGE BREAK ═══ */}
       <section className="relative h-[320px] sm:h-[420px] overflow-hidden">
-        <Image src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1920&q=80" alt="Costa Brava terrein" fill sizes="100vw" className="object-cover" />
+        <Image src="https://u.cubeupload.com/laurensbos/caravanstoragespain4.jpg" alt="Costa Brava terrein" fill sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-surface-dark/80 via-surface-dark/20 to-transparent" />
         <div className="absolute bottom-0 inset-x-0 max-w-7xl mx-auto px-4 sm:px-6 pb-10 sm:pb-14 text-center">
           <p className="text-white/70 text-sm font-medium mb-2">Sant Climent de Peralta, Girona</p>
@@ -271,11 +276,10 @@ export default function HomePage() {
             <p className="text-warm-gray leading-relaxed">Transparante maandtarieven inclusief beveiliging, verzekering en tweewekelijkse controle.</p>
           </A>
 
-          <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div className="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
             {[
               { title: "Buitenstalling", price: "65", desc: "Beveiligd buitenterrein met 24/7 bewaking", features: ["Securitas Direct alarm", "24/7 camerabewaking", "Standaard verzekerd", "Tweewekelijkse controle", "Jaarlijkse keuring"], popular: false },
               { title: "Binnenstalling", price: "95", desc: "Overdekte hal met klimaatbescherming", features: ["Geïsoleerde hal", "Geen hitte of kou", "Alle voordelen buiten", "Premium locatie", "Beperkt beschikbaar"], popular: true },
-              { title: "Seizoensstalling", price: "45", desc: "Flexibele stalling buiten het seizoen", features: ["Buitenstalling", "Beveiligd terrein", "Camerabewaking", "Min. 6 maanden", "Upgrade mogelijk"], popular: false },
             ].map((p, i) => (
               <A key={p.title} delay={i * 0.1}>
                 <div className={`relative bg-card rounded-2xl p-7 h-full flex flex-col text-center ${p.popular ? 'border-2 border-primary shadow-lg shadow-primary/10 ring-1 ring-primary/10' : 'border border-sand-dark/30'}`}>
@@ -320,7 +324,7 @@ export default function HomePage() {
 
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { step: "01", icon: Phone, title: "Contact opnemen", desc: "Bel, mail of gebruik het formulier op onze website." },
+              { step: "01", icon: Phone, title: "Vertel uw wensen", desc: "Beantwoord een paar vragen en ontvang een voorstel op maat." },
               { step: "02", icon: MapPin, title: "Plek reserveren", desc: "Wij wijzen een vaste plek toe op uw gewenste locatie." },
               { step: "03", icon: Truck, title: "Caravan brengen", desc: "Breng uw caravan of wij halen hem op met ons transport." },
               { step: "04", icon: Shield, title: "Wij zorgen ervoor", desc: "Bewaking, controles, onderhoud – wij regelen alles." },
@@ -454,11 +458,11 @@ export default function HomePage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
           <A>
             <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">Klaar om uw caravan veilig te stallen?</h2>
-            <p className="text-white/60 mb-8 max-w-lg mx-auto">Neem contact op of vraag direct een stallingsplek aan. Wij reageren binnen 24 uur.</p>
+            <p className="text-white/60 mb-8 max-w-lg mx-auto">Vertel ons uw wensen en ontvang binnen 1 werkdag een persoonlijk voorstel — geheel vrijblijvend.</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link href="/reserveren" className="bg-primary hover:bg-primary-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all duration-200 inline-flex items-center gap-2 shadow-sm">
-                Direct reserveren <ArrowRight size={15} />
-              </Link>
+              <button onClick={() => setQuizOpen(true)} className="bg-primary hover:bg-primary-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all duration-200 inline-flex items-center gap-2 shadow-sm cursor-pointer">
+                Ontvang een voorstel <ArrowRight size={15} />
+              </button>
               <a href="tel:+34650036755" className="text-white/60 hover:text-white font-medium px-6 py-3.5 rounded-xl text-sm transition-colors inline-flex items-center gap-2 border border-white/10 hover:border-white/20">
                 <Phone size={15} /> +34 650 036 755
               </a>
@@ -467,6 +471,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      <QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} source="homepage" />
       <Footer />
     </>
   );

@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Link from 'next/link';
-import { X, ArrowRight, Shield, Gift } from 'lucide-react';
+import { X, ArrowRight, Shield, Gift, CheckCircle, Mail } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ExitIntentPopup() {
   const [show, setShow] = useState(false);
+  const [email, setEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleMouseLeave = useCallback((e: MouseEvent) => {
     if (e.clientY <= 5 && !show) {
@@ -25,6 +27,25 @@ export default function ExitIntentPopup() {
   const dismiss = () => {
     setShow(false);
     sessionStorage.setItem('exit-popup-dismissed', '1');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || submitting) return;
+    setSubmitting(true);
+    try {
+      await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: 'exit-intent', interest: 'offerte' }),
+      });
+      setSubmitted(true);
+      setTimeout(dismiss, 3000);
+    } catch {
+      setSubmitted(true);
+      setTimeout(dismiss, 3000);
+    }
+    setSubmitting(false);
   };
 
   return (
@@ -53,32 +74,56 @@ export default function ExitIntentPopup() {
               <X size={16} />
             </button>
 
-            <div className="text-center">
-              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-5">
-                <Gift size={24} className="text-primary" />
-              </div>
-              <h3 className="text-2xl font-black mb-2">Wacht even!</h3>
-              <p className="text-warm-gray text-sm leading-relaxed mb-6">
-                Vraag vandaag nog een <strong className="text-surface-dark">gratis vrijblijvende offerte</strong> aan en ontvang een overzicht van onze tarieven op maat. Inclusief alle mogelijkheden voor stalling, onderhoud en transport.
-              </p>
-
-              <div className="flex items-center gap-3 justify-center mb-6">
-                <div className="flex items-center gap-1.5 text-xs text-warm-gray">
-                  <Shield size={12} className="text-success" /> Geen verplichtingen
+            {submitted ? (
+              <div className="text-center py-4">
+                <div className="w-14 h-14 bg-accent/15 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle size={24} className="text-accent" />
                 </div>
-                <div className="flex items-center gap-1.5 text-xs text-warm-gray">
-                  <Shield size={12} className="text-success" /> Reactie binnen 24 uur
-                </div>
+                <h3 className="text-xl font-black mb-2">Bedankt!</h3>
+                <p className="text-sm text-warm-gray">Wij sturen u binnen 24 uur een persoonlijke offerte op maat.</p>
               </div>
+            ) : (
+              <div className="text-center">
+                <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                  <Gift size={24} className="text-primary" />
+                </div>
+                <h3 className="text-2xl font-black mb-2">Gratis offerte op maat</h3>
+                <p className="text-warm-gray text-sm leading-relaxed mb-6">
+                  Laat uw e-mailadres achter en ontvang binnen 24 uur een <strong className="text-surface-dark">persoonlijk aanbod</strong> met onze tarieven voor stalling, onderhoud en transport.
+                </p>
 
-              <div className="flex flex-col gap-3">
-                <Link
-                  href="/contact"
-                  onClick={dismiss}
-                  className="w-full bg-primary hover:bg-primary-dark text-white font-bold px-6 py-3.5 rounded-xl text-sm transition-all inline-flex items-center justify-center gap-2 shadow-sm"
-                >
-                  Gratis offerte aanvragen <ArrowRight size={14} />
-                </Link>
+                <form onSubmit={handleSubmit} className="mb-4">
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Mail size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-warm-gray/40" />
+                      <input
+                        type="email"
+                        required
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 bg-sand/40 border border-sand-dark/40 rounded-xl text-sm focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all"
+                        placeholder="uw@email.com"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="bg-primary hover:bg-primary-dark text-white font-bold px-5 py-3 rounded-xl text-sm transition-all flex items-center gap-1.5 disabled:opacity-50 shadow-sm shrink-0"
+                    >
+                      {submitting ? '...' : <><span className="hidden sm:inline">Verstuur</span> <ArrowRight size={14} /></>}
+                    </button>
+                  </div>
+                </form>
+
+                <div className="flex items-center gap-3 justify-center mb-5">
+                  <div className="flex items-center gap-1.5 text-xs text-warm-gray">
+                    <Shield size={12} className="text-success" /> Geen spam
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs text-warm-gray">
+                    <Shield size={12} className="text-success" /> Reactie binnen 24 uur
+                  </div>
+                </div>
+
                 <button
                   onClick={dismiss}
                   className="text-sm text-warm-gray hover:text-primary transition-colors font-medium py-2"
@@ -86,7 +131,7 @@ export default function ExitIntentPopup() {
                   Nee bedankt, ik kijk nog even rond
                 </button>
               </div>
-            </div>
+            )}
           </motion.div>
         </motion.div>
       )}

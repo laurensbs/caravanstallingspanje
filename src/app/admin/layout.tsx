@@ -7,14 +7,15 @@ import {
   LayoutDashboard, Users, Caravan, MapPin, FileText, Receipt, UserCog,
   ClipboardList, Truck, Settings, LogOut, Menu, X, Bell, Search, ChevronDown,
   Wrench, MessageSquare, Shield, Eye, EyeOff, Lock, User, ArrowRight, AlertCircle,
-  BarChart3, CalendarDays, Package,
+  BarChart3, CalendarDays, Package, Target,
 } from 'lucide-react';
 
 type NavItem = { href: string; icon: typeof LayoutDashboard; label: string; section: string; roles: string[] };
 
 const NAV: NavItem[] = [
   { href: '/admin', icon: LayoutDashboard, label: 'Dashboard', section: '', roles: ['admin', 'staff'] },
-  { href: '/admin/klanten', icon: Users, label: 'Klanten', section: 'Beheer', roles: ['admin'] },
+  { href: '/admin/leads', icon: Target, label: 'Leads', section: 'Beheer', roles: ['admin'] },
+  { href: '/admin/klanten', icon: Users, label: 'Klanten', section: '', roles: ['admin'] },
   { href: '/admin/caravans', icon: Caravan, label: 'Caravans', section: '', roles: ['admin'] },
   { href: '/admin/locaties', icon: MapPin, label: 'Locaties & Plekken', section: '', roles: ['admin'] },
   { href: '/admin/contracten', icon: FileText, label: 'Contracten', section: 'Financieel', roles: ['admin'] },

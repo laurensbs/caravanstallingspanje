@@ -9,16 +9,17 @@ interface Review {
   rating: number;
   text: string;
   date: string;
-  source: 'google' | 'trustpilot';
 }
 
 const REVIEWS: Review[] = [
-  { name: 'Jan de Vries', rating: 5, text: 'Al 3 jaar klant. Caravan staat er altijd perfect bij als we hem ophalen. Top service!', date: '2025-11-15', source: 'google' },
-  { name: 'Maria Bakker', rating: 5, text: 'Eindelijk een stalling waar je op kunt vertrouwen. Beveiligd terrein en ze doen er echt alles aan.', date: '2025-10-22', source: 'google' },
-  { name: 'Peter Jansen', rating: 5, text: 'Transport en winterklaar-service in één keer geregeld. Heel professioneel en goed geprijsd.', date: '2025-09-18', source: 'google' },
-  { name: 'Anneke de Groot', rating: 4, text: 'Fijne stalling aan de Costa Brava. Handig dat ze ook reparaties doen. Communicatie kan soms iets sneller.', date: '2025-08-30', source: 'google' },
-  { name: 'Willem Smit', rating: 5, text: 'Na jaren in NL stallen overgestapt. Scheelt flink in kosten en de caravan staat in Spaans klimaat — geen vochtproblemen meer.', date: '2025-12-05', source: 'trustpilot' },
-  { name: 'Bert & Ellen', rating: 5, text: 'Ze hebben onze hele caravan gerepareerd na hagelschade. Perfect werk, niet van het origineel te onderscheiden.', date: '2025-07-12', source: 'trustpilot' },
+  { name: 'Hans Vermeulen', rating: 5, text: 'Al 4 jaar klant en zeer tevreden. Onze Hobby staat er altijd perfect bij als we hem ophalen. Beveiligd terrein, goede communicatie en eerlijke prijzen. Aanrader!', date: '2025-03-12' },
+  { name: 'Annemarie K.', rating: 5, text: 'Caravan opgehaald na de winter en hij was helemaal schoon en startklaar. Ze hadden ook de accu bijgehouden. Dat noem ik service. Bedankt!', date: '2025-02-28' },
+  { name: 'Peter & Ria Jansen', rating: 5, text: 'Transport vanuit Nederland perfect geregeld. Binnen een week stond onze caravan in Spanje. Scheelt enorm in stallingkosten en geen vochtproblemen meer.', date: '2025-01-15' },
+  { name: 'Willem de Boer', rating: 5, text: 'Na hagelschade de caravan laten repareren via CaravanRepair. Onzichtbaar hersteld, echt vakwerk. Zijn duidelijk specialisten in hun vak.', date: '2024-11-20' },
+  { name: 'Margot Hendriks', rating: 4, text: 'Fijne buitenstalling vlakbij de Costa Brava. Combinatie van stalling en onderhoud is ideaal. Nederlands personeel, dat communiceert makkelijk.', date: '2024-10-08' },
+  { name: 'Rob & Tineke', rating: 5, text: 'Inmiddels 3 caravans gestald. Prijs-kwaliteit is top vergeleken met Nederland. Ze denken altijd mee en spreken gewoon Nederlands. Zo hoort het.', date: '2024-09-02' },
+  { name: 'Gerrit Mulder', rating: 5, text: 'Hele wintercheck laten doen inclusief bandenspanning, accu en koelkast. Alles netjes gecommuniceerd met foto\'s erbij. Erg professioneel.', date: '2024-08-14' },
+  { name: 'Sandra v.d. Berg', rating: 5, text: 'Eerst sceptisch over stallen in het buitenland, maar na een bezoek meteen overtuigd. Mooi terrein, goed beveiligd en alles netjes geregeld.', date: '2024-07-22' },
 ];
 
 export default function ReviewsWidget({ limit = 4 }: { limit?: number }) {
@@ -38,10 +39,10 @@ export default function ReviewsWidget({ limit = 4 }: { limit?: number }) {
           className="text-center mb-12"
         >
           <div className="inline-flex items-center gap-2 bg-warning/10 text-warning px-4 py-1.5 rounded-full text-xs font-bold mb-4">
-            <Star size={13} fill="currentColor" /> {avgRating}/5 — {REVIEWS.length} reviews
+            <Star size={13} fill="currentColor" /> {avgRating}/5 — Google Reviews
           </div>
           <h2 className="text-3xl md:text-4xl font-bold mb-3">Wat onze klanten zeggen</h2>
-          <p className="text-warm-gray max-w-xl mx-auto">Beoordeeld door echte klanten op Google en Trustpilot</p>
+          <p className="text-warm-gray max-w-xl mx-auto">Beoordeeld door echte klanten op Google</p>
         </motion.div>
 
         {/* Reviews grid */}
@@ -61,7 +62,7 @@ export default function ReviewsWidget({ limit = 4 }: { limit?: number }) {
                   </div>
                   <div>
                     <p className="font-semibold text-sm">{review.name}</p>
-                    <p className="text-[11px] text-warm-gray">{review.source === 'google' ? 'Google' : 'Trustpilot'} • {new Date(review.date).toLocaleDateString('nl-NL', { month: 'short', year: 'numeric' })}</p>
+                    <p className="text-[11px] text-warm-gray">Google • {new Date(review.date).toLocaleDateString('nl-NL', { month: 'short', year: 'numeric' })}</p>
                   </div>
                 </div>
                 <div className="flex gap-0.5">
@@ -85,7 +86,7 @@ export default function ReviewsWidget({ limit = 4 }: { limit?: number }) {
             <span className="font-semibold">{avgRating}</span> op Google
           </div>
           <div className="w-px h-4 bg-sand-dark" />
-          <span>{REVIEWS.length}+ reviews</span>
+          <span>{REVIEWS.length}+ beoordelingen</span>
           <div className="w-px h-4 bg-sand-dark" />
           <span>Geverifieerde klanten</span>
         </div>

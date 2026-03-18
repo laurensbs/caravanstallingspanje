@@ -25,7 +25,7 @@ export default function DienstenPage() {
     <>
       <Header />
 
-      <PageHero badge="Onze diensten" title={<>Meer dan alleen <span className="gradient-text">stalling</span></>} subtitle="Caravanstalling Spanje is uw totaalaanbieder aan de Costa Brava. Van veilige stalling en professionele reparaties tot het gepatenteerde CaravanRepair® schadeherstel, transport door heel Europa en verhuur van fietsen en koelkasten." image="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1920&q=80">
+      <PageHero badge="Onze diensten" title={<>Meer dan alleen <span className="gradient-text">stalling</span></>} subtitle="Caravanstalling Spanje is uw totaalaanbieder aan de Costa Brava. Van veilige stalling en professionele reparaties tot het gepatenteerde CaravanRepair® schadeherstel, transport door heel Europa en verhuur van fietsen en koelkasten." image="https://u.cubeupload.com/laurensbos/caravanstoragespain5.jpg">
         <div className="flex flex-wrap justify-center gap-3 mt-8">
           {[
             { icon: Shield, label: 'Stalling', href: '#stalling' },
@@ -105,11 +105,6 @@ export default function DienstenPage() {
                     <p className="text-2xl font-black">€95</p>
                     <p className="text-[10px] text-warm-gray font-medium">Binnen /mnd</p>
                   </div>
-                  <div className="w-px h-10 bg-sand-dark/30" />
-                  <div className="text-center">
-                    <p className="text-2xl font-black">€45</p>
-                    <p className="text-[10px] text-warm-gray font-medium">Seizoen /mnd</p>
-                  </div>
                 </div>
 
                 <Link href="/stalling" className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2">
@@ -117,7 +112,7 @@ export default function DienstenPage() {
                 </Link>
               </div>
               <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
-                <Image src="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=800&q=80" alt="Beveiligd stallingsterrein aan de Costa Brava" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+                <Image src="https://u.cubeupload.com/laurensbos/caravanstoragespain2.jpg" alt="Beveiligd stallingsterrein aan de Costa Brava" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-surface-dark/40 to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4">
                   <p className="text-white text-xs font-medium bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-lg inline-block">Sant Climent de Peralta, Girona</p>

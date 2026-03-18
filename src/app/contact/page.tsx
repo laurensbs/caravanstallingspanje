@@ -2,196 +2,156 @@
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import Link from 'next/link';
-import { MapPin, Phone, Mail, Clock, Send, ArrowRight, MessageCircle, CheckCircle } from 'lucide-react';
-import { useState, FormEvent } from 'react';
+import Image from 'next/image';
+import { MapPin, Phone, Mail, Clock, MessageCircle, ArrowRight, Shield, Star, Users } from 'lucide-react';
+import { useState } from 'react';
 import A from '@/components/AnimateIn';
 import PageHero from '@/components/PageHero';
+import QuizModal from '@/components/QuizModal';
 
 
 export default function ContactPage() {
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [formError, setFormError] = useState('');
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-
-  function validateField(name: string, value: string) {
-    if ((name === 'name' || name === 'email' || name === 'subject' || name === 'message') && !value.trim()) {
-      return 'Dit veld is verplicht';
-    }
-    if (name === 'email' && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-      return 'Voer een geldig e-mailadres in';
-    }
-    return '';
-  }
-
-  function handleBlur(e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
-    const { name, value } = e.target;
-    const error = validateField(name, value);
-    setFieldErrors(prev => ({ ...prev, [name]: error }));
-  }
-
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true);
-    setFormError('');
-    const form = e.currentTarget;
-    const data = {
-      name: (form.elements.namedItem('name') as HTMLInputElement).value,
-      email: (form.elements.namedItem('email') as HTMLInputElement).value,
-      phone: (form.elements.namedItem('phone') as HTMLInputElement).value,
-      subject: (form.elements.namedItem('subject') as HTMLSelectElement).value,
-      message: (form.elements.namedItem('message') as HTMLTextAreaElement).value,
-    };
-
-    // Client-side validation
-    const errors: Record<string, string> = {};
-    for (const [key, val] of Object.entries(data)) {
-      const err = validateField(key, val);
-      if (err) errors[key] = err;
-    }
-    if (Object.keys(errors).length > 0) {
-      setFieldErrors(errors);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const res = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-      if (!res.ok) throw new Error('Verzenden mislukt');
-      setSubmitted(true);
-    } catch {
-      setFormError('Er ging iets mis bij het verzenden. Probeer het opnieuw of bel ons op +34 650 036 755.');
-    } finally {
-      setLoading(false);
-    }
-  }
+  const [quizOpen, setQuizOpen] = useState(false);
 
   return (
     <>
       <Header />
 
-      <PageHero badge="Contact" title={<>Neem <span className="gradient-text">contact</span> op</>} subtitle="Heeft u vragen over stalling, reparatie, transport of een van onze andere diensten? Wilt u een offerte of een afspraak maken? Wij staan graag voor u klaar. Wij spreken Nederlands, Engels en Spaans." />
+      <PageHero
+        badge="Contact"
+        title={<>Neem <span className="gradient-text">contact</span> op</>}
+        subtitle="Vertel ons waar u naar zoekt en ontvang binnen 1 werkdag een persoonlijk voorstel. Wij spreken Nederlands, Engels en Spaans."
+        image="https://u.cubeupload.com/laurensbos/caravanstoragespain6.jpg"
+      />
 
-      {/* Contact Grid */}
-      <section className="py-20 sm:py-28 bg-surface">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-5 gap-12 lg:gap-16">
+      {/* Quick Contact Options */}
+      <section className="py-16 sm:py-20 bg-surface">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <A>
+            <div className="text-center mb-12">
+              <h2 className="text-2xl sm:text-3xl font-black mb-3">Hoe wilt u contact opnemen?</h2>
+              <p className="text-warm-gray max-w-xl mx-auto">Kies de manier die u het beste uitkomt. Via onze slimme keuzehulp ontvangt u direct een voorstel op maat.</p>
+            </div>
+          </A>
 
-            {/* Form */}
-            <A className="lg:col-span-3">
-              {submitted ? (
-                <div className="bg-surface rounded-2xl p-10 sm:p-14 text-center border border-sand-dark/[0.04]">
-                  <div className="w-16 h-16 bg-accent/15 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <CheckCircle className="text-accent" size={32} />
+          <div className="grid sm:grid-cols-3 gap-5 mb-16">
+            {/* Quiz CTA — Primary */}
+            <A className="sm:col-span-3">
+              <button
+                onClick={() => setQuizOpen(true)}
+                className="w-full bg-gradient-to-br from-accent to-accent-dark text-white rounded-2xl p-8 sm:p-10 text-left hover:shadow-xl transition-all group cursor-pointer"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="inline-flex items-center gap-2 bg-white/20 rounded-full px-3 py-1.5 text-xs font-bold mb-4">
+                      <Star size={12} /> Aanbevolen
+                    </div>
+                    <h3 className="text-xl sm:text-2xl font-black mb-2">Ontvang een voorstel op maat</h3>
+                    <p className="text-white/80 text-sm sm:text-base leading-relaxed max-w-lg">
+                      Beantwoord een paar korte vragen over uw caravan en wensen. Wij sturen u binnen 1 werkdag een persoonlijk voorstel — geheel vrijblijvend.
+                    </p>
+                    <div className="flex items-center gap-3 mt-5 text-sm font-bold">
+                      <span className="inline-flex items-center gap-1.5 bg-white/15 rounded-lg px-3 py-1.5"><Shield size={13} /> Vrijblijvend</span>
+                      <span className="inline-flex items-center gap-1.5 bg-white/15 rounded-lg px-3 py-1.5"><Clock size={13} /> 30 seconden</span>
+                    </div>
                   </div>
-                  <h2 className="text-2xl font-black mb-3">Bericht verzonden</h2>
-                  <p className="text-warm-gray leading-relaxed mb-6">Bedankt voor uw bericht. Wij nemen zo spoedig mogelijk contact met u op, meestal binnen 1 werkdag.</p>
-                  <Link href="/" className="text-primary hover:text-surface-dark font-bold text-sm inline-flex items-center gap-1">
-                    Terug naar home <ArrowRight size={14} />
-                  </Link>
+                  <div className="hidden sm:flex w-14 h-14 bg-white/20 rounded-2xl items-center justify-center shrink-0 group-hover:bg-white/30 transition-colors">
+                    <ArrowRight size={24} />
+                  </div>
                 </div>
-              ) : (
-                <div>
-                  <h2 className="text-2xl font-black mb-1">Stuur ons een bericht</h2>
-                  <p className="text-warm-gray text-sm mb-8">Vul het onderstaande formulier in en wij reageren binnen 1 werkdag. Of bel ons direct op +34 650 036 755.</p>
-
-                  <form onSubmit={(e) => { handleSubmit(e); }} className="space-y-5" noValidate>
-                    <div className="grid sm:grid-cols-2 gap-5">
-                      <div>
-                        <label htmlFor="name" className="block text-xs font-bold mb-1.5">Naam *</label>
-                        <input id="name" name="name" type="text" required aria-required="true" aria-invalid={!!fieldErrors.name} aria-describedby={fieldErrors.name ? 'name-error' : undefined} onBlur={handleBlur} className={`w-full border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all ${fieldErrors.name ? 'border-red-400 bg-red-50/30' : 'border-sand-dark/[0.08]'}`} placeholder="Uw naam" />
-                        {fieldErrors.name && <p id="name-error" className="text-red-600 text-xs mt-1" role="alert">{fieldErrors.name}</p>}
-                      </div>
-                      <div>
-                        <label htmlFor="email" className="block text-xs font-bold mb-1.5">E-mail *</label>
-                        <input id="email" name="email" type="email" required aria-required="true" aria-invalid={!!fieldErrors.email} aria-describedby={fieldErrors.email ? 'email-error' : undefined} onBlur={handleBlur} className={`w-full border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all ${fieldErrors.email ? 'border-red-400 bg-red-50/30' : 'border-sand-dark/[0.08]'}`} placeholder="uw@email.com" />
-                        {fieldErrors.email && <p id="email-error" className="text-red-600 text-xs mt-1" role="alert">{fieldErrors.email}</p>}
-                      </div>
-                    </div>
-                    <div className="grid sm:grid-cols-2 gap-5">
-                      <div>
-                        <label htmlFor="phone" className="block text-xs font-bold mb-1.5">Telefoon</label>
-                        <input id="phone" name="phone" type="tel" onBlur={handleBlur} className="w-full border border-sand-dark/[0.08] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" placeholder="+31 6 1234 5678" />
-                      </div>
-                      <div>
-                        <label htmlFor="subject" className="block text-xs font-bold mb-1.5">Onderwerp *</label>
-                        <select id="subject" name="subject" required aria-required="true" aria-invalid={!!fieldErrors.subject} aria-describedby={fieldErrors.subject ? 'subject-error' : undefined} onBlur={handleBlur} className={`w-full border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all bg-surface ${fieldErrors.subject ? 'border-red-400 bg-red-50/30' : 'border-sand-dark/[0.08]'}`}>
-                          <option value="">Kies een onderwerp</option>
-                          <option value="stalling">Stalling aanvragen</option>
-                          <option value="reparatie">Reparatie & Onderhoud</option>
-                          <option value="caravanrepair">CaravanRepair®</option>
-                          <option value="transport">Transport</option>
-                          <option value="verkoop">Verkoop</option>
-                          <option value="verhuur">Verhuur (fietsen/koelkast/airco)</option>
-                          <option value="schoonmaak">Schoonmaak</option>
-                          <option value="overig">Overig</option>
-                        </select>
-                        {fieldErrors.subject && <p id="subject-error" className="text-red-600 text-xs mt-1" role="alert">{fieldErrors.subject}</p>}
-                      </div>
-                    </div>
-                    <div>
-                      <label htmlFor="message" className="block text-xs font-bold mb-1.5">Bericht *</label>
-                      <textarea id="message" name="message" rows={5} required aria-required="true" aria-invalid={!!fieldErrors.message} aria-describedby={fieldErrors.message ? 'message-error' : undefined} onBlur={handleBlur} className={`w-full border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all resize-none ${fieldErrors.message ? 'border-red-400 bg-red-50/30' : 'border-sand-dark/[0.08]'}`} placeholder="Waar kunnen wij u mee helpen?" />
-                      {fieldErrors.message && <p id="message-error" className="text-red-600 text-xs mt-1" role="alert">{fieldErrors.message}</p>}
-                    </div>
-                    <button type="submit" disabled={loading} aria-busy={loading} className="bg-accent hover:bg-accent-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm disabled:opacity-60">
-                      {loading ? 'Verzenden...' : 'Verstuur bericht'} <Send size={14} />
-                    </button>
-                    {formError && (
-                      <div role="alert" className="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 text-sm p-4 rounded-xl">
-                        <MessageCircle size={16} className="shrink-0 mt-0.5" />
-                        <span>{formError}</span>
-                      </div>
-                    )}
-                  </form>
-                </div>
-              )}
+              </button>
             </A>
 
-            {/* Contact Info Sidebar */}
-            <A delay={0.15} className="lg:col-span-2">
-              <div className="space-y-6">
-                <div className="bg-surface rounded-2xl p-7 border border-sand-dark/[0.04]">
-                  <h3 className="font-black text-lg mb-5">Contactgegevens</h3>
-                  <div className="space-y-5">
-                    {[
-                      { icon: Phone, label: 'Telefoon', value: '+34 650 036 755', href: 'tel:+34650036755' },
-                      { icon: Mail, label: 'E-mail', value: 'info@caravanstalling-spanje.com', href: 'mailto:info@caravanstalling-spanje.com' },
-                      { icon: MapPin, label: 'Adres', value: 'Ctra de Palamós, 91\n17110 Sant Climent de Peralta\nGirona, Spanje', href: undefined },
-                      { icon: Clock, label: 'Openingstijden', value: 'Maandag t/m vrijdag\n09:30 – 16:30\nWeekend: gesloten', href: undefined },
-                    ].map(c => (
-                      <div key={c.label} className="flex gap-4">
-                        <div className="w-10 h-10 bg-surface rounded-xl flex items-center justify-center border border-sand-dark/[0.04] shrink-0">
-                          <c.icon size={16} className="text-primary" />
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-warm-gray uppercase tracking-wider mb-0.5">{c.label}</p>
-                          {c.href ? (
-                            <a href={c.href} className="text-sm font-medium hover:text-primary transition-colors">{c.value}</a>
-                          ) : (
-                            <p className="text-sm font-medium whitespace-pre-line">{c.value}</p>
-                          )}
-                        </div>
+            {/* Call */}
+            <A delay={0.1}>
+              <a href="tel:+34650036755" className="block bg-card rounded-2xl p-6 border border-sand-dark/[0.06] hover:border-primary/20 hover:shadow-lg transition-all h-full">
+                <div className="w-12 h-12 bg-hero/10 rounded-xl flex items-center justify-center mb-4">
+                  <Phone size={20} className="text-hero" />
+                </div>
+                <h3 className="font-black text-lg mb-1">Bel ons</h3>
+                <p className="text-warm-gray text-sm leading-relaxed mb-3">Direct een medewerker aan de lijn. Wij spreken Nederlands, Engels en Spaans.</p>
+                <p className="text-primary font-bold text-sm">+34 650 036 755</p>
+                <p className="text-warm-gray text-xs mt-1">Ma-vr 09:30 – 16:30</p>
+              </a>
+            </A>
+
+            {/* WhatsApp */}
+            <A delay={0.15}>
+              <a href="https://wa.me/34650036755" target="_blank" rel="noopener noreferrer" className="block bg-card rounded-2xl p-6 border border-sand-dark/[0.06] hover:border-[#25D366]/30 hover:shadow-lg transition-all h-full">
+                <div className="w-12 h-12 bg-[#25D366]/10 rounded-xl flex items-center justify-center mb-4">
+                  <MessageCircle size={20} className="text-[#25D366]" />
+                </div>
+                <h3 className="font-black text-lg mb-1">WhatsApp</h3>
+                <p className="text-warm-gray text-sm leading-relaxed mb-3">Handig voor foto&apos;s van schade, vragen onderweg of een snelle reactie.</p>
+                <p className="text-[#25D366] font-bold text-sm">Start gesprek →</p>
+              </a>
+            </A>
+
+            {/* Email */}
+            <A delay={0.2}>
+              <a href="mailto:info@caravanstalling-spanje.com" className="block bg-card rounded-2xl p-6 border border-sand-dark/[0.06] hover:border-primary/20 hover:shadow-lg transition-all h-full">
+                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
+                  <Mail size={20} className="text-primary" />
+                </div>
+                <h3 className="font-black text-lg mb-1">E-mail</h3>
+                <p className="text-warm-gray text-sm leading-relaxed mb-3">Stuur ons een bericht. Wij reageren altijd binnen 1 werkdag.</p>
+                <p className="text-primary font-bold text-sm break-all">info@caravanstalling-spanje.com</p>
+              </a>
+            </A>
+          </div>
+
+          {/* Trust bar */}
+          <A delay={0.25}>
+            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-warm-gray">
+              <span className="inline-flex items-center gap-1.5"><Star size={14} className="text-yellow-500 fill-yellow-500" /> 4.8 Google Reviews</span>
+              <span className="inline-flex items-center gap-1.5"><Shield size={14} className="text-accent" /> 15+ jaar ervaring</span>
+              <span className="inline-flex items-center gap-1.5"><Users size={14} className="text-primary" /> 200+ tevreden klanten</span>
+            </div>
+          </A>
+        </div>
+      </section>
+
+      {/* Contact Info + Image */}
+      <section className="py-16 sm:py-20 bg-sand/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <A>
+              <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
+                <Image
+                  src="https://u.cubeupload.com/laurensbos/caravanstoragespain2.jpg"
+                  alt="Caravanstalling in Spanje"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover"
+                />
+              </div>
+            </A>
+
+            <A delay={0.1}>
+              <div>
+                <p className="text-xs font-bold tracking-[0.2em] uppercase text-primary mb-3">Onze locatie</p>
+                <h2 className="text-2xl sm:text-3xl font-black mb-6">Bezoek ons in Spanje</h2>
+                <div className="space-y-5 mb-8">
+                  {[
+                    { icon: MapPin, label: 'Adres', value: 'Ctra de Palamós, 91\n17110 Sant Climent de Peralta\nGirona, Spanje' },
+                    { icon: Clock, label: 'Openingstijden', value: 'Maandag t/m vrijdag: 09:30 – 16:30\nWeekend: gesloten' },
+                    { icon: Phone, label: 'Telefoon', value: '+34 650 036 755', href: 'tel:+34650036755' },
+                    { icon: Mail, label: 'E-mail', value: 'info@caravanstalling-spanje.com', href: 'mailto:info@caravanstalling-spanje.com' },
+                  ].map(c => (
+                    <div key={c.label} className="flex gap-4">
+                      <div className="w-10 h-10 bg-card rounded-xl flex items-center justify-center border border-sand-dark/[0.06] shrink-0">
+                        <c.icon size={16} className="text-primary" />
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-surface rounded-2xl p-7 border border-sand-dark/[0.04]">
-                  <h3 className="font-black text-lg mb-3">Liever direct bellen?</h3>
-                  <p className="text-sm text-warm-gray leading-relaxed mb-4">Wij spreken Nederlands, Engels en Spaans. Bel ons gerust tijdens openingstijden (ma-vr 09:30-16:30). U spreekt direct met een medewerker.</p>
-                  <a href="tel:+34650036755" className="bg-hero hover:bg-primary text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 w-full justify-center">
-                    <Phone size={15} /> Bel +34 650 036 755
-                  </a>
-                </div>
-
-                <div className="bg-surface rounded-2xl p-7 border border-sand-dark/[0.04]">
-                  <h3 className="font-black text-lg mb-3">WhatsApp</h3>
-                  <p className="text-sm text-warm-gray leading-relaxed mb-4">Stuur ons een WhatsApp-bericht. Handig voor het doorsturen van foto&apos;s van schade, vragen onderweg of het snel doorgeven van uw wensen.</p>
-                  <a href="https://wa.me/34650036755" target="_blank" rel="noopener noreferrer" className="bg-[#25D366] hover:bg-[#22C35E] text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 w-full justify-center">
-                    <MessageCircle size={15} /> WhatsApp ons
-                  </a>
+                      <div>
+                        <p className="text-[10px] font-bold text-warm-gray uppercase tracking-wider mb-0.5">{c.label}</p>
+                        {c.href ? (
+                          <a href={c.href} className="text-sm font-medium hover:text-primary transition-colors">{c.value}</a>
+                        ) : (
+                          <p className="text-sm font-medium whitespace-pre-line">{c.value}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </A>
@@ -219,6 +179,7 @@ export default function ContactPage() {
         </div>
       </section>
 
+      <QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} source="contact-page" />
       <Footer />
     </>
   );
