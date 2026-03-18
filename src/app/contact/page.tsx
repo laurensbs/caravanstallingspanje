@@ -53,7 +53,7 @@ export default function ContactPage() {
               Neem <span className="gradient-text">contact</span> op
             </h1>
             <p className="text-white/50 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-              Heeft u vragen, wilt u een offerte of een afspraak maken? Wij staan graag voor u klaar.
+              Heeft u vragen over stalling, reparatie, transport of een van onze andere diensten? Wilt u een offerte of een afspraak maken? Wij staan graag voor u klaar. Wij spreken Nederlands, Engels en Spaans.
             </p>
           </motion.div>
         </div>
@@ -80,7 +80,7 @@ export default function ContactPage() {
               ) : (
                 <div>
                   <h2 className="text-2xl font-black mb-1">Stuur ons een bericht</h2>
-                  <p className="text-warm-gray text-sm mb-8">Vul het formulier in en wij reageren binnen 1 werkdag.</p>
+                  <p className="text-warm-gray text-sm mb-8">Vul het onderstaande formulier in en wij reageren binnen 1 werkdag. Of bel ons direct op +34 650 036 755.</p>
 
                   <form onSubmit={(e) => { handleSubmit(e); }} className="space-y-5">
                     <div className="grid sm:grid-cols-2 gap-5">
@@ -156,7 +156,7 @@ export default function ContactPage() {
 
                 <div className="bg-surface rounded-2xl p-7 border border-sand-dark/[0.04]">
                   <h3 className="font-black text-lg mb-3">Liever direct bellen?</h3>
-                  <p className="text-sm text-warm-gray leading-relaxed mb-4">Wij spreken Nederlands, Engels en Spaans. Bel ons gerust tijdens openingstijden.</p>
+                  <p className="text-sm text-warm-gray leading-relaxed mb-4">Wij spreken Nederlands, Engels en Spaans. Bel ons gerust tijdens openingstijden (ma-vr 09:30-16:30). U spreekt direct met een medewerker.</p>
                   <a href="tel:+34650036755" className="bg-surface-dark hover:bg-primary text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 w-full justify-center">
                     <Phone size={15} /> Bel +34 650 036 755
                   </a>
@@ -164,7 +164,7 @@ export default function ContactPage() {
 
                 <div className="bg-surface rounded-2xl p-7 border border-sand-dark/[0.04]">
                   <h3 className="font-black text-lg mb-3">WhatsApp</h3>
-                  <p className="text-sm text-warm-gray leading-relaxed mb-4">Stuur ons een WhatsApp-bericht. Handig voor foto&apos;s van schade of vragen onderweg.</p>
+                  <p className="text-sm text-warm-gray leading-relaxed mb-4">Stuur ons een WhatsApp-bericht. Handig voor het doorsturen van foto&apos;s van schade, vragen onderweg of het snel doorgeven van uw wensen.</p>
                   <a href="https://wa.me/34650036755" target="_blank" rel="noopener noreferrer" className="bg-[#25D366] hover:bg-[#22C35E] text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 w-full justify-center">
                     <MessageCircle size={15} /> WhatsApp ons
                   </a>

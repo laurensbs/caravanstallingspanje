@@ -37,8 +37,8 @@ const plans = [
     title: 'Buitenstalling',
     price: '65',
     period: '/maand',
-    desc: 'Veilige buitenstalling op ons afgesloten, beveiligde terrein.',
-    features: ['Eigen pleknummer', '24/7 camerabewaking', 'Securitas Direct alarm', 'Standaard verzekerd', 'Tweewekelijkse controle', 'Jaarlijkse technische keuring'],
+    desc: 'Onze populairste optie. Veilige buitenstalling op ons beveiligde terrein met Securitas Direct alarm. Ideaal voor de meeste caravans en campers — het milde Spaanse klimaat beschermt tegen vorst en strooizout.',
+    features: ['Eigen vaste plek met pleknummer', '24/7 camerabewaking', 'Securitas Direct alarm', 'Standaard verzekerd tegen schade & diefstal', 'Tweewekelijkse controle op weerschade', 'Jaarlijkse technische keuring'],
     popular: true,
     color: 'bg-accent/10 text-accent',
     cta: 'Stalling aanvragen',
@@ -47,8 +47,8 @@ const plans = [
     title: 'Binnenstalling',
     price: '95',
     period: '/maand',
-    desc: 'Overdekte, geïsoleerde hal voor maximale bescherming.',
-    features: ['Alles van buitenstalling', 'Geïsoleerde hal', 'Bescherming tegen weer', 'Geen UV-schade', 'Stabiele temperatuur', 'Beperkt beschikbaar'],
+    desc: 'Maximale bescherming in onze geïsoleerde hal. Geen UV-straling, geen extreme temperaturen, geen mos of alg op de wanden. Ideaal voor nieuwere of duurdere caravans en campers.',
+    features: ['Alles van buitenstalling', 'Geïsoleerde overdekte hal', 'Geen UV-schade of verbleking', 'Stabiele temperatuur jaarrond', 'Geen mos- of algvorming', 'Beperkt beschikbaar — reserveer tijdig'],
     popular: false,
     color: 'bg-ocean/10 text-ocean',
     cta: 'Beschikbaarheid checken',
@@ -57,8 +57,8 @@ const plans = [
     title: 'Seizoensstalling',
     price: '45',
     period: '/maand',
-    desc: 'Voordelig tarief bij stalling alleen buiten het seizoen (okt-apr).',
-    features: ['Eigen pleknummer', '24/7 camerabewaking', 'Securitas Direct alarm', 'Standaard verzekerd', 'Controle tijdens stalling', 'Okt t/m april'],
+    desc: 'Voordelig tarief voor stalling uitsluitend buiten het kampeerseizoen (oktober t/m april). Uw caravan staat veilig terwijl u in Nederland bent. Upgrade naar jaarcontract altijd mogelijk.',
+    features: ['Buitenstalling terrein', 'Oktober t/m april', 'Securitas Direct alarm', 'Standaard verzekerd', '24/7 camerabewaking', 'Controle tijdens stallingperiode'],
     popular: false,
     color: 'bg-warning/10 text-warning',
     cta: 'Meer informatie',
@@ -81,12 +81,14 @@ const extras = [
 ];
 
 const faqs = [
-  { q: 'Wat is inbegrepen bij de stallingsprijs?', a: 'Bij alle stallingstypen is inbegrepen: eigen pleknummer, 24/7 camerabewaking, Securitas Direct alarmsysteem, standaardverzekering, tweewekelijkse controle en een jaarlijkse technische keuring.' },
-  { q: 'Kan ik mijn caravan het hele jaar door ophalen?', a: 'Ja, tijdens onze openingstijden (ma-vr 09:30-16:30) kunt u uw caravan ophalen. Wij bereiden uw caravan voor zodat deze rijklaar staat op de afgesproken datum.' },
-  { q: 'Hoe werkt de verzekering?', a: 'Alle gestalde caravans zijn standaard verzekerd via onze collectieve polis. Deze dekt schade en diefstal op ons terrein. Voor uitgebreidere dekking kunt u informeren naar aanvullende opties.' },
-  { q: 'Zijn er langetermijnkortingen?', a: 'Ja, bij een jaarcontract bieden wij een aantrekkelijk tarief. Neem contact op voor een persoonlijke offerte.' },
-  { q: 'Kan ik ook een camper of boot stallen?', a: 'Ja, wij stallen naast caravans ook campers, vouwwagens en boten. De tarieven zijn afhankelijk van de afmetingen. Neem contact op voor een offerte.' },
-  { q: 'Hoe regel ik transport van Nederland naar Spanje?', a: 'Wij beschikken over 7 eigen transporteenheden en verzorgen het transport door heel Europa. Neem contact op voor een transportofferte.' },
+  { q: 'Wat is inbegrepen bij de stallingsprijs?', a: 'Bij alle stallingstypen is inbegrepen: een eigen vaste plek met pleknummer, 24/7 camerabewaking, het Securitas Direct alarmsysteem, standaardverzekering tegen schade en diefstal, tweewekelijkse controle op weerschade en een jaarlijkse volledige technische keuring. U betaalt geen extra kosten voor deze diensten.' },
+  { q: 'Kan ik mijn caravan het hele jaar door ophalen?', a: 'Ja, tijdens onze openingstijden (ma-vr 09:30-16:30) kunt u uw caravan ophalen. Wij vragen u wel om minimaal 48 uur van tevoren contact op te nemen, zodat wij uw caravan kunnen voorbereiden en rijklaar zetten op de afgesproken datum.' },
+  { q: 'Hoe werkt de verzekering?', a: 'Alle gestalde caravans zijn standaard verzekerd via onze collectieve polis. Deze dekt schade en diefstal op ons terrein. De kosten zijn inbegrepen in de stallingsprijs. Voor uitgebreidere dekking of bijzondere objecten kunt u bij ons informeren naar aanvullende opties.' },
+  { q: 'Zijn er langetermijnkortingen?', a: 'Ja, bij een jaarcontract bieden wij een aantrekkelijker tarief dan bij maandbetaling. Ook voor meerdere voertuigen gelden speciale tarieven. Neem contact op voor een persoonlijke offerte op maat.' },
+  { q: 'Kan ik ook een camper of boot stallen?', a: 'Zeker. Wij stallen naast caravans ook campers (integraal en halfintegraal), vouwwagens, boten en trailers. Tarieven zijn afhankelijk van de afmetingen van uw voertuig. Neem contact op voor een offerte.' },
+  { q: 'Hoe regel ik transport van Nederland naar Spanje?', a: 'Wij beschikken over 7 eigen transporteenheden en circa 12 medewerkers in het seizoen. Wij halen uw caravan op vanuit Nederland, België of Duitsland en leveren deze af op onze stalling of rechtstreeks op uw camping aan de Costa Brava. Transport is ook mogelijk tussen campings onderling.' },
+  { q: 'Wat is CaravanRepair® en kan ik daar gebruik van maken?', a: 'CaravanRepair® is het gepatenteerde schadeherstelsysteem voor geprofileerde caravan- en camperwanden. Als officieel Masterdealer bieden wij onzichtbaar herstel van hagel-, storm-, aanrijdings- en vochtschade met levenslange garantie. Alle verzekeraars erkennen dit systeem. Wij verzorgen ook de complete afhandeling met uw verzekeraar.' },
+  { q: 'Wat gebeurt er als mijn caravan schade oploopt tijdens stalling?', a: 'Tijdens onze tweewekelijkse controles signaleren wij eventuele schade direct. Wij nemen contact met u op, documenteren de schade en pakken het op in onze eigen werkplaats. De kosten zijn afhankelijk van het type schade en vallen vaak onder de verzekering.' },
 ];
 
 export default function TarievenPage() {
@@ -105,7 +107,7 @@ export default function TarievenPage() {
               Transparante <span className="gradient-text">tarieven</span>
             </h1>
             <p className="text-white/50 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-              Geen verborgen kosten. Bewaking, verzekering en inspecties inbegrepen bij elk stallingstype.
+              Geen verborgen kosten. Bewaking, verzekering, tweewekelijkse controles en jaarlijkse technische keuring zijn bij elk stallingstype inbegrepen. U betaalt een vast maandtarief en weet precies waar u aan toe bent.
             </p>
           </motion.div>
         </div>
@@ -150,7 +152,8 @@ export default function TarievenPage() {
           <A className="text-center max-w-2xl mx-auto mb-14">
             <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Extra diensten</p>
             <h2 className="text-3xl sm:text-4xl font-black mb-4">Aanvullende services</h2>
-            <div className="section-divider mt-5" />
+            <div className="section-divider mt-5 mb-5" />
+            <p className="text-warm-gray leading-relaxed">Naast stalling bieden wij een breed scala aan extra diensten. Van professionele schoonmaak tot transport en verhuur.</p>
           </A>
 
           <A>

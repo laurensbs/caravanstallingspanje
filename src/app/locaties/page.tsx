@@ -3,7 +3,7 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
-import { MapPin, Shield, Wrench, Sun, ArrowRight, Phone, CheckCircle, Star, Clock } from 'lucide-react';
+import { MapPin, Shield, Wrench, Sun, ArrowRight, Phone, CheckCircle, Star, Clock, Navigation, Plane, Car, Palmtree } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 
@@ -29,7 +29,7 @@ export default function LocatiesPage() {
               <span className="gradient-text">Costa Brava</span>, Spanje
             </h1>
             <p className="text-white/50 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-              Centraal gelegen in Sant Climent de Peralta, Girona. Tussen de prachtige stranden en dorpen van de Costa Brava.
+              Ons stallingsterrein en werkplaats liggen centraal aan de Costa Brava, in het rustige Sant Climent de Peralta, provincie Girona. Op korte afstand van Pals, Begur, L&apos;Estartit en Palamós.
             </p>
           </motion.div>
         </div>
@@ -49,10 +49,16 @@ export default function LocatiesPage() {
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-black mb-2">Sant Climent de Peralta</h2>
                 <p className="text-primary font-bold text-sm mb-6">Ctra de Palamós, 91 · 17110 Girona</p>
-                <p className="text-warm-gray leading-relaxed mb-8">
+                <p className="text-warm-gray leading-relaxed mb-4">
                   Ons hoofdterrein ligt aan de Ctra de Palamós in het rustige Sant Climent de Peralta, provincie Girona. 
-                  Centraal gelegen ten opzichte van populaire badplaatsen als Pals, Begur, L&apos;Estartit en Palamós. 
+                  Het terrein is centraal gelegen ten opzichte van de populairste badplaatsen aan de Costa Brava: Pals, Begur, L&apos;Estartit en Palamós liggen allemaal op slechts 6 tot 15 kilometer afstand. 
                   Direct aan de doorgaande weg, makkelijk bereikbaar vanuit alle richtingen.
+                </p>
+                <p className="text-warm-gray leading-relaxed mb-4">
+                  Het terrein is volledig afgesloten en beveiligd met het Securitas Direct alarmsysteem en 24/7 camerabewaking. Op het terrein bevindt zich ook onze volledig uitgeruste werkplaats waar wij reparaties, onderhoud en het gepatenteerde CaravanRepair® schadeherstel uitvoeren.
+                </p>
+                <p className="text-warm-gray leading-relaxed mb-8">
+                  Het dichtstbijzijnde vliegveld is Girona-Costa Brava Airport (40 min rijden) met regelmatige vluchten vanuit Nederland en België. Barcelona El Prat is circa 1,5 uur rijden. Wij spreken Nederlands, Engels en Spaans.
                 </p>
 
                 <div className="space-y-4 mb-8">
@@ -124,10 +130,10 @@ export default function LocatiesPage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-5xl mx-auto">
             {[
-              { place: 'Pals', km: '6 km', desc: 'Middeleeuws dorp met prachtige stranden', rating: 4.8 },
-              { place: 'Begur', km: '10 km', desc: 'Charmant kustdorp, verborgen baaien', rating: 4.9 },
-              { place: 'L\'Estartit', km: '12 km', desc: 'Duikparadijs, Medes eilanden', rating: 4.7 },
-              { place: 'Palamós', km: '15 km', desc: 'Vissershaven, culinaire hotspot', rating: 4.6 },
+              { place: 'Pals', km: '6 km', desc: 'Middeleeuws dorpje met rijstterrassen, golfbaan en kilometerslange zandstranden', rating: 4.8 },
+              { place: 'Begur', km: '10 km', desc: 'Charmant kustdorp op een heuvel, met verborgen baaien en kristalhelder water', rating: 4.9 },
+              { place: 'L\'Estartit', km: '12 km', desc: 'Duikparadijs bij de Medes-eilanden, een beschermd marien reservaat', rating: 4.7 },
+              { place: 'Palamós', km: '15 km', desc: 'Authentieke vissershaven, beroemd om de gambas en de visveiling', rating: 4.6 },
             ].map((p, i) => (
               <A key={p.place} delay={i * 0.08}>
                 <div className="bg-surface rounded-2xl p-6 border border-sand-dark/[0.04] card-hover h-full text-center">
@@ -146,13 +152,13 @@ export default function LocatiesPage() {
       </section>
 
       {/* Facts */}
-      <section className="py-16 sm:py-20 bg-surface">
+      <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               {[
                 { val: '20+', lbl: 'Jaar ervaring' },
-                { val: '12', lbl: 'Medewerkers' },
+                { val: '12', lbl: 'Medewerkers in seizoen' },
                 { val: '4.9/5', lbl: 'Google reviews' },
                 { val: '7', lbl: 'Transporteenheden' },
               ].map(s => (
@@ -163,6 +169,36 @@ export default function LocatiesPage() {
               ))}
             </div>
           </A>
+        </div>
+      </section>
+
+      {/* Bereikbaarheid */}
+      <section className="py-20 sm:py-28 bg-surface">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <A className="text-center max-w-2xl mx-auto mb-14">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Bereikbaarheid</p>
+            <h2 className="text-3xl sm:text-4xl font-black mb-4">Hoe komt u bij ons?</h2>
+            <div className="section-divider mt-5 mb-5" />
+            <p className="text-warm-gray leading-relaxed">Of u nu met het vliegtuig of de auto komt — onze stalling is goed bereikbaar.</p>
+          </A>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {[
+              { icon: Car, title: 'Met de auto', desc: 'Via de AP-7 (afslag La Bisbal d\'Empordà). Vervolgens via de C-31 richting Palamós. Na Sant Climent de Peralta vindt u ons terrein aan de linkerzijde van de weg. Vanaf de Franse grens circa 45 minuten.', color: 'bg-accent/10 text-accent' },
+              { icon: Plane, title: 'Per vliegtuig', desc: 'Girona-Costa Brava Airport ligt op 40 minuten rijden. Barcelona El Prat op circa 1,5 uur. Er zijn regelmatige vluchten vanuit Amsterdam, Eindhoven, Rotterdam en Brussel.', color: 'bg-ocean/10 text-ocean' },
+              { icon: Navigation, title: 'Navigatie', desc: 'Voer in uw navigatie in: Ctra de Palamós 91, 17110 Sant Climent de Peralta, Girona. Google Maps en Waze kennen ons adres. Parkeren is mogelijk op het terrein.', color: 'bg-primary/10 text-primary' },
+            ].map((f, i) => (
+              <A key={f.title} delay={i * 0.08}>
+                <div className="bg-white rounded-2xl p-6 border border-sand-dark/20 card-hover h-full">
+                  <div className={`w-12 h-12 ${f.color} rounded-xl flex items-center justify-center mb-4`}>
+                    <f.icon size={22} />
+                  </div>
+                  <h3 className="font-bold mb-2">{f.title}</h3>
+                  <p className="text-sm text-warm-gray leading-relaxed">{f.desc}</p>
+                </div>
+              </A>
+            ))}
+          </div>
         </div>
       </section>
 

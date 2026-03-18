@@ -222,12 +222,12 @@ export default function HomePage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: Shield, title: "Beveiligde stalling", desc: "Securitas Direct alarmsysteem, 24/7 camerabewaking en standaard verzekerd. Buiten- en binnenstalling beschikbaar.", color: "bg-ocean/10 text-ocean" },
-              { icon: Wrench, title: "Reparatie & onderhoud", desc: "Goed uitgeruste werkplaats met ervaren monteurs. Van banden en remmen tot dakluiken en airco.", color: "bg-warning/10 text-warning" },
-              { icon: Sparkles, title: "CaravanRepair\u00ae Masterdealer", desc: "Onzichtbaar schadeherstel van geprofileerde wanden. Levenslange garantie op alle wandreparaties.", color: "bg-primary/10 text-primary" },
-              { icon: Truck, title: "Transport (7 eenheden)", desc: "Wij leveren uw caravan af op de camping en halen deze weer op. 12 medewerkers in het seizoen.", color: "bg-accent/10 text-accent" },
-              { icon: ShoppingBag, title: "Verkoop tweedehands", desc: "Gecontroleerde tweedehands caravans te koop. Eerlijk advies en volledige transparantie.", color: "bg-danger/10 text-danger" },
-              { icon: Eye, title: "Tweewekelijkse controle", desc: "Elke 2 weken worden alle caravans gecontroleerd op schades. Jaarlijks technische keuring.", color: "bg-info/10 text-info" },
+              { icon: Shield, title: "Beveiligde stalling", desc: "Securitas Direct alarm, 24/7 camerabewaking en standaard verzekerd. Buiten- en binnenstalling op ons afgesloten terrein in Sant Climent de Peralta.", color: "bg-ocean/10 text-ocean" },
+              { icon: Wrench, title: "Reparatie & onderhoud", desc: "Goed uitgeruste werkplaats voor alle voorkomende reparaties. Banden, remmen, dakluiken, airco, gas, elektra en vochtschade.", color: "bg-warning/10 text-warning" },
+              { icon: Sparkles, title: "CaravanRepair\u00ae Masterdealer", desc: "Onzichtbaar schadeherstel van geprofileerde wanden met levenslange garantie. Erkend door alle verzekeraars. Hagel, storm en aanrijdingsschade.", color: "bg-primary/10 text-primary" },
+              { icon: Truck, title: "Transport (7 eenheden)", desc: "Met ons wagenpark van 7 eenheden en 12 seizoensmedewerkers halen wij uw caravan op en leveren hem af op elke camping aan de Costa Brava.", color: "bg-accent/10 text-accent" },
+              { icon: ShoppingBag, title: "Verkoop tweedehands", desc: "Gecontroleerde occasion caravans, al in Spanje. Eerlijk advies, werkplaatskeuring en verkoopbemiddeling. Geen transportkosten.", color: "bg-danger/10 text-danger" },
+              { icon: Eye, title: "Tweewekelijkse controle", desc: "Elke 2 weken worden alle caravans gecontroleerd op weerschade. Jaarlijks volledige technische keuring met rapport via uw klantportaal.", color: "bg-info/10 text-info" },
             ].map((f, i) => (
               <A key={f.title} delay={i * 0.08}>
                 <div className="bg-white rounded-2xl p-7 border border-sand-dark/30 hover:border-primary/20 card-hover h-full group">
