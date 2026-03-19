@@ -49,7 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <link rel="apple-touch-icon" href="/images/icon-192.png" />
+        <link rel="apple-touch-icon" href="/images/icon-192.svg" />
       </head>
       <body className="bg-surface text-surface-dark antialiased pb-16 md:pb-0">
         <a href="#main-content" className="skip-link">Ga naar inhoud</a>

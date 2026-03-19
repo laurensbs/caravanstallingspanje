@@ -22,6 +22,7 @@ export default function HomePage() {
   const [booking, setBooking] = useState({ type: "buiten", length: "", start: "", location: "sant-climent" });
   const [checkingAvail, setCheckingAvail] = useState(false);
   const [quizOpen, setQuizOpen] = useState(false);
+  const [quizInterest, setQuizInterest] = useState<string | undefined>(undefined);
   const [availSpots, setAvailSpots] = useState<number | null>(null);
 
   const reviewSchema = {
@@ -205,19 +206,22 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-8">
             <h2 className="text-2xl sm:text-3xl font-black">Wat kunnen wij voor u doen?</h2>
-            <p className="text-warm-gray text-sm mt-2">Tik op een dienst voor meer informatie</p>
+            <p className="text-warm-gray text-sm mt-2">Tik op een dienst om direct aan te vragen</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
             {[
-              { icon: Shield, label: "Stalling", desc: "Buiten & binnen", href: "/stalling", color: "from-accent to-accent-dark", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain2.jpg" },
-              { icon: Wrench, label: "Reparatie", desc: "Alle merken", href: "/diensten#reparatie", color: "from-warning to-warning/80", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain5.jpg" },
-              { icon: Sparkles, label: "CaravanRepair®", desc: "Schadeherstel", href: "/diensten#caravanrepair", color: "from-primary to-primary-dark", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain4.jpg" },
-              { icon: Truck, label: "Transport", desc: "7 eenheden", href: "/diensten#transport", color: "from-ocean to-ocean-dark", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain3.jpg" },
-              { icon: ShoppingBag, label: "Verkoop", desc: "Occasions", href: "/diensten#verkoop", color: "from-danger to-danger/80", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain6.jpg" },
-              { icon: Bike, label: "Verhuur", desc: "Fietsen & meer", href: "/diensten#verhuur", color: "from-info to-info/80", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain.jpg" },
+              { icon: Shield, label: "Stalling", desc: "Vanaf €65/mnd", interest: "stalling", color: "from-accent to-accent-dark", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain2.jpg" },
+              { icon: Wrench, label: "Reparatie", desc: "Alle merken", interest: "reparatie", color: "from-warning to-warning/80", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain5.jpg" },
+              { icon: Sparkles, label: "CaravanRepair®", desc: "Schadeherstel", interest: "schadeherstel", color: "from-primary to-primary-dark", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain4.jpg" },
+              { icon: Truck, label: "Transport", desc: "Door heel Europa", interest: "transport", color: "from-ocean to-ocean-dark", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain3.jpg" },
+              { icon: ShoppingBag, label: "Verkoop", desc: "Occasions", interest: "verkoop", color: "from-danger to-danger/80", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain6.jpg" },
+              { icon: Bike, label: "Verhuur", desc: "Fietsen & meer", interest: "anders", color: "from-info to-info/80", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain.jpg" },
             ].map((s, i) => (
               <A key={s.label} delay={i * 0.05}>
-                <Link href={s.href} className="group block relative rounded-2xl overflow-hidden aspect-[3/4] sm:aspect-[3/4] touch-manipulation">
+                <button
+                  onClick={() => { setQuizInterest(s.interest); setQuizOpen(true); }}
+                  className="group block relative rounded-2xl overflow-hidden aspect-[3/4] sm:aspect-[3/4] touch-manipulation w-full cursor-pointer"
+                >
                   <Image src={s.img} alt={s.label} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw" className="object-cover group-hover:scale-110 transition-transform duration-500" />
                   <div className={`absolute inset-0 bg-gradient-to-t ${s.color} opacity-75 group-hover:opacity-85 transition-opacity`} />
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-3">
@@ -227,9 +231,19 @@ export default function HomePage() {
                     <span className="font-black text-sm sm:text-base text-center leading-tight">{s.label}</span>
                     <span className="text-white/70 text-[11px] mt-0.5">{s.desc}</span>
                   </div>
-                </Link>
+                  <div className="absolute bottom-2 inset-x-2">
+                    <div className="bg-white/20 backdrop-blur-sm rounded-lg py-1.5 text-white text-[10px] font-bold text-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      Direct aanvragen →
+                    </div>
+                  </div>
+                </button>
               </A>
             ))}
+          </div>
+          <div className="text-center mt-6">
+            <Link href="/diensten" className="text-sm text-primary font-semibold hover:text-primary-dark transition-colors inline-flex items-center gap-1">
+              Bekijk alle diensten in detail <ArrowRight size={14} />
+            </Link>
           </div>
         </div>
       </section>
@@ -489,7 +503,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} source="homepage" />
+      <QuizModal open={quizOpen} onClose={() => { setQuizOpen(false); setQuizInterest(undefined); }} source="homepage" initialInterest={quizInterest} />
       <Footer />
     </>
   );

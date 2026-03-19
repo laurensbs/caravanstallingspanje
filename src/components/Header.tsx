@@ -229,42 +229,67 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile menu - unique items not in bottom nav */}
+        {/* Mobile menu - full-screen app-like overlay */}
         <AnimatePresence>
           {open && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden bg-card border-t border-sand-dark/20 overflow-hidden"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="lg:hidden fixed inset-0 top-16 bg-card z-40 overflow-y-auto pb-24"
             >
-              <div className="px-4 py-4 space-y-1">
-                {/* Only show items NOT in MobileNav bottom bar */}
-                {navItems.filter(item => !['/','/ ','/stalling','/diensten','/blog','/contact','/mijn-account'].includes(item.href)).map(item => (
-                  <div key={item.href}>
-                    <Link href={item.href} className={`block px-4 py-3 rounded-xl text-sm font-medium transition-colors ${pathname === item.href ? 'bg-primary/8 text-primary' : 'text-surface-dark hover:bg-sand/50'}`}>
+              <div className="px-4 py-6 max-w-lg mx-auto">
+                {/* Main navigation */}
+                <div className="grid grid-cols-2 gap-2 mb-6">
+                  {navItems.filter(item => !item.hasMega).map(item => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all ${
+                        pathname === item.href
+                          ? 'bg-primary/10 text-primary border border-primary/20'
+                          : 'bg-sand/50 text-surface-dark hover:bg-sand border border-transparent'
+                      }`}
+                    >
                       {item.label}
                     </Link>
-                  </div>
-                ))}
-                {/* Diensten sub-items */}
-                <div>
-                  <p className="px-4 pt-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-warm-gray/50">Onze diensten</p>
-                  <div className="space-y-0.5">
-                    {DIENSTEN_ITEMS.map(d => (
-                      <Link key={d.label} href={d.href} className="flex items-center gap-2.5 px-4 py-2 text-xs text-warm-gray hover:text-surface-dark transition-colors">
-                        <d.icon size={13} className="text-primary/50" /> {d.label}
-                      </Link>
-                    ))}
-                  </div>
+                  ))}
                 </div>
-                <div className="pt-3 border-t border-sand-dark/20 space-y-2">
-                  <Link href="/mijn-account" className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-surface-dark hover:bg-sand/50 rounded-xl">
+
+                {/* Diensten as large tiles */}
+                <p className="text-[10px] font-bold uppercase tracking-widest text-warm-gray/60 mb-3">Onze diensten</p>
+                <div className="grid grid-cols-3 gap-2 mb-6">
+                  {DIENSTEN_ITEMS.map(d => (
+                    <Link
+                      key={d.label}
+                      href={d.href}
+                      className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-sand/50 hover:bg-sand border border-transparent hover:border-primary/10 transition-all text-center"
+                    >
+                      <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                        <d.icon size={18} className="text-primary" />
+                      </div>
+                      <span className="text-[11px] font-semibold text-surface-dark leading-tight">{d.label.split(' ')[0]}</span>
+                    </Link>
+                  ))}
+                </div>
+
+                {/* Quick actions */}
+                <div className="space-y-2">
+                  <button onClick={() => { setQuizOpen(true); setOpen(false); }} className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3.5 rounded-xl text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                    <ArrowRight size={15} /> Stalling aanvragen
+                  </button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <a href="tel:+34650036755" className="flex items-center justify-center gap-2 py-3 rounded-xl bg-hero text-white text-sm font-semibold transition-colors">
+                      <Phone size={14} /> Bellen
+                    </a>
+                    <a href="https://wa.me/34650036755" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 py-3 rounded-xl bg-[#25D366] text-white text-sm font-semibold transition-colors">
+                      <Mail size={14} /> WhatsApp
+                    </a>
+                  </div>
+                  <Link href="/mijn-account" className="flex items-center justify-center gap-2 py-3 rounded-xl bg-sand/70 text-surface-dark text-sm font-semibold hover:bg-sand transition-colors">
                     <User size={15} /> Mijn Account
                   </Link>
-                  <button onClick={() => { setQuizOpen(true); setOpen(false); }} className="block w-full text-center bg-primary hover:bg-primary-dark text-white font-semibold py-3 rounded-xl text-sm transition-colors cursor-pointer">
-                    Stalling aanvragen
-                  </button>
                 </div>
               </div>
             </motion.div>

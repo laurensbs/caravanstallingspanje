@@ -16,20 +16,21 @@ const PRECACHE_URLS = [
   '/blog',
 ];
 
-const self = globalThis as unknown as ServiceWorkerGlobalScope;
+// @ts-ignore — this file runs as plain JS in the browser
+const sw = /** @type {ServiceWorkerGlobalScope} */ (globalThis);
 
 // Install — precache essential pages
-self.addEventListener('install', (event) => {
+sw.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(PRECACHE_URLS);
     })
   );
-  self.skipWaiting();
+  sw.skipWaiting();
 });
 
 // Activate — clean old caches (any cache not matching current version)
-self.addEventListener('activate', (event) => {
+sw.addEventListener('activate', (event) => {
   const currentCaches = [CACHE_NAME, STATIC_CACHE];
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -40,11 +41,11 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
-  self.clients.claim();
+  sw.clients.claim();
 });
 
 // Fetch — network-first with cache fallback
-self.addEventListener('fetch', (event) => {
+sw.addEventListener('fetch', (event) => {
   const { request } = event;
 
   // Skip non-GET requests
@@ -118,14 +119,14 @@ self.addEventListener('fetch', (event) => {
 });
 
 // Push notification handler
-self.addEventListener('push', (event) => {
+sw.addEventListener('push', (event) => {
   const data = event.data?.json() || { title: 'Caravan Stalling Spanje', body: 'Nieuwe notificatie' };
   
   event.waitUntil(
-    self.registration.showNotification(data.title, {
+    sw.registration.showNotification(data.title, {
       body: data.body,
-      icon: '/icons/icon-192x192.png',
-      badge: '/icons/icon-72x72.png',
+      icon: '/icons/icon-192x192.svg',
+      badge: '/icons/icon-72x72.svg',
       tag: data.tag || 'default',
       data: { url: data.url || '/' },
     })
@@ -133,12 +134,12 @@ self.addEventListener('push', (event) => {
 });
 
 // Notification click — open relevant page
-self.addEventListener('notificationclick', (event) => {
+sw.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const url = event.notification.data?.url || '/';
   
   event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+    sw.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
       // Focus existing tab if available
       for (const client of clients) {
         if (client.url.includes(url) && 'focus' in client) {
@@ -146,13 +147,13 @@ self.addEventListener('notificationclick', (event) => {
         }
       }
       // Otherwise open new tab
-      return self.clients.openWindow(url);
+      return sw.clients.openWindow(url);
     })
   );
 });
 
 // Background sync — retry failed form submissions when back online
-self.addEventListener('sync', (event) => {
+sw.addEventListener('sync', (event) => {
   if (event.tag === 'contact-form-sync') {
     event.waitUntil(replayQueuedRequests());
   }

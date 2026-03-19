@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowRight, ArrowLeft, CheckCircle, Shield, Wrench, Truck, ShoppingBag, Sparkles, MapPin, Phone, MessageCircle, Mail } from 'lucide-react';
 
@@ -8,6 +8,7 @@ interface QuizModalProps {
   open: boolean;
   onClose: () => void;
   source?: string;
+  initialInterest?: string;
 }
 
 const STEPS = ['interest', 'details', 'contact', 'done'] as const;
@@ -39,10 +40,10 @@ const TIMEFRAMES = [
   { id: 'orienterend', label: 'Ik oriënteer mij' },
 ];
 
-export default function QuizModal({ open, onClose, source = 'quiz' }: QuizModalProps) {
-  const [step, setStep] = useState<Step>('interest');
+export default function QuizModal({ open, onClose, source = 'quiz', initialInterest }: QuizModalProps) {
+  const [step, setStep] = useState<Step>(initialInterest ? 'details' : 'interest');
   const [data, setData] = useState({
-    interest: '',
+    interest: initialInterest || '',
     storage_type: '',
     caravan_brand: '',
     caravan_length: '',
@@ -54,10 +55,20 @@ export default function QuizModal({ open, onClose, source = 'quiz' }: QuizModalP
   const [submitting, setSubmitting] = useState(false);
 
   const reset = () => {
-    setStep('interest');
-    setData({ interest: '', storage_type: '', caravan_brand: '', caravan_length: '', timeframe: '', email: '', name: '', phone: '' });
+    setStep(initialInterest ? 'details' : 'interest');
+    setData({ interest: initialInterest || '', storage_type: '', caravan_brand: '', caravan_length: '', timeframe: '', email: '', name: '', phone: '' });
     setSubmitting(false);
   };
+
+  // Sync when modal opens with a new initialInterest
+  useEffect(() => {
+    if (open && initialInterest) {
+      setData(d => ({ ...d, interest: initialInterest }));
+      setStep('details');
+    } else if (open && !initialInterest) {
+      setStep('interest');
+    }
+  }, [open, initialInterest]);
 
   const handleClose = () => {
     onClose();
