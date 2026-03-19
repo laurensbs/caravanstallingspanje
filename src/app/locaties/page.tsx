@@ -29,7 +29,8 @@ export default function LocatiesPage() {
       <PageHero badge="Onze locatie" title={<><span className="gradient-text">Costa Brava</span>, Spanje</>} subtitle="Ons stallingsterrein en werkplaats liggen centraal aan de Costa Brava, in het rustige Sant Climent de Peralta, provincie Girona. Op korte afstand van Pals, Begur, L'Estartit en Palamós." image="https://u.cubeupload.com/laurensbos/caravanstoragespain.jpg" />
 
       {/* Main Location */}
-      <section className="py-10 sm:py-20 bg-surface">
+      <section className="py-14 sm:py-24 bg-surface relative overflow-hidden">
+        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-primary/[0.03] rounded-full blur-3xl pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-start">
             <A>
@@ -119,13 +120,14 @@ export default function LocatiesPage() {
       </section>
 
       {/* Nearby */}
-      <section className="py-10 sm:py-20 bg-surface">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Omgeving</p>
+      <section className="py-14 sm:py-24 bg-premium-warm relative overflow-hidden">
+        <div className="absolute -top-20 -left-20 w-72 h-72 bg-primary/[0.04] rounded-full blur-3xl pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
+          <A className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
+            <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3"><MapPin size={11} className="text-primary" /><span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Omgeving</span></span>
             <h2 className="text-2xl sm:text-4xl font-black mb-3">Populaire bestemmingen</h2>
-            <div className="section-divider mt-3" />
-            <p className="text-warm-gray mt-3 text-sm">Onze stalling ligt centraal, op korte afstand van de mooiste badplaatsen en dorpen.</p>
+            <div className="divider-animated mt-3 mb-4" />
+            <p className="text-warm-gray text-sm">Onze stalling ligt centraal, op korte afstand van de mooiste badplaatsen en dorpen.</p>
           </A>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 max-w-5xl mx-auto">
@@ -136,8 +138,8 @@ export default function LocatiesPage() {
               { place: 'Palamós', km: '15 km', desc: 'Authentieke vissershaven, beroemd om de gambas en de visveiling', rating: 4.6 },
             ].map((p, i) => (
               <A key={p.place} delay={i * 0.08}>
-                <div className="bg-surface rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-sand-dark/[0.04] card-hover h-full text-center">
-                  <p className="text-primary font-bold text-xl mb-1">{p.km}</p>
+                <div className="card-premium p-4 sm:p-6 h-full text-center">
+                  <p className="stat-number text-xl mb-1">{p.km}</p>
                   <h3 className="font-black text-lg mb-2">{p.place}</h3>
                   <p className="text-xs text-warm-gray leading-relaxed mb-3">{p.desc}</p>
                   <div className="flex items-center justify-center gap-1">
@@ -152,7 +154,7 @@ export default function LocatiesPage() {
       </section>
 
       {/* Facts */}
-      <section className="py-16 sm:py-20 bg-card">
+      <section className="py-12 sm:py-16 bg-card relative">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
@@ -161,11 +163,13 @@ export default function LocatiesPage() {
                 { val: '12', lbl: 'Medewerkers in seizoen' },
                 { val: '4.9/5', lbl: 'Google reviews' },
                 { val: '7', lbl: 'Transporteenheden' },
-              ].map(s => (
-                <div key={s.lbl}>
-                  <p className="text-3xl sm:text-4xl font-black gradient-text mb-1">{s.val}</p>
-                  <p className="text-xs text-warm-gray font-medium">{s.lbl}</p>
-                </div>
+              ].map((s, i) => (
+                <A key={s.lbl} delay={i * 0.1}>
+                  <div>
+                    <p className="stat-number text-3xl sm:text-4xl mb-1">{s.val}</p>
+                    <p className="text-xs text-warm-gray font-medium">{s.lbl}</p>
+                  </div>
+                </A>
               ))}
             </div>
           </A>
@@ -173,12 +177,13 @@ export default function LocatiesPage() {
       </section>
 
       {/* Bereikbaarheid */}
-      <section className="py-10 sm:py-20 bg-surface">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Bereikbaarheid</p>
+      <section className="py-14 sm:py-24 bg-premium-cool relative overflow-hidden">
+        <div className="absolute -bottom-32 -right-32 w-80 h-80 bg-ocean/[0.04] rounded-full blur-3xl pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
+          <A className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
+            <span className="inline-flex items-center gap-2 bg-ocean/8 rounded-full px-3 py-1 mb-3"><Navigation size={11} className="text-ocean" /><span className="text-ocean text-xs font-bold tracking-[0.15em] uppercase">Bereikbaarheid</span></span>
             <h2 className="text-2xl sm:text-4xl font-black mb-3">Hoe komt u bij ons?</h2>
-            <div className="section-divider mt-3 mb-3" />
+            <div className="divider-animated mt-3 mb-4" />
             <p className="text-warm-gray leading-relaxed text-sm">Met vliegtuig of auto — we zijn goed bereikbaar.</p>
           </A>
 
@@ -189,7 +194,7 @@ export default function LocatiesPage() {
               { icon: Navigation, title: 'Navigatie', desc: 'Voer in uw navigatie in: Ctra de Palamós 91, 17110 Sant Climent de Peralta, Girona. Google Maps en Waze kennen ons adres. Parkeren is mogelijk op het terrein.', color: 'bg-primary/10 text-primary' },
             ].map((f, i) => (
               <A key={f.title} delay={i * 0.08}>
-                <div className="bg-card rounded-2xl p-6 border border-sand-dark/20 card-hover h-full">
+                <div className="card-premium p-6 h-full">
                   <div className={`w-12 h-12 ${f.color} rounded-xl flex items-center justify-center mb-4`}>
                     <f.icon size={22} />
                   </div>
@@ -203,12 +208,13 @@ export default function LocatiesPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-10 sm:py-20 bg-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Veelgestelde vragen</p>
+      <section className="py-14 sm:py-24 bg-card relative">
+        <div className="absolute inset-0 line-pattern opacity-20 pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
+          <A className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
+            <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3"><HelpCircle size={11} className="text-primary" /><span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Veelgestelde vragen</span></span>
             <h2 className="text-2xl sm:text-4xl font-black mb-3">Vragen over onze locatie?</h2>
-            <div className="section-divider mt-3" />
+            <div className="divider-animated mt-3" />
           </A>
           <A>
             <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">

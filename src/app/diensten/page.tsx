@@ -68,7 +68,8 @@ export default function DienstenPage() {
       </nav>
 
       {/* ═══════════ STALLING ═══════════ */}
-      <section id="stalling" className="py-10 sm:py-20 bg-card scroll-mt-28">
+      <section id="stalling" className="py-14 sm:py-24 bg-card scroll-mt-28 relative overflow-hidden">
+        <div className="absolute inset-0 line-pattern opacity-30 pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
@@ -127,7 +128,7 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ REPARATIE & ONDERHOUD ═══════════ */}
-      <section id="reparatie" className="py-10 sm:py-20 bg-surface scroll-mt-28">
+      <section id="reparatie" className="py-14 sm:py-24 bg-premium-cool scroll-mt-28 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
@@ -181,14 +182,15 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ CARAVANREPAIR® ═══════════ */}
-      <section id="caravanrepair" className="py-10 sm:py-20 bg-card scroll-mt-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-3xl mx-auto mb-8 sm:mb-14">
+      <section id="caravanrepair" className="py-14 sm:py-24 bg-card scroll-mt-28 relative overflow-hidden">
+        <div className="absolute inset-0 line-pattern opacity-30 pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
+          <A className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
             <div className="inline-flex items-center gap-2 bg-primary/8 text-primary px-4 py-1.5 rounded-full text-xs font-bold mb-3">
               <Award size={14} /> Officieel Masterdealer
             </div>
             <h2 className="text-2xl sm:text-4xl font-black mb-3">CaravanRepair® schadeherstel</h2>
-            <div className="section-divider mt-3 mb-3" />
+            <div className="divider-animated mt-3 mb-4" />
             <p className="text-warm-gray leading-relaxed text-sm sm:text-base">
               CaravanRepair® is de grootste keten van erkende caravan- en camperschadespecialisten in Nederland en Europa. Caravanstalling Spanje is officieel CaravanRepair® Masterdealer — het hoogste niveau binnen het dealernetwerk.
             </p>
@@ -224,7 +226,7 @@ export default function DienstenPage() {
               </div>
 
               <div className="space-y-4">
-                <div className="bg-surface rounded-2xl p-6 border border-sand-dark/20">
+                <div className="card-premium p-6">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center"><Sparkles size={18} className="text-primary" /></div>
                     <h4 className="font-bold">Onzichtbaar herstel</h4>
@@ -232,7 +234,7 @@ export default function DienstenPage() {
                   <p className="text-sm text-warm-gray leading-relaxed">Het gepatenteerde systeem garandeert dat reparaties aan geprofileerde wanden 100% onzichtbaar zijn. Geen verschil met de originele wand.</p>
                 </div>
 
-                <div className="bg-surface rounded-2xl p-6 border border-sand-dark/20">
+                <div className="card-premium p-6">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center"><Shield size={18} className="text-accent" /></div>
                     <h4 className="font-bold">Levenslange garantie</h4>
@@ -240,7 +242,7 @@ export default function DienstenPage() {
                   <p className="text-sm text-warm-gray leading-relaxed">Op alle geprofileerde wandreparaties ontvangt u levenslange garantie. Dat geeft een betrouwbaar en veilig gevoel voor de toekomst.</p>
                 </div>
 
-                <div className="bg-surface rounded-2xl p-6 border border-sand-dark/20">
+                <div className="card-premium p-6">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 bg-ocean/10 rounded-xl flex items-center justify-center"><FileCheck size={18} className="text-ocean" /></div>
                     <h4 className="font-bold">Erkend door alle verzekeraars</h4>
@@ -248,7 +250,7 @@ export default function DienstenPage() {
                   <p className="text-sm text-warm-gray leading-relaxed">Het CaravanRepair® systeem wordt erkend door alle verzekeraars. Wij verzorgen de complete afhandeling van uw schadeclaim.</p>
                 </div>
 
-                <div className="bg-surface rounded-2xl p-6 border border-sand-dark/20">
+                <div className="card-premium p-6">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 bg-warning/10 rounded-xl flex items-center justify-center"><Zap size={18} className="text-warning" /></div>
                     <h4 className="font-bold">Sneller &amp; duurzamer</h4>
@@ -261,7 +263,7 @@ export default function DienstenPage() {
 
           <A>
             <div className="mt-12 text-center">
-              <button onClick={() => setQuizOpen(true)} className="bg-primary hover:bg-primary-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm cursor-pointer">
+              <button onClick={() => setQuizOpen(true)} className="bg-primary hover:bg-primary-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-lg shadow-primary/20 hover:shadow-xl hover:-translate-y-0.5 cursor-pointer">
                 Schade melden <ArrowRight size={14} />
               </button>
             </div>
@@ -270,7 +272,8 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ TRANSPORT ═══════════ */}
-      <section id="transport" className="py-10 sm:py-20 bg-surface scroll-mt-28">
+      <section id="transport" className="py-14 sm:py-24 bg-premium-warm scroll-mt-28 relative overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/[0.03] rounded-full blur-3xl pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
@@ -328,7 +331,8 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ VERKOOP ═══════════ */}
-      <section id="verkoop" className="py-10 sm:py-20 bg-card scroll-mt-28">
+      <section id="verkoop" className="py-14 sm:py-24 bg-card scroll-mt-28 relative overflow-hidden">
+        <div className="absolute inset-0 line-pattern opacity-30 pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
@@ -391,12 +395,13 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ VERHUUR ═══════════ */}
-      <section id="verhuur" className="py-10 sm:py-20 bg-surface scroll-mt-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
+      <section id="verhuur" className="py-14 sm:py-24 bg-premium-accent scroll-mt-28 relative overflow-hidden">
+        <div className="absolute -bottom-32 -left-32 w-72 h-72 bg-accent/[0.04] rounded-full blur-3xl pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
+          <A className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
             <div className="w-12 h-12 bg-accent/10 text-accent rounded-xl flex items-center justify-center mx-auto mb-3"><Bike size={22} /></div>
             <h2 className="text-2xl sm:text-4xl font-black mb-3">Verhuur</h2>
-            <div className="section-divider mt-3 mb-3" />
+            <div className="divider-animated mt-3 mb-4" />
             <p className="text-warm-gray leading-relaxed text-sm">Extra&apos;s voor uw verblijf aan de Costa Brava. Direct leverbaar op uw camping.</p>
           </A>
 
@@ -428,7 +433,7 @@ export default function DienstenPage() {
               },
             ].map((v, i) => (
               <A key={v.title} delay={i * 0.1}>
-                <div className="bg-card rounded-2xl p-7 border border-sand-dark/20 h-full flex flex-col card-hover">
+                <div className="card-premium p-7 h-full flex flex-col">
                   <div className={`w-12 h-12 ${v.color} rounded-xl flex items-center justify-center mb-5`}>
                     <v.icon size={22} />
                   </div>
@@ -450,7 +455,8 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ SCHOONMAAK ═══════════ */}
-      <section id="schoonmaak" className="py-10 sm:py-20 bg-card scroll-mt-28">
+      <section id="schoonmaak" className="py-14 sm:py-24 bg-card scroll-mt-28 relative overflow-hidden">
+        <div className="absolute inset-0 line-pattern opacity-20 pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
@@ -515,12 +521,12 @@ export default function DienstenPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-10 sm:py-20 bg-card">
+      <section className="py-14 sm:py-24 bg-premium-warm relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Veelgestelde vragen</p>
+          <A className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
+            <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3"><HelpCircle size={11} className="text-primary" /><span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Veelgestelde vragen</span></span>
             <h2 className="text-2xl sm:text-4xl font-black mb-3">Vragen over onze diensten?</h2>
-            <div className="section-divider mt-3" />
+            <div className="divider-animated mt-3" />
           </A>
           <A>
             <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">

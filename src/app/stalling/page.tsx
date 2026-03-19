@@ -28,15 +28,38 @@ export default function StallingPage() {
 
       <PageHero badge="Caravanstalling" title={<>Veilige stalling aan de <span className="gradient-text">Costa Brava</span></>} subtitle="Al meer dan 20 jaar dé specialist in het veilig en betrouwbaar stallen van caravans, campers, vouwwagens en boten in Sant Climent de Peralta. Securitas Direct bewaking, 24/7 camerabewaking en standaard verzekerd." image="https://u.cubeupload.com/laurensbos/caravanstoragespain3.jpg" />
 
+      {/* Stats strip */}
+      <section className="py-8 sm:py-10 bg-card relative">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <A>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8">
+              {[
+                { num: '20+', label: 'Jaar ervaring' },
+                { num: '200+', label: 'Tevreden klanten' },
+                { num: '24/7', label: 'Camerabewaking' },
+                { num: '14', label: 'Daagse controles' },
+              ].map((s, i) => (
+                <A key={s.label} delay={i * 0.1}>
+                  <div className="text-center">
+                    <p className="stat-number text-3xl sm:text-4xl mb-1">{s.num}</p>
+                    <p className="text-warm-gray text-xs font-medium">{s.label}</p>
+                  </div>
+                </A>
+              ))}
+            </div>
+          </A>
+        </div>
+      </section>
+
       {/* Intro / Waarom bij ons stallen */}
-      <section className="py-10 sm:py-20 bg-card">
+      <section className="py-12 sm:py-24 bg-premium-warm relative overflow-hidden wave-divider-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
               <div>
-                <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Waarom bij ons stallen?</p>
+                <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3"><span className="w-1.5 h-1.5 rounded-full bg-primary" /><span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Waarom bij ons stallen?</span></span>
                 <h2 className="text-2xl sm:text-4xl font-black mb-4">Uw caravan in goede handen</h2>
-                <div className="section-divider mt-0 mb-4" />
+                <div className="divider-animated mt-0 mb-4 !mx-0" />
                 <p className="text-warm-gray leading-relaxed mb-3 text-sm sm:text-base">
                   Laat uw caravan staan waar u hem gebruikt — aan de Costa Brava. Geen 3.000 km heen en weer, geen tolkosten, geen gedoe. Uw caravan staat veilig op ons terrein, klaar wanneer u aankomt.
                 </p>
@@ -57,13 +80,15 @@ export default function StallingPage() {
                   { icon: Wrench, title: 'Eigen werkplaats', desc: 'Reparaties worden direct uitgevoerd. Van banden en remmen tot dakluiken en vochtschade.', color: 'bg-primary/10 text-primary' },
                 ].map((f, i) => (
                   <A key={f.title} delay={i * 0.08}>
-                    <div className="flex gap-4 bg-surface rounded-xl p-4 border border-sand-dark/20">
-                      <div className={`w-11 h-11 ${f.color} rounded-xl flex items-center justify-center shrink-0`}>
-                        <f.icon size={19} />
-                      </div>
-                      <div>
-                        <p className="font-bold text-sm mb-0.5">{f.title}</p>
-                        <p className="text-xs text-warm-gray leading-relaxed">{f.desc}</p>
+                    <div className="card-premium p-4">
+                      <div className="flex gap-4">
+                        <div className={`w-11 h-11 ${f.color} rounded-xl flex items-center justify-center shrink-0`}>
+                          <f.icon size={19} />
+                        </div>
+                        <div>
+                          <p className="font-bold text-sm mb-0.5">{f.title}</p>
+                          <p className="text-xs text-warm-gray leading-relaxed">{f.desc}</p>
+                        </div>
                       </div>
                     </div>
                   </A>
@@ -75,12 +100,13 @@ export default function StallingPage() {
       </section>
 
       {/* Stalling types */}
-      <section className="py-10 sm:py-20 bg-surface">
+      <section className="py-14 sm:py-24 bg-surface relative overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-accent/[0.03] rounded-full blur-3xl pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Stallingstypen</p>
+          <A className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
+            <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3"><span className="w-1.5 h-1.5 rounded-full bg-primary" /><span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Stallingstypen</span></span>
             <h2 className="text-2xl sm:text-4xl font-black mb-3">Kies uw stallingtype</h2>
-            <div className="section-divider mt-3 mb-3" />
+            <div className="divider-animated mt-3 mb-4" />
             <p className="text-warm-gray text-sm">Inclusief beveiliging, verzekering en controle.</p>
           </A>
 
@@ -100,7 +126,7 @@ export default function StallingPage() {
               },
             ].map((t, i) => (
               <A key={t.title} delay={i * 0.1}>
-                <div className="relative bg-card rounded-2xl p-7 sm:p-8 border border-sand-dark/20 card-hover h-full flex flex-col">
+                <div className="card-premium p-7 sm:p-8 h-full flex flex-col">
                   {t.tag && <span className="absolute top-6 right-6 bg-primary/8 text-primary text-[10px] font-bold px-3 py-1 rounded-full">{t.tag}</span>}
                   <div className={`w-12 h-12 ${t.gradient} rounded-xl flex items-center justify-center mb-5`}>
                     <t.icon size={22} />
@@ -117,7 +143,7 @@ export default function StallingPage() {
                     <span className="text-4xl font-black">€{t.price}</span>
                     <span className="text-warm-gray text-sm">/maand</span>
                   </div>
-                  <button onClick={() => setQuizOpen(true)} className="w-full bg-accent hover:bg-accent-dark text-white font-bold px-6 py-3.5 rounded-xl text-sm transition-all inline-flex items-center justify-center gap-2 shadow-sm cursor-pointer">
+                  <button onClick={() => setQuizOpen(true)} className="w-full bg-accent hover:bg-accent-dark text-white font-bold px-6 py-3.5 rounded-xl text-sm transition-all inline-flex items-center justify-center gap-2 shadow-lg shadow-accent/20 hover:shadow-xl hover:shadow-accent/30 hover:-translate-y-0.5 cursor-pointer">
                     Stalling aanvragen <ArrowRight size={14} />
                   </button>
                 </div>
@@ -128,12 +154,13 @@ export default function StallingPage() {
       </section>
 
       {/* Wat wij doen tijdens stalling */}
-      <section className="py-10 sm:py-20 bg-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-3xl mx-auto mb-8 sm:mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Onze zorg</p>
+      <section className="py-14 sm:py-24 bg-card relative overflow-hidden">
+        <div className="absolute inset-0 line-pattern opacity-40 pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
+          <A className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
+            <span className="inline-flex items-center gap-2 bg-accent/8 rounded-full px-3 py-1 mb-3"><span className="w-1.5 h-1.5 rounded-full bg-accent" /><span className="text-accent text-xs font-bold tracking-[0.15em] uppercase">Onze zorg</span></span>
             <h2 className="text-2xl sm:text-4xl font-black mb-3">Wat wij doen voor uw caravan</h2>
-            <div className="section-divider mt-3 mb-3" />
+            <div className="divider-animated mt-3 mb-4" />
             <p className="text-warm-gray leading-relaxed text-sm">Meer dan alleen parkeren — het hele jaar door actieve zorg.</p>
           </A>
 
@@ -161,7 +188,7 @@ export default function StallingPage() {
               },
             ].map((f, i) => (
               <A key={f.title} delay={i * 0.08}>
-                <div className="bg-surface rounded-2xl p-6 border border-sand-dark/20 card-hover h-full">
+                <div className="card-premium p-6 h-full">
                   <div className="flex items-center gap-3 mb-3">
                     <div className={`w-10 h-10 ${f.color} rounded-xl flex items-center justify-center shrink-0`}>
                       <f.icon size={18} />
@@ -177,14 +204,15 @@ export default function StallingPage() {
       </section>
 
       {/* Security Detail */}
-      <section className="py-10 sm:py-20 bg-surface">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <section className="py-14 sm:py-24 bg-premium-cool relative overflow-hidden">
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-ocean/[0.04] rounded-full blur-3xl pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
           <A>
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
               <div>
-                <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Beveiliging</p>
+                <span className="inline-flex items-center gap-2 bg-ocean/8 rounded-full px-3 py-1 mb-3"><Lock size={11} className="text-ocean" /><span className="text-ocean text-xs font-bold tracking-[0.15em] uppercase">Beveiliging</span></span>
                 <h2 className="text-2xl sm:text-4xl font-black mb-4">Uw caravan is bij ons veilig</h2>
-                <div className="section-divider mt-0 mb-4" />
+                <div className="divider-animated mt-0 mb-4 !mx-0" />
                 <p className="text-warm-gray leading-relaxed mb-3 text-sm sm:text-base">
                   Ons terrein is volledig omsloten, alleen toegankelijk voor personeel. Securitas Direct met directe alarmopvolging. Standaard verzekerd tegen schade en diefstal.
                 </p>
@@ -209,7 +237,7 @@ export default function StallingPage() {
                   { icon: Eye, title: 'Dagelijks toezicht', desc: 'Ons personeel is dagelijks aanwezig op het terrein voor toezicht en onderhoud.', color: 'bg-warning/10 text-warning' },
                 ].map((f, i) => (
                   <A key={f.title} delay={i * 0.08}>
-                    <div className="bg-card rounded-2xl p-5 border border-sand-dark/20 card-hover h-full text-center">
+                    <div className="card-premium p-5 h-full text-center">
                       <div className={`w-12 h-12 ${f.color} rounded-xl flex items-center justify-center mx-auto mb-3`}>
                         <f.icon size={20} />
                       </div>
@@ -225,14 +253,15 @@ export default function StallingPage() {
       </section>
 
       {/* Spot System */}
-      <section className="py-10 sm:py-20 bg-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <section className="py-14 sm:py-24 bg-card relative overflow-hidden">
+        <div className="absolute inset-0 line-pattern opacity-30 pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
           <A>
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
               <div className="text-center lg:text-left">
-                <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Organisatie</p>
+                <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3"><MapPin size={11} className="text-primary" /><span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Organisatie</span></span>
                 <h2 className="text-2xl sm:text-4xl font-black mb-4">Vaste plek met pleknummer</h2>
-                <div className="section-divider mt-0 mb-4 mx-auto lg:mx-0" />
+                <div className="divider-animated mt-0 mb-4 mx-auto lg:!mx-0" />
                 <p className="text-warm-gray mb-3 leading-relaxed text-sm sm:text-base">Elke caravan krijgt een eigen, vaste plek. Online inzien via uw klantportaal — inclusief contract, facturen en inspecties.</p>
                 <p className="text-warm-gray mb-6 leading-relaxed text-sm sm:text-base">Zones A-D buitenstalling, zone H binnenstalling.</p>
                 <div className="space-y-3 text-left max-w-sm mx-auto lg:mx-0">
@@ -260,21 +289,25 @@ export default function StallingPage() {
       </section>
 
       {/* Wat kunt u stallen */}
-      <section className="py-16 sm:py-20 bg-surface">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+      <section className="py-14 sm:py-24 bg-premium-accent relative overflow-hidden">
+        <div className="absolute -top-20 -left-20 w-72 h-72 bg-accent/[0.04] rounded-full blur-3xl pointer-events-none" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 relative">
           <A className="text-center max-w-2xl mx-auto mb-10">
+            <span className="inline-flex items-center gap-2 bg-accent/8 rounded-full px-3 py-1 mb-3"><Truck size={11} className="text-accent" /><span className="text-accent text-xs font-bold tracking-[0.15em] uppercase">Voertuigtypes</span></span>
             <h2 className="text-2xl sm:text-3xl font-black mb-4">Wat kunt u bij ons stallen?</h2>
+            <div className="divider-animated mt-0 mb-4" />
             <p className="text-warm-gray text-sm">Wij stallen niet alleen caravans, maar ook campers, vouwwagens en boten.</p>
           </A>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { type: 'Caravans', desc: 'Alle merken en lengtes' },
-              { type: 'Campers', desc: 'Integraal & halfintegraal' },
-              { type: 'Vouwwagens', desc: 'Compact gestald' },
-              { type: 'Boten & trailers', desc: 'Op aanvraag' },
+              { type: 'Caravans', desc: 'Alle merken en lengtes', icon: '🏕️' },
+              { type: 'Campers', desc: 'Integraal & halfintegraal', icon: '🚐' },
+              { type: 'Vouwwagens', desc: 'Compact gestald', icon: '⛺' },
+              { type: 'Boten & trailers', desc: 'Op aanvraag', icon: '⛵' },
             ].map((v, i) => (
               <A key={v.type} delay={i * 0.08}>
-                <div className="bg-card rounded-xl p-5 border border-sand-dark/20 text-center card-hover">
+                <div className="card-premium p-5 text-center">
+                  <span className="text-2xl mb-2 block">{v.icon}</span>
                   <p className="font-bold text-sm mb-1">{v.type}</p>
                   <p className="text-xs text-warm-gray">{v.desc}</p>
                 </div>
@@ -285,12 +318,13 @@ export default function StallingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-10 sm:py-20 bg-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Veelgestelde vragen</p>
+      <section className="py-14 sm:py-24 bg-card relative">
+        <div className="absolute inset-0 line-pattern opacity-20 pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
+          <A className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
+            <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3"><HelpCircle size={11} className="text-primary" /><span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Veelgestelde vragen</span></span>
             <h2 className="text-2xl sm:text-4xl font-black mb-3">Vragen over stalling?</h2>
-            <div className="section-divider mt-3" />
+            <div className="divider-animated mt-3" />
           </A>
           <A>
             <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">

@@ -25,10 +25,12 @@ export default function ContactPage() {
       />
 
       {/* Quick Contact Options */}
-      <section className="py-10 sm:py-16 bg-surface">
+      <section className="py-12 sm:py-20 bg-surface relative overflow-hidden">
+        <div className="absolute -top-32 -right-32 w-80 h-80 bg-accent/[0.04] rounded-full blur-3xl pointer-events-none" />
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <A>
-            <div className="text-center mb-8">
+            <div className="text-center mb-10">
+              <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3"><span className="w-1.5 h-1.5 rounded-full bg-primary" /><span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Contact</span></span>
               <h2 className="text-xl sm:text-3xl font-black mb-2">Hoe wilt u contact opnemen?</h2>
               <p className="text-warm-gray text-sm sm:text-base max-w-xl mx-auto">Kies de manier die u het beste uitkomt.</p>
             </div>
@@ -39,8 +41,9 @@ export default function ContactPage() {
             <A className="col-span-2 sm:col-span-3">
               <button
                 onClick={() => setQuizOpen(true)}
-                className="w-full bg-gradient-to-br from-accent to-accent-dark text-white rounded-2xl p-5 sm:p-10 text-left hover:shadow-xl transition-all group cursor-pointer"
+                className="w-full bg-gradient-to-br from-accent to-accent-dark text-white rounded-2xl p-5 sm:p-10 text-left hover:shadow-2xl transition-all group cursor-pointer relative overflow-hidden"
               >
+                <div className="absolute -top-20 -right-20 w-60 h-60 bg-white/[0.04] rounded-full blur-2xl pointer-events-none" />
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="inline-flex items-center gap-2 bg-white/20 rounded-full px-3 py-1 text-xs font-bold mb-3">
@@ -64,7 +67,7 @@ export default function ContactPage() {
 
             {/* Call */}
             <A delay={0.1}>
-              <a href="tel:+34650036755" className="block bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-sand-dark/[0.06] hover:border-primary/20 hover:shadow-lg transition-all h-full">
+              <a href="tel:+34650036755" className="block card-premium p-4 sm:p-6 h-full">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-hero/10 rounded-xl flex items-center justify-center mb-3">
                   <Phone size={18} className="text-hero" />
                 </div>
@@ -76,7 +79,7 @@ export default function ContactPage() {
 
             {/* WhatsApp */}
             <A delay={0.15}>
-              <a href="https://wa.me/34650036755" target="_blank" rel="noopener noreferrer" className="block bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-sand-dark/[0.06] hover:border-[#25D366]/30 hover:shadow-lg transition-all h-full">
+              <a href="https://wa.me/34650036755" target="_blank" rel="noopener noreferrer" className="block card-premium p-4 sm:p-6 h-full">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#25D366]/10 rounded-xl flex items-center justify-center mb-3">
                   <MessageCircle size={18} className="text-[#25D366]" />
                 </div>
@@ -88,7 +91,7 @@ export default function ContactPage() {
 
             {/* Email — only visible on sm+ to keep 2-col grid clean on mobile */}
             <A delay={0.2} className="col-span-2 sm:col-span-1">
-              <a href="mailto:info@caravanstalling-spanje.com" className="block bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-sand-dark/[0.06] hover:border-primary/20 hover:shadow-lg transition-all h-full">
+              <a href="mailto:info@caravanstalling-spanje.com" className="block card-premium p-4 sm:p-6 h-full">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-3">
                   <Mail size={18} className="text-primary" />
                 </div>
@@ -111,7 +114,8 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Info + Image */}
-      <section className="py-10 sm:py-16 bg-sand/30">
+      <section className="py-12 sm:py-20 bg-premium-warm relative overflow-hidden">
+        <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-primary/[0.04] rounded-full blur-3xl pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
             <A>
@@ -160,7 +164,7 @@ export default function ContactPage() {
 
       {/* Map */}
       <section className="bg-surface">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
           <A>
             <div className="rounded-2xl overflow-hidden border border-sand-dark/[0.04]">
               <iframe

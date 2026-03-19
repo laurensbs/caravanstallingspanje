@@ -81,13 +81,14 @@ export default function TarievenPage() {
       <PageHero badge="Tarieven" title={<>Transparante <span className="gradient-text">tarieven</span></>} subtitle="Geen verborgen kosten. Bewaking, verzekering, tweewekelijkse controles en jaarlijkse technische keuring zijn bij elk stallingstype inbegrepen. U betaalt een vast maandtarief en weet precies waar u aan toe bent." image="https://u.cubeupload.com/laurensbos/caravanstoragespain2.jpg" />
 
       {/* Pricing Cards */}
-      <section className="py-10 sm:py-20 bg-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <section className="py-14 sm:py-24 bg-card relative overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-accent/[0.04] rounded-full blur-3xl pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {plans.map((p, i) => (
               <A key={p.title} delay={i * 0.1}>
-                <div className={`relative bg-card rounded-2xl p-7 sm:p-8 border h-full flex flex-col ${p.popular ? 'border-accent/30 ring-1 ring-accent/10 shadow-lg' : 'border-sand-dark/[0.06]'}`}>
-                  {p.popular && <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-accent text-white text-[10px] font-bold px-4 py-1.5 rounded-full shadow-sm uppercase tracking-wider">Populair</span>}
+                <div className={`card-premium p-7 sm:p-8 h-full flex flex-col ${p.popular ? 'ring-2 ring-accent/20 shadow-lg' : ''}`}>
+                  {p.popular && <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-accent text-white text-[10px] font-bold px-4 py-1.5 rounded-full shadow-md uppercase tracking-wider">Populair</span>}
                   <div className={`w-12 h-12 ${p.color} rounded-xl flex items-center justify-center mb-5`}>
                     <Shield size={20} />
                   </div>
@@ -103,7 +104,7 @@ export default function TarievenPage() {
                       <li key={f} className="flex items-center gap-2.5 text-sm"><CheckCircle size={14} className="text-success shrink-0" /> {f}</li>
                     ))}
                   </ul>
-                  <button onClick={() => setQuizOpen(true)} className={`w-full font-bold px-6 py-3.5 rounded-xl text-sm transition-all inline-flex items-center justify-center gap-2 cursor-pointer ${p.popular ? 'bg-accent hover:bg-accent-dark text-white shadow-sm' : 'bg-hero/[0.04] hover:bg-sand-dark/[0.08] text-surface-dark'}`}>
+                  <button onClick={() => setQuizOpen(true)} className={`w-full font-bold px-6 py-3.5 rounded-xl text-sm transition-all inline-flex items-center justify-center gap-2 cursor-pointer hover:-translate-y-0.5 ${p.popular ? 'bg-accent hover:bg-accent-dark text-white shadow-lg shadow-accent/20 hover:shadow-xl' : 'bg-hero/[0.04] hover:bg-sand-dark/[0.08] text-surface-dark'}`}>
                     {p.cta} <ArrowRight size={14} />
                   </button>
                 </div>
@@ -114,12 +115,12 @@ export default function TarievenPage() {
       </section>
 
       {/* Comparison Table */}
-      <section className="py-16 sm:py-20 bg-surface">
+      <section className="py-14 sm:py-24 bg-premium-warm relative">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-2xl mx-auto mb-10">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Vergelijking</p>
+            <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3"><span className="w-1.5 h-1.5 rounded-full bg-primary" /><span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Vergelijking</span></span>
             <h2 className="text-2xl sm:text-3xl font-black mb-4">Wat is inbegrepen?</h2>
-            <div className="section-divider mt-5 mb-5" />
+            <div className="divider-animated mt-3 mb-4" />
           </A>
           <A>
             <div className="overflow-x-auto">
@@ -159,12 +160,13 @@ export default function TarievenPage() {
       </section>
 
       {/* Extra Services */}
-      <section className="py-10 sm:py-20 bg-surface">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Extra diensten</p>
+      <section className="py-14 sm:py-24 bg-surface relative overflow-hidden">
+        <div className="absolute -bottom-32 -right-32 w-72 h-72 bg-primary/[0.03] rounded-full blur-3xl pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
+          <A className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
+            <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3"><Sparkles size={11} className="text-primary" /><span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Extra diensten</span></span>
             <h2 className="text-2xl sm:text-4xl font-black mb-3">Aanvullende services</h2>
-            <div className="section-divider mt-3 mb-3" />
+            <div className="divider-animated mt-3 mb-4" />
             <p className="text-warm-gray leading-relaxed text-sm">Schoonmaak, transport, verhuur en meer.</p>
           </A>
 
@@ -182,10 +184,10 @@ export default function TarievenPage() {
       </section>
 
       {/* CaravanRepair */}
-      <section className="py-16 bg-card">
+      <section className="py-14 sm:py-16 bg-card relative">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <A>
-            <div className="bg-surface rounded-2xl p-8 sm:p-10 border border-sand-dark/[0.04] flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+            <div className="card-premium p-8 sm:p-10 flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
               <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center shrink-0">
                 <Sparkles className="text-primary" size={28} />
               </div>
@@ -202,12 +204,12 @@ export default function TarievenPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-10 sm:py-20 bg-card">
+      <section className="py-14 sm:py-24 bg-premium-warm relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Veelgestelde vragen</p>
+          <A className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
+            <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3"><HelpCircle size={11} className="text-primary" /><span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Veelgestelde vragen</span></span>
             <h2 className="text-2xl sm:text-4xl font-black mb-3">Heeft u vragen?</h2>
-            <div className="section-divider mt-3" />
+            <div className="divider-animated mt-3" />
           </A>
 
           <A>
