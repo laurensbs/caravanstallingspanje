@@ -294,45 +294,59 @@ function MijnAccountContent() {
       <div className="min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-sand/40 via-surface to-sand/60 p-4 relative overflow-hidden">
         <div className="absolute top-20 right-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
         <div className="absolute bottom-20 left-20 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
-        <div className="bg-surface rounded-3xl shadow-xl shadow-sand-dark/20 border border-sand-dark/20 p-8 sm:p-10 w-full max-w-md relative">
-          <div className="text-center mb-8">
+        <div className="bg-surface rounded-3xl shadow-xl shadow-sand-dark/20 border border-sand-dark/20 p-6 sm:p-10 w-full max-w-md relative">
+          <div className="text-center mb-6">
             <div className="w-14 h-14 bg-gradient-to-br from-primary to-primary-light rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/20">
               <Shield className="text-white" size={24}/>
             </div>
-            <h1 className="text-2xl font-black text-surface-dark">{showForgot ? 'Wachtwoord vergeten' : isRegister ? 'Account aanmaken' : 'Mijn Account'}</h1>
-            <p className="text-sm text-warm-gray/70 mt-1">Caravanstalling Spanje</p>
+            {showForgot ? (
+              <>
+                <h1 className="text-2xl font-black text-surface-dark">Wachtwoord vergeten</h1>
+                <p className="text-sm text-warm-gray/70 mt-1">Vul uw e-mailadres in voor een resetlink</p>
+              </>
+            ) : (
+              <>
+                <h1 className="text-2xl font-black text-surface-dark">Mijn Account</h1>
+                <p className="text-sm text-warm-gray/70 mt-1">Caravanstalling Spanje</p>
+              </>
+            )}
           </div>
+
+          {/* Tab toggle login/register */}
+          {!showForgot && (
+            <div className="flex bg-sand/60 rounded-xl p-1 mb-6">
+              <button type="button" onClick={() => { setIsRegister(false); setLoginError(''); }} className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ${!isRegister ? 'bg-white text-surface-dark shadow-sm' : 'text-warm-gray/60 hover:text-warm-gray'}`}>Inloggen</button>
+              <button type="button" onClick={() => { setIsRegister(true); setLoginError(''); }} className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ${isRegister ? 'bg-white text-surface-dark shadow-sm' : 'text-warm-gray/60 hover:text-warm-gray'}`}>Registreren</button>
+            </div>
+          )}
+
           {loginError && <div className="bg-danger/10 border border-danger/30 text-danger text-sm p-3 rounded-xl mb-5 flex items-center gap-2"><AlertCircle size={14}/>{loginError}</div>}
           {showForgot ? (
             <div className="space-y-4">
               {forgotMsg && <div className="bg-accent/10 border border-accent/30 text-primary-dark text-sm p-3 rounded-xl flex items-center gap-2"><CheckCircle2 size={14}/>{forgotMsg}</div>}
               <form onSubmit={handleForgotPassword} className="space-y-4">
-                <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">E-mailadres</label><input type="email" required value={forgotEmail} onChange={e=>setForgotEmail(e.target.value)} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
+                <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">E-mailadres</label><input type="email" required value={forgotEmail} onChange={e=>setForgotEmail(e.target.value)} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3.5 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="uw@email.nl"/></div>
                 <button type="submit" disabled={forgotLoading} className="w-full bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-primary/20 disabled:opacity-50">{forgotLoading ? 'Verzenden...' : 'Resetlink versturen'}</button>
               </form>
-              <p className="text-center text-sm text-warm-gray/70">Weet u uw wachtwoord? <button type="button" onClick={()=>{setShowForgot(false);setForgotMsg('');}} className="text-primary font-semibold hover:underline">Inloggen</button></p>
+              <p className="text-center text-sm text-warm-gray/70">Weet u uw wachtwoord? <button type="button" onClick={()=>{setShowForgot(false);setForgotMsg('');}} className="text-primary font-semibold hover:underline">Terug naar inloggen</button></p>
             </div>
           ) : isRegister ? (
             <form onSubmit={register} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Voornaam *</label><input required value={registerForm.first_name} onChange={e=>setRegisterForm({...registerForm,first_name:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
-                <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Achternaam *</label><input required value={registerForm.last_name} onChange={e=>setRegisterForm({...registerForm,last_name:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Voornaam *</label><input required value={registerForm.first_name} onChange={e=>setRegisterForm({...registerForm,first_name:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3.5 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Jan"/></div>
+                <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Achternaam *</label><input required value={registerForm.last_name} onChange={e=>setRegisterForm({...registerForm,last_name:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3.5 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Janssen"/></div>
               </div>
-              <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">E-mail *</label><input type="email" required value={registerForm.email} onChange={e=>setRegisterForm({...registerForm,email:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
-              <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Telefoon</label><input value={registerForm.phone} onChange={e=>setRegisterForm({...registerForm,phone:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
-              <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Wachtwoord *</label><div className="relative"><input type={showPw?'text':'password'} required minLength={8} value={registerForm.password} onChange={e=>setRegisterForm({...registerForm,password:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm pr-10 bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/><button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-warm-gray/50 hover:text-warm-gray" aria-label={showPw ? "Wachtwoord verbergen" : "Wachtwoord tonen"}>{showPw?<EyeOff size={16}/>:<Eye size={16}/>}</button></div></div>
+              <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">E-mail *</label><input type="email" required value={registerForm.email} onChange={e=>setRegisterForm({...registerForm,email:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3.5 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="uw@email.nl"/></div>
+              <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Telefoon</label><input value={registerForm.phone} onChange={e=>setRegisterForm({...registerForm,phone:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3.5 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="+31 6 12345678"/></div>
+              <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Wachtwoord *</label><div className="relative"><input type={showPw?'text':'password'} required minLength={8} value={registerForm.password} onChange={e=>setRegisterForm({...registerForm,password:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3.5 text-sm pr-12 bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Min. 8 tekens"/><button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-warm-gray/50 hover:text-warm-gray p-1" aria-label={showPw ? "Wachtwoord verbergen" : "Wachtwoord tonen"}>{showPw?<EyeOff size={18}/>:<Eye size={18}/>}</button></div></div>
               <button type="submit" className="w-full bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-primary/20">Registreren</button>
-              <p className="text-center text-sm text-warm-gray/70">Al een account? <button type="button" onClick={()=>setIsRegister(false)} className="text-primary font-semibold hover:underline">Inloggen</button></p>
             </form>
           ) : (
             <form onSubmit={login} className="space-y-4">
-              <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">E-mail</label><input type="email" required value={loginForm.email} onChange={e=>setLoginForm({...loginForm,email:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
-              <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Wachtwoord</label><div className="relative"><input type={showPw?'text':'password'} required value={loginForm.password} onChange={e=>setLoginForm({...loginForm,password:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm pr-10 bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/><button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-warm-gray/50 hover:text-warm-gray" aria-label={showPw ? "Wachtwoord verbergen" : "Wachtwoord tonen"}>{showPw?<EyeOff size={16}/>:<Eye size={16}/>}</button></div></div>
+              <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">E-mail</label><input type="email" required value={loginForm.email} onChange={e=>setLoginForm({...loginForm,email:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3.5 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="uw@email.nl"/></div>
+              <div><label className="text-xs font-semibold text-warm-gray/70 block mb-2">Wachtwoord</label><div className="relative"><input type={showPw?'text':'password'} required value={loginForm.password} onChange={e=>setLoginForm({...loginForm,password:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3.5 text-sm pr-12 bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Uw wachtwoord"/><button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-warm-gray/50 hover:text-warm-gray p-1" aria-label={showPw ? "Wachtwoord verbergen" : "Wachtwoord tonen"}>{showPw?<EyeOff size={18}/>:<Eye size={18}/>}</button></div></div>
               <button type="submit" className="w-full bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-primary/20">Inloggen</button>
-              <div className="flex items-center justify-between text-sm">
-                <button type="button" onClick={()=>setShowForgot(true)} className="text-primary font-semibold hover:underline">Wachtwoord vergeten?</button>
-                <button type="button" onClick={()=>setIsRegister(true)} className="text-primary font-semibold hover:underline">Registreren</button>
-              </div>
+              <button type="button" onClick={()=>setShowForgot(true)} className="w-full text-center text-sm text-warm-gray/60 hover:text-primary transition-colors py-1">Wachtwoord vergeten?</button>
             </form>
           )}
         </div>

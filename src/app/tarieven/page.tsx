@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
@@ -8,6 +9,7 @@ import A from '@/components/AnimateIn';
 import CtaSection from '@/components/CtaSection';
 import PageHero from '@/components/PageHero';
 import { FaqItem } from '@/components/FaqAccordion';
+import QuizModal from '@/components/QuizModal';
 
 
 const plans = [
@@ -30,16 +32,6 @@ const plans = [
     popular: false,
     color: 'bg-ocean/10 text-ocean',
     cta: 'Beschikbaarheid checken',
-  },
-  {
-    title: 'Seizoensstalling',
-    price: '45',
-    period: '/maand',
-    desc: 'Voordelig tarief voor stalling uitsluitend buiten het kampeerseizoen (oktober t/m april). Uw caravan staat veilig terwijl u in Nederland bent. Upgrade naar jaarcontract altijd mogelijk.',
-    features: ['Buitenstalling terrein', 'Oktober t/m april', 'Securitas Direct alarm', 'Standaard verzekerd', '24/7 camerabewaking', 'Controle tijdens stallingperiode'],
-    popular: false,
-    color: 'bg-warning/10 text-warning',
-    cta: 'Meer informatie',
   },
 ];
 
@@ -70,6 +62,7 @@ const faqs = [
 ];
 
 export default function TarievenPage() {
+  const [quizOpen, setQuizOpen] = useState(false);
   const faqSchema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -90,7 +83,7 @@ export default function TarievenPage() {
       {/* Pricing Cards */}
       <section className="py-20 sm:py-28 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {plans.map((p, i) => (
               <A key={p.title} delay={i * 0.1}>
                 <div className={`relative bg-card rounded-2xl p-7 sm:p-8 border h-full flex flex-col ${p.popular ? 'border-accent/30 ring-1 ring-accent/10 shadow-lg' : 'border-sand-dark/[0.06]'}`}>
@@ -110,9 +103,9 @@ export default function TarievenPage() {
                       <li key={f} className="flex items-center gap-2.5 text-sm"><CheckCircle size={14} className="text-success shrink-0" /> {f}</li>
                     ))}
                   </ul>
-                  <Link href="/contact" className={`w-full font-bold px-6 py-3.5 rounded-xl text-sm transition-all inline-flex items-center justify-center gap-2 ${p.popular ? 'bg-accent hover:bg-accent-dark text-white shadow-sm' : 'bg-hero/[0.04] hover:bg-sand-dark/[0.08] text-surface-dark'}`}>
+                  <button onClick={() => setQuizOpen(true)} className={`w-full font-bold px-6 py-3.5 rounded-xl text-sm transition-all inline-flex items-center justify-center gap-2 cursor-pointer ${p.popular ? 'bg-accent hover:bg-accent-dark text-white shadow-sm' : 'bg-hero/[0.04] hover:bg-sand-dark/[0.08] text-surface-dark'}`}>
                     {p.cta} <ArrowRight size={14} />
-                  </Link>
+                  </button>
                 </div>
               </A>
             ))}
@@ -134,28 +127,26 @@ export default function TarievenPage() {
                 <thead>
                   <tr className="border-b border-sand-dark/10">
                     <th className="text-left px-5 py-4 font-bold">Kenmerk</th>
-                    <th className="text-center px-4 py-4 font-bold">Seizoen <span className="block text-xs font-normal text-warm-gray">€45/mnd</span></th>
                     <th className="text-center px-4 py-4 font-bold bg-accent/5">Buiten <span className="block text-xs font-normal text-warm-gray">€65/mnd</span></th>
                     <th className="text-center px-4 py-4 font-bold">Binnen <span className="block text-xs font-normal text-warm-gray">€95/mnd</span></th>
                   </tr>
                 </thead>
                 <tbody>
                   {[
-                    { feature: 'Securitas Direct alarm', seizoen: true, buiten: true, binnen: true },
-                    { feature: '24/7 camerabewaking', seizoen: true, buiten: true, binnen: true },
-                    { feature: 'Standaard verzekerd', seizoen: true, buiten: true, binnen: true },
-                    { feature: 'Eigen vaste plek', seizoen: true, buiten: true, binnen: true },
-                    { feature: 'Tweewekelijkse controle', seizoen: true, buiten: true, binnen: true },
-                    { feature: 'Jaarlijkse technische keuring', seizoen: false, buiten: true, binnen: true },
-                    { feature: 'Jaarrond beschikbaar', seizoen: false, buiten: true, binnen: true },
-                    { feature: 'Overdekte hal', seizoen: false, buiten: false, binnen: true },
-                    { feature: 'Geen UV-schade', seizoen: false, buiten: false, binnen: true },
-                    { feature: 'Stabiele temperatuur', seizoen: false, buiten: false, binnen: true },
-                    { feature: 'Geen mos/algvorming', seizoen: false, buiten: false, binnen: true },
+                    { feature: 'Securitas Direct alarm', buiten: true, binnen: true },
+                    { feature: '24/7 camerabewaking', buiten: true, binnen: true },
+                    { feature: 'Standaard verzekerd', buiten: true, binnen: true },
+                    { feature: 'Eigen vaste plek', buiten: true, binnen: true },
+                    { feature: 'Tweewekelijkse controle', buiten: true, binnen: true },
+                    { feature: 'Jaarlijkse technische keuring', buiten: true, binnen: true },
+                    { feature: 'Jaarrond beschikbaar', buiten: true, binnen: true },
+                    { feature: 'Overdekte hal', buiten: false, binnen: true },
+                    { feature: 'Geen UV-schade', buiten: false, binnen: true },
+                    { feature: 'Stabiele temperatuur', buiten: false, binnen: true },
+                    { feature: 'Geen mos/algvorming', buiten: false, binnen: true },
                   ].map((row, i) => (
                     <tr key={row.feature} className={i % 2 === 0 ? 'bg-surface/50' : ''}>
                       <td className="px-5 py-3 font-medium">{row.feature}</td>
-                      <td className="text-center px-4 py-3">{row.seizoen ? <CheckCircle size={16} className="text-success mx-auto" /> : <span className="text-warm-gray/40">—</span>}</td>
                       <td className="text-center px-4 py-3 bg-accent/5">{row.buiten ? <CheckCircle size={16} className="text-success mx-auto" /> : <span className="text-warm-gray/40">—</span>}</td>
                       <td className="text-center px-4 py-3">{row.binnen ? <CheckCircle size={16} className="text-success mx-auto" /> : <span className="text-warm-gray/40">—</span>}</td>
                     </tr>
@@ -227,8 +218,9 @@ export default function TarievenPage() {
         </div>
       </section>
 
-      <CtaSection title="Klaar om uw caravan te stallen?" subtitle="Vraag vrijblijvend een offerte aan of bel voor direct advies." primaryLabel="Offerte aanvragen" primaryColor="accent" />
+      <CtaSection title="Klaar om uw caravan te stallen?" subtitle="Vraag vrijblijvend een offerte aan of bel voor direct advies." primaryLabel="Offerte aanvragen" primaryColor="accent" onPrimaryClick={() => setQuizOpen(true)} />
 
+      <QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} source="tarieven" />
       <Footer />
     </>
   );

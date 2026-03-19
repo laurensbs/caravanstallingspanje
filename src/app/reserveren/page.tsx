@@ -20,7 +20,6 @@ const STEPS = [
 const STORAGE_TYPES = [
   { id: "buiten", label: "Buitenstalling", price: 65, desc: "Beveiligd buitenterrein met 24/7 bewaking", features: ["Securitas alarm", "24/7 camera's", "Verzekerd", "Tweewekelijkse controle"], icon: Shield, popular: false },
   { id: "binnen", label: "Binnenstalling", price: 95, desc: "Overdekte hal met klimaatbescherming", features: ["Geïsoleerde hal", "Geen hitte/kou", "Alle buiten-voordelen", "Premium locatie"], icon: Lock, popular: true },
-  { id: "seizoen", label: "Seizoensstalling", price: 45, desc: "Flexibel buiten het seizoen (okt-apr)", features: ["Buitenstalling", "Beveiligd", "6+ maanden", "Upgrade mogelijk"], icon: Calendar, popular: false },
 ];
 
 const EXTRAS = [
@@ -257,7 +256,7 @@ function BookingPageInner() {
                     </p>
                   </div>
 
-                  <div className="grid sm:grid-cols-3 gap-4">
+                  <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
                     {STORAGE_TYPES.map(type => (
                       <button key={type.id} onClick={() => update("storageType", type.id)} className={`relative text-left p-6 rounded-2xl border-2 transition-all duration-200 ${form.storageType === type.id ? "border-accent bg-surface shadow-lg shadow-primary/10 ring-1 ring-primary/10" : "border-transparent bg-surface hover:border-black/[0.08]"}`}>
                         {type.popular && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white text-[10px] font-bold px-3 py-1 rounded-full">Populair</span>}

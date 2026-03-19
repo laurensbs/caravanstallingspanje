@@ -1,13 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import Link from 'next/link';
 import { MapPin, Shield, Wrench, Sun, ArrowRight, Phone, CheckCircle, Star, Clock, Navigation, Plane, Car, Palmtree, HelpCircle } from 'lucide-react';
 import A from '@/components/AnimateIn';
 import CtaSection from '@/components/CtaSection';
 import PageHero from '@/components/PageHero';
 import { FaqItem } from '@/components/FaqAccordion';
+import QuizModal from '@/components/QuizModal';
 
 const locatieFaqs = [
   { q: 'Waar ligt de stalling precies?', a: 'Onze stalling ligt in Sant Climent de Peralta, een klein dorp in de gemeente Forallac, provincie Girona. Centraal aan de Costa Brava, op 25 minuten van Pals en L\'Estartit, 35 minuten van Begur en 45 minuten van Girona Airport.' },
@@ -20,6 +21,7 @@ const locatieFaqs = [
 
 
 export default function LocatiesPage() {
+  const [quizOpen, setQuizOpen] = useState(false);
   return (
     <>
       <Header />
@@ -79,9 +81,9 @@ export default function LocatiesPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Link href="/contact" className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2">
-                    Route plannen <ArrowRight size={14} />
-                  </Link>
+                  <button onClick={() => setQuizOpen(true)} className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 cursor-pointer">
+                    Afspraak maken <ArrowRight size={14} />
+                  </button>
                   <a href="tel:+34650036755" className="text-surface-dark hover:text-primary font-bold px-6 py-3 rounded-xl text-sm transition-colors inline-flex items-center gap-2 border border-sand-dark/[0.08]">
                     <Phone size={15} /> +34 650 036 755
                   </a>
@@ -225,8 +227,9 @@ export default function LocatiesPage() {
         }) }} />
       </section>
 
-      <CtaSection title="Bezoek onze stalling" subtitle="Maak een afspraak voor een rondleiding of neem vrijblijvend contact op." primaryLabel="Neem contact op" primaryColor="accent" />
+      <CtaSection title="Bezoek onze stalling" subtitle="Maak een afspraak voor een rondleiding of neem vrijblijvend contact op." primaryLabel="Neem contact op" primaryColor="accent" onPrimaryClick={() => setQuizOpen(true)} />
 
+      <QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} source="locaties" />
       <Footer />
     </>
   );

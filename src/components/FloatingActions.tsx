@@ -1,12 +1,14 @@
 'use client';
 
-import { Phone, ArrowUp, MessageCircle } from 'lucide-react';
+import { Phone, ArrowUp, MessageCircle, FileText } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import QuizModal from './QuizModal';
 
 export default function FloatingActions() {
   const [showTop, setShowTop] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [quizOpen, setQuizOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setShowTop(window.scrollY > 400);
@@ -15,6 +17,7 @@ export default function FloatingActions() {
   }, []);
 
   return (
+    <>
     <div className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-40 flex flex-col items-end gap-3">
       {/* Scroll to top */}
       <AnimatePresence>
@@ -41,6 +44,13 @@ export default function FloatingActions() {
             exit={{ opacity: 0, y: 10, scale: 0.9 }}
             className="flex flex-col gap-2 mb-1"
           >
+            <button
+              onClick={() => { setQuizOpen(true); setExpanded(false); }}
+              className="w-12 h-12 rounded-full bg-accent shadow-lg shadow-accent/20 flex items-center justify-center text-white hover:scale-110 transition-transform duration-300"
+              aria-label="Offerte aanvragen"
+            >
+              <FileText size={20} />
+            </button>
             <a
               href="https://wa.me/34650036755?text=Hallo%2C%20ik%20heb%20een%20vraag%20over%20caravanstalling%20aan%20de%20Costa%20Brava."
               target="_blank"
@@ -77,5 +87,7 @@ export default function FloatingActions() {
         </svg>
       </button>
     </div>
+    <QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} source="floating-action" />
+    </>
   );
 }

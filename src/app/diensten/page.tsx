@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
@@ -9,6 +10,7 @@ import A from '@/components/AnimateIn';
 import CtaSection from '@/components/CtaSection';
 import PageHero from '@/components/PageHero';
 import { FaqItem } from '@/components/FaqAccordion';
+import QuizModal from '@/components/QuizModal';
 
 const dienstenFaqs = [
   { q: 'Welke reparaties kunnen jullie uitvoeren?', a: 'Wij voeren vrijwel alle reparaties uit: remmen, banden, verlichting, gasinstallatie, waterleiding, dakluiken, ramen, vloer, elektra en carrosserie. Van kleine klussen tot complete renovaties. Onze werkplaats is volledig uitgerust voor alle merken caravans en campers.' },
@@ -21,6 +23,7 @@ const dienstenFaqs = [
 
 
 export default function DienstenPage() {
+  const [quizOpen, setQuizOpen] = useState(false);
   return (
     <>
       <Header />
@@ -170,9 +173,9 @@ export default function DienstenPage() {
                   </div>
                 </div>
 
-                <Link href="/contact" className="bg-ocean hover:bg-ocean-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2">
+                <button onClick={() => setQuizOpen(true)} className="bg-ocean hover:bg-ocean-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 cursor-pointer">
                   Reparatie aanvragen <ArrowRight size={14} />
-                </Link>
+                </button>
               </div>
             </div>
           </A>
@@ -260,9 +263,9 @@ export default function DienstenPage() {
 
           <A>
             <div className="mt-12 text-center">
-              <Link href="/contact" className="bg-primary hover:bg-primary-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm">
+              <button onClick={() => setQuizOpen(true)} className="bg-primary hover:bg-primary-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm cursor-pointer">
                 Schade melden <ArrowRight size={14} />
-              </Link>
+              </button>
             </div>
           </A>
         </div>
@@ -299,9 +302,9 @@ export default function DienstenPage() {
                   ))}
                 </div>
 
-                <Link href="/contact" className="bg-primary hover:bg-primary-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2">
+                <button onClick={() => setQuizOpen(true)} className="bg-primary hover:bg-primary-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 cursor-pointer">
                   Transport aanvragen <ArrowRight size={14} />
-                </Link>
+                </button>
               </div>
               <div className="bg-primary/5 rounded-2xl p-8 border border-sand-dark/20">
                 <h3 className="font-bold text-lg mb-4">Veelgevraagde routes</h3>
@@ -380,9 +383,9 @@ export default function DienstenPage() {
                   ))}
                 </div>
 
-                <Link href="/contact" className="bg-hero hover:bg-primary text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2">
+                <button onClick={() => setQuizOpen(true)} className="bg-hero hover:bg-primary text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 cursor-pointer">
                   Aanbod bekijken <ArrowRight size={14} />
-                </Link>
+                </button>
               </div>
             </div>
           </A>
@@ -482,9 +485,9 @@ export default function DienstenPage() {
                   ))}
                 </div>
 
-                <Link href="/contact" className="bg-ocean hover:bg-ocean-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2">
+                <button onClick={() => setQuizOpen(true)} className="bg-ocean hover:bg-ocean-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 cursor-pointer">
                   Schoonmaak boeken <ArrowRight size={14} />
-                </Link>
+                </button>
               </div>
               <div className="bg-ocean/5 rounded-2xl p-8 border border-sand-dark/20">
                 <h3 className="font-bold text-lg mb-4">Seizoensklaar pakket</h3>
@@ -538,8 +541,9 @@ export default function DienstenPage() {
         }) }} />
       </section>
 
-      <CtaSection title="Hulp nodig? Wij staan voor u klaar" subtitle="Neem contact op voor een vrijblijvende offerte of meer informatie. Wij spreken Nederlands, Engels en Spaans." hours="Op werkdagen bereikbaar van 09:30 tot 16:30 uur" primaryLabel="Neem contact op" />
+      <CtaSection title="Hulp nodig? Wij staan voor u klaar" subtitle="Neem contact op voor een vrijblijvende offerte of meer informatie. Wij spreken Nederlands, Engels en Spaans." hours="Op werkdagen bereikbaar van 09:30 tot 16:30 uur" primaryLabel="Neem contact op" onPrimaryClick={() => setQuizOpen(true)} />
 
+      <QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} source="diensten" />
       <Footer />
     </>
   );

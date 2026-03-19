@@ -42,7 +42,6 @@ export async function POST(request: NextRequest) {
     const pricing: Record<string, number> = {
       buiten: 65,
       binnen: 95,
-      seizoen: 45,
     };
 
     return NextResponse.json({

@@ -1,13 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import Link from 'next/link';
 import { Shield, Thermometer, Camera, CheckCircle, ArrowRight, Lock, Eye, Sparkles, Truck,  Sun, Droplets, Wind, FileCheck, MapPin, Clock, Wrench, HelpCircle } from 'lucide-react';
 import A from '@/components/AnimateIn';
 import CtaSection from '@/components/CtaSection';
 import PageHero from '@/components/PageHero';
 import { FaqItem } from '@/components/FaqAccordion';
+import QuizModal from '@/components/QuizModal';
 
 const stallingFaqs = [
   { q: 'Hoe is de beveiliging van het terrein geregeld?', a: 'Ons terrein is volledig omsloten en beveiligd met het Securitas Direct professioneel alarmsysteem met directe alarmopvolging. Daarnaast filmt een geavanceerd camerasysteem 24/7 alle bewegingen. Ons personeel is dagelijks aanwezig voor toezicht.' },
@@ -20,6 +21,7 @@ const stallingFaqs = [
 
 
 export default function StallingPage() {
+  const [quizOpen, setQuizOpen] = useState(false);
   return (
     <>
       <Header />
@@ -118,9 +120,9 @@ export default function StallingPage() {
                     <span className="text-4xl font-black">€{t.price}</span>
                     <span className="text-warm-gray text-sm">/maand</span>
                   </div>
-                  <Link href="/contact" className="w-full bg-accent hover:bg-accent-dark text-white font-bold px-6 py-3.5 rounded-xl text-sm transition-all inline-flex items-center justify-center gap-2 shadow-sm">
+                  <button onClick={() => setQuizOpen(true)} className="w-full bg-accent hover:bg-accent-dark text-white font-bold px-6 py-3.5 rounded-xl text-sm transition-all inline-flex items-center justify-center gap-2 shadow-sm cursor-pointer">
                     Stalling aanvragen <ArrowRight size={14} />
-                  </Link>
+                  </button>
                 </div>
               </A>
             ))}
@@ -314,8 +316,9 @@ export default function StallingPage() {
         }) }} />
       </section>
 
-      <CtaSection title="Wilt u uw caravan bij ons stallen?" subtitle="Neem contact op voor een vrijblijvende offerte of bel voor direct advies. Wij spreken Nederlands, Engels en Spaans." hours="Op werkdagen bereikbaar van 09:30 tot 16:30 uur" primaryLabel="Stalling aanvragen" />
+      <CtaSection title="Wilt u uw caravan bij ons stallen?" subtitle="Neem contact op voor een vrijblijvende offerte of bel voor direct advies. Wij spreken Nederlands, Engels en Spaans." hours="Op werkdagen bereikbaar van 09:30 tot 16:30 uur" primaryLabel="Stalling aanvragen" onPrimaryClick={() => setQuizOpen(true)} />
 
+      <QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} source="stalling" />
       <Footer />
     </>
   );

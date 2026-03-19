@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     // Pre-compute all values before entering the transaction
     const spotType = data.storageType === 'binnen' ? 'binnen' : 'buiten';
     const contractNum = 'CON-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-5);
-    const pricing: Record<string, number> = { buiten: 65, binnen: 95, seizoen: 45 };
+    const pricing: Record<string, number> = { buiten: 65, binnen: 95 };
     const monthlyRate = pricing[data.storageType] || 65;
     const startDate = data.startDate;
     const endDate = new Date(new Date(startDate).getTime() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
     try {
       const session = await createCheckoutSession({
         customerEmail: data.email,
-        storageType: data.storageType as 'buiten' | 'binnen' | 'seizoen',
+        storageType: data.storageType as 'buiten' | 'binnen',
         extras: data.extras,
         successUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://caravanstalling-spanje.com'}/reserveren?success=true&contract=${contractNum}`,
         cancelUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://caravanstalling-spanje.com'}/reserveren?cancelled=true`,

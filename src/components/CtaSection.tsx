@@ -8,13 +8,14 @@ interface CtaSectionProps {
   hours?: string;
   primaryLabel: string;
   primaryHref?: string;
+  onPrimaryClick?: () => void;
   primaryColor?: 'primary' | 'accent';
   secondaryPhone?: boolean;
   secondaryLabel?: string;
   secondaryHref?: string;
 }
 
-export default function CtaSection({ title, subtitle, hours, primaryLabel, primaryHref = '/contact', primaryColor = 'primary', secondaryPhone = true, secondaryLabel, secondaryHref }: CtaSectionProps) {
+export default function CtaSection({ title, subtitle, hours, primaryLabel, primaryHref = '/contact', onPrimaryClick, primaryColor = 'primary', secondaryPhone = true, secondaryLabel, secondaryHref }: CtaSectionProps) {
   const btnColor = primaryColor === 'accent' ? 'bg-accent hover:bg-accent-dark' : 'bg-primary hover:bg-primary-dark';
   return (
     <section className="bg-hero relative overflow-hidden">
@@ -26,9 +27,15 @@ export default function CtaSection({ title, subtitle, hours, primaryLabel, prima
           {hours && <p className="text-white/70 text-sm mb-8">{hours}</p>}
           {!hours && <div className="mb-4" />}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link href={primaryHref} className={`${btnColor} text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm`}>
-              {primaryLabel} <ArrowRight size={15} />
-            </Link>
+            {onPrimaryClick ? (
+              <button onClick={onPrimaryClick} className={`${btnColor} text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm cursor-pointer`}>
+                {primaryLabel} <ArrowRight size={15} />
+              </button>
+            ) : (
+              <Link href={primaryHref} className={`${btnColor} text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm`}>
+                {primaryLabel} <ArrowRight size={15} />
+              </Link>
+            )}
             {secondaryPhone ? (
               <a href="tel:+34650036755" className="text-white/60 hover:text-white font-medium px-6 py-3.5 rounded-xl text-sm transition-colors inline-flex items-center gap-2 border border-white/10 hover:border-white/20">
                 <Phone size={15} /> +34 650 036 755

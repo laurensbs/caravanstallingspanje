@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 // ── Booking ──
 export const bookingSchema = z.object({
-  storageType: z.enum(['buiten', 'binnen', 'seizoen']),
+  storageType: z.enum(['buiten', 'binnen']),
   caravanLength: z.string().min(1, 'Selecteer caravanlengte'),
   startDate: z.string().min(1, 'Selecteer startdatum'),
   locationId: z.number().positive(),
@@ -23,7 +23,7 @@ export const bookingSchema = z.object({
 });
 
 export const checkAvailabilitySchema = z.object({
-  storageType: z.enum(['buiten', 'binnen', 'seizoen']),
+  storageType: z.enum(['buiten', 'binnen']),
   caravanLength: z.string().min(1),
   startDate: z.string().min(1),
   locationId: z.number().positive(),

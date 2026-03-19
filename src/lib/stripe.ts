@@ -12,7 +12,6 @@ export const stripe = process.env.STRIPE_SECRET_KEY
 export const STORAGE_PRICES = {
   buiten: { monthly: 6500, label: 'Buitenstalling', stripePriceId: process.env.STRIPE_PRICE_OUTDOOR },
   binnen: { monthly: 9500, label: 'Binnenstalling', stripePriceId: process.env.STRIPE_PRICE_INDOOR },
-  seizoen: { monthly: 4500, label: 'Seizoensstalling', stripePriceId: process.env.STRIPE_PRICE_SEASONAL },
 } as const;
 
 export const EXTRAS = [
