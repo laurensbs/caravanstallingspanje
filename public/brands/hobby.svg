@@ -1,1 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 40"><text x="55" y="26" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-weight="900" font-size="22" fill="#003DA5" letter-spacing="1">Hobby</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 48">
+  <polygon points="20,6 30,16 20,26 10,16" fill="#003DA5" opacity="0.2"/>
+  <polygon points="20,6 30,16 20,26 10,16" fill="none" stroke="#003DA5" stroke-width="1.5"/>
+  <text x="70" y="30" text-anchor="middle" font-family="'Georgia',serif" font-weight="700" font-size="20" fill="#003DA5" letter-spacing="1">Hobby</text>
+  <line x1="38" y1="36" x2="102" y2="36" stroke="#003DA5" stroke-width="1.5" opacity="0.4"/>
+</svg>

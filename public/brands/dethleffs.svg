@@ -1,1 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 40"><text x="70" y="26" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-weight="800" font-size="19" fill="#C4161C" letter-spacing="1">Dethleffs</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 48">
+  <path d="M10 24 Q10 8 26 8 L124 8 Q140 8 140 24 Q140 40 124 40 L26 40 Q10 40 10 24Z" fill="none" stroke="#C4161C" stroke-width="2"/>
+  <circle cx="22" cy="24" r="5" fill="#C4161C" opacity="0.15"/>
+  <text x="75" y="30" text-anchor="middle" font-family="'Georgia',serif" font-weight="700" font-size="17" fill="#C4161C" font-style="italic" letter-spacing="1">Dethleffs</text>
+</svg>

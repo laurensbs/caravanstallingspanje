@@ -1,1 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 40"><text x="65" y="26" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-weight="800" font-size="20" fill="#1D1D1B" letter-spacing="1">Bürstner</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 48">
+  <line x1="10" y1="10" x2="10" y2="38" stroke="#1D1D1B" stroke-width="2.5"/>
+  <line x1="10" y1="10" x2="26" y2="10" stroke="#1D1D1B" stroke-width="2.5"/>
+  <text x="78" y="31" text-anchor="middle" font-family="'Georgia',serif" font-weight="700" font-size="19" fill="#1D1D1B" letter-spacing="1.5">Bürstner</text>
+  <line x1="32" y1="38" x2="130" y2="38" stroke="#1D1D1B" stroke-width="0.8" opacity="0.3"/>
+</svg>

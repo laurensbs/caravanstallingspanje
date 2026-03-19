@@ -1,1 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 40"><text x="50" y="26" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-weight="900" font-size="22" fill="#005CA9" font-style="italic" letter-spacing="1">Adria</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 48">
+  <polygon points="18,38 10,38 18,10" fill="#005CA9" opacity="0.2"/>
+  <polygon points="18,38 26,38 18,10" fill="#005CA9" opacity="0.35"/>
+  <text x="68" y="32" text-anchor="middle" font-family="'Georgia',serif" font-weight="700" font-size="22" fill="#005CA9" font-style="italic" letter-spacing="1">Adria</text>
+</svg>
