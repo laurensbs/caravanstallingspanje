@@ -25,34 +25,34 @@ export default function ContactPage() {
       />
 
       {/* Quick Contact Options */}
-      <section className="py-16 sm:py-20 bg-surface">
+      <section className="py-10 sm:py-16 bg-surface">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <A>
-            <div className="text-center mb-12">
-              <h2 className="text-2xl sm:text-3xl font-black mb-3">Hoe wilt u contact opnemen?</h2>
-              <p className="text-warm-gray max-w-xl mx-auto">Kies de manier die u het beste uitkomt. Via onze slimme keuzehulp ontvangt u direct een voorstel op maat.</p>
+            <div className="text-center mb-8">
+              <h2 className="text-xl sm:text-3xl font-black mb-2">Hoe wilt u contact opnemen?</h2>
+              <p className="text-warm-gray text-sm sm:text-base max-w-xl mx-auto">Kies de manier die u het beste uitkomt.</p>
             </div>
           </A>
 
-          <div className="grid sm:grid-cols-3 gap-5 mb-16">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-5 mb-10">
             {/* Quiz CTA — Primary */}
-            <A className="sm:col-span-3">
+            <A className="col-span-2 sm:col-span-3">
               <button
                 onClick={() => setQuizOpen(true)}
-                className="w-full bg-gradient-to-br from-accent to-accent-dark text-white rounded-2xl p-8 sm:p-10 text-left hover:shadow-xl transition-all group cursor-pointer"
+                className="w-full bg-gradient-to-br from-accent to-accent-dark text-white rounded-2xl p-5 sm:p-10 text-left hover:shadow-xl transition-all group cursor-pointer"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <div className="inline-flex items-center gap-2 bg-white/20 rounded-full px-3 py-1.5 text-xs font-bold mb-4">
+                    <div className="inline-flex items-center gap-2 bg-white/20 rounded-full px-3 py-1 text-xs font-bold mb-3">
                       <Star size={12} /> Aanbevolen
                     </div>
-                    <h3 className="text-xl sm:text-2xl font-black mb-2">Ontvang een voorstel op maat</h3>
-                    <p className="text-white/80 text-sm sm:text-base leading-relaxed max-w-lg">
-                      Beantwoord een paar korte vragen over uw caravan en wensen. Wij sturen u binnen 1 werkdag een persoonlijk voorstel — geheel vrijblijvend.
+                    <h3 className="text-lg sm:text-2xl font-black mb-1">Ontvang een voorstel op maat</h3>
+                    <p className="text-white/80 text-sm leading-relaxed max-w-lg">
+                      Beantwoord een paar korte vragen — wij sturen u binnen 1 werkdag een persoonlijk voorstel.
                     </p>
-                    <div className="flex items-center gap-3 mt-5 text-sm font-bold">
-                      <span className="inline-flex items-center gap-1.5 bg-white/15 rounded-lg px-3 py-1.5"><Shield size={13} /> Vrijblijvend</span>
-                      <span className="inline-flex items-center gap-1.5 bg-white/15 rounded-lg px-3 py-1.5"><Clock size={13} /> 30 seconden</span>
+                    <div className="flex items-center gap-2 mt-3 sm:mt-5 text-xs sm:text-sm font-bold">
+                      <span className="inline-flex items-center gap-1.5 bg-white/15 rounded-lg px-2.5 py-1 sm:px-3 sm:py-1.5"><Shield size={13} /> Vrijblijvend</span>
+                      <span className="inline-flex items-center gap-1.5 bg-white/15 rounded-lg px-2.5 py-1 sm:px-3 sm:py-1.5"><Clock size={13} /> 30 sec</span>
                     </div>
                   </div>
                   <div className="hidden sm:flex w-14 h-14 bg-white/20 rounded-2xl items-center justify-center shrink-0 group-hover:bg-white/30 transition-colors">
@@ -64,38 +64,37 @@ export default function ContactPage() {
 
             {/* Call */}
             <A delay={0.1}>
-              <a href="tel:+34650036755" className="block bg-card rounded-2xl p-6 border border-sand-dark/[0.06] hover:border-primary/20 hover:shadow-lg transition-all h-full">
-                <div className="w-12 h-12 bg-hero/10 rounded-xl flex items-center justify-center mb-4">
-                  <Phone size={20} className="text-hero" />
+              <a href="tel:+34650036755" className="block bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-sand-dark/[0.06] hover:border-primary/20 hover:shadow-lg transition-all h-full">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-hero/10 rounded-xl flex items-center justify-center mb-3">
+                  <Phone size={18} className="text-hero" />
                 </div>
-                <h3 className="font-black text-lg mb-1">Bel ons</h3>
-                <p className="text-warm-gray text-sm leading-relaxed mb-3">Direct een medewerker aan de lijn. Wij spreken Nederlands, Engels en Spaans.</p>
+                <h3 className="font-black text-base sm:text-lg mb-1">Bel ons</h3>
+                <p className="text-warm-gray text-xs sm:text-sm leading-relaxed mb-2">Direct aan de lijn — NL, EN, ES.</p>
                 <p className="text-primary font-bold text-sm">+34 650 036 755</p>
-                <p className="text-warm-gray text-xs mt-1">Ma-vr 09:30 – 16:30</p>
               </a>
             </A>
 
             {/* WhatsApp */}
             <A delay={0.15}>
-              <a href="https://wa.me/34650036755" target="_blank" rel="noopener noreferrer" className="block bg-card rounded-2xl p-6 border border-sand-dark/[0.06] hover:border-[#25D366]/30 hover:shadow-lg transition-all h-full">
-                <div className="w-12 h-12 bg-[#25D366]/10 rounded-xl flex items-center justify-center mb-4">
-                  <MessageCircle size={20} className="text-[#25D366]" />
+              <a href="https://wa.me/34650036755" target="_blank" rel="noopener noreferrer" className="block bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-sand-dark/[0.06] hover:border-[#25D366]/30 hover:shadow-lg transition-all h-full">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#25D366]/10 rounded-xl flex items-center justify-center mb-3">
+                  <MessageCircle size={18} className="text-[#25D366]" />
                 </div>
-                <h3 className="font-black text-lg mb-1">WhatsApp</h3>
-                <p className="text-warm-gray text-sm leading-relaxed mb-3">Handig voor foto&apos;s van schade, vragen onderweg of een snelle reactie.</p>
+                <h3 className="font-black text-base sm:text-lg mb-1">WhatsApp</h3>
+                <p className="text-warm-gray text-xs sm:text-sm leading-relaxed mb-2">Foto&apos;s, vragen of snelle reactie.</p>
                 <p className="text-[#25D366] font-bold text-sm">Start gesprek →</p>
               </a>
             </A>
 
-            {/* Email */}
-            <A delay={0.2}>
-              <a href="mailto:info@caravanstalling-spanje.com" className="block bg-card rounded-2xl p-6 border border-sand-dark/[0.06] hover:border-primary/20 hover:shadow-lg transition-all h-full">
-                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
-                  <Mail size={20} className="text-primary" />
+            {/* Email — only visible on sm+ to keep 2-col grid clean on mobile */}
+            <A delay={0.2} className="col-span-2 sm:col-span-1">
+              <a href="mailto:info@caravanstalling-spanje.com" className="block bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-sand-dark/[0.06] hover:border-primary/20 hover:shadow-lg transition-all h-full">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-3">
+                  <Mail size={18} className="text-primary" />
                 </div>
-                <h3 className="font-black text-lg mb-1">E-mail</h3>
-                <p className="text-warm-gray text-sm leading-relaxed mb-3">Stuur ons een bericht. Wij reageren altijd binnen 1 werkdag.</p>
-                <p className="text-primary font-bold text-sm break-all">info@caravanstalling-spanje.com</p>
+                <h3 className="font-black text-base sm:text-lg mb-1">E-mail</h3>
+                <p className="text-warm-gray text-xs sm:text-sm leading-relaxed mb-2">Reactie binnen 1 werkdag.</p>
+                <p className="text-primary font-bold text-xs sm:text-sm break-all">info@caravanstalling-spanje.com</p>
               </a>
             </A>
           </div>
@@ -112,9 +111,9 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Info + Image */}
-      <section className="py-16 sm:py-20 bg-sand/30">
+      <section className="py-10 sm:py-16 bg-sand/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 items-center">
             <A>
               <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
                 <Image
@@ -130,8 +129,8 @@ export default function ContactPage() {
             <A delay={0.1}>
               <div>
                 <p className="text-xs font-bold tracking-[0.2em] uppercase text-primary mb-3">Onze locatie</p>
-                <h2 className="text-2xl sm:text-3xl font-black mb-6">Bezoek ons in Spanje</h2>
-                <div className="space-y-5 mb-8">
+                <h2 className="text-xl sm:text-3xl font-black mb-4">Bezoek ons in Spanje</h2>
+                <div className="space-y-4 mb-6">
                   {[
                     { icon: MapPin, label: 'Adres', value: 'Ctra de Palamós, 91\n17110 Sant Climent de Peralta\nGirona, Spanje' },
                     { icon: Clock, label: 'Openingstijden', value: 'Maandag t/m vrijdag: 09:30 – 16:30\nWeekend: gesloten' },
@@ -161,7 +160,7 @@ export default function ContactPage() {
 
       {/* Map */}
       <section className="bg-surface">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
           <A>
             <div className="rounded-2xl overflow-hidden border border-sand-dark/[0.04]">
               <iframe

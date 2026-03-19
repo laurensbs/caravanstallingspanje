@@ -64,7 +64,7 @@ export default function HomePage() {
       <Header />
 
       {/* ═══ HERO ═══ */}
-      <section id="main-content" className="relative min-h-[92vh] flex items-center bg-hero overflow-hidden">
+      <section id="main-content" className="relative min-h-[80vh] sm:min-h-[92vh] flex items-center bg-hero overflow-hidden">
         <div className="absolute inset-0">
           <Image src="https://u.cubeupload.com/laurensbos/caravanstoragespain.jpg" alt="Caravanstalling terrein" fill sizes="100vw" className="object-cover opacity-30" priority />
           <div className="hero-overlay absolute inset-0" />
@@ -200,55 +200,68 @@ export default function HomePage() {
       {/* ═══ BRAND SLIDER ═══ */}
       <BrandSlider />
 
-      {/* ═══ DIENSTEN BAR ═══ */}
-      <section className="bg-card border-b border-sand-dark/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5">
-          <div className="flex flex-wrap justify-center gap-3 sm:gap-8 lg:gap-12">
+      {/* ═══ DIENSTEN TILES — App-style grid ═══ */}
+      <section className="py-10 sm:py-16 bg-surface">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl sm:text-3xl font-black">Wat kunnen wij voor u doen?</h2>
+            <p className="text-warm-gray text-sm mt-2">Tik op een dienst voor meer informatie</p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
             {[
-              { icon: Shield, label: "Stalling", href: "/stalling" },
-              { icon: Wrench, label: "Reparatie", href: "/diensten" },
-              { icon: Sparkles, label: "CaravanRepair®", href: "/diensten" },
-              { icon: Truck, label: "Transport", href: "/diensten" },
-              { icon: ShoppingBag, label: "Verkoop", href: "/diensten" },
-              { icon: Bike, label: "Verhuur", href: "/diensten" },
-            ].map(s => (
-              <Link key={s.label} href={s.href} className="flex items-center gap-2 text-warm-gray hover:text-primary transition-colors py-2 px-3 rounded-lg group text-sm font-medium">
-                <s.icon size={17} className="group-hover:text-primary transition-colors" />
-                <span>{s.label}</span>
-              </Link>
+              { icon: Shield, label: "Stalling", desc: "Buiten & binnen", href: "/stalling", color: "from-accent to-accent-dark", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain2.jpg" },
+              { icon: Wrench, label: "Reparatie", desc: "Alle merken", href: "/diensten#reparatie", color: "from-warning to-warning/80", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain5.jpg" },
+              { icon: Sparkles, label: "CaravanRepair®", desc: "Schadeherstel", href: "/diensten#caravanrepair", color: "from-primary to-primary-dark", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain4.jpg" },
+              { icon: Truck, label: "Transport", desc: "7 eenheden", href: "/diensten#transport", color: "from-ocean to-ocean-dark", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain3.jpg" },
+              { icon: ShoppingBag, label: "Verkoop", desc: "Occasions", href: "/diensten#verkoop", color: "from-danger to-danger/80", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain6.jpg" },
+              { icon: Bike, label: "Verhuur", desc: "Fietsen & meer", href: "/diensten#verhuur", color: "from-info to-info/80", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain.jpg" },
+            ].map((s, i) => (
+              <A key={s.label} delay={i * 0.05}>
+                <Link href={s.href} className="group block relative rounded-2xl overflow-hidden aspect-[3/4] sm:aspect-[3/4] touch-manipulation">
+                  <Image src={s.img} alt={s.label} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw" className="object-cover group-hover:scale-110 transition-transform duration-500" />
+                  <div className={`absolute inset-0 bg-gradient-to-t ${s.color} opacity-75 group-hover:opacity-85 transition-opacity`} />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-3">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                      <s.icon size={24} />
+                    </div>
+                    <span className="font-black text-sm sm:text-base text-center leading-tight">{s.label}</span>
+                    <span className="text-white/70 text-[11px] mt-0.5">{s.desc}</span>
+                  </div>
+                </Link>
+              </A>
             ))}
           </div>
         </div>
       </section>
 
       {/* ═══ WAAROM WIJ ═══ */}
-      <section className="py-20 sm:py-28 bg-card">
+      <section className="py-12 sm:py-20 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Waarom Caravanstalling Spanje</p>
-            <h2 className="text-3xl sm:text-4xl font-black mb-4">Meer dan alleen stalling</h2>
-            <div className="section-divider mt-5 mb-5" />
-            <p className="text-warm-gray leading-relaxed">
-              Wij ontzorgen u volledig. Van veilige stalling tot professionele reparatie, transport en verkoop. Alles onder één dak, met Nederlandstalig personeel.
+          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Waarom Caravanstalling Spanje</p>
+            <h2 className="text-2xl sm:text-4xl font-black mb-3">Meer dan alleen stalling</h2>
+            <div className="section-divider mt-3 mb-3" />
+            <p className="text-warm-gray leading-relaxed text-sm sm:text-base">
+              Alles onder één dak: stalling, reparatie, transport en verkoop. Nederlandstalig personeel.
             </p>
           </A>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
             {[
-              { icon: Shield, title: "Beveiligde stalling", desc: "Securitas Direct alarm, 24/7 camerabewaking en standaard verzekerd. Buiten- en binnenstalling op ons afgesloten terrein in Sant Climent de Peralta.", color: "bg-ocean/10 text-ocean" },
-              { icon: Wrench, title: "Reparatie & onderhoud", desc: "Goed uitgeruste werkplaats voor alle voorkomende reparaties. Banden, remmen, dakluiken, airco, gas, elektra en vochtschade.", color: "bg-warning/10 text-warning" },
-              { icon: Sparkles, title: "CaravanRepair® Masterdealer", desc: "Onzichtbaar schadeherstel van geprofileerde wanden met levenslange garantie. Erkend door alle verzekeraars. Hagel, storm en aanrijdingsschade.", color: "bg-primary/10 text-primary" },
-              { icon: Truck, title: "Transport (7 eenheden)", desc: "Met ons wagenpark van 7 eenheden en 12 seizoensmedewerkers halen wij uw caravan op en leveren hem af op elke camping aan de Costa Brava.", color: "bg-accent/10 text-accent" },
-              { icon: ShoppingBag, title: "Verkoop tweedehands", desc: "Gecontroleerde occasion caravans, al in Spanje. Eerlijk advies, werkplaatskeuring en verkoopbemiddeling. Geen transportkosten.", color: "bg-danger/10 text-danger" },
-              { icon: Eye, title: "Tweewekelijkse controle", desc: "Elke 2 weken worden alle caravans gecontroleerd op weerschade. Jaarlijks volledige technische keuring met rapport via uw klantportaal.", color: "bg-info/10 text-info" },
+              { icon: Shield, title: "Beveiligde stalling", desc: "Securitas Direct, 24/7 camera's, standaard verzekerd.", color: "bg-ocean/10 text-ocean" },
+              { icon: Wrench, title: "Reparatie & onderhoud", desc: "Complete werkplaats, alle merken caravans.", color: "bg-warning/10 text-warning" },
+              { icon: Sparkles, title: "CaravanRepair®", desc: "Onzichtbaar schadeherstel, levenslange garantie.", color: "bg-primary/10 text-primary" },
+              { icon: Truck, title: "Transport", desc: "7 eenheden, ophalen en afleveren heel Costa Brava.", color: "bg-accent/10 text-accent" },
+              { icon: ShoppingBag, title: "Verkoop", desc: "Occasions al in Spanje, geen transportkosten.", color: "bg-danger/10 text-danger" },
+              { icon: Eye, title: "Controles & keuring", desc: "Elke 2 weken check, jaarlijks technische keuring.", color: "bg-info/10 text-info" },
             ].map((f, i) => (
-              <A key={f.title} delay={i * 0.08}>
-                <div className="bg-card rounded-2xl p-7 border border-sand-dark/30 hover:border-primary/20 card-hover h-full group">
-                  <div className={`w-12 h-12 ${f.color} rounded-xl flex items-center justify-center mb-5 transition-transform group-hover:scale-110 duration-300`}>
-                    <f.icon size={21} />
+              <A key={f.title} delay={i * 0.05}>
+                <div className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-sand-dark/30 hover:border-primary/20 transition-all h-full group">
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 ${f.color} rounded-xl flex items-center justify-center mb-3 sm:mb-4`}>
+                    <f.icon size={20} />
                   </div>
-                  <h3 className="font-bold text-[17px] mb-2">{f.title}</h3>
-                  <p className="text-sm text-warm-gray leading-relaxed">{f.desc}</p>
+                  <h3 className="font-bold text-[13px] sm:text-[16px] mb-1">{f.title}</h3>
+                  <p className="text-[11px] sm:text-sm text-warm-gray leading-relaxed">{f.desc}</p>
                 </div>
               </A>
             ))}
@@ -257,23 +270,23 @@ export default function HomePage() {
       </section>
 
       {/* ═══ IMAGE BREAK ═══ */}
-      <section className="relative h-[320px] sm:h-[420px] overflow-hidden">
+      <section className="relative h-[200px] sm:h-[360px] overflow-hidden">
         <Image src="https://u.cubeupload.com/laurensbos/caravanstoragespain3.jpg" alt="Caravanstalling terrein in Spanje" fill sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-surface-dark/80 via-surface-dark/20 to-transparent" />
-        <div className="absolute bottom-0 inset-x-0 max-w-7xl mx-auto px-4 sm:px-6 pb-10 sm:pb-14 text-center">
-          <p className="text-white/70 text-sm font-medium mb-2">Sant Climent de Peralta, Girona</p>
-          <h3 className="text-white text-2xl sm:text-3xl font-black">3 beveiligde locaties aan de Costa Brava</h3>
+        <div className="absolute bottom-0 inset-x-0 max-w-7xl mx-auto px-4 sm:px-6 pb-6 sm:pb-14 text-center">
+          <p className="text-white/70 text-xs sm:text-sm font-medium mb-1">Sant Climent de Peralta, Girona</p>
+          <h3 className="text-white text-lg sm:text-3xl font-black">3 beveiligde locaties aan de Costa Brava</h3>
         </div>
       </section>
 
       {/* ═══ STALLING TYPES ═══ */}
-      <section className="py-20 sm:py-28 bg-surface">
+      <section className="py-12 sm:py-20 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Stallingstypen</p>
-            <h2 className="text-3xl sm:text-4xl font-black mb-4">Kies uw stallingtype</h2>
-            <div className="section-divider mt-5 mb-5" />
-            <p className="text-warm-gray leading-relaxed">Transparante maandtarieven inclusief beveiliging, verzekering en tweewekelijkse controle.</p>
+          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Stallingstypen</p>
+            <h2 className="text-2xl sm:text-4xl font-black mb-3">Kies uw stallingtype</h2>
+            <div className="section-divider mt-3 mb-3" />
+            <p className="text-warm-gray leading-relaxed text-sm">Maandtarieven inclusief beveiliging, verzekering en controle.</p>
           </A>
 
           <div className="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
@@ -314,35 +327,35 @@ export default function HomePage() {
       </section>
 
       {/* ═══ HOE HET WERKT ═══ */}
-      <section className="py-20 sm:py-28 bg-card">
+      <section className="py-12 sm:py-20 bg-card">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">In 4 stappen</p>
-            <h2 className="text-3xl sm:text-4xl font-black mb-4">Hoe werkt het?</h2>
-            <div className="section-divider mt-5 mb-5" />
+          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">In 4 stappen</p>
+            <h2 className="text-2xl sm:text-4xl font-black mb-3">Hoe werkt het?</h2>
+            <div className="section-divider mt-3 mb-3" />
           </A>
 
           <div className="relative">
             {/* Connecting line */}
             <div className="hidden md:block absolute top-14 left-[12.5%] right-[12.5%] h-[2px] bg-gradient-to-r from-primary/10 via-primary/25 to-primary/10" />
 
-            <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
               {[
-                { step: "1", icon: Phone, title: "Vertel uw wensen", desc: "Beantwoord een paar vragen en ontvang een voorstel op maat." },
-                { step: "2", icon: MapPin, title: "Plek reserveren", desc: "Wij wijzen een vaste plek toe op uw gewenste locatie." },
-                { step: "3", icon: Truck, title: "Caravan brengen", desc: "Breng uw caravan of wij halen hem op met ons transport." },
-                { step: "4", icon: Shield, title: "Wij zorgen ervoor", desc: "Bewaking, controles, onderhoud – wij regelen alles." },
+                { step: "1", icon: Phone, title: "Vertel uw wensen", desc: "Beantwoord een paar vragen en ontvang een voorstel." },
+                { step: "2", icon: MapPin, title: "Plek reserveren", desc: "Wij wijzen een vaste plek toe op uw locatie." },
+                { step: "3", icon: Truck, title: "Caravan brengen", desc: "Breng hem of wij halen hem op met transport." },
+                { step: "4", icon: Shield, title: "Wij zorgen ervoor", desc: "Bewaking, controles en onderhoud — wij regelen alles." },
               ].map((s, i) => (
                 <A key={s.step} delay={i * 0.1}>
-                  <div className="bg-surface rounded-2xl p-6 border border-sand-dark/10 text-center relative hover:border-primary/15 hover:shadow-md transition-all h-full">
-                    <div className="relative inline-flex mb-5">
-                      <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center">
-                        <s.icon size={22} className="text-primary" />
+                  <div className="bg-surface rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-sand-dark/10 text-center relative hover:border-primary/15 hover:shadow-md transition-all h-full">
+                    <div className="relative inline-flex mb-3 sm:mb-5">
+                      <div className="w-11 h-11 sm:w-14 sm:h-14 bg-primary/10 rounded-full flex items-center justify-center">
+                        <s.icon size={20} className="text-primary" />
                       </div>
-                      <span className="absolute -top-1 -right-1 w-6 h-6 bg-primary text-white text-[11px] font-black rounded-full flex items-center justify-center shadow-sm">{s.step}</span>
+                      <span className="absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white text-[10px] sm:text-[11px] font-black rounded-full flex items-center justify-center shadow-sm">{s.step}</span>
                     </div>
-                    <h3 className="font-bold text-[15px] mb-2">{s.title}</h3>
-                    <p className="text-sm text-warm-gray leading-relaxed">{s.desc}</p>
+                    <h3 className="font-bold text-[13px] sm:text-[15px] mb-1">{s.title}</h3>
+                    <p className="text-[11px] sm:text-sm text-warm-gray leading-relaxed">{s.desc}</p>
                   </div>
                 </A>
               ))}
@@ -354,7 +367,7 @@ export default function HomePage() {
       {/* ═══ CARAVANREPAIR BANNER ═══ */}
       <section className="bg-hero relative overflow-hidden">
         <div className="absolute inset-0 line-pattern" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-16 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-16 relative">
           <A>
             <div className="flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
               <div className="flex flex-col md:flex-row items-center gap-5">
@@ -378,18 +391,18 @@ export default function HomePage() {
       <ReviewsWidget limit={4} />
 
       {/* ═══ KLANTPORTAAL ═══ */}
-      <section className="py-20 sm:py-28 bg-card">
+      <section className="py-12 sm:py-20 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
               <div className="text-center lg:text-left">
-                <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Klantportaal</p>
-                <h2 className="text-3xl sm:text-4xl font-black mb-6">Alles online inzien</h2>
-                <div className="section-divider mt-0 mb-6 mx-auto lg:mx-0" />
-                <p className="text-warm-gray mb-8 leading-relaxed max-w-lg mx-auto lg:mx-0">Beheer uw stalling online. Bekijk contracten, facturen, inspecties en dien service aanvragen in via uw persoonlijke dashboard.</p>
-                <ul className="space-y-3 mb-8 text-left max-w-md mx-auto lg:mx-0">
-                  {["Uw caravans en pleknummers bekijken", "Contracten en verlengingen inzien", "Facturen downloaden en betaalstatus", "Service aanvragen (reparatie, transport)", "Inspectierapportages ontvangen"].map(f => (
-                    <li key={f} className="flex items-center gap-3 text-sm"><CheckCircle size={15} className="text-success shrink-0" /><span>{f}</span></li>
+                <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Klantportaal</p>
+                <h2 className="text-2xl sm:text-4xl font-black mb-4">Alles online inzien</h2>
+                <div className="section-divider mt-0 mb-4 mx-auto lg:mx-0" />
+                <p className="text-warm-gray mb-6 leading-relaxed max-w-lg mx-auto lg:mx-0 text-sm sm:text-base">Beheer uw stalling online. Contracten, facturen, inspecties en service aanvragen via uw dashboard.</p>
+                <ul className="space-y-2 mb-6 text-left max-w-md mx-auto lg:mx-0">
+                  {["Caravans en pleknummers bekijken", "Contracten en facturen inzien", "Service aanvragen indienen", "Inspectierapportages ontvangen"].map(f => (
+                    <li key={f} className="flex items-center gap-2.5 text-sm"><CheckCircle size={14} className="text-success shrink-0" /><span>{f}</span></li>
                   ))}
                 </ul>
                 <Link href="/mijn-account" className="inline-flex items-center gap-2 bg-hero hover:bg-hero/90 text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all duration-200">
@@ -418,21 +431,21 @@ export default function HomePage() {
       </section>
 
       {/* ═══ BLOG PREVIEW ═══ */}
-      <section className="py-20 sm:py-28 bg-surface">
+      <section className="py-12 sm:py-20 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Blog & Tips</p>
-            <h2 className="text-3xl sm:text-4xl font-black mb-4">Kennis & reisgidsen</h2>
-            <div className="section-divider mt-5 mb-5" />
-            <p className="text-warm-gray leading-relaxed">Praktische tips van onze monteurs, reisgidsen voor de Costa Brava en alles over caravanonderhoud.</p>
+          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Blog & Tips</p>
+            <h2 className="text-2xl sm:text-4xl font-black mb-3">Kennis & reisgidsen</h2>
+            <div className="section-divider mt-3 mb-3" />
+            <p className="text-warm-gray leading-relaxed text-sm">Praktische tips, reisgidsen voor de Costa Brava en alles over caravanonderhoud.</p>
           </A>
-          <div className="grid sm:grid-cols-3 gap-6">
+          <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:pb-0 no-scrollbar">
             {BLOG_PREVIEW.map((post, i) => (
               <A key={post.slug} delay={i * 0.08}>
-                <Link href={`/blog/${post.slug}`} className="group block h-full">
+                <Link href={`/blog/${post.slug}`} className="group block h-full snap-start min-w-[280px] sm:min-w-0">
                   <div className="bg-card rounded-2xl overflow-hidden border border-sand-dark/20 h-full flex flex-col card-hover">
                     <div className="relative aspect-[16/10] overflow-hidden">
-                      <Image src={post.image} alt={post.title} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <Image src={post.image} alt={post.title} fill sizes="(max-width: 640px) 80vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
                       <div className="absolute top-3 left-3">
                         <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white/90 text-primary">{post.category}</span>
                       </div>
@@ -460,7 +473,7 @@ export default function HomePage() {
       {/* ═══ CTA ═══ */}
       <section className="bg-hero relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-20 text-center relative">
           <A>
             <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">Klaar om uw caravan veilig te stallen?</h2>
             <p className="text-white/60 mb-8 max-w-lg mx-auto">Vertel ons uw wensen en ontvang binnen 1 werkdag een persoonlijk voorstel — geheel vrijblijvend.</p>

@@ -78,10 +78,10 @@ export default function TarievenPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <Header />
 
-      <PageHero badge="Tarieven" title={<>Transparante <span className="gradient-text">tarieven</span></>} subtitle="Geen verborgen kosten. Bewaking, verzekering, tweewekelijkse controles en jaarlijkse technische keuring zijn bij elk stallingstype inbegrepen. U betaalt een vast maandtarief en weet precies waar u aan toe bent." />
+      <PageHero badge="Tarieven" title={<>Transparante <span className="gradient-text">tarieven</span></>} subtitle="Geen verborgen kosten. Bewaking, verzekering, tweewekelijkse controles en jaarlijkse technische keuring zijn bij elk stallingstype inbegrepen. U betaalt een vast maandtarief en weet precies waar u aan toe bent." image="https://u.cubeupload.com/laurensbos/caravanstoragespain2.jpg" />
 
       {/* Pricing Cards */}
-      <section className="py-20 sm:py-28 bg-card">
+      <section className="py-10 sm:py-20 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {plans.map((p, i) => (
@@ -159,13 +159,13 @@ export default function TarievenPage() {
       </section>
 
       {/* Extra Services */}
-      <section className="py-20 sm:py-28 bg-surface">
+      <section className="py-10 sm:py-20 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Extra diensten</p>
-            <h2 className="text-3xl sm:text-4xl font-black mb-4">Aanvullende services</h2>
-            <div className="section-divider mt-5 mb-5" />
-            <p className="text-warm-gray leading-relaxed">Naast stalling bieden wij een breed scala aan extra diensten. Van professionele schoonmaak tot transport en verhuur.</p>
+          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Extra diensten</p>
+            <h2 className="text-2xl sm:text-4xl font-black mb-3">Aanvullende services</h2>
+            <div className="section-divider mt-3 mb-3" />
+            <p className="text-warm-gray leading-relaxed text-sm">Schoonmaak, transport, verhuur en meer.</p>
           </A>
 
           <A>
@@ -202,12 +202,12 @@ export default function TarievenPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 sm:py-28 bg-card">
+      <section className="py-10 sm:py-20 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Veelgestelde vragen</p>
-            <h2 className="text-3xl sm:text-4xl font-black mb-4">Heeft u vragen?</h2>
-            <div className="section-divider mt-5" />
+          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Veelgestelde vragen</p>
+            <h2 className="text-2xl sm:text-4xl font-black mb-3">Heeft u vragen?</h2>
+            <div className="section-divider mt-3" />
           </A>
 
           <A>

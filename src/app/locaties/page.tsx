@@ -26,12 +26,12 @@ export default function LocatiesPage() {
     <>
       <Header />
 
-      <PageHero badge="Onze locatie" title={<><span className="gradient-text">Costa Brava</span>, Spanje</>} subtitle="Ons stallingsterrein en werkplaats liggen centraal aan de Costa Brava, in het rustige Sant Climent de Peralta, provincie Girona. Op korte afstand van Pals, Begur, L'Estartit en Palamós." />
+      <PageHero badge="Onze locatie" title={<><span className="gradient-text">Costa Brava</span>, Spanje</>} subtitle="Ons stallingsterrein en werkplaats liggen centraal aan de Costa Brava, in het rustige Sant Climent de Peralta, provincie Girona. Op korte afstand van Pals, Begur, L'Estartit en Palamós." image="https://u.cubeupload.com/laurensbos/caravanstoragespain.jpg" />
 
       {/* Main Location */}
-      <section className="py-20 sm:py-28 bg-surface">
+      <section className="py-10 sm:py-20 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-start">
             <A>
               <div>
                 <div className="flex items-center gap-3 mb-4">
@@ -119,16 +119,16 @@ export default function LocatiesPage() {
       </section>
 
       {/* Nearby */}
-      <section className="py-20 sm:py-28 bg-surface">
+      <section className="py-10 sm:py-20 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Omgeving</p>
-            <h2 className="text-3xl sm:text-4xl font-black mb-4">Populaire bestemmingen</h2>
-            <div className="section-divider mt-5" />
-            <p className="text-warm-gray mt-5">Onze stalling ligt centraal aan de Costa Brava, op korte afstand van de mooiste badplaatsen en dorpen.</p>
+          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Omgeving</p>
+            <h2 className="text-2xl sm:text-4xl font-black mb-3">Populaire bestemmingen</h2>
+            <div className="section-divider mt-3" />
+            <p className="text-warm-gray mt-3 text-sm">Onze stalling ligt centraal, op korte afstand van de mooiste badplaatsen en dorpen.</p>
           </A>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 max-w-5xl mx-auto">
             {[
               { place: 'Pals', km: '6 km', desc: 'Middeleeuws dorpje met rijstterrassen, golfbaan en kilometerslange zandstranden', rating: 4.8 },
               { place: 'Begur', km: '10 km', desc: 'Charmant kustdorp op een heuvel, met verborgen baaien en kristalhelder water', rating: 4.9 },
@@ -136,7 +136,7 @@ export default function LocatiesPage() {
               { place: 'Palamós', km: '15 km', desc: 'Authentieke vissershaven, beroemd om de gambas en de visveiling', rating: 4.6 },
             ].map((p, i) => (
               <A key={p.place} delay={i * 0.08}>
-                <div className="bg-surface rounded-2xl p-6 border border-sand-dark/[0.04] card-hover h-full text-center">
+                <div className="bg-surface rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-sand-dark/[0.04] card-hover h-full text-center">
                   <p className="text-primary font-bold text-xl mb-1">{p.km}</p>
                   <h3 className="font-black text-lg mb-2">{p.place}</h3>
                   <p className="text-xs text-warm-gray leading-relaxed mb-3">{p.desc}</p>
@@ -173,13 +173,13 @@ export default function LocatiesPage() {
       </section>
 
       {/* Bereikbaarheid */}
-      <section className="py-20 sm:py-28 bg-surface">
+      <section className="py-10 sm:py-20 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Bereikbaarheid</p>
-            <h2 className="text-3xl sm:text-4xl font-black mb-4">Hoe komt u bij ons?</h2>
-            <div className="section-divider mt-5 mb-5" />
-            <p className="text-warm-gray leading-relaxed">Of u nu met het vliegtuig of de auto komt — onze stalling is goed bereikbaar.</p>
+          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Bereikbaarheid</p>
+            <h2 className="text-2xl sm:text-4xl font-black mb-3">Hoe komt u bij ons?</h2>
+            <div className="section-divider mt-3 mb-3" />
+            <p className="text-warm-gray leading-relaxed text-sm">Met vliegtuig of auto — we zijn goed bereikbaar.</p>
           </A>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -203,12 +203,12 @@ export default function LocatiesPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 sm:py-28 bg-card">
+      <section className="py-10 sm:py-20 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Veelgestelde vragen</p>
-            <h2 className="text-3xl sm:text-4xl font-black mb-4">Vragen over onze locatie?</h2>
-            <div className="section-divider mt-5" />
+          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Veelgestelde vragen</p>
+            <h2 className="text-2xl sm:text-4xl font-black mb-3">Vragen over onze locatie?</h2>
+            <div className="section-divider mt-3" />
           </A>
           <A>
             <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">

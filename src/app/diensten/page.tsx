@@ -68,10 +68,10 @@ export default function DienstenPage() {
       </nav>
 
       {/* ═══════════ STALLING ═══════════ */}
-      <section id="stalling" className="py-20 sm:py-28 bg-card scroll-mt-28">
+      <section id="stalling" className="py-10 sm:py-20 bg-card scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 bg-accent/10 text-accent rounded-xl flex items-center justify-center"><Shield size={22} /></div>
@@ -127,17 +127,15 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ REPARATIE & ONDERHOUD ═══════════ */}
-      <section id="reparatie" className="py-20 sm:py-28 bg-surface scroll-mt-28">
+      <section id="reparatie" className="py-10 sm:py-20 bg-surface scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-              <div className="order-2 lg:order-1 relative rounded-2xl overflow-hidden aspect-[4/3] bg-ocean/5 border border-sand-dark/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <div className="w-20 h-20 bg-ocean/10 text-ocean rounded-2xl flex items-center justify-center mx-auto mb-4"><Wrench size={36} /></div>
-                    <p className="text-sm font-bold text-surface-dark">Goed uitgeruste werkplaats</p>
-                    <p className="text-xs text-warm-gray mt-1">Ervaren monteurs · Alle merken</p>
-                  </div>
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
+              <div className="order-2 lg:order-1 relative rounded-2xl overflow-hidden aspect-[4/3]">
+                <Image src="https://u.cubeupload.com/laurensbos/caravanstoragespain5.jpg" alt="Werkplaats reparatie en onderhoud" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-surface-dark/40 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <p className="text-white text-xs font-medium bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-lg inline-block">Goed uitgeruste werkplaats · Alle merken</p>
                 </div>
               </div>
               <div className="order-1 lg:order-2">
@@ -183,21 +181,21 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ CARAVANREPAIR® ═══════════ */}
-      <section id="caravanrepair" className="py-20 sm:py-28 bg-card scroll-mt-28">
+      <section id="caravanrepair" className="py-10 sm:py-20 bg-card scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-3xl mx-auto mb-14">
-            <div className="inline-flex items-center gap-2 bg-primary/8 text-primary px-4 py-1.5 rounded-full text-xs font-bold mb-4">
+          <A className="text-center max-w-3xl mx-auto mb-8 sm:mb-14">
+            <div className="inline-flex items-center gap-2 bg-primary/8 text-primary px-4 py-1.5 rounded-full text-xs font-bold mb-3">
               <Award size={14} /> Officieel Masterdealer
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black mb-4">CaravanRepair® schadeherstel</h2>
-            <div className="section-divider mt-5 mb-5" />
-            <p className="text-warm-gray leading-relaxed">
+            <h2 className="text-2xl sm:text-4xl font-black mb-3">CaravanRepair® schadeherstel</h2>
+            <div className="section-divider mt-3 mb-3" />
+            <p className="text-warm-gray leading-relaxed text-sm sm:text-base">
               CaravanRepair® is de grootste keten van erkende caravan- en camperschadespecialisten in Nederland en Europa. Caravanstalling Spanje is officieel CaravanRepair® Masterdealer — het hoogste niveau binnen het dealernetwerk.
             </p>
           </A>
 
           <A>
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
               <div>
                 <h3 className="text-xl font-black mb-4">Gepatenteerd reparatiesysteem</h3>
                 <p className="text-warm-gray leading-relaxed mb-4">
@@ -272,10 +270,10 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ TRANSPORT ═══════════ */}
-      <section id="transport" className="py-20 sm:py-28 bg-surface scroll-mt-28">
+      <section id="transport" className="py-10 sm:py-20 bg-surface scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center"><Truck size={22} /></div>
@@ -330,10 +328,10 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ VERKOOP ═══════════ */}
-      <section id="verkoop" className="py-20 sm:py-28 bg-card scroll-mt-28">
+      <section id="verkoop" className="py-10 sm:py-20 bg-card scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
               <div className="order-2 lg:order-1 bg-danger/5 rounded-2xl p-8 border border-sand-dark/20">
                 <h3 className="font-bold text-lg mb-2">Huidig aanbod</h3>
                 <p className="text-sm text-warm-gray mb-4">Enkele voorbeelden uit ons wisselend aanbod:</p>
@@ -393,13 +391,13 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ VERHUUR ═══════════ */}
-      <section id="verhuur" className="py-20 sm:py-28 bg-surface scroll-mt-28">
+      <section id="verhuur" className="py-10 sm:py-20 bg-surface scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-14">
-            <div className="w-12 h-12 bg-accent/10 text-accent rounded-xl flex items-center justify-center mx-auto mb-4"><Bike size={22} /></div>
-            <h2 className="text-3xl sm:text-4xl font-black mb-4">Verhuur</h2>
-            <div className="section-divider mt-5 mb-5" />
-            <p className="text-warm-gray leading-relaxed">Handige extra&apos;s voor uw verblijf aan de Costa Brava. Direct leverbaar op uw camping of vakantieadres.</p>
+          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
+            <div className="w-12 h-12 bg-accent/10 text-accent rounded-xl flex items-center justify-center mx-auto mb-3"><Bike size={22} /></div>
+            <h2 className="text-2xl sm:text-4xl font-black mb-3">Verhuur</h2>
+            <div className="section-divider mt-3 mb-3" />
+            <p className="text-warm-gray leading-relaxed text-sm">Extra&apos;s voor uw verblijf aan de Costa Brava. Direct leverbaar op uw camping.</p>
           </A>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
@@ -452,10 +450,10 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ SCHOONMAAK ═══════════ */}
-      <section id="schoonmaak" className="py-20 sm:py-28 bg-card scroll-mt-28">
+      <section id="schoonmaak" className="py-10 sm:py-20 bg-card scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 bg-ocean/10 text-ocean rounded-xl flex items-center justify-center"><SprayCan size={22} /></div>
@@ -517,12 +515,12 @@ export default function DienstenPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 sm:py-28 bg-card">
+      <section className="py-10 sm:py-20 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Veelgestelde vragen</p>
-            <h2 className="text-3xl sm:text-4xl font-black mb-4">Vragen over onze diensten?</h2>
-            <div className="section-divider mt-5" />
+          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Veelgestelde vragen</p>
+            <h2 className="text-2xl sm:text-4xl font-black mb-3">Vragen over onze diensten?</h2>
+            <div className="section-divider mt-3" />
           </A>
           <A>
             <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">

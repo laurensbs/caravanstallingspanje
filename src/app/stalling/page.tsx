@@ -29,22 +29,19 @@ export default function StallingPage() {
       <PageHero badge="Caravanstalling" title={<>Veilige stalling aan de <span className="gradient-text">Costa Brava</span></>} subtitle="Al meer dan 20 jaar dé specialist in het veilig en betrouwbaar stallen van caravans, campers, vouwwagens en boten in Sant Climent de Peralta. Securitas Direct bewaking, 24/7 camerabewaking en standaard verzekerd." image="https://u.cubeupload.com/laurensbos/caravanstoragespain3.jpg" />
 
       {/* Intro / Waarom bij ons stallen */}
-      <section className="py-20 sm:py-28 bg-card">
+      <section className="py-10 sm:py-20 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
               <div>
-                <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Waarom bij ons stallen?</p>
-                <h2 className="text-3xl sm:text-4xl font-black mb-6">Uw caravan in goede handen aan de Costa Brava</h2>
-                <div className="section-divider mt-0 mb-6" />
-                <p className="text-warm-gray leading-relaxed mb-4">
-                  Waarom zou u uw caravan elk seizoen heen en weer slepen over 1.500 kilometer snelweg? Laat uw caravan staan waar u hem gebruikt — aan de prachtige Costa Brava. Geen slijtage door lange ritten, geen tolkosten, geen gedoe met opslag thuis. Uw caravan staat veilig op ons terrein, klaar wanneer u aankomt.
+                <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Waarom bij ons stallen?</p>
+                <h2 className="text-2xl sm:text-4xl font-black mb-4">Uw caravan in goede handen</h2>
+                <div className="section-divider mt-0 mb-4" />
+                <p className="text-warm-gray leading-relaxed mb-3 text-sm sm:text-base">
+                  Laat uw caravan staan waar u hem gebruikt — aan de Costa Brava. Geen 3.000 km heen en weer, geen tolkosten, geen gedoe. Uw caravan staat veilig op ons terrein, klaar wanneer u aankomt.
                 </p>
-                <p className="text-warm-gray leading-relaxed mb-4">
-                  Ons stallingsterrein in Sant Climent de Peralta is volledig afgesloten en voorzien van het Securitas Direct alarmsysteem met directe alarmopvolging. Daarnaast filmt een geavanceerd camerasysteem 24 uur per dag, 7 dagen per week alle bewegingen op het terrein. Uw caravan is bij ons standaard verzekerd tegen schade en diefstal.
-                </p>
-                <p className="text-warm-gray leading-relaxed mb-6">
-                  Maar wij doen meer dan alleen stallen. Elke twee weken controleren wij alle caravans op schades die kunnen ontstaan door weersomstandigheden. Daarnaast voeren wij jaarlijks een volledige technische keuring uit, zodat uw caravan altijd in topconditie staat. Eventuele problemen pakken wij direct aan in onze eigen werkplaats.
+                <p className="text-warm-gray leading-relaxed mb-4 text-sm sm:text-base">
+                  Securitas Direct alarm, 24/7 camera&apos;s, standaard verzekerd. Elke 2 weken controle op weerschade, jaarlijks technische keuring. Problemen pakken wij direct aan in onze eigen werkplaats.
                 </p>
                 <div className="flex flex-wrap gap-4">
                   <div className="flex items-center gap-2 text-sm"><Shield size={15} className="text-success" /> <span className="font-medium">Securitas Direct</span></div>
@@ -78,13 +75,13 @@ export default function StallingPage() {
       </section>
 
       {/* Stalling types */}
-      <section className="py-20 sm:py-28 bg-surface">
+      <section className="py-10 sm:py-20 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Stallingstypen</p>
-            <h2 className="text-3xl sm:text-4xl font-black mb-4">Kies uw stallingtype</h2>
-            <div className="section-divider mt-5 mb-5" />
-            <p className="text-warm-gray">Alle stallingstypen inclusief beveiliging, verzekering en tweewekelijkse controle.</p>
+          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Stallingstypen</p>
+            <h2 className="text-2xl sm:text-4xl font-black mb-3">Kies uw stallingtype</h2>
+            <div className="section-divider mt-3 mb-3" />
+            <p className="text-warm-gray text-sm">Inclusief beveiliging, verzekering en controle.</p>
           </A>
 
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -131,13 +128,13 @@ export default function StallingPage() {
       </section>
 
       {/* Wat wij doen tijdens stalling */}
-      <section className="py-20 sm:py-28 bg-card">
+      <section className="py-10 sm:py-20 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-3xl mx-auto mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Onze zorg</p>
-            <h2 className="text-3xl sm:text-4xl font-black mb-4">Wat wij doen terwijl uw caravan bij ons staat</h2>
-            <div className="section-divider mt-5 mb-5" />
-            <p className="text-warm-gray leading-relaxed">Stallen is bij ons meer dan alleen parkeren. Wij besteden het hele jaar door actief aandacht aan uw caravan.</p>
+          <A className="text-center max-w-3xl mx-auto mb-8 sm:mb-14">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Onze zorg</p>
+            <h2 className="text-2xl sm:text-4xl font-black mb-3">Wat wij doen voor uw caravan</h2>
+            <div className="section-divider mt-3 mb-3" />
+            <p className="text-warm-gray leading-relaxed text-sm">Meer dan alleen parkeren — het hele jaar door actieve zorg.</p>
           </A>
 
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -180,19 +177,16 @@ export default function StallingPage() {
       </section>
 
       {/* Security Detail */}
-      <section className="py-20 sm:py-28 bg-surface">
+      <section className="py-10 sm:py-20 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
               <div>
-                <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Beveiliging</p>
-                <h2 className="text-3xl sm:text-4xl font-black mb-6">Uw caravan is bij ons veilig</h2>
-                <div className="section-divider mt-0 mb-6" />
-                <p className="text-warm-gray leading-relaxed mb-4">
-                  Beveiliging is onze eerste prioriteit. Ons terrein is volledig omsloten en alleen toegankelijk voor geautoriseerd personeel. Het Securitas Direct alarmsysteem is gekoppeld aan een alarmcentrale die bij ongeautoriseerde toegang direct actie onderneemt.
-                </p>
-                <p className="text-warm-gray leading-relaxed mb-6">
-                  Alle gestalde caravans zijn via onze collectieve polis standaard verzekerd tegen schade en diefstal op ons terrein. Heeft u behoefte aan een uitgebreidere dekking? Neem dan contact met ons op voor de mogelijkheden.
+                <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Beveiliging</p>
+                <h2 className="text-2xl sm:text-4xl font-black mb-4">Uw caravan is bij ons veilig</h2>
+                <div className="section-divider mt-0 mb-4" />
+                <p className="text-warm-gray leading-relaxed mb-3 text-sm sm:text-base">
+                  Ons terrein is volledig omsloten, alleen toegankelijk voor personeel. Securitas Direct met directe alarmopvolging. Standaard verzekerd tegen schade en diefstal.
                 </p>
 
                 <div className="space-y-3">
@@ -231,17 +225,16 @@ export default function StallingPage() {
       </section>
 
       {/* Spot System */}
-      <section className="py-20 sm:py-28 bg-card">
+      <section className="py-10 sm:py-20 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
               <div className="text-center lg:text-left">
-                <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Organisatie</p>
-                <h2 className="text-3xl sm:text-4xl font-black mb-6">Vaste plek met pleknummer</h2>
-                <div className="section-divider mt-0 mb-6 mx-auto lg:mx-0" />
-                <p className="text-warm-gray mb-4 leading-relaxed">Elke caravan krijgt bij ons een eigen, vaste plek met een uniek pleknummer. Zo weet u altijd precies waar uw caravan staat en kunnen wij efficiënt werken bij controles, reparaties en transport.</p>
-                <p className="text-warm-gray mb-4 leading-relaxed">Via uw persoonlijk klantportaal kunt u altijd uw pleknummer, contractstatus, inspectierapportages en facturen online inzien. U kunt ook service aanvragen indienen voor reparatie, schoonmaak of transport.</p>
-                <p className="text-warm-gray mb-8 leading-relaxed">Ons terrein is ingedeeld in overzichtelijke zones. De buitenstalling is verdeeld over zones A tot en met D, en de binnenstalling is zone H.</p>
+                <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Organisatie</p>
+                <h2 className="text-2xl sm:text-4xl font-black mb-4">Vaste plek met pleknummer</h2>
+                <div className="section-divider mt-0 mb-4 mx-auto lg:mx-0" />
+                <p className="text-warm-gray mb-3 leading-relaxed text-sm sm:text-base">Elke caravan krijgt een eigen, vaste plek. Online inzien via uw klantportaal — inclusief contract, facturen en inspecties.</p>
+                <p className="text-warm-gray mb-6 leading-relaxed text-sm sm:text-base">Zones A-D buitenstalling, zone H binnenstalling.</p>
                 <div className="space-y-3 text-left max-w-sm mx-auto lg:mx-0">
                   {['Zones A-D: Buitenstalling (jaarrond)', 'Zone H: Binnenstalling (geïsoleerde hal)'].map(z => (
                     <div key={z} className="flex items-center gap-3 text-sm"><CheckCircle size={14} className="text-success shrink-0" /><span className="font-medium">{z}</span></div>
@@ -292,12 +285,12 @@ export default function StallingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 sm:py-28 bg-card">
+      <section className="py-10 sm:py-20 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">Veelgestelde vragen</p>
-            <h2 className="text-3xl sm:text-4xl font-black mb-4">Vragen over stalling?</h2>
-            <div className="section-divider mt-5" />
+          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Veelgestelde vragen</p>
+            <h2 className="text-2xl sm:text-4xl font-black mb-3">Vragen over stalling?</h2>
+            <div className="section-divider mt-3" />
           </A>
           <A>
             <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">

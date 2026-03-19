@@ -13,7 +13,7 @@ interface PageHeroProps {
 
 export default function PageHero({ badge, title, subtitle, image, children }: PageHeroProps) {
   return (
-    <section className="relative bg-hero text-white py-20 sm:py-28 overflow-hidden">
+    <section className="relative bg-hero text-white py-14 sm:py-28 overflow-hidden">
       <div className="absolute inset-0">
         {image ? (
           <>
@@ -27,9 +27,9 @@ export default function PageHero({ badge, title, subtitle, image, children }: Pa
       <div className="absolute inset-0 dot-pattern opacity-20" />
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
         <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-          <p className={`text-xs font-bold tracking-[0.2em] uppercase mb-4 ${image ? 'text-primary-light' : 'text-primary'}`}>{badge}</p>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] mb-6">{title}</h1>
-          <p className="text-white/70 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">{subtitle}</p>
+          <p className={`text-xs font-bold tracking-[0.2em] uppercase mb-3 ${image ? 'text-primary-light' : 'text-primary'}`}>{badge}</p>
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.08] mb-4">{title}</h1>
+          <p className="text-white/70 max-w-2xl mx-auto text-sm sm:text-lg leading-relaxed">{subtitle}</p>
         </motion.div>
         {children}
       </div>

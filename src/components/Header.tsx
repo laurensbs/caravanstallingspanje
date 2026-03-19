@@ -51,9 +51,11 @@ export default function Header() {
   }, []);
 
   const isHome = pathname === '/';
-  const headerBg = scrolled || !isHome
+  const headerBg = scrolled
     ? 'bg-card/95 backdrop-blur-xl border-b border-sand-dark/30 shadow-[0_1px_3px_rgba(139,134,128,0.08)]'
-    : 'bg-transparent';
+    : isHome
+      ? 'bg-hero/90 backdrop-blur-md'
+      : 'bg-card/95 backdrop-blur-xl border-b border-sand-dark/30 shadow-[0_1px_3px_rgba(139,134,128,0.08)]';
   const textColor = scrolled || !isHome ? 'text-surface-dark' : 'text-white';
   const mutedColor = scrolled || !isHome ? 'text-warm-gray' : 'text-white/60';
 
