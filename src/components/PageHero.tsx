@@ -33,7 +33,7 @@ export default function PageHero({ badge, title, subtitle, image, children }: Pa
             <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
             <span className="text-xs font-semibold tracking-[0.15em] uppercase text-white/90">{badge}</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.1] mb-5">{title}</h1>
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.1] mb-5 text-white">{title}</h1>
           <p className="text-white/80 max-w-2xl mx-auto text-sm sm:text-lg leading-relaxed">{subtitle}</p>
         </motion.div>
         {children}

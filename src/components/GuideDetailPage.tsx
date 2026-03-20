@@ -105,7 +105,7 @@ export default function GuideDetailPage({ config }: { config: GuideDetailConfig 
               {config.renderBadges?.(item)}
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.1] mb-3">{name}</h1>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.1] mb-3 text-white">{name}</h1>
 
             <div className="flex flex-wrap items-center gap-3 text-white/60 text-sm">
               {item.town && (

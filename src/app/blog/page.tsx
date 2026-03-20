@@ -65,7 +65,7 @@ export default function HubPage() {
               <Palmtree size={14} className="text-white/60" />
               <span className="text-xs font-bold tracking-[0.2em] uppercase text-white/90">Costa Brava Gids</span>
             </motion.div>
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.08] mb-5">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.08] mb-5 text-white">
               Ontdek de <span className="gradient-text">Costa Brava</span>
             </h1>
             <p className="text-white/65 max-w-2xl mx-auto text-sm sm:text-lg leading-relaxed mb-8">
