@@ -24,6 +24,8 @@ const dienstenFaqs = [
 
 export default function DienstenPage() {
   const [quizOpen, setQuizOpen] = useState(false);
+  const [quizInterest, setQuizInterest] = useState('');
+  const openQuiz = (interest: string) => { setQuizInterest(interest); setQuizOpen(true); };
   return (
     <>
       <Header />
@@ -172,7 +174,7 @@ export default function DienstenPage() {
                   </div>
                 </div>
 
-                <button onClick={() => setQuizOpen(true)} className="bg-ocean hover:bg-ocean-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 cursor-pointer">
+                <button onClick={() => openQuiz('reparatie')} className="bg-ocean hover:bg-ocean-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 cursor-pointer">
                   Reparatie aanvragen <ArrowRight size={14} />
                 </button>
               </div>
@@ -263,7 +265,7 @@ export default function DienstenPage() {
 
           <A>
             <div className="mt-12 text-center">
-              <button onClick={() => setQuizOpen(true)} className="bg-primary hover:bg-primary-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-lg shadow-primary/20 hover:shadow-xl hover:-translate-y-0.5 cursor-pointer">
+              <button onClick={() => openQuiz('schadeherstel')} className="bg-primary hover:bg-primary-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-lg shadow-primary/20 hover:shadow-xl hover:-translate-y-0.5 cursor-pointer">
                 Schade melden <ArrowRight size={14} />
               </button>
             </div>
@@ -303,7 +305,7 @@ export default function DienstenPage() {
                   ))}
                 </div>
 
-                <button onClick={() => setQuizOpen(true)} className="bg-primary hover:bg-primary-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 cursor-pointer">
+                <button onClick={() => openQuiz('transport')} className="bg-primary hover:bg-primary-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 cursor-pointer">
                   Transport aanvragen <ArrowRight size={14} />
                 </button>
               </div>
@@ -385,7 +387,7 @@ export default function DienstenPage() {
                   ))}
                 </div>
 
-                <button onClick={() => setQuizOpen(true)} className="bg-hero hover:bg-primary text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 cursor-pointer">
+                <button onClick={() => openQuiz('verkoop')} className="bg-hero hover:bg-primary text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 cursor-pointer">
                   Aanbod bekijken <ArrowRight size={14} />
                 </button>
               </div>
@@ -489,7 +491,7 @@ export default function DienstenPage() {
                   ))}
                 </div>
 
-                <button onClick={() => setQuizOpen(true)} className="bg-ocean hover:bg-ocean-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 cursor-pointer">
+                <button onClick={() => openQuiz('schoonmaak')} className="bg-ocean hover:bg-ocean-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 cursor-pointer">
                   Schoonmaak boeken <ArrowRight size={14} />
                 </button>
               </div>
@@ -547,7 +549,7 @@ export default function DienstenPage() {
 
       <CtaSection title="Hulp nodig? Wij staan voor u klaar" subtitle="Neem contact op voor een vrijblijvende offerte of meer informatie. Wij spreken Nederlands, Engels en Spaans." hours="Op werkdagen bereikbaar van 09:30 tot 16:30 uur" primaryLabel="Neem contact op" onPrimaryClick={() => setQuizOpen(true)} />
 
-      <QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} source="diensten" />
+      <QuizModal open={quizOpen} onClose={() => { setQuizOpen(false); setQuizInterest(''); }} source="diensten" initialInterest={quizInterest || undefined} />
       <Footer />
     </>
   );

@@ -29,25 +29,24 @@ export default function StallingPage() {
       <PageHero badge="Caravanstalling" title={<>Veilige stalling aan de <span className="gradient-text">Costa Brava</span></>} subtitle="Al meer dan 20 jaar dé specialist in het veilig en betrouwbaar stallen van caravans, campers, vouwwagens en boten in Sant Climent de Peralta. Securitas Direct bewaking, 24/7 camerabewaking en standaard verzekerd." image="https://u.cubeupload.com/laurensbos/caravanstoragespain3.jpg" />
 
       {/* Stats strip */}
-      <section className="py-8 sm:py-10 bg-card relative">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <A>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8">
-              {[
-                { num: '20+', label: 'Jaar ervaring' },
-                { num: '200+', label: 'Tevreden klanten' },
-                { num: '24/7', label: 'Camerabewaking' },
-                { num: '14', label: 'Daagse controles' },
-              ].map((s, i) => (
-                <A key={s.label} delay={i * 0.1}>
-                  <div className="text-center">
-                    <p className="stat-number text-3xl sm:text-4xl mb-1">{s.num}</p>
-                    <p className="text-warm-gray text-xs font-medium">{s.label}</p>
-                  </div>
-                </A>
-              ))}
-            </div>
-          </A>
+      <section className="py-10 sm:py-14 bg-card relative overflow-hidden">
+        <div className="absolute inset-0 line-pattern opacity-15 pointer-events-none" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 relative">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8">
+            {[
+              { num: '20+', label: 'Jaar ervaring' },
+              { num: '200+', label: 'Tevreden klanten' },
+              { num: '24/7', label: 'Camerabewaking' },
+              { num: '14', label: 'Daagse controles' },
+            ].map((s, i) => (
+              <A key={s.label} delay={i * 0.1}>
+                <div className="text-center">
+                  <p className="stat-number text-3xl sm:text-5xl mb-1.5">{s.num}</p>
+                  <p className="text-warm-gray text-xs sm:text-sm font-medium">{s.label}</p>
+                </div>
+              </A>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -74,16 +73,16 @@ export default function StallingPage() {
               </div>
               <div className="space-y-4">
                 {[
-                  { icon: Sun, title: 'Geen heen-en-weer gerij', desc: 'Bespaar uzelf 3.000 km per jaar. Uw caravan staat al in Spanje wanneer u op vakantie gaat.', color: 'bg-warning/10 text-warning' },
-                  { icon: Shield, title: 'Professioneel beveiligd', desc: 'Securitas Direct alarmsysteem met directe alarmopvolging. 24/7 camerabewaking. Afgesloten terrein.', color: 'bg-accent/10 text-accent' },
-                  { icon: Eye, title: 'Regelmatige controles', desc: 'Elke 2 weken controle op weer- en stormschade. Jaarlijks volledige technische keuring.', color: 'bg-ocean/10 text-ocean' },
-                  { icon: Wrench, title: 'Eigen werkplaats', desc: 'Reparaties worden direct uitgevoerd. Van banden en remmen tot dakluiken en vochtschade.', color: 'bg-primary/10 text-primary' },
+                  { icon: Sun, title: 'Geen heen-en-weer gerij', desc: 'Bespaar uzelf 3.000 km per jaar. Uw caravan staat al in Spanje wanneer u op vakantie gaat.' },
+                  { icon: Shield, title: 'Professioneel beveiligd', desc: 'Securitas Direct alarmsysteem met directe alarmopvolging. 24/7 camerabewaking. Afgesloten terrein.' },
+                  { icon: Eye, title: 'Regelmatige controles', desc: 'Elke 2 weken controle op weer- en stormschade. Jaarlijks volledige technische keuring.' },
+                  { icon: Wrench, title: 'Eigen werkplaats', desc: 'Reparaties worden direct uitgevoerd. Van banden en remmen tot dakluiken en vochtschade.' },
                 ].map((f, i) => (
                   <A key={f.title} delay={i * 0.08}>
-                    <div className="card-premium p-4">
+                    <div className="card-premium p-4 sm:p-5">
                       <div className="flex gap-4">
-                        <div className={`w-11 h-11 ${f.color} rounded-xl flex items-center justify-center shrink-0`}>
-                          <f.icon size={19} />
+                        <div className="w-11 h-11 bg-primary/8 rounded-xl flex items-center justify-center shrink-0">
+                          <f.icon size={19} className="text-primary" />
                         </div>
                         <div>
                           <p className="font-bold text-sm mb-0.5">{f.title}</p>
@@ -110,40 +109,40 @@ export default function StallingPage() {
             <p className="text-warm-gray text-sm">Inclusief beveiliging, verzekering en controle.</p>
           </A>
 
-          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto">
             {[
               {
                 title: 'Buitenstalling', icon: Shield, price: '65',
                 desc: 'Onze populairste optie. Uw caravan staat op een afgesloten, beveiligd buitenterrein. De milde Spaanse winters zorgen ervoor dat uw caravan geen last heeft van vorst of strooizout.',
                 features: ['Eigen vaste plek met pleknummer', '24/7 camerabewaking', 'Securitas Direct alarm', 'Standaard verzekerd', 'Tweewekelijkse weerschadecontrole', 'Jaarlijkse technische keuring', 'Caravans, campers, vouwwagens & boten'],
-                tag: 'Populair', gradient: 'bg-accent/10 text-accent'
+                tag: null
               },
               {
                 title: 'Binnenstalling', icon: Thermometer, price: '95',
                 desc: 'Maximale bescherming in onze geïsoleerde hal. Geen hitte, geen kou, geen UV-straling. Ideaal voor nieuwere of duurdere caravans die u optimaal wilt beschermen.',
                 features: ['Geïsoleerde overdekte hal', 'Geen UV-schade of verbleking', 'Stabiele temperatuur', 'Geen mos- of algvorming', 'Alle voordelen buitenstalling', 'Beperkte beschikbaarheid', 'Reserveer tijdig'],
-                tag: 'Premium', gradient: 'bg-ocean/10 text-ocean'
+                tag: 'Premium'
               },
             ].map((t, i) => (
               <A key={t.title} delay={i * 0.1}>
-                <div className="card-premium p-7 sm:p-8 h-full flex flex-col">
-                  {t.tag && <span className="absolute top-6 right-6 bg-primary/8 text-primary text-[10px] font-bold px-3 py-1 rounded-full">{t.tag}</span>}
-                  <div className={`w-12 h-12 ${t.gradient} rounded-xl flex items-center justify-center mb-5`}>
+                <div className={`card-premium p-7 sm:p-9 h-full flex flex-col ${t.tag ? 'ring-2 ring-primary/20' : ''}`}>
+                  {t.tag && <span className="absolute top-6 right-6 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">{t.tag}</span>}
+                  <div className={`w-12 h-12 ${t.tag ? 'bg-primary/8 text-primary' : 'bg-accent/8 text-accent'} rounded-xl flex items-center justify-center mb-5`}>
                     <t.icon size={22} />
                   </div>
                   <h3 className="text-xl font-black mb-2">{t.title}</h3>
                   <p className="text-sm text-warm-gray mb-5 leading-relaxed">{t.desc}</p>
                   <ul className="space-y-2 mb-8 flex-1">
                     {t.features.map(f => (
-                      <li key={f} className="flex items-center gap-2.5 text-sm"><CheckCircle size={13} className="text-success shrink-0" /> {f}</li>
+                      <li key={f} className="flex items-center gap-2.5 text-sm"><CheckCircle size={13} className="text-accent shrink-0" /> {f}</li>
                     ))}
                   </ul>
                   <div className="flex items-end gap-1 mb-5">
                     <span className="text-sm text-warm-gray">Vanaf</span>
-                    <span className="text-4xl font-black">€{t.price}</span>
+                    <span className="stat-number text-4xl">€{t.price}</span>
                     <span className="text-warm-gray text-sm">/maand</span>
                   </div>
-                  <button onClick={() => setQuizOpen(true)} className="w-full bg-accent hover:bg-accent-dark text-white font-bold px-6 py-3.5 rounded-xl text-sm transition-all inline-flex items-center justify-center gap-2 shadow-lg shadow-accent/20 hover:shadow-xl hover:shadow-accent/30 hover:-translate-y-0.5 cursor-pointer">
+                  <button onClick={() => setQuizOpen(true)} className={`w-full py-3.5 rounded-xl text-sm font-bold transition-all duration-200 cursor-pointer inline-flex items-center justify-center gap-2 ${t.tag ? 'bg-primary hover:bg-primary-dark text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5' : 'bg-hero hover:bg-hero/90 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5'}`}>
                     Stalling aanvragen <ArrowRight size={14} />
                   </button>
                 </div>
@@ -169,29 +168,25 @@ export default function StallingPage() {
               {
                 icon: Eye, title: 'Tweewekelijkse visuele controle',
                 desc: 'Elke twee weken lopen onze medewerkers langs alle gestalde caravans. Wij controleren op beschadigingen door storm, hagel, vallende takken of andere weersomstandigheden. Eventuele schade melden wij direct aan u en pakken wij op in onze werkplaats.',
-                color: 'bg-ocean/10 text-ocean'
               },
               {
                 icon: FileCheck, title: 'Jaarlijkse technische keuring',
                 desc: 'Eén keer per jaar voeren wij een uitgebreide technische keuring uit. Wij controleren banden, remmen, verlichting, koppeling, gasinstallatie, dakluiken, ramen en naden. U ontvangt een keuringsrapport via uw klantportaal.',
-                color: 'bg-accent/10 text-accent'
               },
               {
                 icon: Droplets, title: 'Vochtcontrole',
                 desc: 'Vocht is de grootste vijand van uw caravan. Wij controleren regelmatig op vochtsporen en lekkages. Door vroege signalering voorkomen wij kostbare vervolgschade. Eventuele lekkages worden direct door ons team verholpen.',
-                color: 'bg-warning/10 text-warning'
               },
               {
                 icon: Wind, title: 'Storm- en weerbescherming',
                 desc: 'Bij zware stormen of extreme weersomstandigheden nemen wij extra maatregelen. Wij controleren de verankering, sluiten luifels en dakluiken en beschermen kwetsbare onderdelen. Na de storm volgt altijd een extra ronde.',
-                color: 'bg-primary/10 text-primary'
               },
             ].map((f, i) => (
               <A key={f.title} delay={i * 0.08}>
                 <div className="card-premium p-6 h-full">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className={`w-10 h-10 ${f.color} rounded-xl flex items-center justify-center shrink-0`}>
-                      <f.icon size={18} />
+                    <div className="w-10 h-10 bg-primary/8 rounded-xl flex items-center justify-center shrink-0">
+                      <f.icon size={18} className="text-primary" />
                     </div>
                     <h3 className="font-bold">{f.title}</h3>
                   </div>
@@ -231,15 +226,15 @@ export default function StallingPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { icon: Lock, title: 'Securitas Direct', desc: 'Professioneel alarmsysteem met directe alarmopvolging bij ongeautoriseerde toegang.', color: 'bg-accent/10 text-accent' },
-                  { icon: Camera, title: '24/7 Camera\'s', desc: 'Geavanceerd camerasysteem met continue registratie. Beeldmateriaal wordt opgeslagen.', color: 'bg-ocean/10 text-ocean' },
-                  { icon: Shield, title: 'Verzekerd', desc: 'Collectieve verzekeringspolis dekt schade en diefstal op ons terrein.', color: 'bg-primary/10 text-primary' },
-                  { icon: Eye, title: 'Dagelijks toezicht', desc: 'Ons personeel is dagelijks aanwezig op het terrein voor toezicht en onderhoud.', color: 'bg-warning/10 text-warning' },
+                  { icon: Lock, title: 'Securitas Direct', desc: 'Professioneel alarmsysteem met directe alarmopvolging bij ongeautoriseerde toegang.' },
+                  { icon: Camera, title: '24/7 Camera\'s', desc: 'Geavanceerd camerasysteem met continue registratie. Beeldmateriaal wordt opgeslagen.' },
+                  { icon: Shield, title: 'Verzekerd', desc: 'Collectieve verzekeringspolis dekt schade en diefstal op ons terrein.' },
+                  { icon: Eye, title: 'Dagelijks toezicht', desc: 'Ons personeel is dagelijks aanwezig op het terrein voor toezicht en onderhoud.' },
                 ].map((f, i) => (
                   <A key={f.title} delay={i * 0.08}>
                     <div className="card-premium p-5 h-full text-center">
-                      <div className={`w-12 h-12 ${f.color} rounded-xl flex items-center justify-center mx-auto mb-3`}>
-                        <f.icon size={20} />
+                      <div className="w-12 h-12 bg-primary/8 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <f.icon size={20} className="text-primary" />
                       </div>
                       <h3 className="font-bold text-sm mb-1">{f.title}</h3>
                       <p className="text-xs text-warm-gray leading-relaxed">{f.desc}</p>
@@ -273,14 +268,15 @@ export default function StallingPage() {
               <div className="bg-surface rounded-2xl p-6 sm:p-8 border border-sand-dark/20">
                 <div className="grid grid-cols-4 gap-2">
                   {['A-001','A-002','A-003','A-004','A-005','A-006','A-007','A-008','B-001','B-002','B-003','B-004','H-001','H-002','H-003','H-004'].map((spot, i) => {
-                    const c = i < 8 ? (i % 3 === 0 ? 'bg-accent/15 text-accent-dark' : i % 3 === 1 ? 'bg-ocean/15 text-ocean-dark' : 'bg-warning/15 text-warning') : i < 12 ? 'bg-accent/15 text-accent-dark' : 'bg-ocean/15 text-ocean-dark';
+                    const status = i % 5 === 0 ? 'open' : i % 4 === 0 ? 'reserved' : 'taken';
+                    const c = status === 'open' ? 'bg-accent/10 text-accent border border-accent/15' : status === 'reserved' ? 'bg-primary/10 text-primary border border-primary/15' : 'bg-sand/60 text-warm-gray border border-sand-dark/15';
                     return <div key={spot} className={`${c} rounded-xl p-3 text-center text-xs font-bold`}>{spot}</div>;
                   })}
                 </div>
-                <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-sand-dark/20">
-                  <span className="flex items-center gap-1.5 text-[10px] font-medium text-warm-gray"><span className="w-2.5 h-2.5 bg-accent rounded-full" /> Vrij</span>
-                  <span className="flex items-center gap-1.5 text-[10px] font-medium text-warm-gray"><span className="w-2.5 h-2.5 bg-ocean rounded-full" /> Bezet</span>
-                  <span className="flex items-center gap-1.5 text-[10px] font-medium text-warm-gray"><span className="w-2.5 h-2.5 bg-warning rounded-full" /> Gereserveerd</span>
+                <div className="flex items-center justify-center gap-5 mt-5 pt-4 border-t border-sand-dark/15">
+                  <span className="flex items-center gap-1.5 text-[11px] font-medium text-warm-gray"><span className="w-2.5 h-2.5 bg-accent/60 rounded-full" /> Vrij</span>
+                  <span className="flex items-center gap-1.5 text-[11px] font-medium text-warm-gray"><span className="w-2.5 h-2.5 bg-sand-dark/40 rounded-full" /> Bezet</span>
+                  <span className="flex items-center gap-1.5 text-[11px] font-medium text-warm-gray"><span className="w-2.5 h-2.5 bg-primary/60 rounded-full" /> Gereserveerd</span>
                 </div>
               </div>
             </div>
@@ -345,7 +341,7 @@ export default function StallingPage() {
 
       <CtaSection title="Wilt u uw caravan bij ons stallen?" subtitle="Neem contact op voor een vrijblijvende offerte of bel voor direct advies. Wij spreken Nederlands, Engels en Spaans." hours="Op werkdagen bereikbaar van 09:30 tot 16:30 uur" primaryLabel="Stalling aanvragen" onPrimaryClick={() => setQuizOpen(true)} />
 
-      <QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} source="stalling" />
+      <QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} source="stalling" initialInterest="stalling" />
       <Footer />
     </>
   );

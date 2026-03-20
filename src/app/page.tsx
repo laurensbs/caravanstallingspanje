@@ -208,14 +208,13 @@ export default function HomePage() {
             <h2 className="text-2xl sm:text-3xl font-black">Wat kunnen wij voor u doen?</h2>
             <p className="text-warm-gray text-sm mt-2">Tik op een dienst om direct aan te vragen</p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
             {[
-              { icon: Shield, label: "Stalling", desc: "Vanaf €65/mnd", interest: "stalling", color: "from-accent to-accent-dark", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain2.jpg" },
-              { icon: Wrench, label: "Reparatie", desc: "Alle merken", interest: "reparatie", color: "from-warning to-warning/80", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain5.jpg" },
-              { icon: Sparkles, label: "CaravanRepair®", desc: "Schadeherstel", interest: "schadeherstel", color: "from-primary to-primary-dark", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain4.jpg" },
-              { icon: Truck, label: "Transport", desc: "Door heel Europa", interest: "transport", color: "from-ocean to-ocean-dark", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain3.jpg" },
-              { icon: ShoppingBag, label: "Verkoop", desc: "Occasions", interest: "verkoop", color: "from-danger to-danger/80", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain6.jpg" },
-              { icon: Bike, label: "Verhuur", desc: "Fietsen & meer", interest: "anders", color: "from-info to-info/80", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain.jpg" },
+              { icon: Shield, label: "Stalling", desc: "Vanaf €65/mnd", interest: "stalling", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain2.jpg" },
+              { icon: Wrench, label: "Reparatie & CaravanRepair®", desc: "Alle merken · Schadeherstel", interest: "reparatie", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain5.jpg" },
+              { icon: Truck, label: "Transport", desc: "Door heel Europa", interest: "transport", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain4.jpg" },
+              { icon: ShoppingBag, label: "Verkoop", desc: "Occasions", interest: "verkoop", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain6.jpg" },
+              { icon: Bike, label: "Verhuur", desc: "Fietsen & meer", interest: "anders", img: "https://u.cubeupload.com/laurensbos/caravanstoragespain.jpg" },
             ].map((s, i) => (
               <A key={s.label} delay={i * 0.05}>
                 <button
@@ -223,16 +222,16 @@ export default function HomePage() {
                   className="group block relative rounded-2xl overflow-hidden aspect-[3/4] sm:aspect-[3/4] touch-manipulation w-full cursor-pointer"
                 >
                   <Image src={s.img} alt={s.label} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw" className="object-cover group-hover:scale-110 transition-transform duration-500" />
-                  <div className={`absolute inset-0 bg-gradient-to-t ${s.color} opacity-75 group-hover:opacity-85 transition-opacity`} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-hero/90 via-hero/50 to-hero/20 group-hover:from-hero/95 group-hover:via-hero/60 transition-all duration-300" />
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-3">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white/10 border border-white/15 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-primary/30 group-hover:border-primary/30 transition-all duration-300">
                       <s.icon size={24} />
                     </div>
                     <span className="font-black text-sm sm:text-base text-center leading-tight">{s.label}</span>
-                    <span className="text-white/70 text-[11px] mt-0.5">{s.desc}</span>
+                    <span className="text-white/60 text-[11px] mt-0.5">{s.desc}</span>
                   </div>
                   <div className="absolute bottom-2 inset-x-2">
-                    <div className="bg-white/20 backdrop-blur-sm rounded-lg py-1.5 text-white text-[10px] font-bold text-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="bg-primary/80 backdrop-blur-sm rounded-lg py-1.5 text-white text-[10px] font-bold text-center opacity-0 group-hover:opacity-100 transition-opacity">
                       Direct aanvragen →
                     </div>
                   </div>
@@ -248,105 +247,85 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ WAAROM WIJ ═══ */}
-      <section className="py-12 sm:py-20 bg-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Waarom Caravanstalling Spanje</p>
-            <h2 className="text-2xl sm:text-4xl font-black mb-3">Meer dan alleen stalling</h2>
-            <div className="section-divider mt-3 mb-3" />
-            <p className="text-warm-gray leading-relaxed text-sm sm:text-base">
-              Alles onder één dak: stalling, reparatie, transport en verkoop. Nederlandstalig personeel.
-            </p>
-          </A>
 
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
-            {[
-              { icon: Shield, title: "Beveiligde stalling", desc: "Securitas Direct, 24/7 camera's, standaard verzekerd.", color: "bg-ocean/10 text-ocean" },
-              { icon: Wrench, title: "Reparatie & onderhoud", desc: "Complete werkplaats, alle merken caravans.", color: "bg-warning/10 text-warning" },
-              { icon: Sparkles, title: "CaravanRepair®", desc: "Onzichtbaar schadeherstel, levenslange garantie.", color: "bg-primary/10 text-primary" },
-              { icon: Truck, title: "Transport", desc: "7 eenheden, ophalen en afleveren heel Costa Brava.", color: "bg-accent/10 text-accent" },
-              { icon: ShoppingBag, title: "Verkoop", desc: "Occasions al in Spanje, geen transportkosten.", color: "bg-danger/10 text-danger" },
-              { icon: Eye, title: "Controles & keuring", desc: "Elke 2 weken check, jaarlijks technische keuring.", color: "bg-info/10 text-info" },
-            ].map((f, i) => (
-              <A key={f.title} delay={i * 0.05}>
-                <div className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-sand-dark/30 hover:border-primary/20 transition-all h-full group">
-                  <div className={`w-10 h-10 sm:w-12 sm:h-12 ${f.color} rounded-xl flex items-center justify-center mb-3 sm:mb-4`}>
-                    <f.icon size={20} />
-                  </div>
-                  <h3 className="font-bold text-[13px] sm:text-[16px] mb-1">{f.title}</h3>
-                  <p className="text-[11px] sm:text-sm text-warm-gray leading-relaxed">{f.desc}</p>
-                </div>
-              </A>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ═══ IMAGE BREAK ═══ */}
-      <section className="relative h-[200px] sm:h-[360px] overflow-hidden">
+      <section className="relative h-[280px] sm:h-[420px] overflow-hidden">
         <Image src="https://u.cubeupload.com/laurensbos/caravanstoragespain3.jpg" alt="Caravanstalling terrein in Spanje" fill sizes="100vw" className="object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-surface-dark/80 via-surface-dark/20 to-transparent" />
-        <div className="absolute bottom-0 inset-x-0 max-w-7xl mx-auto px-4 sm:px-6 pb-6 sm:pb-14 text-center">
-          <p className="text-white/70 text-xs sm:text-sm font-medium mb-1">Sant Climent de Peralta, Girona</p>
-          <h3 className="text-white text-lg sm:text-3xl font-black">3 beveiligde locaties aan de Costa Brava</h3>
+        <div className="absolute inset-0 bg-gradient-to-t from-hero via-hero/40 to-hero/10" />
+        <div className="absolute inset-0 flex items-end">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-10 sm:pb-16 w-full">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+              <div>
+                <p className="text-primary-light/80 text-[11px] font-bold tracking-[0.2em] uppercase mb-2">Sant Climent de Peralta, Girona</p>
+                <h3 className="text-white text-xl sm:text-3xl font-black leading-tight">3 beveiligde locaties<br className="sm:hidden" /> aan de Costa Brava</h3>
+              </div>
+              <Link href="/locaties" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/15 text-white text-sm font-semibold px-5 py-2.5 rounded-xl backdrop-blur-sm transition-all">
+                Bekijk locaties <ArrowRight size={14} />
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ═══ STALLING TYPES ═══ */}
-      <section className="py-12 sm:py-20 bg-surface">
+      <section className="py-14 sm:py-24 bg-surface relative overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/[0.03] rounded-full blur-3xl pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">Stallingstypen</p>
+          <A className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
+            <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              <span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Stallingstypen</span>
+            </span>
             <h2 className="text-2xl sm:text-4xl font-black mb-3">Kies uw stallingtype</h2>
-            <div className="section-divider mt-3 mb-3" />
-            <p className="text-warm-gray leading-relaxed text-sm">Maandtarieven inclusief beveiliging, verzekering en controle.</p>
+            <div className="divider-animated mt-3 mb-4" />
+            <p className="text-warm-gray leading-relaxed text-sm">Inclusief beveiliging, verzekering en tweewekelijkse controle.</p>
           </A>
 
-          <div className="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          <div className="grid sm:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto">
             {[
-              { title: "Buitenstalling", price: "65", desc: "Beveiligd buitenterrein met 24/7 bewaking", features: ["Securitas Direct alarm", "24/7 camerabewaking", "Standaard verzekerd", "Tweewekelijkse controle", "Jaarlijkse keuring"], popular: false },
-              { title: "Binnenstalling", price: "95", desc: "Overdekte hal met klimaatbescherming", features: ["Geïsoleerde hal", "Geen hitte of kou", "Alle voordelen buiten", "Premium locatie", "Beperkt beschikbaar"], popular: true },
+              { title: "Buitenstalling", price: "65", desc: "Uw caravan op een beveiligd buitenterrein met 24/7 bewaking. Het milde Spaanse klimaat beschermt tegen vorst en strooizout.", features: ["Eigen vaste plek met pleknummer", "Securitas Direct alarm", "24/7 camerabewaking", "Standaard verzekerd", "Tweewekelijkse controle", "Jaarlijkse technische keuring"], popular: false, icon: Shield },
+              { title: "Binnenstalling", price: "95", desc: "Maximale bescherming in onze geïsoleerde hal. Geen UV-schade, stabiele temperatuur — ideaal voor nieuwere caravans.", features: ["Geïsoleerde overdekte hal", "Geen UV-schade of verbleking", "Stabiele temperatuur", "Alle voordelen buitenstalling", "Premium locatie", "Beperkt beschikbaar"], popular: true, icon: Building },
             ].map((p, i) => (
               <A key={p.title} delay={i * 0.1}>
-                <div className={`relative bg-card rounded-2xl p-7 h-full flex flex-col text-center ${p.popular ? 'border-2 border-primary shadow-lg shadow-primary/10 ring-1 ring-primary/10' : 'border border-sand-dark/30'}`}>
-                  {p.popular && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-bold px-4 py-1 rounded-full shadow-sm">Meest gekozen</span>}
-                  <h3 className="text-lg font-bold mt-1">{p.title}</h3>
-                  <p className="text-xs text-warm-gray mt-1 mb-5">{p.desc}</p>
-                  <div className="mb-6">
-                    <span className="text-4xl font-black">€{p.price}</span>
-                    <span className="text-warm-gray text-sm">/mnd</span>
+                <div className={`card-premium p-7 sm:p-9 h-full flex flex-col ${p.popular ? 'ring-2 ring-primary/20' : ''}`}>
+                  {p.popular && <span className="absolute top-6 right-6 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">Meest gekozen</span>}
+                  <div className={`w-12 h-12 ${p.popular ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'} rounded-xl flex items-center justify-center mb-5`}>
+                    <p.icon size={22} />
                   </div>
-                  <ul className="space-y-2.5 mb-8 flex-1 text-left">
+                  <h3 className="text-xl font-black mb-1.5">{p.title}</h3>
+                  <p className="text-sm text-warm-gray mb-6 leading-relaxed">{p.desc}</p>
+                  <ul className="space-y-2.5 mb-8 flex-1">
                     {p.features.map(f => (
-                      <li key={f} className="flex items-center gap-2.5 text-sm"><CheckCircle size={14} className="text-success shrink-0" /> {f}</li>
+                      <li key={f} className="flex items-center gap-2.5 text-sm"><CheckCircle size={14} className="text-accent shrink-0" /> {f}</li>
                     ))}
                   </ul>
-                  <Link href="/reserveren" className={`block py-3 rounded-xl text-sm font-bold transition-all duration-200 ${p.popular ? 'bg-primary hover:bg-primary-dark text-white shadow-sm' : 'bg-hero hover:bg-hero/90 text-white'}`}>
-                    Direct reserveren
-                  </Link>
+                  <div className="flex items-end gap-1 mb-5">
+                    <span className="text-sm text-warm-gray">Vanaf</span>
+                    <span className="stat-number text-4xl">€{p.price}</span>
+                    <span className="text-warm-gray text-sm">/maand</span>
+                  </div>
+                  <button onClick={() => setQuizOpen(true)} className={`w-full py-3.5 rounded-xl text-sm font-bold transition-all duration-200 cursor-pointer inline-flex items-center justify-center gap-2 ${p.popular ? 'bg-primary hover:bg-primary-dark text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5' : 'bg-hero hover:bg-hero/90 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5'}`}>
+                    Stalling aanvragen <ArrowRight size={14} />
+                  </button>
                 </div>
               </A>
             ))}
-          </div>
-
-          {/* Trust badges */}
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 mt-10 text-xs text-warm-gray">
-            <span className="flex items-center gap-1.5"><Shield size={13} className="text-success" /> Securitas Direct beveiligd</span>
-            <span className="flex items-center gap-1.5"><CheckCircle size={13} className="text-ocean" /> Standaard verzekerd</span>
-            <span className="flex items-center gap-1.5"><Eye size={13} className="text-primary" /> Tweewekelijkse controle</span>
-            <span className="flex items-center gap-1.5"><Star size={13} className="text-warning" /> 4.9/5 Google reviews</span>
           </div>
         </div>
       </section>
 
       {/* ═══ HOE HET WERKT ═══ */}
-      <section className="py-12 sm:py-20 bg-card">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-14">
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-2">In 4 stappen</p>
+      <section className="py-14 sm:py-24 bg-card relative overflow-hidden">
+        <div className="absolute inset-0 line-pattern opacity-20 pointer-events-none" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 relative">
+          <A className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
+            <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              <span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">In 4 stappen</span>
+            </span>
             <h2 className="text-2xl sm:text-4xl font-black mb-3">Hoe werkt het?</h2>
-            <div className="section-divider mt-3 mb-3" />
+            <div className="divider-animated mt-3 mb-3" />
           </A>
 
           <div className="relative">
@@ -361,15 +340,15 @@ export default function HomePage() {
                 { step: "4", icon: Shield, title: "Wij zorgen ervoor", desc: "Bewaking, controles en onderhoud — wij regelen alles." },
               ].map((s, i) => (
                 <A key={s.step} delay={i * 0.1}>
-                  <div className="bg-surface rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-sand-dark/10 text-center relative hover:border-primary/15 hover:shadow-md transition-all h-full">
-                    <div className="relative inline-flex mb-3 sm:mb-5">
-                      <div className="w-11 h-11 sm:w-14 sm:h-14 bg-primary/10 rounded-full flex items-center justify-center">
-                        <s.icon size={20} className="text-primary" />
+                  <div className="card-premium p-5 sm:p-6 text-center h-full">
+                    <div className="relative inline-flex mb-4 sm:mb-5">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 bg-primary/8 rounded-2xl flex items-center justify-center">
+                        <s.icon size={22} className="text-primary" />
                       </div>
-                      <span className="absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white text-[10px] sm:text-[11px] font-black rounded-full flex items-center justify-center shadow-sm">{s.step}</span>
+                      <span className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-primary text-white text-[11px] font-black rounded-full flex items-center justify-center shadow-lg shadow-primary/30">{s.step}</span>
                     </div>
-                    <h3 className="font-bold text-[13px] sm:text-[15px] mb-1">{s.title}</h3>
-                    <p className="text-[11px] sm:text-sm text-warm-gray leading-relaxed">{s.desc}</p>
+                    <h3 className="font-bold text-[14px] sm:text-[15px] mb-1.5">{s.title}</h3>
+                    <p className="text-[12px] sm:text-sm text-warm-gray leading-relaxed">{s.desc}</p>
                   </div>
                 </A>
               ))}

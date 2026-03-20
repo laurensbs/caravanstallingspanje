@@ -108,7 +108,8 @@ export default function Footer() {
             <ul className={`space-y-2.5 ${openSections.links ? 'block' : 'hidden sm:block'}`}>
               {[
                 { href: '/locaties', label: 'Onze Locaties' },
-                { href: '/blog', label: 'Blog & Tips' },
+                { href: '/blog', label: 'Costa Brava Gids' },
+                { href: '/blog/artikelen', label: 'Blog & Tips' },
                 { href: '/mijn-account', label: 'Mijn Account' },
                 { href: '/contact', label: 'Contact' },
                 { href: '/privacy', label: 'Privacybeleid' },

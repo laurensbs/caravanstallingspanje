@@ -222,7 +222,7 @@ export default function TarievenPage() {
 
       <CtaSection title="Klaar om uw caravan te stallen?" subtitle="Vraag vrijblijvend een offerte aan of bel voor direct advies." primaryLabel="Offerte aanvragen" primaryColor="accent" onPrimaryClick={() => setQuizOpen(true)} />
 
-      <QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} source="tarieven" />
+      <QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} source="tarieven" initialInterest="stalling" />
       <Footer />
     </>
   );

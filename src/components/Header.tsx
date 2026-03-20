@@ -65,7 +65,7 @@ export default function Header() {
     { href: '/diensten', label: 'Diensten', hasMega: true },
     { href: '/locaties', label: 'Locaties' },
     { href: '/tarieven', label: 'Tarieven' },
-    { href: '/blog', label: 'Blog' },
+    { href: '/blog', label: 'Costa Brava Gids' },
     { href: '/contact', label: 'Contact' },
   ];
 
@@ -229,73 +229,74 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile menu - full-screen app-like overlay */}
-        <AnimatePresence>
-          {open && (
-            <motion.div
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2 }}
-              className="lg:hidden fixed inset-0 top-16 bg-card z-40 overflow-y-auto pb-24"
-            >
-              <div className="px-4 py-6 max-w-lg mx-auto">
-                {/* Main navigation */}
-                <div className="grid grid-cols-2 gap-2 mb-6">
-                  {navItems.filter(item => !item.hasMega).map(item => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all ${
-                        pathname === item.href
-                          ? 'bg-primary/10 text-primary border border-primary/20'
-                          : 'bg-sand/50 text-surface-dark hover:bg-sand border border-transparent'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-
-                {/* Diensten as large tiles */}
-                <p className="text-[10px] font-bold uppercase tracking-widest text-warm-gray/60 mb-3">Onze diensten</p>
-                <div className="grid grid-cols-3 gap-2 mb-6">
-                  {DIENSTEN_ITEMS.map(d => (
-                    <Link
-                      key={d.label}
-                      href={d.href}
-                      className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-sand/50 hover:bg-sand border border-transparent hover:border-primary/10 transition-all text-center"
-                    >
-                      <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                        <d.icon size={18} className="text-primary" />
-                      </div>
-                      <span className="text-[11px] font-semibold text-surface-dark leading-tight">{d.label.split(' ')[0]}</span>
-                    </Link>
-                  ))}
-                </div>
-
-                {/* Quick actions */}
-                <div className="space-y-2">
-                  <button onClick={() => { setQuizOpen(true); setOpen(false); }} className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3.5 rounded-xl text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm">
-                    <ArrowRight size={15} /> Stalling aanvragen
-                  </button>
-                  <div className="grid grid-cols-2 gap-2">
-                    <a href="tel:+34650036755" className="flex items-center justify-center gap-2 py-3 rounded-xl bg-hero text-white text-sm font-semibold transition-colors">
-                      <Phone size={14} /> Bellen
-                    </a>
-                    <a href="https://wa.me/34650036755" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 py-3 rounded-xl bg-[#25D366] text-white text-sm font-semibold transition-colors">
-                      <Mail size={14} /> WhatsApp
-                    </a>
-                  </div>
-                  <Link href="/mijn-account" className="flex items-center justify-center gap-2 py-3 rounded-xl bg-sand/70 text-surface-dark text-sm font-semibold hover:bg-sand transition-colors">
-                    <User size={15} /> Mijn Account
-                  </Link>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </header>
+
+      {/* Mobile menu - outside header to avoid backdrop-filter containing block issue */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="lg:hidden fixed inset-0 top-16 bg-card z-[45] overflow-y-auto pb-24"
+          >
+            <div className="px-4 py-6 max-w-lg mx-auto">
+              {/* Main navigation */}
+              <div className="grid grid-cols-2 gap-2 mb-6">
+                {navItems.filter(item => !item.hasMega).map(item => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all ${
+                      pathname === item.href
+                        ? 'bg-primary/10 text-primary border border-primary/20'
+                        : 'bg-sand/50 text-surface-dark hover:bg-sand border border-transparent'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+
+              {/* Diensten as large tiles */}
+              <p className="text-[10px] font-bold uppercase tracking-widest text-warm-gray/60 mb-3">Onze diensten</p>
+              <div className="grid grid-cols-3 gap-2 mb-6">
+                {DIENSTEN_ITEMS.map(d => (
+                  <Link
+                    key={d.label}
+                    href={d.href}
+                    className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-sand/50 hover:bg-sand border border-transparent hover:border-primary/10 transition-all text-center"
+                  >
+                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                      <d.icon size={18} className="text-primary" />
+                    </div>
+                    <span className="text-[11px] font-semibold text-surface-dark leading-tight">{d.label.split(' ')[0]}</span>
+                  </Link>
+                ))}
+              </div>
+
+              {/* Quick actions */}
+              <div className="space-y-2">
+                <button onClick={() => { setQuizOpen(true); setOpen(false); }} className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3.5 rounded-xl text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                  <ArrowRight size={15} /> Stalling aanvragen
+                </button>
+                <div className="grid grid-cols-2 gap-2">
+                  <a href="tel:+34650036755" className="flex items-center justify-center gap-2 py-3 rounded-xl bg-hero text-white text-sm font-semibold transition-colors">
+                    <Phone size={14} /> Bellen
+                  </a>
+                  <a href="https://wa.me/34650036755" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 py-3 rounded-xl bg-[#25D366] text-white text-sm font-semibold transition-colors">
+                    <Mail size={14} /> WhatsApp
+                  </a>
+                </div>
+                <Link href="/mijn-account" className="flex items-center justify-center gap-2 py-3 rounded-xl bg-sand/70 text-surface-dark text-sm font-semibold hover:bg-sand transition-colors">
+                  <User size={15} /> Mijn Account
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} source="header" />
     </>
   );

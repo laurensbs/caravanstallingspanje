@@ -240,6 +240,159 @@ export async function initDatabase() {
   await sql`CREATE INDEX IF NOT EXISTS idx_leads_status ON leads(status)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_leads_created ON leads(created_at DESC)`;
 
+  // Guide Hub tables
+  await sql`CREATE TABLE IF NOT EXISTS guide_campings (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    slug TEXT UNIQUE NOT NULL,
+    description TEXT,
+    region TEXT DEFAULT 'Costa Brava',
+    town TEXT,
+    address TEXT,
+    lat DECIMAL(10,7),
+    lng DECIMAL(10,7),
+    stars INTEGER DEFAULT 3,
+    website TEXT,
+    phone TEXT,
+    price_range TEXT DEFAULT '€€',
+    amenities JSONB DEFAULT '[]',
+    highlights JSONB DEFAULT '[]',
+    is_featured BOOLEAN DEFAULT false,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  )`;
+
+  await sql`CREATE TABLE IF NOT EXISTS guide_places (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    slug TEXT UNIQUE NOT NULL,
+    description TEXT,
+    region TEXT DEFAULT 'Costa Brava',
+    lat DECIMAL(10,7),
+    lng DECIMAL(10,7),
+    highlights JSONB DEFAULT '[]',
+    best_season TEXT,
+    population TEXT,
+    is_featured BOOLEAN DEFAULT false,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  )`;
+
+  await sql`CREATE TABLE IF NOT EXISTS guide_beaches (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    slug TEXT UNIQUE NOT NULL,
+    description TEXT,
+    place_id INTEGER REFERENCES guide_places(id),
+    region TEXT DEFAULT 'Costa Brava',
+    beach_type TEXT DEFAULT 'zand',
+    lat DECIMAL(10,7),
+    lng DECIMAL(10,7),
+    facilities JSONB DEFAULT '[]',
+    is_featured BOOLEAN DEFAULT false,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  )`;
+
+  await sql`CREATE TABLE IF NOT EXISTS guide_attractions (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    slug TEXT UNIQUE NOT NULL,
+    description TEXT,
+    place_id INTEGER REFERENCES guide_places(id),
+    region TEXT DEFAULT 'Costa Brava',
+    category TEXT DEFAULT 'bezienswaardigheid',
+    address TEXT,
+    lat DECIMAL(10,7),
+    lng DECIMAL(10,7),
+    website TEXT,
+    price_info TEXT,
+    opening_hours TEXT,
+    is_featured BOOLEAN DEFAULT false,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  )`;
+
+  await sql`CREATE TABLE IF NOT EXISTS guide_restaurants (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    slug TEXT UNIQUE NOT NULL,
+    description TEXT,
+    place_id INTEGER REFERENCES guide_places(id),
+    region TEXT DEFAULT 'Costa Brava',
+    cuisine_type TEXT,
+    price_range TEXT DEFAULT '€€',
+    address TEXT,
+    lat DECIMAL(10,7),
+    lng DECIMAL(10,7),
+    website TEXT,
+    phone TEXT,
+    is_featured BOOLEAN DEFAULT false,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  )`;
+
+  await sql`CREATE TABLE IF NOT EXISTS guide_blog_posts (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    slug TEXT UNIQUE NOT NULL,
+    excerpt TEXT,
+    content TEXT,
+    category TEXT DEFAULT 'Algemeen',
+    read_time TEXT DEFAULT '5 min',
+    author TEXT DEFAULT 'Caravanstalling Spanje',
+    is_featured BOOLEAN DEFAULT false,
+    is_published BOOLEAN DEFAULT false,
+    published_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  )`;
+
+  await sql`CREATE TABLE IF NOT EXISTS guide_images (
+    id SERIAL PRIMARY KEY,
+    entity_type TEXT NOT NULL,
+    entity_id INTEGER NOT NULL,
+    url TEXT NOT NULL,
+    alt_text TEXT,
+    is_cover BOOLEAN DEFAULT false,
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT NOW()
+  )`;
+
+  await sql`CREATE INDEX IF NOT EXISTS idx_guide_campings_slug ON guide_campings(slug)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_guide_campings_region ON guide_campings(region)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_guide_campings_featured ON guide_campings(is_featured) WHERE is_featured = true`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_guide_places_slug ON guide_places(slug)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_guide_places_featured ON guide_places(is_featured) WHERE is_featured = true`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_guide_beaches_slug ON guide_beaches(slug)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_guide_beaches_place ON guide_beaches(place_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_guide_attractions_slug ON guide_attractions(slug)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_guide_attractions_place ON guide_attractions(place_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_guide_attractions_category ON guide_attractions(category)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_guide_restaurants_slug ON guide_restaurants(slug)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_guide_restaurants_place ON guide_restaurants(place_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_guide_blog_slug ON guide_blog_posts(slug)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_guide_blog_published ON guide_blog_posts(is_published, published_at DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_guide_images_entity ON guide_images(entity_type, entity_id)`;
+
+  // Add missing columns (idempotent ALTER TABLE)
+  await sql`ALTER TABLE guide_beaches ADD COLUMN IF NOT EXISTS town TEXT`;
+  await sql`ALTER TABLE guide_beaches ADD COLUMN IF NOT EXISTS length_meters INTEGER`;
+  await sql`ALTER TABLE guide_beaches ADD COLUMN IF NOT EXISTS blue_flag BOOLEAN DEFAULT false`;
+  await sql`ALTER TABLE guide_attractions ADD COLUMN IF NOT EXISTS town TEXT`;
+  await sql`ALTER TABLE guide_attractions ADD COLUMN IF NOT EXISTS highlights JSONB DEFAULT '[]'`;
+  await sql`ALTER TABLE guide_attractions ADD COLUMN IF NOT EXISTS price_range TEXT`;
+  await sql`ALTER TABLE guide_restaurants ADD COLUMN IF NOT EXISTS town TEXT`;
+  await sql`ALTER TABLE guide_restaurants ADD COLUMN IF NOT EXISTS michelin_stars INTEGER DEFAULT 0`;
+  await sql`ALTER TABLE guide_restaurants ADD COLUMN IF NOT EXISTS specialties JSONB DEFAULT '[]'`;
+  await sql`ALTER TABLE guide_blog_posts ADD COLUMN IF NOT EXISTS tags JSONB DEFAULT '[]'`;
+  await sql`ALTER TABLE guide_places ADD COLUMN IF NOT EXISTS town TEXT`;
+
   await sql`CREATE TABLE IF NOT EXISTS notifications (
     id SERIAL PRIMARY KEY,
     user_type TEXT NOT NULL,
@@ -615,6 +768,198 @@ export async function logActivity(data: { actor?: string; role?: string; action:
 
 export async function getRecentActivity(limit = 30) {
   return sql`SELECT * FROM activity_log ORDER BY created_at DESC LIMIT ${limit}`;
+}
+
+// ─── Guide Hub: Campings ───
+export async function getGuideCampings(page = 1, limit = 20, search = '', region = '', stars?: number) {
+  const offset = (page - 1) * limit;
+  const q = search ? '%' + search + '%' : null;
+  const rows = await sql`SELECT c.*, (SELECT url FROM guide_images WHERE entity_type = 'camping' AND entity_id = c.id AND is_cover = true LIMIT 1) as cover_image FROM guide_campings c WHERE c.is_active = true AND (${q}::text IS NULL OR c.name ILIKE ${q || ''} OR c.town ILIKE ${q || ''}) AND (${region || null}::text IS NULL OR c.region = ${region || ''}) AND (${stars ?? null}::int IS NULL OR c.stars = ${stars ?? 0}) ORDER BY c.is_featured DESC, c.stars DESC, c.name LIMIT ${limit} OFFSET ${offset}`;
+  const cnt = await sql`SELECT COUNT(*) as total FROM guide_campings c WHERE c.is_active = true AND (${q}::text IS NULL OR c.name ILIKE ${q || ''} OR c.town ILIKE ${q || ''}) AND (${region || null}::text IS NULL OR c.region = ${region || ''}) AND (${stars ?? null}::int IS NULL OR c.stars = ${stars ?? 0})`;
+  return { items: rows, total: Number(cnt[0].total) };
+}
+export async function getGuideCampingBySlug(slug: string) {
+  const rows = await sql`SELECT * FROM guide_campings WHERE slug = ${slug} AND is_active = true LIMIT 1`;
+  return rows[0] || null;
+}
+export async function createGuideCamping(data: Record<string, unknown>) {
+  const res = await sql`INSERT INTO guide_campings (name, slug, description, region, town, address, lat, lng, stars, website, phone, price_range, amenities, highlights, is_featured) VALUES (${data.name as string}, ${data.slug as string}, ${data.description as string || null}, ${data.region as string || 'Costa Brava'}, ${data.town as string || null}, ${data.address as string || null}, ${data.lat as number || null}, ${data.lng as number || null}, ${data.stars as number || 3}, ${data.website as string || null}, ${data.phone as string || null}, ${data.price_range as string || '€€'}, ${JSON.stringify(data.amenities || [])}, ${JSON.stringify(data.highlights || [])}, ${data.is_featured === true}) RETURNING *`;
+  return res[0];
+}
+export async function updateGuideCamping(id: number, data: Record<string, unknown>) {
+  const res = await sql`UPDATE guide_campings SET name=${data.name as string}, slug=${data.slug as string}, description=${data.description as string||null}, region=${data.region as string||'Costa Brava'}, town=${data.town as string||null}, address=${data.address as string||null}, lat=${data.lat as number||null}, lng=${data.lng as number||null}, stars=${data.stars as number||3}, website=${data.website as string||null}, phone=${data.phone as string||null}, price_range=${data.price_range as string||'€€'}, amenities=${JSON.stringify(data.amenities||[])}, highlights=${JSON.stringify(data.highlights||[])}, is_featured=${data.is_featured===true}, is_active=${data.is_active!==false}, updated_at=NOW() WHERE id=${id} RETURNING *`;
+  return res[0];
+}
+export async function deleteGuideCamping(id: number) {
+  await sql`UPDATE guide_campings SET is_active = false, updated_at = NOW() WHERE id = ${id}`;
+}
+
+// ─── Guide Hub: Places ───
+export async function getGuidePlaces(page = 1, limit = 20, search = '', region = '') {
+  const offset = (page - 1) * limit;
+  const q = search ? '%' + search + '%' : null;
+  const rows = await sql`SELECT p.*, (SELECT url FROM guide_images WHERE entity_type = 'place' AND entity_id = p.id AND is_cover = true LIMIT 1) as cover_image FROM guide_places p WHERE p.is_active = true AND (${q}::text IS NULL OR p.name ILIKE ${q || ''}) AND (${region || null}::text IS NULL OR p.region = ${region || ''}) ORDER BY p.is_featured DESC, p.name LIMIT ${limit} OFFSET ${offset}`;
+  const cnt = await sql`SELECT COUNT(*) as total FROM guide_places p WHERE p.is_active = true AND (${q}::text IS NULL OR p.name ILIKE ${q || ''}) AND (${region || null}::text IS NULL OR p.region = ${region || ''})`;
+  return { items: rows, total: Number(cnt[0].total) };
+}
+export async function getGuidePlaceBySlug(slug: string) {
+  const rows = await sql`SELECT * FROM guide_places WHERE slug = ${slug} AND is_active = true LIMIT 1`;
+  return rows[0] || null;
+}
+export async function createGuidePlace(data: Record<string, unknown>) {
+  const res = await sql`INSERT INTO guide_places (name, slug, description, region, town, lat, lng, highlights, best_season, population, is_featured) VALUES (${data.name as string}, ${data.slug as string}, ${data.description as string || null}, ${data.region as string || 'Costa Brava'}, ${data.town as string || null}, ${data.lat as number || null}, ${data.lng as number || null}, ${JSON.stringify(data.highlights || [])}, ${data.best_season as string || null}, ${data.population as string || null}, ${data.is_featured === true}) RETURNING *`;
+  return res[0];
+}
+export async function updateGuidePlace(id: number, data: Record<string, unknown>) {
+  const res = await sql`UPDATE guide_places SET name=${data.name as string}, slug=${data.slug as string}, description=${data.description as string||null}, region=${data.region as string||'Costa Brava'}, town=${data.town as string||null}, lat=${data.lat as number||null}, lng=${data.lng as number||null}, highlights=${JSON.stringify(data.highlights||[])}, best_season=${data.best_season as string||null}, population=${data.population as string||null}, is_featured=${data.is_featured===true}, is_active=${data.is_active!==false}, updated_at=NOW() WHERE id=${id} RETURNING *`;
+  return res[0];
+}
+export async function deleteGuidePlace(id: number) {
+  await sql`UPDATE guide_places SET is_active = false, updated_at = NOW() WHERE id = ${id}`;
+}
+
+// ─── Guide Hub: Beaches ───
+export async function getGuideBeaches(page = 1, limit = 20, search = '', region = '', beachType = '') {
+  const offset = (page - 1) * limit;
+  const q = search ? '%' + search + '%' : null;
+  const rows = await sql`SELECT b.*, p.name as place_name, (SELECT url FROM guide_images WHERE entity_type = 'beach' AND entity_id = b.id AND is_cover = true LIMIT 1) as cover_image FROM guide_beaches b LEFT JOIN guide_places p ON b.place_id = p.id WHERE b.is_active = true AND (${q}::text IS NULL OR b.name ILIKE ${q || ''}) AND (${region || null}::text IS NULL OR b.region = ${region || ''}) AND (${beachType || null}::text IS NULL OR b.beach_type = ${beachType || ''}) ORDER BY b.is_featured DESC, b.name LIMIT ${limit} OFFSET ${offset}`;
+  const cnt = await sql`SELECT COUNT(*) as total FROM guide_beaches b WHERE b.is_active = true AND (${q}::text IS NULL OR b.name ILIKE ${q || ''}) AND (${region || null}::text IS NULL OR b.region = ${region || ''}) AND (${beachType || null}::text IS NULL OR b.beach_type = ${beachType || ''})`;
+  return { items: rows, total: Number(cnt[0].total) };
+}
+export async function getGuideBeachBySlug(slug: string) {
+  const rows = await sql`SELECT b.*, p.name as place_name FROM guide_beaches b LEFT JOIN guide_places p ON b.place_id = p.id WHERE b.slug = ${slug} AND b.is_active = true LIMIT 1`;
+  return rows[0] || null;
+}
+export async function createGuideBeach(data: Record<string, unknown>) {
+  const res = await sql`INSERT INTO guide_beaches (name, slug, description, place_id, region, town, beach_type, length_meters, blue_flag, lat, lng, facilities, is_featured) VALUES (${data.name as string}, ${data.slug as string}, ${data.description as string || null}, ${data.place_id as number || null}, ${data.region as string || 'Costa Brava'}, ${data.town as string || null}, ${data.beach_type as string || 'zand'}, ${data.length_meters as number || null}, ${data.blue_flag === true}, ${data.lat as number || null}, ${data.lng as number || null}, ${JSON.stringify(data.facilities || [])}, ${data.is_featured === true}) RETURNING *`;
+  return res[0];
+}
+export async function updateGuideBeach(id: number, data: Record<string, unknown>) {
+  const res = await sql`UPDATE guide_beaches SET name=${data.name as string}, slug=${data.slug as string}, description=${data.description as string||null}, place_id=${data.place_id as number||null}, region=${data.region as string||'Costa Brava'}, town=${data.town as string||null}, beach_type=${data.beach_type as string||'zand'}, length_meters=${data.length_meters as number||null}, blue_flag=${data.blue_flag===true}, lat=${data.lat as number||null}, lng=${data.lng as number||null}, facilities=${JSON.stringify(data.facilities||[])}, is_featured=${data.is_featured===true}, is_active=${data.is_active!==false}, updated_at=NOW() WHERE id=${id} RETURNING *`;
+  return res[0];
+}
+export async function deleteGuideBeach(id: number) {
+  await sql`UPDATE guide_beaches SET is_active = false, updated_at = NOW() WHERE id = ${id}`;
+}
+
+// ─── Guide Hub: Attractions ───
+export async function getGuideAttractions(page = 1, limit = 20, search = '', region = '', category = '') {
+  const offset = (page - 1) * limit;
+  const q = search ? '%' + search + '%' : null;
+  const rows = await sql`SELECT a.*, p.name as place_name, (SELECT url FROM guide_images WHERE entity_type = 'attraction' AND entity_id = a.id AND is_cover = true LIMIT 1) as cover_image FROM guide_attractions a LEFT JOIN guide_places p ON a.place_id = p.id WHERE a.is_active = true AND (${q}::text IS NULL OR a.name ILIKE ${q || ''}) AND (${region || null}::text IS NULL OR a.region = ${region || ''}) AND (${category || null}::text IS NULL OR a.category = ${category || ''}) ORDER BY a.is_featured DESC, a.name LIMIT ${limit} OFFSET ${offset}`;
+  const cnt = await sql`SELECT COUNT(*) as total FROM guide_attractions a WHERE a.is_active = true AND (${q}::text IS NULL OR a.name ILIKE ${q || ''}) AND (${region || null}::text IS NULL OR a.region = ${region || ''}) AND (${category || null}::text IS NULL OR a.category = ${category || ''})`;
+  return { items: rows, total: Number(cnt[0].total) };
+}
+export async function getGuideAttractionBySlug(slug: string) {
+  const rows = await sql`SELECT a.*, p.name as place_name FROM guide_attractions a LEFT JOIN guide_places p ON a.place_id = p.id WHERE a.slug = ${slug} AND a.is_active = true LIMIT 1`;
+  return rows[0] || null;
+}
+export async function createGuideAttraction(data: Record<string, unknown>) {
+  const res = await sql`INSERT INTO guide_attractions (name, slug, description, place_id, region, town, category, address, lat, lng, website, price_info, opening_hours, price_range, highlights, is_featured) VALUES (${data.name as string}, ${data.slug as string}, ${data.description as string || null}, ${data.place_id as number || null}, ${data.region as string || 'Costa Brava'}, ${data.town as string || null}, ${data.category as string || 'bezienswaardigheid'}, ${data.address as string || null}, ${data.lat as number || null}, ${data.lng as number || null}, ${data.website as string || null}, ${data.price_info as string || null}, ${data.opening_hours as string || null}, ${data.price_range as string || null}, ${JSON.stringify(data.highlights || [])}, ${data.is_featured === true}) RETURNING *`;
+  return res[0];
+}
+export async function updateGuideAttraction(id: number, data: Record<string, unknown>) {
+  const res = await sql`UPDATE guide_attractions SET name=${data.name as string}, slug=${data.slug as string}, description=${data.description as string||null}, place_id=${data.place_id as number||null}, region=${data.region as string||'Costa Brava'}, town=${data.town as string||null}, category=${data.category as string||'bezienswaardigheid'}, address=${data.address as string||null}, lat=${data.lat as number||null}, lng=${data.lng as number||null}, website=${data.website as string||null}, price_info=${data.price_info as string||null}, opening_hours=${data.opening_hours as string||null}, price_range=${data.price_range as string||null}, highlights=${JSON.stringify(data.highlights||[])}, is_featured=${data.is_featured===true}, is_active=${data.is_active!==false}, updated_at=NOW() WHERE id=${id} RETURNING *`;
+  return res[0];
+}
+export async function deleteGuideAttraction(id: number) {
+  await sql`UPDATE guide_attractions SET is_active = false, updated_at = NOW() WHERE id = ${id}`;
+}
+
+// ─── Guide Hub: Restaurants ───
+export async function getGuideRestaurants(page = 1, limit = 20, search = '', region = '', cuisineType = '') {
+  const offset = (page - 1) * limit;
+  const q = search ? '%' + search + '%' : null;
+  const rows = await sql`SELECT r.*, p.name as place_name, (SELECT url FROM guide_images WHERE entity_type = 'restaurant' AND entity_id = r.id AND is_cover = true LIMIT 1) as cover_image FROM guide_restaurants r LEFT JOIN guide_places p ON r.place_id = p.id WHERE r.is_active = true AND (${q}::text IS NULL OR r.name ILIKE ${q || ''}) AND (${region || null}::text IS NULL OR r.region = ${region || ''}) AND (${cuisineType || null}::text IS NULL OR r.cuisine_type = ${cuisineType || ''}) ORDER BY r.is_featured DESC, r.name LIMIT ${limit} OFFSET ${offset}`;
+  const cnt = await sql`SELECT COUNT(*) as total FROM guide_restaurants r WHERE r.is_active = true AND (${q}::text IS NULL OR r.name ILIKE ${q || ''}) AND (${region || null}::text IS NULL OR r.region = ${region || ''}) AND (${cuisineType || null}::text IS NULL OR r.cuisine_type = ${cuisineType || ''})`;
+  return { items: rows, total: Number(cnt[0].total) };
+}
+export async function getGuideRestaurantBySlug(slug: string) {
+  const rows = await sql`SELECT r.*, p.name as place_name FROM guide_restaurants r LEFT JOIN guide_places p ON r.place_id = p.id WHERE r.slug = ${slug} AND r.is_active = true LIMIT 1`;
+  return rows[0] || null;
+}
+export async function createGuideRestaurant(data: Record<string, unknown>) {
+  const res = await sql`INSERT INTO guide_restaurants (name, slug, description, place_id, region, town, cuisine_type, price_range, address, lat, lng, website, phone, michelin_stars, specialties, is_featured) VALUES (${data.name as string}, ${data.slug as string}, ${data.description as string || null}, ${data.place_id as number || null}, ${data.region as string || 'Costa Brava'}, ${data.town as string || null}, ${data.cuisine_type as string || null}, ${data.price_range as string || '€€'}, ${data.address as string || null}, ${data.lat as number || null}, ${data.lng as number || null}, ${data.website as string || null}, ${data.phone as string || null}, ${data.michelin_stars as number || 0}, ${JSON.stringify(data.specialties || [])}, ${data.is_featured === true}) RETURNING *`;
+  return res[0];
+}
+export async function updateGuideRestaurant(id: number, data: Record<string, unknown>) {
+  const res = await sql`UPDATE guide_restaurants SET name=${data.name as string}, slug=${data.slug as string}, description=${data.description as string||null}, place_id=${data.place_id as number||null}, region=${data.region as string||'Costa Brava'}, town=${data.town as string||null}, cuisine_type=${data.cuisine_type as string||null}, price_range=${data.price_range as string||'€€'}, address=${data.address as string||null}, lat=${data.lat as number||null}, lng=${data.lng as number||null}, website=${data.website as string||null}, phone=${data.phone as string||null}, michelin_stars=${data.michelin_stars as number||0}, specialties=${JSON.stringify(data.specialties||[])}, is_featured=${data.is_featured===true}, is_active=${data.is_active!==false}, updated_at=NOW() WHERE id=${id} RETURNING *`;
+  return res[0];
+}
+export async function deleteGuideRestaurant(id: number) {
+  await sql`UPDATE guide_restaurants SET is_active = false, updated_at = NOW() WHERE id = ${id}`;
+}
+
+// ─── Guide Hub: Blog Posts ───
+export async function getGuideBlogPosts(page = 1, limit = 20, search = '', category = '', publishedOnly = true) {
+  const offset = (page - 1) * limit;
+  const q = search ? '%' + search + '%' : null;
+  const rows = await sql`SELECT bp.*, (SELECT url FROM guide_images WHERE entity_type = 'blog' AND entity_id = bp.id AND is_cover = true LIMIT 1) as cover_image FROM guide_blog_posts bp WHERE (${publishedOnly} = false OR bp.is_published = true) AND (${q}::text IS NULL OR bp.title ILIKE ${q || ''} OR bp.excerpt ILIKE ${q || ''}) AND (${category || null}::text IS NULL OR bp.category = ${category || ''}) ORDER BY bp.is_featured DESC, bp.published_at DESC NULLS LAST, bp.created_at DESC LIMIT ${limit} OFFSET ${offset}`;
+  const cnt = await sql`SELECT COUNT(*) as total FROM guide_blog_posts bp WHERE (${publishedOnly} = false OR bp.is_published = true) AND (${q}::text IS NULL OR bp.title ILIKE ${q || ''} OR bp.excerpt ILIKE ${q || ''}) AND (${category || null}::text IS NULL OR bp.category = ${category || ''})`;
+  return { items: rows, total: Number(cnt[0].total) };
+}
+export async function getGuideBlogPostBySlug(slug: string) {
+  const rows = await sql`SELECT * FROM guide_blog_posts WHERE slug = ${slug} LIMIT 1`;
+  return rows[0] || null;
+}
+export async function createGuideBlogPost(data: Record<string, unknown>) {
+  const res = await sql`INSERT INTO guide_blog_posts (title, slug, excerpt, content, category, read_time, author, tags, is_featured, is_published, published_at) VALUES (${data.title as string}, ${data.slug as string}, ${data.excerpt as string || null}, ${data.content as string || null}, ${data.category as string || 'Algemeen'}, ${data.read_time as string || '5 min'}, ${data.author as string || 'Caravanstalling Spanje'}, ${JSON.stringify(data.tags || [])}, ${data.is_featured === true}, ${data.is_published === true}, ${data.is_published === true ? new Date().toISOString() : null}) RETURNING *`;
+  return res[0];
+}
+export async function updateGuideBlogPost(id: number, data: Record<string, unknown>) {
+  const wasPublished = data._was_published === true;
+  const isNowPublished = data.is_published === true;
+  const publishedAt = (!wasPublished && isNowPublished) ? new Date().toISOString() : (data.published_at as string || null);
+  const res = await sql`UPDATE guide_blog_posts SET title=${data.title as string}, slug=${data.slug as string}, excerpt=${data.excerpt as string||null}, content=${data.content as string||null}, category=${data.category as string||'Algemeen'}, read_time=${data.read_time as string||'5 min'}, author=${data.author as string||'Caravanstalling Spanje'}, tags=${JSON.stringify(data.tags||[])}, is_featured=${data.is_featured===true}, is_published=${data.is_published===true}, published_at=${publishedAt}, updated_at=NOW() WHERE id=${id} RETURNING *`;
+  return res[0];
+}
+export async function deleteGuideBlogPost(id: number) {
+  await sql`DELETE FROM guide_blog_posts WHERE id = ${id}`;
+}
+
+// ─── Guide Hub: Images ───
+export async function getGuideImages(entityType: string, entityId: number) {
+  return sql`SELECT * FROM guide_images WHERE entity_type = ${entityType} AND entity_id = ${entityId} ORDER BY is_cover DESC, sort_order ASC`;
+}
+export async function createGuideImage(data: { entity_type: string; entity_id: number; url: string; alt_text?: string; is_cover?: boolean; sort_order?: number }) {
+  if (data.is_cover) {
+    await sql`UPDATE guide_images SET is_cover = false WHERE entity_type = ${data.entity_type} AND entity_id = ${data.entity_id}`;
+  }
+  const res = await sql`INSERT INTO guide_images (entity_type, entity_id, url, alt_text, is_cover, sort_order) VALUES (${data.entity_type}, ${data.entity_id}, ${data.url}, ${data.alt_text || null}, ${data.is_cover || false}, ${data.sort_order || 0}) RETURNING *`;
+  return res[0];
+}
+export async function deleteGuideImage(id: number) {
+  const rows = await sql`DELETE FROM guide_images WHERE id = ${id} RETURNING url`;
+  return rows[0]?.url || null;
+}
+export async function setGuideCoverImage(id: number, entityType: string, entityId: number) {
+  await sql`UPDATE guide_images SET is_cover = false WHERE entity_type = ${entityType} AND entity_id = ${entityId}`;
+  await sql`UPDATE guide_images SET is_cover = true WHERE id = ${id}`;
+}
+
+// ─── Guide Hub: Featured & Cross-search ───
+export async function getGuideFeatured() {
+  const [campings, places, beaches, attractions, restaurants, posts] = await Promise.all([
+    sql`SELECT c.*, 'camping' as type, (SELECT url FROM guide_images WHERE entity_type = 'camping' AND entity_id = c.id AND is_cover = true LIMIT 1) as cover_image FROM guide_campings c WHERE c.is_featured = true AND c.is_active = true ORDER BY c.stars DESC LIMIT 6`,
+    sql`SELECT p.*, 'place' as type, (SELECT url FROM guide_images WHERE entity_type = 'place' AND entity_id = p.id AND is_cover = true LIMIT 1) as cover_image FROM guide_places p WHERE p.is_featured = true AND p.is_active = true LIMIT 6`,
+    sql`SELECT b.*, 'beach' as type, (SELECT url FROM guide_images WHERE entity_type = 'beach' AND entity_id = b.id AND is_cover = true LIMIT 1) as cover_image FROM guide_beaches b WHERE b.is_featured = true AND b.is_active = true LIMIT 6`,
+    sql`SELECT a.*, 'attraction' as type, (SELECT url FROM guide_images WHERE entity_type = 'attraction' AND entity_id = a.id AND is_cover = true LIMIT 1) as cover_image FROM guide_attractions a WHERE a.is_featured = true AND a.is_active = true LIMIT 6`,
+    sql`SELECT r.*, 'restaurant' as type, (SELECT url FROM guide_images WHERE entity_type = 'restaurant' AND entity_id = r.id AND is_cover = true LIMIT 1) as cover_image FROM guide_restaurants r WHERE r.is_featured = true AND r.is_active = true LIMIT 6`,
+    sql`SELECT bp.*, 'blog' as type, (SELECT url FROM guide_images WHERE entity_type = 'blog' AND entity_id = bp.id AND is_cover = true LIMIT 1) as cover_image FROM guide_blog_posts bp WHERE bp.is_featured = true AND bp.is_published = true ORDER BY bp.published_at DESC LIMIT 6`,
+  ]);
+  return { campings, places, beaches, attractions, restaurants, posts };
+}
+
+export async function getGuideStats() {
+  const [c, p, b, a, r, bp] = await Promise.all([
+    sql`SELECT COUNT(*) as total FROM guide_campings WHERE is_active = true`,
+    sql`SELECT COUNT(*) as total FROM guide_places WHERE is_active = true`,
+    sql`SELECT COUNT(*) as total FROM guide_beaches WHERE is_active = true`,
+    sql`SELECT COUNT(*) as total FROM guide_attractions WHERE is_active = true`,
+    sql`SELECT COUNT(*) as total FROM guide_restaurants WHERE is_active = true`,
+    sql`SELECT COUNT(*) as total FROM guide_blog_posts WHERE is_published = true`,
+  ]);
+  return { campings: Number(c[0].total), places: Number(p[0].total), beaches: Number(b[0].total), attractions: Number(a[0].total), restaurants: Number(r[0].total), blogPosts: Number(bp[0].total) };
 }
 
 export { sql };

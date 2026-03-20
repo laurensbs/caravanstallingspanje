@@ -1,16 +1,16 @@
 'use client';
 
 const BRANDS = [
-  { name: 'Knaus', logo: '/brands/knaus.svg' },
-  { name: 'Dethleffs', logo: '/brands/dethleffs.svg' },
-  { name: 'Hobby', logo: '/brands/hobby.svg' },
-  { name: 'Fendt', logo: '/brands/fendt.svg' },
-  { name: 'Adria', logo: '/brands/adria.svg' },
-  { name: 'Bürstner', logo: '/brands/burstner.svg' },
-  { name: 'LMC', logo: '/brands/lmc.svg' },
-  { name: 'Tabbert', logo: '/brands/tabbert.svg' },
-  { name: 'Eriba', logo: '/brands/eriba.svg' },
-  { name: 'ANWB', logo: '/brands/anwb.svg' },
+  { name: 'Knaus', logo: '/brands/knaus.svg', h: 'h-16 sm:h-20' },
+  { name: 'Dethleffs', logo: '/brands/dethleffs.svg', h: 'h-8 sm:h-10' },
+  { name: 'Hobby', logo: '/brands/hobby.svg', h: 'h-10 sm:h-12' },
+  { name: 'Fendt', logo: '/brands/fendt.svg', h: 'h-14 sm:h-18' },
+  { name: 'Adria', logo: '/brands/adria.svg', h: 'h-16 sm:h-20' },
+  { name: 'Bürstner', logo: '/brands/burstner.svg', h: 'h-7 sm:h-9' },
+  { name: 'LMC', logo: '/brands/lmc.svg', h: 'h-14 sm:h-18' },
+  { name: 'Tabbert', logo: '/brands/tabbert.svg', h: 'h-12 sm:h-16' },
+  { name: 'Eriba', logo: '/brands/eriba.svg', h: 'h-8 sm:h-10' },
+  { name: 'ANWB', logo: '/brands/anwb.svg', h: 'h-14 sm:h-18' },
 ];
 
 export default function BrandSlider() {
@@ -31,17 +31,15 @@ export default function BrandSlider() {
             {items.map((brand, i) => (
               <div
                 key={`${brand.name}-${i}`}
-                className="inline-flex items-center justify-center mx-5 sm:mx-7 shrink-0"
+                className="inline-flex items-center justify-center mx-6 sm:mx-10 shrink-0"
               >
-                <div className="bg-card border border-sand-dark/10 rounded-xl px-5 py-3 hover:border-sand-dark/20 hover:shadow-sm transition-all flex items-center justify-center h-14 min-w-[100px]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={brand.logo}
-                    alt={brand.name}
-                    className="h-7 w-auto object-contain opacity-70 hover:opacity-100 transition-opacity"
-                    loading="lazy"
-                  />
-                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={brand.logo}
+                  alt={brand.name}
+                  className={`${brand.h} w-auto object-contain opacity-40 hover:opacity-70 transition-opacity grayscale`}
+                  loading="lazy"
+                />
               </div>
             ))}
           </div>
@@ -53,6 +51,7 @@ export default function BrandSlider() {
         }
         .brand-marquee-track {
           display: flex;
+          align-items: center;
           width: max-content;
           animation: marquee 40s linear infinite;
         }

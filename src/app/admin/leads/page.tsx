@@ -37,6 +37,8 @@ const INTEREST_LABELS: Record<string, string> = {
   schadeherstel: 'CaravanRepair® schade',
   transport: 'Transport',
   verkoop: 'Verkoop / bemiddeling',
+  verhuur: 'Verhuur',
+  schoonmaak: 'Schoonmaak',
   anders: 'Anders',
 };
 
@@ -45,6 +47,33 @@ const SOURCE_LABELS: Record<string, string> = {
   'contact-page': 'Contactpagina',
   'exit-intent': 'Exit-intent popup',
   homepage: 'Homepage',
+  diensten: 'Dienstenpagina',
+  stalling: 'Stallingpagina',
+  tarieven: 'Tarievenpagina',
+};
+
+const SERVICE_DETAIL_LABELS: Record<string, string> = {
+  repair_types: 'Reparatietypen',
+  urgency: 'Urgentie',
+  description: 'Toelichting',
+  damage_types: 'Schadetypen',
+  insurance: 'Verzekering',
+  route: 'Route',
+  sale_type: 'Koop/Verkoop',
+  budget: 'Budget',
+  rental_items: 'Huuritems',
+  rental_period: 'Huurperiode',
+  cleaning_package: 'Schoonmaakpakket',
+};
+
+const parseServices = (services: string | null): Record<string, unknown> | null => {
+  if (!services) return null;
+  try {
+    const parsed = JSON.parse(services);
+    return typeof parsed === 'object' && parsed !== null ? parsed : null;
+  } catch {
+    return null;
+  }
 };
 
 export default function LeadsPage() {
@@ -193,12 +222,23 @@ export default function LeadsPage() {
                       <p className="text-sm font-medium">{lead.timeframe}</p>
                     </div>
                   )}
-                  {lead.services && (
-                    <div>
-                      <p className="text-[10px] font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Diensten</p>
-                      <p className="text-sm font-medium">{lead.services}</p>
-                    </div>
-                  )}
+                  {lead.services && (() => {
+                    const parsed = parseServices(lead.services);
+                    if (parsed) {
+                      return Object.entries(parsed).map(([key, value]) => (
+                        <div key={key}>
+                          <p className="text-[10px] font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">{SERVICE_DETAIL_LABELS[key] || key}</p>
+                          <p className="text-sm font-medium">{Array.isArray(value) ? value.join(', ') : String(value)}</p>
+                        </div>
+                      ));
+                    }
+                    return (
+                      <div>
+                        <p className="text-[10px] font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Diensten</p>
+                        <p className="text-sm font-medium">{lead.services}</p>
+                      </div>
+                    );
+                  })()}
                   <div>
                     <p className="text-[10px] font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Aangemaakt</p>
                     <p className="text-sm font-medium">{new Date(lead.created_at).toLocaleString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>

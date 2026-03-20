@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Users, Caravan, MapPin, FileText, Receipt, UserCog,
   ClipboardList, Truck, Settings, LogOut, Menu, X, Bell, Search, ChevronDown,
   Wrench, MessageSquare, Shield, Eye, EyeOff, Lock, User, ArrowRight, AlertCircle,
-  BarChart3, CalendarDays, Package, Target,
+  BarChart3, CalendarDays, Package, Target, Map, Palmtree, Mountain, UtensilsCrossed, BookOpen, Tent,
 } from 'lucide-react';
 
 type NavItem = { href: string; icon: typeof LayoutDashboard; label: string; section: string; roles: string[] };
@@ -26,6 +26,12 @@ const NAV: NavItem[] = [
   { href: '/admin/diensten', icon: Wrench, label: 'Service aanvragen', section: '', roles: ['admin', 'staff'] },
   { href: '/admin/pakketten', icon: Package, label: 'Pakketten & Diensten', section: '', roles: ['admin'] },
   { href: '/admin/planning', icon: CalendarDays, label: 'Planning', section: '', roles: ['admin', 'staff'] },
+  { href: '/admin/gids/campings', icon: Tent, label: 'Campings', section: 'Gids', roles: ['admin'] },
+  { href: '/admin/gids/plaatsen', icon: Map, label: 'Plaatsen', section: '', roles: ['admin'] },
+  { href: '/admin/gids/stranden', icon: Palmtree, label: 'Stranden', section: '', roles: ['admin'] },
+  { href: '/admin/gids/bezienswaardigheden', icon: Mountain, label: 'Bezienswaardigheden', section: '', roles: ['admin'] },
+  { href: '/admin/gids/restaurants', icon: UtensilsCrossed, label: 'Restaurants', section: '', roles: ['admin'] },
+  { href: '/admin/gids/blog', icon: BookOpen, label: 'Blog Artikelen', section: '', roles: ['admin'] },
   { href: '/admin/berichten', icon: MessageSquare, label: 'Berichten', section: 'Overig', roles: ['admin', 'staff'] },
   { href: '/admin/medewerkers', icon: UserCog, label: 'Medewerkers', section: '', roles: ['admin'] },
   { href: '/admin/instellingen', icon: Settings, label: 'Instellingen', section: '', roles: ['admin'] },

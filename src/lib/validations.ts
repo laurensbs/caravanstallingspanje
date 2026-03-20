@@ -144,6 +144,102 @@ export const staffSchema = z.object({
   location_id: z.number().positive().optional(),
 });
 
+// ── Guide Hub ──
+const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+export const guideCampingSchema = z.object({
+  name: z.string().min(1).max(200),
+  slug: z.string().min(1).max(200).regex(slugRegex, 'Alleen kleine letters, cijfers en streepjes'),
+  description: z.string().max(10000).optional(),
+  region: z.string().max(100).default('Costa Brava'),
+  town: z.string().max(100).optional(),
+  address: z.string().max(300).optional(),
+  lat: z.number().min(-90).max(90).optional(),
+  lng: z.number().min(-180).max(180).optional(),
+  stars: z.number().min(1).max(5).default(3),
+  website: z.string().max(500).optional(),
+  phone: z.string().max(30).optional(),
+  price_range: z.string().max(10).default('€€'),
+  amenities: z.array(z.string()).default([]),
+  highlights: z.array(z.string()).default([]),
+  is_featured: z.boolean().default(false),
+  is_active: z.boolean().default(true),
+});
+
+export const guidePlaceSchema = z.object({
+  name: z.string().min(1).max(200),
+  slug: z.string().min(1).max(200).regex(slugRegex, 'Alleen kleine letters, cijfers en streepjes'),
+  description: z.string().max(10000).optional(),
+  region: z.string().max(100).default('Costa Brava'),
+  lat: z.number().min(-90).max(90).optional(),
+  lng: z.number().min(-180).max(180).optional(),
+  highlights: z.array(z.string()).default([]),
+  best_season: z.string().max(100).optional(),
+  population: z.string().max(50).optional(),
+  is_featured: z.boolean().default(false),
+  is_active: z.boolean().default(true),
+});
+
+export const guideBeachSchema = z.object({
+  name: z.string().min(1).max(200),
+  slug: z.string().min(1).max(200).regex(slugRegex, 'Alleen kleine letters, cijfers en streepjes'),
+  description: z.string().max(10000).optional(),
+  place_id: z.number().positive().optional(),
+  region: z.string().max(100).default('Costa Brava'),
+  beach_type: z.enum(['zand', 'kiezel', 'cala', 'rots']).default('zand'),
+  lat: z.number().min(-90).max(90).optional(),
+  lng: z.number().min(-180).max(180).optional(),
+  facilities: z.array(z.string()).default([]),
+  is_featured: z.boolean().default(false),
+  is_active: z.boolean().default(true),
+});
+
+export const guideAttractionSchema = z.object({
+  name: z.string().min(1).max(200),
+  slug: z.string().min(1).max(200).regex(slugRegex, 'Alleen kleine letters, cijfers en streepjes'),
+  description: z.string().max(10000).optional(),
+  place_id: z.number().positive().optional(),
+  region: z.string().max(100).default('Costa Brava'),
+  category: z.enum(['museum', 'natuur', 'historisch', 'activiteit', 'park']).default('activiteit'),
+  address: z.string().max(300).optional(),
+  lat: z.number().min(-90).max(90).optional(),
+  lng: z.number().min(-180).max(180).optional(),
+  website: z.string().max(500).optional(),
+  price_info: z.string().max(200).optional(),
+  opening_hours: z.string().max(500).optional(),
+  is_featured: z.boolean().default(false),
+  is_active: z.boolean().default(true),
+});
+
+export const guideRestaurantSchema = z.object({
+  name: z.string().min(1).max(200),
+  slug: z.string().min(1).max(200).regex(slugRegex, 'Alleen kleine letters, cijfers en streepjes'),
+  description: z.string().max(10000).optional(),
+  place_id: z.number().positive().optional(),
+  region: z.string().max(100).default('Costa Brava'),
+  cuisine_type: z.string().max(100).optional(),
+  price_range: z.string().max(10).default('€€'),
+  address: z.string().max(300).optional(),
+  lat: z.number().min(-90).max(90).optional(),
+  lng: z.number().min(-180).max(180).optional(),
+  website: z.string().max(500).optional(),
+  phone: z.string().max(30).optional(),
+  is_featured: z.boolean().default(false),
+  is_active: z.boolean().default(true),
+});
+
+export const guideBlogPostSchema = z.object({
+  title: z.string().min(1).max(300),
+  slug: z.string().min(1).max(300).regex(slugRegex, 'Alleen kleine letters, cijfers en streepjes'),
+  excerpt: z.string().max(1000).optional(),
+  content: z.string().max(100000).optional(),
+  category: z.string().max(100).default('Algemeen'),
+  read_time: z.string().max(20).default('5 min'),
+  author: z.string().max(100).default('Caravanstalling Spanje'),
+  is_featured: z.boolean().default(false),
+  is_published: z.boolean().default(false),
+});
+
 // ── Helpers ──
 export function validateBody<T>(schema: z.ZodSchema<T>, data: unknown): { success: true; data: T } | { success: false; error: string } {
   const result = schema.safeParse(data);
