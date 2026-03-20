@@ -84,7 +84,7 @@ export default function GuideDetailPage({ config }: { config: GuideDetailConfig 
       <Header />
 
       {/* Hero with image gallery */}
-      <section className="relative bg-primary text-white overflow-hidden">
+      <section className="relative bg-gray-900 text-white overflow-hidden">
         <div className="absolute inset-0">
           {coverImg ? (
             <Image src={allImages[activeImage]?.url || coverImg.url} alt={name} fill sizes="100vw" className="img-cover opacity-30" priority />
@@ -128,7 +128,7 @@ export default function GuideDetailPage({ config }: { config: GuideDetailConfig 
 
       {/* Image gallery */}
       {allImages.length > 1 && (
-        <section className="bg-primary">
+        <section className="bg-gray-900">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-6">
             <div className="relative rounded-2xl overflow-hidden aspect-[16/8] sm:aspect-[16/6]">
               <Image

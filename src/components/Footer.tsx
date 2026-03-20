@@ -19,7 +19,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative bg-primary text-white/60 overflow-hidden">
+    <footer className="relative bg-gray-900 text-white/60 overflow-hidden">
       {/* CTA Banner */}
       <div className="relative border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12">

@@ -13,7 +13,7 @@ interface PageHeroProps {
 
 export default function PageHero({ badge, title, subtitle, image, children }: PageHeroProps) {
   return (
-    <section className="relative bg-primary text-white py-20 sm:py-28 overflow-hidden">
+    <section className="relative bg-gray-900 text-white py-20 sm:py-28 overflow-hidden">
       {/* Background image — clearly visible */}
       <div className="absolute inset-0">
         {image ? (
@@ -22,14 +22,14 @@ export default function PageHero({ badge, title, subtitle, image, children }: Pa
             <div className="hero-overlay absolute inset-0" />
           </>
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-primary-dark to-primary opacity-80" />
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-800 opacity-80" />
         )}
       </div>
 
       {/* Content */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <div className="inline-flex items-center gap-2 bg-primary-light/20 border border-white/15 rounded-full px-4 py-1.5 mb-5">
+          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/15 rounded-full px-4 py-1.5 mb-5">
             <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
             <span className="text-xs font-semibold tracking-[0.15em] uppercase text-white/90">{badge}</span>
           </div>

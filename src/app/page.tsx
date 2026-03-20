@@ -71,7 +71,7 @@ export default function HomePage() {
       <Header />
 
       {/* ═══ HERO ═══ */}
-      <section id="main-content" className="relative min-h-[80vh] sm:min-h-[92vh] flex items-center bg-primary overflow-hidden">
+      <section id="main-content" className="relative min-h-[80vh] sm:min-h-[92vh] flex items-center bg-gray-900 overflow-hidden">
         <div className="absolute inset-0">
           <Image src="https://u.cubeupload.com/laurensbos/caravanstoragespain.jpg" alt="Caravanstalling terrein" fill sizes="100vw" className="object-cover opacity-45" priority />
           <div className="hero-overlay absolute inset-0" />
@@ -460,7 +460,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══ CTA ═══ */}
-      <section className="bg-primary relative overflow-hidden">
+      <section className="bg-gray-900 relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-20 text-center relative">
           <A>

@@ -24,7 +24,7 @@
   --color-warning: #F59E0B;
   --color-info: #3B82F6;
   /* Dark-bg sections (hero, footer, CTA) */
-  --color-hero: #0F1F1A;
+  --color-hero: #1A1A1A;
   /* Card / elevated surface */
   --color-card: #FFFFFF;
   --color-elevated: #F5F3EF;
@@ -204,7 +204,7 @@
 
   /* ── Hero overlay — single clean gradient ── */
   .hero-overlay {
-    background: linear-gradient(to bottom, rgba(15,31,26,0.70), rgba(15,31,26,0.50));
+    background: linear-gradient(to bottom, rgba(20,20,20,0.65), rgba(20,20,20,0.40));
   }
 
   /* ── Stat number — clean, no serif ── */
@@ -266,7 +266,7 @@
   .card-editorial-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(15,31,26,0.80) 0%, rgba(15,31,26,0.25) 40%, transparent 70%);
+    background: linear-gradient(to top, rgba(20,20,20,0.80) 0%, rgba(20,20,20,0.25) 40%, transparent 70%);
     pointer-events: none;
   }
 
