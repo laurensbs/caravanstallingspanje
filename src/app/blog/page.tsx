@@ -62,8 +62,8 @@ export default function HubPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, delay: 0.1 }} className="inline-flex items-center gap-2 bg-white/[0.07] border border-white/10 rounded-full px-4 py-1.5 mb-5">
-              <Palmtree size={14} className="text-primary-light" />
-              <span className="text-xs font-bold tracking-[0.2em] uppercase text-primary-light">Costa Brava Gids</span>
+              <Palmtree size={14} className="text-white/60" />
+              <span className="text-xs font-bold tracking-[0.2em] uppercase text-white/90">Costa Brava Gids</span>
             </motion.div>
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.08] mb-5">
               Ontdek de <span className="gradient-text">Costa Brava</span>

@@ -217,7 +217,7 @@
   }
 
   .gradient-text {
-    color: var(--color-primary);
+    color: white;
   }
 
   /* ── Section divider — simple line ── */

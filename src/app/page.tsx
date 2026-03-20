@@ -86,7 +86,7 @@ export default function HomePage() {
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.1] text-white mb-6">
                 Meer dan alleen{" "}
-                <span className="text-primary-light">caravanstalling</span>
+                <span className="text-white">caravanstalling</span>
               </h1>
               <p className="text-white/80 text-base sm:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0 mb-10">
                 Stalling, onderhoud, reparatie, transport en verkoop. Al meer dan 20 jaar dé specialist aan de Costa Brava. Nederlandstalig personeel.
