@@ -45,12 +45,12 @@ export default function Breadcrumbs() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <nav aria-label="Breadcrumb" className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
-        <ol className="flex items-center gap-1.5 text-xs text-warm-gray/70 flex-wrap">
+        <ol className="flex items-center gap-1.5 text-xs text-gray-500/70 flex-wrap">
           {crumbs.map((c, i) => (
             <li key={c.href} className="flex items-center gap-1.5">
-              {i > 0 && <ChevronRight size={10} className="text-warm-gray/40" />}
+              {i > 0 && <ChevronRight size={10} className="text-gray-500/40" />}
               {i === crumbs.length - 1 ? (
-                <span className="font-semibold text-surface-dark">{c.label}</span>
+                <span className="font-semibold text-gray-900">{c.label}</span>
               ) : (
                 <Link href={c.href} className="hover:text-primary transition-colors flex items-center gap-1">
                   {i === 0 && <Home size={11} />}

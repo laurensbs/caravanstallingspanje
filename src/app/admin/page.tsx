@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 const DashboardCharts = dynamic(() => import('./_components/DashboardCharts'), {
   ssr: false,
-  loading: () => <div className="grid lg:grid-cols-2 gap-6 mb-8"><div className="bg-surface rounded-2xl p-6 border border-sand-dark/20 h-80 animate-pulse" /><div className="bg-surface rounded-2xl p-6 border border-sand-dark/20 h-80 animate-pulse" /></div>,
+  loading: () => <div className="grid lg:grid-cols-2 gap-6 mb-8"><div className="bg-surface rounded-2xl p-6 border border-gray-200 h-80 animate-pulse" /><div className="bg-surface rounded-2xl p-6 border border-gray-200 h-80 animate-pulse" /></div>,
 });
 
 interface Stats {
@@ -57,8 +57,8 @@ export default function AdminDashboard() {
     <div>
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-black text-surface-dark">Dashboard</h1>
-          <p className="text-sm text-warm-gray/70 mt-1">Overzicht van uw stallingbedrijf</p>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-sm text-gray-500/70 mt-1">Overzicht van uw stallingbedrijf</p>
         </div>
         <div className="flex items-center gap-2.5 bg-gradient-to-r from-accent/10 to-accent/20 text-accent-dark px-5 py-2.5 rounded-xl text-sm font-bold border border-accent/30 shadow-sm">
           <TrendingUp size={16} /> Omzet {new Date().getFullYear()}: <span className="stat-number">{fmt(stats.yearRevenue)}</span>
@@ -75,9 +75,9 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <ShieldAlert size={18} className="text-danger" />
-                <h2 className="font-bold text-surface-dark">Aandachtspunten ({totalAlerts})</h2>
+                <h2 className="font-bold text-gray-900">Aandachtspunten ({totalAlerts})</h2>
               </div>
-              <button onClick={() => setAlertsDismissed(true)} className="text-warm-gray/50 hover:text-warm-gray transition-colors" aria-label="Meldingen sluiten"><X size={16} /></button>
+              <button onClick={() => setAlertsDismissed(true)} className="text-gray-500/50 hover:text-gray-500 transition-colors" aria-label="Meldingen sluiten"><X size={16} /></button>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {stats.overdueInvoices > 0 && (
@@ -85,7 +85,7 @@ export default function AdminDashboard() {
                   <div className="w-8 h-8 bg-danger/10 rounded-lg flex items-center justify-center shrink-0"><Receipt size={15} className="text-danger" /></div>
                   <div>
                     <p className="text-sm font-bold text-danger">{stats.overdueInvoices} achterstallige facturen</p>
-                    <p className="text-xs text-warm-gray/70">{fmt(stats.overdueAmount)} openstaand</p>
+                    <p className="text-xs text-gray-500/70">{fmt(stats.overdueAmount)} openstaand</p>
                   </div>
                 </Link>
               )}
@@ -94,7 +94,7 @@ export default function AdminDashboard() {
                   <div className="w-8 h-8 bg-warning/10 rounded-lg flex items-center justify-center shrink-0"><Calendar size={15} className="text-warning" /></div>
                   <div>
                     <p className="text-sm font-bold text-warning">{alerts.expiringContracts.length} contracten verlopen binnenkort</p>
-                    <p className="text-xs text-warm-gray/70">{alerts.expiringContracts[0]?.customer_name} — {fmtDate(alerts.expiringContracts[0]?.end_date)}</p>
+                    <p className="text-xs text-gray-500/70">{alerts.expiringContracts[0]?.customer_name} — {fmtDate(alerts.expiringContracts[0]?.end_date)}</p>
                   </div>
                 </Link>
               )}
@@ -103,7 +103,7 @@ export default function AdminDashboard() {
                   <div className="w-8 h-8 bg-warning/10 rounded-lg flex items-center justify-center shrink-0"><AlertTriangle size={15} className="text-warning" /></div>
                   <div>
                     <p className="text-sm font-bold text-warning">{alerts.expiringInsurance.length} verzekeringen verlopen</p>
-                    <p className="text-xs text-warm-gray/70">{alerts.expiringInsurance[0]?.brand} — {fmtDate(alerts.expiringInsurance[0]?.insurance_expiry)}</p>
+                    <p className="text-xs text-gray-500/70">{alerts.expiringInsurance[0]?.brand} — {fmtDate(alerts.expiringInsurance[0]?.insurance_expiry)}</p>
                   </div>
                 </Link>
               )}
@@ -112,7 +112,7 @@ export default function AdminDashboard() {
                   <div className="w-8 h-8 bg-warning/10 rounded-lg flex items-center justify-center shrink-0"><AlertTriangle size={15} className="text-warning" /></div>
                   <div>
                     <p className="text-sm font-bold text-warning">{alerts.expiringApk.length} APK-keuringen verlopen</p>
-                    <p className="text-xs text-warm-gray/70">{alerts.expiringApk[0]?.brand} — {fmtDate(alerts.expiringApk[0]?.apk_expiry)}</p>
+                    <p className="text-xs text-gray-500/70">{alerts.expiringApk[0]?.brand} — {fmtDate(alerts.expiringApk[0]?.apk_expiry)}</p>
                   </div>
                 </Link>
               )}
@@ -121,7 +121,7 @@ export default function AdminDashboard() {
                   <div className="w-8 h-8 bg-ocean/10 rounded-lg flex items-center justify-center shrink-0"><MessageSquare size={15} className="text-ocean" /></div>
                   <div>
                     <p className="text-sm font-bold text-ocean">{alerts.unreadMessages} ongelezen berichten</p>
-                    <p className="text-xs text-warm-gray/70">Reageer op klantvragen</p>
+                    <p className="text-xs text-gray-500/70">Reageer op klantvragen</p>
                   </div>
                 </Link>
               )}
@@ -130,7 +130,7 @@ export default function AdminDashboard() {
                   <div className="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center shrink-0"><Target size={15} className="text-accent" /></div>
                   <div>
                     <p className="text-sm font-bold text-accent">{alerts.newLeads} nieuwe leads deze week</p>
-                    <p className="text-xs text-warm-gray/70">Neem contact op</p>
+                    <p className="text-xs text-gray-500/70">Neem contact op</p>
                   </div>
                 </Link>
               )}
@@ -139,7 +139,7 @@ export default function AdminDashboard() {
                   <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0"><Wrench size={15} className="text-primary" /></div>
                   <div>
                     <p className="text-sm font-bold text-primary">{alerts.pendingServices} dienstaanvragen wachten</p>
-                    <p className="text-xs text-warm-gray/70">Wachten op goedkeuring of uitvoering</p>
+                    <p className="text-xs text-gray-500/70">Wachten op goedkeuring of uitvoering</p>
                   </div>
                 </Link>
               )}
@@ -164,12 +164,12 @@ export default function AdminDashboard() {
                     {c.trend > 0 ? '+' : ''}{c.trend}
                   </span>
                 )}
-                <ArrowUpRight size={14} className="text-warm-gray/40 group-hover:text-warm-gray/70 transition-colors" />
+                <ArrowUpRight size={14} className="text-gray-500/40 group-hover:text-gray-500/70 transition-colors" />
               </div>
             </div>
             <p className="stat-number text-2xl">{typeof c.value === 'number' ? c.value.toLocaleString('nl-NL') : c.value}</p>
-            <p className="text-sm text-warm-gray/70 mt-0.5">{c.label}</p>
-            {c.sub && <p className="text-xs text-warm-gray/50 mt-1">{c.sub}</p>}
+            <p className="text-sm text-gray-500/70 mt-0.5">{c.label}</p>
+            {c.sub && <p className="text-xs text-gray-500/50 mt-1">{c.sub}</p>}
           </Link>
           </motion.div>
         ))}
@@ -181,7 +181,7 @@ export default function AdminDashboard() {
       {/* Quick Actions + Activity */}
       <div className="grid lg:grid-cols-2 gap-6">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="card-premium p-6">
-          <h2 className="font-black text-surface-dark text-lg mb-5">Snelle acties</h2>
+          <h2 className="font-bold text-gray-900 text-lg mb-5">Snelle acties</h2>
           <div className="grid grid-cols-2 gap-3">
             {[
               { label: 'Nieuwe klant', href: '/admin/klanten?actie=nieuw', icon: Users, color: 'text-ocean', gradient: 'from-ocean/10 to-ocean/5' },
@@ -191,11 +191,11 @@ export default function AdminDashboard() {
               { label: 'Taak aanmaken', href: '/admin/taken?actie=nieuw', icon: ClipboardList, color: 'text-ocean', gradient: 'from-ocean/10 to-ocean/5' },
               { label: 'Locatie beheren', href: '/admin/locaties', icon: MapPin, color: 'text-accent', gradient: 'from-accent/10 to-accent/5' },
             ].map(a => (
-              <Link key={a.label} href={a.href} className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium hover:-translate-y-0.5 transition-all group border border-sand-dark/15 hover:border-sand-dark/30 hover:shadow-md">
+              <Link key={a.label} href={a.href} className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium hover:-translate-y-0.5 transition-all group border border-gray-200 hover:border-gray-200 hover:shadow-md">
                 <div className={`w-8 h-8 bg-gradient-to-br ${a.gradient} rounded-lg flex items-center justify-center`}>
                   <a.icon size={14} className={a.color} />
                 </div>
-                <span className="text-warm-gray group-hover:text-surface-dark font-semibold">{a.label}</span>
+                <span className="text-gray-500 group-hover:text-gray-900 font-semibold">{a.label}</span>
               </Link>
             ))}
           </div>
@@ -206,24 +206,24 @@ export default function AdminDashboard() {
             <div className="w-8 h-8 bg-gradient-to-br from-primary/15 to-primary/5 rounded-lg flex items-center justify-center">
               <Activity size={14} className="text-primary" />
             </div>
-            <h2 className="font-black text-surface-dark text-lg">Recente activiteit</h2>
+            <h2 className="font-bold text-gray-900 text-lg">Recente activiteit</h2>
           </div>
           {activity.length === 0 ? (
             <div className="text-center py-8">
-              <div className="w-12 h-12 bg-sand/40 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <Activity size={20} className="text-warm-gray/50" />
+              <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Activity size={20} className="text-gray-500/50" />
               </div>
-              <p className="text-warm-gray/70 text-sm">Nog geen activiteit geregistreerd.</p>
+              <p className="text-gray-500/70 text-sm">Nog geen activiteit geregistreerd.</p>
             </div>
           ) : (
             <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
               {activity.slice(0, 10).map(a => (
-                <div key={a.id} className="flex items-start gap-3 text-sm p-3 rounded-xl hover:bg-sand/30 transition-colors border border-transparent hover:border-sand-dark/15">
+                <div key={a.id} className="flex items-start gap-3 text-sm p-3 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-200">
                   <div className="w-2 h-2 rounded-full bg-warning mt-1.5 shrink-0" />
                   <div>
-                    <p className="text-warm-gray"><span className="font-semibold text-surface-dark">{a.actor || 'Systeem'}</span> — {a.action} {a.entity_label && <span className="text-warm-gray/70">({a.entity_label})</span>}</p>
-                    {a.details && <p className="text-xs text-warm-gray/70 mt-0.5">{a.details}</p>}
-                    <p className="text-xs text-warm-gray/50 mt-0.5">{fmtDate(a.created_at)}</p>
+                    <p className="text-gray-500"><span className="font-semibold text-gray-900">{a.actor || 'Systeem'}</span> — {a.action} {a.entity_label && <span className="text-gray-500/70">({a.entity_label})</span>}</p>
+                    {a.details && <p className="text-xs text-gray-500/70 mt-0.5">{a.details}</p>}
+                    <p className="text-xs text-gray-500/50 mt-0.5">{fmtDate(a.created_at)}</p>
                   </div>
                 </div>
               ))}

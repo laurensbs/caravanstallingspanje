@@ -24,8 +24,8 @@ export default function NotFound() {
         <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <Search size={32} className="text-primary" />
         </div>
-        <h1 className="text-4xl font-black mb-3">Pagina niet gevonden</h1>
-        <p className="text-warm-gray mb-8 leading-relaxed">
+        <h1 className="text-4xl font-bold mb-3">Pagina niet gevonden</h1>
+        <p className="text-gray-500 mb-8 leading-relaxed">
           De pagina die u zoekt bestaat niet of is verplaatst. Controleer het adres of bekijk een van onze populaire pagina&apos;s.
         </p>
         <div className="flex flex-wrap justify-center gap-3 mb-8">
@@ -33,7 +33,7 @@ export default function NotFound() {
             <Link
               key={page.href}
               href={page.href}
-              className="inline-flex items-center gap-2 bg-card hover:bg-sand border border-sand-dark/30 text-dark font-semibold px-5 py-2.5 rounded-xl text-sm transition-all duration-200 shadow-sm hover:shadow-md"
+              className="inline-flex items-center gap-2 bg-card hover:bg-gray-100 border border-gray-200 text-dark font-semibold px-5 py-2.5 rounded-xl text-sm transition-all duration-200 shadow-sm hover:shadow-md"
             >
               <page.icon size={14} className="text-primary" /> {page.label}
             </Link>
@@ -41,7 +41,7 @@ export default function NotFound() {
         </div>
         <Link
           href="/"
-          className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all duration-200 shadow-sm"
+          className="inline-flex items-center gap-2 bg-primary hover:bg-primary-light text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all duration-200 shadow-sm"
         >
           <Home size={15} /> Naar homepage
         </Link>

@@ -61,9 +61,9 @@ export default function GuideDetailPage({ config }: { config: GuideDetailConfig 
       <><Header />
         <div className="min-h-[60vh] flex items-center justify-center bg-surface">
           <div className="text-center">
-            <h1 className="text-2xl font-black mb-4">Niet gevonden</h1>
-            <p className="text-warm-gray mb-6">Dit item bestaat niet of is verwijderd.</p>
-            <Link href={config.backHref} className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all">
+            <h1 className="text-2xl font-bold mb-4">Niet gevonden</h1>
+            <p className="text-gray-500 mb-6">Dit item bestaat niet of is verwijderd.</p>
+            <Link href={config.backHref} className="inline-flex items-center gap-2 bg-primary hover:bg-primary-light text-white font-bold px-6 py-3 rounded-xl text-sm transition-all">
               <ArrowLeft size={15} /> {config.backLabel}
             </Link>
           </div>
@@ -84,12 +84,12 @@ export default function GuideDetailPage({ config }: { config: GuideDetailConfig 
       <Header />
 
       {/* Hero with image gallery */}
-      <section className="relative bg-hero text-white overflow-hidden">
+      <section className="relative bg-primary text-white overflow-hidden">
         <div className="absolute inset-0">
           {coverImg ? (
             <Image src={allImages[activeImage]?.url || coverImg.url} alt={name} fill sizes="100vw" className="img-cover opacity-30" priority />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-hero to-hero/80" />
+            <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-700" />
           )}
           <div className="hero-overlay absolute inset-0" />
         </div>
@@ -105,7 +105,7 @@ export default function GuideDetailPage({ config }: { config: GuideDetailConfig 
               {config.renderBadges?.(item)}
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.1] mb-3">{name}</h1>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.1] mb-3">{name}</h1>
 
             <div className="flex flex-wrap items-center gap-3 text-white/60 text-sm">
               {item.town && (
@@ -128,7 +128,7 @@ export default function GuideDetailPage({ config }: { config: GuideDetailConfig 
 
       {/* Image gallery */}
       {allImages.length > 1 && (
-        <section className="bg-hero">
+        <section className="bg-primary">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-6">
             <div className="relative rounded-2xl overflow-hidden aspect-[16/8] sm:aspect-[16/6]">
               <Image
@@ -187,9 +187,9 @@ export default function GuideDetailPage({ config }: { config: GuideDetailConfig 
             <div className="lg:col-span-2">
               <A>
                 {description && (
-                  <div className="bg-card rounded-2xl border border-sand-dark/15 p-6 sm:p-8 mb-6">
-                    <h2 className="text-lg font-black mb-4">Over {name}</h2>
-                    <div className="text-warm-gray leading-relaxed whitespace-pre-line text-[15px]">
+                  <div className="bg-card rounded-2xl border border-gray-200 p-6 sm:p-8 mb-6">
+                    <h2 className="text-lg font-bold mb-4">Over {name}</h2>
+                    <div className="text-gray-500 leading-relaxed whitespace-pre-line text-[15px]">
                       {description}
                     </div>
                   </div>
@@ -199,7 +199,7 @@ export default function GuideDetailPage({ config }: { config: GuideDetailConfig 
               {/* Amenities / Custom content */}
               {config.renderAmenities && (
                 <A delay={0.1}>
-                  <div className="bg-card rounded-2xl border border-sand-dark/15 p-6 sm:p-8 mb-6">
+                  <div className="bg-card rounded-2xl border border-gray-200 p-6 sm:p-8 mb-6">
                     {config.renderAmenities(item)}
                   </div>
                 </A>
@@ -208,8 +208,8 @@ export default function GuideDetailPage({ config }: { config: GuideDetailConfig 
               {/* Map */}
               {hasMap && (
                 <A delay={0.2}>
-                  <div className="bg-card rounded-2xl border border-sand-dark/15 p-6 sm:p-8">
-                    <h2 className="text-lg font-black mb-4">Locatie</h2>
+                  <div className="bg-card rounded-2xl border border-gray-200 p-6 sm:p-8">
+                    <h2 className="text-lg font-bold mb-4">Locatie</h2>
                     <div className="rounded-xl overflow-hidden aspect-[16/9]">
                       <iframe
                         title="Locatie op kaart"
@@ -220,7 +220,7 @@ export default function GuideDetailPage({ config }: { config: GuideDetailConfig 
                         referrerPolicy="no-referrer-when-downgrade"
                       />
                     </div>
-                    {item.address && <p className="text-sm text-warm-gray mt-3 flex items-center gap-1.5"><MapPin size={13} /> {String(item.address)}</p>}
+                    {item.address && <p className="text-sm text-gray-500 mt-3 flex items-center gap-1.5"><MapPin size={13} /> {String(item.address)}</p>}
                   </div>
                 </A>
               )}
@@ -231,7 +231,7 @@ export default function GuideDetailPage({ config }: { config: GuideDetailConfig 
               <A delay={0.1}>
                 {/* Info card */}
                 {config.renderInfo && (
-                  <div className="bg-card rounded-2xl border border-sand-dark/15 p-6">
+                  <div className="bg-card rounded-2xl border border-gray-200 p-6">
                     <h3 className="font-bold text-[15px] mb-4">Informatie</h3>
                     {config.renderInfo(item)}
                   </div>
@@ -240,13 +240,13 @@ export default function GuideDetailPage({ config }: { config: GuideDetailConfig 
 
               {/* Quick actions */}
               <A delay={0.15}>
-                <div className="bg-card rounded-2xl border border-sand-dark/15 p-6 space-y-3">
+                <div className="bg-card rounded-2xl border border-gray-200 p-6 space-y-3">
                   {item.website && (
                     <a
                       href={String(item.website)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 w-full bg-primary hover:bg-primary-dark text-white font-bold px-5 py-3 rounded-xl text-sm transition-all justify-center"
+                      className="flex items-center gap-2 w-full bg-primary hover:bg-primary-light text-white font-bold px-5 py-3 rounded-xl text-sm transition-all justify-center"
                     >
                       <ExternalLink size={14} /> Bezoek website
                     </a>
@@ -267,7 +267,7 @@ export default function GuideDetailPage({ config }: { config: GuideDetailConfig 
                         navigator.clipboard.writeText(window.location.href);
                       }
                     }}
-                    className="flex items-center gap-2 w-full bg-sand hover:bg-sand-dark/20 text-surface-dark font-bold px-5 py-3 rounded-xl text-sm transition-all justify-center"
+                    className="flex items-center gap-2 w-full bg-gray-100 hover:bg-gray-300/20 text-gray-900 font-bold px-5 py-3 rounded-xl text-sm transition-all justify-center"
                   >
                     <Share2 size={14} /> Delen
                   </button>
@@ -278,8 +278,8 @@ export default function GuideDetailPage({ config }: { config: GuideDetailConfig 
               <A delay={0.2}>
                 <div className="bg-gradient-to-br from-primary/10 to-ocean/10 rounded-2xl border border-primary/20 p-6 text-center">
                   <p className="text-xs font-bold text-primary tracking-[0.15em] uppercase mb-2">Stalling nodig?</p>
-                  <p className="text-sm text-warm-gray mb-4">Stal uw caravan veilig aan de Costa Brava.</p>
-                  <Link href="/stalling" className="inline-flex items-center gap-1.5 bg-primary hover:bg-primary-dark text-white font-bold px-5 py-2.5 rounded-xl text-xs transition-all">
+                  <p className="text-sm text-gray-500 mb-4">Stal uw caravan veilig aan de Costa Brava.</p>
+                  <Link href="/stalling" className="inline-flex items-center gap-1.5 bg-primary hover:bg-primary-light text-white font-bold px-5 py-2.5 rounded-xl text-xs transition-all">
                     Meer informatie
                   </Link>
                 </div>

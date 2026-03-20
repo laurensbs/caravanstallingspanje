@@ -158,10 +158,10 @@ export default function GuideAdminPage({ config }: { config: GuideAdminConfig })
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-surface-dark">{config.title}</h1>
-          <p className="text-sm text-warm-gray mt-1">{total} items</p>
+          <h1 className="text-2xl font-bold text-gray-900">{config.title}</h1>
+          <p className="text-sm text-gray-500 mt-1">{total} items</p>
         </div>
-        <button onClick={handleCreate} className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-semibold text-sm px-4 py-2.5 rounded-xl transition-colors">
+        <button onClick={handleCreate} className="inline-flex items-center gap-2 bg-primary hover:bg-primary-light text-white font-semibold text-sm px-4 py-2.5 rounded-xl transition-colors">
           <Plus size={16} /> Toevoegen
         </button>
       </div>
@@ -169,13 +169,13 @@ export default function GuideAdminPage({ config }: { config: GuideAdminConfig })
       {/* Search & Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray/40" />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500/40" />
           <input
             type="text"
             placeholder="Zoeken..."
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(1); }}
-            className="w-full pl-9 pr-4 py-2.5 bg-surface border border-sand-dark/20 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full pl-9 pr-4 py-2.5 bg-surface border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20"
           />
         </div>
         {config.filterOptions?.map(f => (
@@ -183,7 +183,7 @@ export default function GuideAdminPage({ config }: { config: GuideAdminConfig })
             key={f.key}
             value={filters[f.key] || ''}
             onChange={e => { setFilters(prev => ({ ...prev, [f.key]: e.target.value })); setPage(1); }}
-            className="px-3 py-2.5 bg-surface border border-sand-dark/20 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20"
+            className="px-3 py-2.5 bg-surface border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20"
           >
             <option value="">{f.label}</option>
             {f.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -193,35 +193,35 @@ export default function GuideAdminPage({ config }: { config: GuideAdminConfig })
 
       {/* Create form */}
       {editMode === 'create' && expandedId === null && (
-        <div className="bg-surface border border-sand-dark/20 rounded-2xl p-6 space-y-5">
+        <div className="bg-surface border border-gray-200 rounded-2xl p-6 space-y-5">
           <div className="flex items-center justify-between">
-            <h2 className="font-bold text-lg text-surface-dark">Nieuw item toevoegen</h2>
-            <button onClick={handleCancel} className="text-warm-gray/50 hover:text-warm-gray"><X size={20} /></button>
+            <h2 className="font-bold text-lg text-gray-900">Nieuw item toevoegen</h2>
+            <button onClick={handleCancel} className="text-gray-500/50 hover:text-gray-500"><X size={20} /></button>
           </div>
           <FormFields fields={config.fields} data={formData} onChange={updateField} />
           {error && <p className="text-danger text-sm">{error}</p>}
           <div className="flex gap-3">
-            <button onClick={handleSave} disabled={saving} className="bg-primary hover:bg-primary-dark text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors disabled:opacity-50">
+            <button onClick={handleSave} disabled={saving} className="bg-primary hover:bg-primary-light text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors disabled:opacity-50">
               {saving ? 'Opslaan...' : 'Opslaan'}
             </button>
-            <button onClick={handleCancel} className="text-warm-gray hover:text-surface-dark text-sm font-medium px-4 py-2.5">Annuleren</button>
+            <button onClick={handleCancel} className="text-gray-500 hover:text-gray-900 text-sm font-medium px-4 py-2.5">Annuleren</button>
           </div>
         </div>
       )}
 
       {/* Table */}
-      <div className="bg-surface border border-sand-dark/20 rounded-2xl overflow-hidden">
+      <div className="bg-surface border border-gray-200 rounded-2xl overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-warm-gray/50 text-sm">Laden...</div>
+          <div className="p-12 text-center text-gray-500/50 text-sm">Laden...</div>
         ) : items.length === 0 ? (
-          <div className="p-12 text-center text-warm-gray/50 text-sm">Geen items gevonden</div>
+          <div className="p-12 text-center text-gray-500/50 text-sm">Geen items gevonden</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-sand-dark/20 bg-sand/30">
+                <tr className="border-b border-gray-200 bg-gray-50">
                   {config.tableColumns.map(col => (
-                    <th key={col.key} className="text-left text-xs font-bold text-warm-gray/50 uppercase tracking-wider px-4 py-3">{col.label}</th>
+                    <th key={col.key} className="text-left text-xs font-bold text-gray-500/50 uppercase tracking-wider px-4 py-3">{col.label}</th>
                   ))}
                   <th className="w-24 px-4 py-3" />
                 </tr>
@@ -263,7 +263,7 @@ export default function GuideAdminPage({ config }: { config: GuideAdminConfig })
               key={p}
               onClick={() => setPage(p)}
               className={`w-8 h-8 rounded-lg text-xs font-semibold transition-colors ${
-                p === page ? 'bg-primary text-white' : 'bg-surface border border-sand-dark/20 text-warm-gray hover:bg-sand/50'
+                p === page ? 'bg-primary text-white' : 'bg-surface border border-gray-200 text-gray-500 hover:bg-gray-50'
               }`}
             >
               {p}
@@ -296,34 +296,34 @@ function ItemRow({
 }) {
   return (
     <>
-      <tr className={`border-b border-sand-dark/10 hover:bg-sand/20 cursor-pointer transition-colors ${expanded ? 'bg-sand/30' : ''}`} onClick={onToggle}>
+      <tr className={`border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${expanded ? 'bg-gray-50' : ''}`} onClick={onToggle}>
         {config.tableColumns.map(col => (
-          <td key={col.key} className="px-4 py-3 text-sm text-surface-dark">
+          <td key={col.key} className="px-4 py-3 text-sm text-gray-900">
             {col.render ? col.render(item) : String(item[col.key] ?? '')}
           </td>
         ))}
         <td className="px-4 py-3">
           <div className="flex items-center gap-1 justify-end">
             {item.is_featured && <Star size={13} className="text-amber-500 fill-amber-500" />}
-            {expanded ? <ChevronUp size={16} className="text-warm-gray/50" /> : <ChevronDown size={16} className="text-warm-gray/50" />}
+            {expanded ? <ChevronUp size={16} className="text-gray-500/50" /> : <ChevronDown size={16} className="text-gray-500/50" />}
           </div>
         </td>
       </tr>
       {expanded && editMode === 'edit' && (
         <tr>
-          <td colSpan={config.tableColumns.length + 1} className="px-4 py-5 bg-sand/20 border-b border-sand-dark/20">
+          <td colSpan={config.tableColumns.length + 1} className="px-4 py-5 bg-gray-50 border-b border-gray-200">
             <div className="space-y-5 max-w-4xl">
               <FormFields fields={config.fields} data={formData} onChange={onChange} />
               <div>
-                <label className="block text-xs font-bold text-warm-gray/50 uppercase tracking-wider mb-2">Afbeeldingen</label>
+                <label className="block text-xs font-bold text-gray-500/50 uppercase tracking-wider mb-2">Afbeeldingen</label>
                 <ImageUploadZone entityType={config.imageType} entityId={item.id as number} images={images} onImagesChange={onImagesChange} />
               </div>
               {error && <p className="text-danger text-sm">{error}</p>}
               <div className="flex gap-3">
-                <button onClick={onSave} disabled={saving} className="bg-primary hover:bg-primary-dark text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors disabled:opacity-50">
+                <button onClick={onSave} disabled={saving} className="bg-primary hover:bg-primary-light text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors disabled:opacity-50">
                   {saving ? 'Opslaan...' : 'Opslaan'}
                 </button>
-                <button onClick={onCancel} className="text-warm-gray hover:text-surface-dark text-sm font-medium px-4 py-2.5">Annuleren</button>
+                <button onClick={onCancel} className="text-gray-500 hover:text-gray-900 text-sm font-medium px-4 py-2.5">Annuleren</button>
                 <button onClick={onDelete} className="ml-auto text-danger/70 hover:text-danger text-sm font-medium px-4 py-2.5 flex items-center gap-1.5">
                   <Trash2 size={14} /> Verwijderen
                 </button>
@@ -341,20 +341,20 @@ function FormFields({ fields, data, onChange }: { fields: FieldDef[]; data: Reco
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {fields.map(f => (
         <div key={f.key} className={f.colSpan === 2 ? 'sm:col-span-2' : ''}>
-          <label className="block text-xs font-bold text-warm-gray/50 uppercase tracking-wider mb-1.5">{f.label}{f.required && ' *'}</label>
+          <label className="block text-xs font-bold text-gray-500/50 uppercase tracking-wider mb-1.5">{f.label}{f.required && ' *'}</label>
           {f.type === 'textarea' ? (
             <textarea
               value={(data[f.key] as string) || ''}
               onChange={e => onChange(f.key, e.target.value)}
               placeholder={f.placeholder}
               rows={4}
-              className="w-full bg-surface border border-sand-dark/20 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 resize-y"
+              className="w-full bg-surface border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 resize-y"
             />
           ) : f.type === 'select' ? (
             <select
               value={(data[f.key] as string) || ''}
               onChange={e => onChange(f.key, e.target.value)}
-              className="w-full bg-surface border border-sand-dark/20 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full bg-surface border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20"
             >
               <option value="">Selecteer...</option>
               {f.options?.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -365,9 +365,9 @@ function FormFields({ fields, data, onChange }: { fields: FieldDef[]; data: Reco
                 type="checkbox"
                 checked={data[f.key] === true}
                 onChange={e => onChange(f.key, e.target.checked)}
-                className="w-4 h-4 rounded border-sand-dark/30 text-primary focus:ring-primary/20"
+                className="w-4 h-4 rounded border-gray-200 text-primary focus:ring-primary/20"
               />
-              <span className="text-sm text-warm-gray">{f.placeholder || 'Ja'}</span>
+              <span className="text-sm text-gray-500">{f.placeholder || 'Ja'}</span>
             </label>
           ) : f.type === 'tags' ? (
             <TagInput
@@ -382,7 +382,7 @@ function FormFields({ fields, data, onChange }: { fields: FieldDef[]; data: Reco
               onChange={e => onChange(f.key, e.target.value ? Number(e.target.value) : null)}
               placeholder={f.placeholder}
               step={f.key.includes('lat') || f.key.includes('lng') ? '0.0000001' : '1'}
-              className="w-full bg-surface border border-sand-dark/20 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full bg-surface border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20"
             />
           ) : (
             <input
@@ -390,7 +390,7 @@ function FormFields({ fields, data, onChange }: { fields: FieldDef[]; data: Reco
               value={(data[f.key] as string) || ''}
               onChange={e => onChange(f.key, e.target.value)}
               placeholder={f.placeholder}
-              className="w-full bg-surface border border-sand-dark/20 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full bg-surface border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20"
             />
           )}
         </div>
@@ -410,11 +410,11 @@ function TagInput({ value, onChange, placeholder }: { value: string[]; onChange:
     }
   };
   return (
-    <div className="bg-surface border border-sand-dark/20 rounded-xl px-3 py-2 flex flex-wrap gap-1.5 min-h-[42px]">
+    <div className="bg-surface border border-gray-200 rounded-xl px-3 py-2 flex flex-wrap gap-1.5 min-h-[42px]">
       {value.map(tag => (
         <span key={tag} className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs font-medium px-2 py-1 rounded-lg">
           {tag}
-          <button type="button" onClick={() => onChange(value.filter(t => t !== tag))} className="hover:text-primary-dark"><X size={12} /></button>
+          <button type="button" onClick={() => onChange(value.filter(t => t !== tag))} className="hover:text-primary-light"><X size={12} /></button>
         </span>
       ))}
       <input

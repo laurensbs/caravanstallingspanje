@@ -53,7 +53,7 @@ export default function FloatingActions() {
         onClick={() => setExpanded(!expanded)}
         className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-105 ${
           expanded
-            ? 'bg-hero shadow-surface-dark/20 rotate-45'
+            ? 'bg-primary shadow-surface-dark/20 rotate-45'
             : 'bg-primary shadow-primary/30 animate-pulse-glow'
         }`}
         aria-label="Contact opties"

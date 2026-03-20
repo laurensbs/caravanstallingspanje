@@ -15,8 +15,8 @@ export default function InspectiesTab({ inspections }: Props) {
   return (
     <div className="space-y-4">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="font-black text-surface-dark text-lg">Inspectierapporten</h2>
-        <p className="text-sm text-warm-gray/70 mt-1">Bekijk de inspectierapporten van uw gestalde caravans.</p>
+        <h2 className="font-bold text-gray-900 text-lg">Inspectierapporten</h2>
+        <p className="text-sm text-gray-500/70 mt-1">Bekijk de inspectierapporten van uw gestalde caravans.</p>
       </motion.div>
 
       {inspections.length === 0 ? (
@@ -24,8 +24,8 @@ export default function InspectiesTab({ inspections }: Props) {
           <div className="w-16 h-16 bg-gradient-to-br from-ocean/15 to-ocean/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <ClipboardCheck size={24} className="text-ocean" />
           </div>
-          <h3 className="font-bold text-surface-dark text-lg mb-1">Geen rapporten</h3>
-          <p className="text-sm text-warm-gray/70">Nog geen inspectierapporten beschikbaar</p>
+          <h3 className="font-bold text-gray-900 text-lg mb-1">Geen rapporten</h3>
+          <p className="text-sm text-gray-500/70">Nog geen inspectierapporten beschikbaar</p>
         </motion.div>
       ) : inspections.map((ins, i) => {
         const style = STATUS_STYLES[ins.status] || { bg: 'bg-ocean/10 text-ocean-dark border-ocean/30', icon: Clock };
@@ -39,8 +39,8 @@ export default function InspectiesTab({ inspections }: Props) {
                   <ClipboardCheck size={18} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-surface-dark">{ins.caravan_name}</h3>
-                  <p className="text-xs text-warm-gray/70">{fmtDate(ins.inspection_date)}</p>
+                  <h3 className="font-bold text-gray-900">{ins.caravan_name}</h3>
+                  <p className="text-xs text-gray-500/70">{fmtDate(ins.inspection_date)}</p>
                 </div>
               </div>
               <span className={`text-xs font-bold px-3 py-1.5 rounded-full border flex items-center gap-1.5 ${style.bg}`}>
@@ -48,13 +48,13 @@ export default function InspectiesTab({ inspections }: Props) {
               </span>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-sand/40 rounded-xl p-3">
-                <span className="text-xs font-bold text-warm-gray/60 uppercase tracking-wider block mb-1">Type</span>
-                <span className="font-medium text-surface-dark text-sm">{ins.type}</span>
+              <div className="bg-gray-50 rounded-xl p-3">
+                <span className="text-xs font-bold text-gray-500/60 uppercase tracking-wider block mb-1">Type</span>
+                <span className="font-medium text-gray-900 text-sm">{ins.type}</span>
               </div>
-              <div className="bg-sand/40 rounded-xl p-3">
-                <span className="text-xs font-bold text-warm-gray/60 uppercase tracking-wider block mb-1">Opmerkingen</span>
-                <span className="font-medium text-surface-dark text-sm">{ins.notes || '—'}</span>
+              <div className="bg-gray-50 rounded-xl p-3">
+                <span className="text-xs font-bold text-gray-500/60 uppercase tracking-wider block mb-1">Opmerkingen</span>
+                <span className="font-medium text-gray-900 text-sm">{ins.notes || '—'}</span>
               </div>
             </div>
           </motion.div>

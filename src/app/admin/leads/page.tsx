@@ -129,17 +129,17 @@ export default function LeadsPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-black text-surface-dark">Leads</h1>
-          <p className="text-sm text-warm-gray/70 mt-1">{total} leads totaal</p>
+          <h1 className="text-2xl font-bold text-gray-900">Leads</h1>
+          <p className="text-sm text-gray-500/70 mt-1">{total} leads totaal</p>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-surface rounded-2xl border border-sand-dark/20 mb-6 p-4">
+      <div className="bg-surface rounded-2xl border border-gray-200 mb-6 p-4">
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => { setStatusFilter(''); setPage(1); }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${!statusFilter ? 'bg-hero text-white' : 'bg-sand/60 text-warm-gray hover:bg-sand'}`}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${!statusFilter ? 'bg-primary text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-100'}`}
           >
             Alle
           </button>
@@ -147,7 +147,7 @@ export default function LeadsPage() {
             <button
               key={s}
               onClick={() => { setStatusFilter(s); setPage(1); }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all capitalize ${statusFilter === s ? 'bg-hero text-white' : 'bg-sand/60 text-warm-gray hover:bg-sand'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all capitalize ${statusFilter === s ? 'bg-primary text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-100'}`}
             >
               {s}
             </button>
@@ -158,17 +158,17 @@ export default function LeadsPage() {
       {/* Leads Grid */}
       <div className="space-y-3">
         {loading ? (
-          <div className="bg-surface rounded-2xl border border-sand-dark/20 p-8 text-center text-warm-gray/70">Laden...</div>
+          <div className="bg-surface rounded-2xl border border-gray-200 p-8 text-center text-gray-500/70">Laden...</div>
         ) : leads.length === 0 ? (
-          <div className="bg-surface rounded-2xl border border-sand-dark/20 p-12 text-center">
-            <Target size={32} className="text-warm-gray/30 mx-auto mb-3" />
-            <p className="text-warm-gray/70">Nog geen leads{statusFilter ? ` met status "${statusFilter}"` : ''}</p>
+          <div className="bg-surface rounded-2xl border border-gray-200 p-12 text-center">
+            <Target size={32} className="text-gray-500/30 mx-auto mb-3" />
+            <p className="text-gray-500/70">Nog geen leads{statusFilter ? ` met status "${statusFilter}"` : ''}</p>
           </div>
         ) : leads.map(lead => (
-          <div key={lead.id} className="bg-surface rounded-2xl border border-sand-dark/20 overflow-hidden">
+          <div key={lead.id} className="bg-surface rounded-2xl border border-gray-200 overflow-hidden">
             {/* Lead Header Row */}
             <div
-              className="flex items-center gap-4 px-5 py-4 cursor-pointer hover:bg-sand/20 transition-colors"
+              className="flex items-center gap-4 px-5 py-4 cursor-pointer hover:bg-gray-50 transition-colors"
               onClick={() => setExpandedId(expandedId === lead.id ? null : lead.id)}
             >
               <div className="flex-1 min-w-0">
@@ -178,47 +178,47 @@ export default function LeadsPage() {
                     {lead.status}
                   </span>
                   {lead.source && (
-                    <span className="text-xs text-warm-gray/60 bg-sand/50 px-2 py-0.5 rounded-full">
+                    <span className="text-xs text-gray-500/60 bg-gray-50 px-2 py-0.5 rounded-full">
                       {SOURCE_LABELS[lead.source] || lead.source}
                     </span>
                   )}
                 </div>
-                <div className="flex items-center gap-4 text-xs text-warm-gray/70">
+                <div className="flex items-center gap-4 text-xs text-gray-500/70">
                   <span className="flex items-center gap-1"><Mail size={11} /> {lead.email}</span>
                   {lead.phone && <span className="flex items-center gap-1"><Phone size={11} /> {lead.phone}</span>}
                   {lead.interest && <span>{INTEREST_LABELS[lead.interest] || lead.interest}</span>}
                 </div>
               </div>
-              <div className="text-xs text-warm-gray/50 flex items-center gap-1 shrink-0">
+              <div className="text-xs text-gray-500/50 flex items-center gap-1 shrink-0">
                 <Clock size={11} /> {timeAgo(lead.created_at)}
               </div>
             </div>
 
             {/* Expanded Detail */}
             {expandedId === lead.id && (
-              <div className="border-t border-sand-dark/10 px-5 py-4 bg-sand/10">
+              <div className="border-t border-gray-100 px-5 py-4 bg-gray-50">
                 <div className="grid sm:grid-cols-3 gap-4 mb-4">
                   {lead.storage_type && (
                     <div>
-                      <p className="text-xs font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Type stalling</p>
+                      <p className="text-xs font-bold text-gray-500/60 uppercase tracking-wider mb-0.5">Type stalling</p>
                       <p className="text-sm font-medium capitalize">{lead.storage_type}</p>
                     </div>
                   )}
                   {lead.caravan_brand && (
                     <div>
-                      <p className="text-xs font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Merk</p>
+                      <p className="text-xs font-bold text-gray-500/60 uppercase tracking-wider mb-0.5">Merk</p>
                       <p className="text-sm font-medium">{lead.caravan_brand}</p>
                     </div>
                   )}
                   {lead.caravan_length && (
                     <div>
-                      <p className="text-xs font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Lengte</p>
+                      <p className="text-xs font-bold text-gray-500/60 uppercase tracking-wider mb-0.5">Lengte</p>
                       <p className="text-sm font-medium">{lead.caravan_length}</p>
                     </div>
                   )}
                   {lead.timeframe && (
                     <div>
-                      <p className="text-xs font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Tijdlijn</p>
+                      <p className="text-xs font-bold text-gray-500/60 uppercase tracking-wider mb-0.5">Tijdlijn</p>
                       <p className="text-sm font-medium">{lead.timeframe}</p>
                     </div>
                   )}
@@ -227,32 +227,32 @@ export default function LeadsPage() {
                     if (parsed) {
                       return Object.entries(parsed).map(([key, value]) => (
                         <div key={key}>
-                          <p className="text-xs font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">{SERVICE_DETAIL_LABELS[key] || key}</p>
+                          <p className="text-xs font-bold text-gray-500/60 uppercase tracking-wider mb-0.5">{SERVICE_DETAIL_LABELS[key] || key}</p>
                           <p className="text-sm font-medium">{Array.isArray(value) ? value.join(', ') : String(value)}</p>
                         </div>
                       ));
                     }
                     return (
                       <div>
-                        <p className="text-xs font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Diensten</p>
+                        <p className="text-xs font-bold text-gray-500/60 uppercase tracking-wider mb-0.5">Diensten</p>
                         <p className="text-sm font-medium">{lead.services}</p>
                       </div>
                     );
                   })()}
                   <div>
-                    <p className="text-xs font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Aangemaakt</p>
+                    <p className="text-xs font-bold text-gray-500/60 uppercase tracking-wider mb-0.5">Aangemaakt</p>
                     <p className="text-sm font-medium">{new Date(lead.created_at).toLocaleString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                   </div>
                 </div>
 
                 {/* Status update */}
                 <div className="flex flex-wrap items-center gap-2 mb-4">
-                  <span className="text-xs font-bold text-warm-gray/60 mr-1">Status:</span>
+                  <span className="text-xs font-bold text-gray-500/60 mr-1">Status:</span>
                   {STATUSES.map(s => (
                     <button
                       key={s}
                       onClick={() => updateStatus(lead.id, s)}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all capitalize ${lead.status === s ? STATUS_COLORS[s] : 'bg-sand/60 text-warm-gray/60 hover:bg-sand'}`}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all capitalize ${lead.status === s ? STATUS_COLORS[s] : 'bg-gray-100 text-gray-500/60 hover:bg-gray-100'}`}
                     >
                       {s}
                     </button>
@@ -261,18 +261,18 @@ export default function LeadsPage() {
 
                 {/* Notes */}
                 <div className="mb-4">
-                  <p className="text-xs font-bold text-warm-gray/60 mb-1.5">Notities</p>
+                  <p className="text-xs font-bold text-gray-500/60 mb-1.5">Notities</p>
                   <div className="flex gap-2">
                     <textarea
                       value={editingNotes[lead.id] ?? lead.notes ?? ''}
                       onChange={e => setEditingNotes(prev => ({ ...prev, [lead.id]: e.target.value }))}
                       rows={2}
-                      className="flex-1 border border-sand-dark/20 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 resize-none bg-surface"
+                      className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 resize-none bg-surface"
                       placeholder="Voeg notities toe..."
                     />
                     <button
                       onClick={() => saveNotes(lead.id)}
-                      className="bg-primary hover:bg-primary-dark text-white font-bold px-4 py-2 rounded-xl text-xs transition-all self-end"
+                      className="bg-primary hover:bg-primary-light text-white font-bold px-4 py-2 rounded-xl text-xs transition-all self-end"
                     >
                       Opslaan
                     </button>
@@ -290,7 +290,7 @@ export default function LeadsPage() {
                     <Mail size={12} /> E-mail
                   </a>
                   {lead.phone && (
-                    <a href={`tel:${lead.phone}`} className="inline-flex items-center gap-1.5 bg-hero/10 text-hero hover:bg-hero/20 font-bold px-3 py-1.5 rounded-lg text-xs transition-all">
+                    <a href={`tel:${lead.phone}`} className="inline-flex items-center gap-1.5 bg-primary/10 text-primary hover:bg-primary/20 font-bold px-3 py-1.5 rounded-lg text-xs transition-all">
                       <Phone size={12} /> Bellen
                     </a>
                   )}
@@ -306,12 +306,12 @@ export default function LeadsPage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-6 pt-4 border-t border-sand-dark/10">
-          <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="flex items-center gap-1 text-xs text-warm-gray hover:text-warm-gray/80 disabled:opacity-40">
+        <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+          <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-500/80 disabled:opacity-40">
             <ChevronLeft size={14} /> Vorige
           </button>
-          <span className="text-xs text-warm-gray/60">Pagina {page} van {totalPages}</span>
-          <button disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="flex items-center gap-1 text-xs text-warm-gray hover:text-warm-gray/80 disabled:opacity-40">
+          <span className="text-xs text-gray-500/60">Pagina {page} van {totalPages}</span>
+          <button disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-500/80 disabled:opacity-40">
             Volgende <ChevronRight size={14} />
           </button>
         </div>

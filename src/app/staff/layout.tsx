@@ -89,7 +89,7 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-primary-dark rounded-2xl mb-6 shadow-lg shadow-primary/30">
             <Wrench className="text-white" size={28}/>
           </div>
-          <h1 className="text-white font-black text-3xl tracking-tight">Staff Portal</h1>
+          <h1 className="text-white font-bold text-3xl tracking-tight">Staff Portal</h1>
           <p className="text-white/70 text-sm mt-3">Caravanstalling Spanje</p>
         </div>
         <form onSubmit={login} className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-3xl p-8 space-y-5 shadow-2xl">
@@ -121,7 +121,7 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
   );
 
   return (
-    <div className="min-h-screen bg-sand/40 flex">
+    <div className="min-h-screen bg-gray-50 flex">
       {/* Desktop sidebar */}
       <aside className="hidden md:flex w-64 bg-surface-dark flex-col fixed h-full">
         <div className="p-5 border-b border-white/[0.06]">

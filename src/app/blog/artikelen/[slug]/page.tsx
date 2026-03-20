@@ -57,9 +57,9 @@ export default function ArtikelDetailPage() {
       <><Header />
         <div className="min-h-[60vh] flex items-center justify-center bg-surface">
           <div className="text-center">
-            <h1 className="text-2xl font-black mb-4">Artikel niet gevonden</h1>
-            <p className="text-warm-gray mb-6">Dit artikel bestaat niet of is verwijderd.</p>
-            <Link href="/blog/artikelen" className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all">
+            <h1 className="text-2xl font-bold mb-4">Artikel niet gevonden</h1>
+            <p className="text-gray-500 mb-6">Dit artikel bestaat niet of is verwijderd.</p>
+            <Link href="/blog/artikelen" className="inline-flex items-center gap-2 bg-primary hover:bg-primary-light text-white font-bold px-6 py-3 rounded-xl text-sm transition-all">
               <ArrowLeft size={15} /> Alle artikelen
             </Link>
           </div>
@@ -87,7 +87,7 @@ export default function ArtikelDetailPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative bg-hero text-white py-16 sm:py-24 overflow-hidden">
+      <section className="relative bg-primary text-white py-16 sm:py-24 overflow-hidden">
         <div className="absolute inset-0">
           {coverImage && <Image src={coverImage} alt="" fill sizes="100vw" className="img-cover opacity-20" priority />}
           <div className="hero-overlay absolute inset-0" />
@@ -108,7 +108,7 @@ export default function ArtikelDetailPage() {
                 </span>
               )}
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.1] mb-4">{title}</h1>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.1] mb-4">{title}</h1>
             {excerpt && <p className="text-white/70 text-base sm:text-lg leading-relaxed max-w-3xl">{excerpt}</p>}
           </motion.div>
         </div>
@@ -118,7 +118,7 @@ export default function ArtikelDetailPage() {
       <section className="py-12 sm:py-16 bg-card">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <motion.article initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
-            <div className="prose-custom text-warm-gray leading-relaxed whitespace-pre-line text-[15px]">
+            <div className="prose-custom text-gray-500 leading-relaxed whitespace-pre-line text-[15px]">
               {(() => {
                 let headingCount = 0;
                 return content.split('\n').map((line, i) => {
@@ -128,21 +128,21 @@ export default function ArtikelDetailPage() {
                       <React.Fragment key={i}>
                         {headingCount > 1 && headingCount % 2 === 0 && (
                           <div className="flex items-center gap-4 my-10">
-                            <div className="flex-1 h-px bg-sand-dark/20" />
+                            <div className="flex-1 h-px bg-gray-300/20" />
                             <span className="text-primary/40 text-lg">&#9830;</span>
-                            <div className="flex-1 h-px bg-sand-dark/20" />
+                            <div className="flex-1 h-px bg-gray-300/20" />
                           </div>
                         )}
-                        <h2 className="text-xl sm:text-2xl font-black mt-10 mb-4 text-surface-dark">{line.replace('## ', '')}</h2>
+                        <h2 className="text-xl sm:text-2xl font-bold mt-10 mb-4 text-gray-900">{line.replace('## ', '')}</h2>
                       </React.Fragment>
                     );
                   }
                   if (line.startsWith('### ')) {
-                    return <h3 key={i} className="text-lg font-bold mt-8 mb-3 text-surface-dark">{line.replace('### ', '')}</h3>;
+                    return <h3 key={i} className="text-lg font-bold mt-8 mb-3 text-gray-900">{line.replace('### ', '')}</h3>;
                   }
                   if (line.startsWith('> ')) {
                     return (
-                      <blockquote key={i} className="border-l-4 border-primary pl-5 my-6 italic text-surface-dark/80 text-[15px] leading-relaxed">
+                      <blockquote key={i} className="border-l-4 border-primary pl-5 my-6 italic text-gray-900/80 text-[15px] leading-relaxed">
                         {line.replace('> ', '')}
                       </blockquote>
                     );
@@ -156,7 +156,7 @@ export default function ArtikelDetailPage() {
                     <p key={i} className="mb-4">
                       {parts.map((part, k) => {
                         if (part.startsWith('**') && part.endsWith('**')) {
-                          return <strong key={k} className="text-surface-dark font-semibold">{part.replace(/\*\*/g, '')}</strong>;
+                          return <strong key={k} className="text-gray-900 font-semibold">{part.replace(/\*\*/g, '')}</strong>;
                         }
                         return <span key={k}>{part}</span>;
                       })}
@@ -168,9 +168,9 @@ export default function ArtikelDetailPage() {
           </motion.article>
 
           {/* Author & Share */}
-          <div className="mt-12 pt-8 border-t border-sand-dark/20 flex items-center justify-between">
-            <div className="text-sm text-warm-gray">
-              Door <span className="font-semibold text-surface-dark">{author}</span>
+          <div className="mt-12 pt-8 border-t border-gray-200 flex items-center justify-between">
+            <div className="text-sm text-gray-500">
+              Door <span className="font-semibold text-gray-900">{author}</span>
             </div>
             <button
               onClick={() => {
@@ -180,7 +180,7 @@ export default function ArtikelDetailPage() {
                   navigator.clipboard.writeText(window.location.href);
                 }
               }}
-              className="inline-flex items-center gap-2 text-sm font-semibold text-warm-gray hover:text-primary transition-colors"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-primary transition-colors"
             >
               <Share2 size={14} /> Delen
             </button>

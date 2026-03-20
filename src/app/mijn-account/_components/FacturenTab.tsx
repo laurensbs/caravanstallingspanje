@@ -48,8 +48,8 @@ export default function FacturenTab({ invoices }: Props) {
         <div className="w-16 h-16 bg-gradient-to-br from-warning/15 to-warning/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <Receipt size={24} className="text-warning" />
         </div>
-        <h3 className="font-bold text-surface-dark text-lg mb-1">Geen facturen</h3>
-        <p className="text-sm text-warm-gray/70">U heeft nog geen facturen ontvangen.</p>
+        <h3 className="font-bold text-gray-900 text-lg mb-1">Geen facturen</h3>
+        <p className="text-sm text-gray-500/70">U heeft nog geen facturen ontvangen.</p>
       </motion.div>
     );
   }
@@ -59,9 +59,9 @@ export default function FacturenTab({ invoices }: Props) {
       {/* Toolbar */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="card-premium p-4">
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 bg-sand/30 rounded-xl px-3 py-2">
-            <Filter size={14} className="text-warm-gray/50" />
-            <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setSelected(new Set()); }} className="text-sm bg-transparent border-none outline-none text-warm-gray cursor-pointer">
+          <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2">
+            <Filter size={14} className="text-gray-500/50" />
+            <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setSelected(new Set()); }} className="text-sm bg-transparent border-none outline-none text-gray-500 cursor-pointer">
               {statuses.map(s => <option key={s} value={s}>{s === 'alle' ? 'Alle statussen' : s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
             </select>
           </div>
@@ -70,7 +70,7 @@ export default function FacturenTab({ invoices }: Props) {
               <Download size={14} /> {selected.size} PDF{selected.size > 1 ? "'s" : ''} downloaden
             </button>
           )}
-          <span className="text-sm text-warm-gray/50 ml-auto font-medium">{filtered.length} facturen</span>
+          <span className="text-sm text-gray-500/50 ml-auto font-medium">{filtered.length} facturen</span>
         </div>
       </motion.div>
 
@@ -82,27 +82,27 @@ export default function FacturenTab({ invoices }: Props) {
             className={`card-premium p-5 ${isOverdue ? 'ring-1 ring-danger/30' : ''} ${selected.has(inv.id) ? 'ring-1 ring-primary/30 bg-primary/[0.02]' : ''}`}>
             <div className="flex items-center gap-4">
               <input type="checkbox" checked={selected.has(inv.id)} onChange={() => toggleSelect(inv.id)}
-                className="w-5 h-5 rounded-lg border-sand-dark/30 accent-primary cursor-pointer shrink-0" />
+                className="w-5 h-5 rounded-lg border-gray-200 accent-primary cursor-pointer shrink-0" />
               <div className="icon-premium w-11 h-11 shrink-0">
                 <FileText size={18} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <h3 className="font-bold text-surface-dark text-sm">{inv.invoice_number}</h3>
-                  <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${CUSTOMER_STATUS_COLORS[inv.status] || 'bg-sand/40 text-warm-gray border-sand-dark/30'}`}>{inv.status}</span>
+                  <h3 className="font-bold text-gray-900 text-sm">{inv.invoice_number}</h3>
+                  <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${CUSTOMER_STATUS_COLORS[inv.status] || 'bg-gray-50 text-gray-500 border-gray-200'}`}>{inv.status}</span>
                 </div>
-                <p className="text-xs text-warm-gray/70 truncate">{inv.description || 'Stallingkosten'}</p>
+                <p className="text-xs text-gray-500/70 truncate">{inv.description || 'Stallingkosten'}</p>
               </div>
               <div className="text-right shrink-0">
                 <p className="stat-number text-lg">{fmt(inv.total)}</p>
                 <div className="flex items-center gap-1 justify-end mt-0.5">
-                  <Calendar size={10} className="text-warm-gray/50" />
-                  <span className={`text-xs ${isOverdue ? 'text-danger font-bold' : 'text-warm-gray/70'}`}>{fmtDate(inv.due_date)}</span>
+                  <Calendar size={10} className="text-gray-500/50" />
+                  <span className={`text-xs ${isOverdue ? 'text-danger font-bold' : 'text-gray-500/70'}`}>{fmtDate(inv.due_date)}</span>
                 </div>
               </div>
             </div>
             <div className="flex items-center gap-2 mt-3 ml-[4.25rem]">
-              <button onClick={() => downloadPdf(inv.id)} className="flex items-center gap-1.5 text-xs font-semibold text-warm-gray/70 hover:text-primary bg-sand/30 hover:bg-primary/[0.06] px-3 py-1.5 rounded-lg transition-all">
+              <button onClick={() => downloadPdf(inv.id)} className="flex items-center gap-1.5 text-xs font-semibold text-gray-500/70 hover:text-primary bg-gray-50 hover:bg-primary/[0.06] px-3 py-1.5 rounded-lg transition-all">
                 <Download size={12} /> PDF
               </button>
               {inv.status !== 'betaald' && (

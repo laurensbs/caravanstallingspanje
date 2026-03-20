@@ -20,7 +20,7 @@ export default function PlaatsenPage() {
           </>
         ),
         renderMeta: (item) => (
-          <div className="flex items-center gap-1 text-xs text-warm-gray">
+          <div className="flex items-center gap-1 text-xs text-gray-500">
             {item.region && <span>{String(item.region)}</span>}
             {item.population && <span>· {Number(item.population).toLocaleString('nl-NL')} inwoners</span>}
           </div>

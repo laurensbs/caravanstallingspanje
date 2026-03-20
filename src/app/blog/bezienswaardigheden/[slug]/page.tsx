@@ -35,10 +35,10 @@ export default function AttractionDetailPage() {
         ),
         renderInfo: (item) => (
           <div className="space-y-3 text-sm">
-            {item.category && <div className="flex justify-between"><span className="text-warm-gray">Categorie</span><span className="font-semibold">{categoryLabels[String(item.category)] || String(item.category)}</span></div>}
-            {item.town && <div className="flex justify-between"><span className="text-warm-gray">Plaats</span><span className="font-semibold">{String(item.town)}</span></div>}
-            {item.region && <div className="flex justify-between"><span className="text-warm-gray">Regio</span><span className="font-semibold">{String(item.region)}</span></div>}
-            {item.price_range && <div className="flex justify-between"><span className="text-warm-gray">Prijs</span><span className="font-semibold">{String(item.price_range)}</span></div>}
+            {item.category && <div className="flex justify-between"><span className="text-gray-500">Categorie</span><span className="font-semibold">{categoryLabels[String(item.category)] || String(item.category)}</span></div>}
+            {item.town && <div className="flex justify-between"><span className="text-gray-500">Plaats</span><span className="font-semibold">{String(item.town)}</span></div>}
+            {item.region && <div className="flex justify-between"><span className="text-gray-500">Regio</span><span className="font-semibold">{String(item.region)}</span></div>}
+            {item.price_range && <div className="flex justify-between"><span className="text-gray-500">Prijs</span><span className="font-semibold">{String(item.price_range)}</span></div>}
           </div>
         ),
         renderAmenities: (item) => {
@@ -46,7 +46,7 @@ export default function AttractionDetailPage() {
           if (highlights.length === 0) return null;
           return (
             <>
-              <h2 className="text-lg font-black mb-3">Highlights</h2>
+              <h2 className="text-lg font-bold mb-3">Highlights</h2>
               <div className="flex flex-wrap gap-2">
                 {highlights.map(h => <span key={h} className="bg-primary/10 text-primary text-xs font-medium px-3 py-1.5 rounded-full">{h}</span>)}
               </div>

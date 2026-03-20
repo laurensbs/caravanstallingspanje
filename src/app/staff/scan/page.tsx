@@ -117,7 +117,7 @@ export default function StaffScanPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <p className="text-accent text-xs font-bold tracking-[0.2em] uppercase mb-3">Staff Tools</p>
-            <h1 className="text-3xl font-black text-white mb-3">QR Check-in / Check-out</h1>
+            <h1 className="text-3xl font-bold text-white mb-3">QR Check-in / Check-out</h1>
             <p className="text-white/60 text-sm">Scan een QR-code of voer een contractnummer in.</p>
           </motion.div>
         </div>
@@ -128,10 +128,10 @@ export default function StaffScanPage() {
 
           {/* Mode Toggle */}
           <div className="grid grid-cols-2 gap-2 bg-surface rounded-xl p-1.5 border border-black/[0.04] mb-8">
-            <button onClick={() => { setMode("manual"); stopCamera(); }} className={`py-3 rounded-lg text-sm font-bold transition-all ${mode === "manual" ? "bg-primary-dark text-white" : "text-muted hover:text-primary-dark"}`}>
+            <button onClick={() => { setMode("manual"); stopCamera(); }} className={`py-3 rounded-lg text-sm font-bold transition-all ${mode === "manual" ? "bg-primary-dark text-white" : "text-muted hover:text-primary-light"}`}>
               <Search size={15} className="inline mr-2" /> Handmatig
             </button>
-            <button onClick={startCamera} className={`py-3 rounded-lg text-sm font-bold transition-all ${mode === "scan" ? "bg-primary-dark text-white" : "text-muted hover:text-primary-dark"}`}>
+            <button onClick={startCamera} className={`py-3 rounded-lg text-sm font-bold transition-all ${mode === "scan" ? "bg-primary-dark text-white" : "text-muted hover:text-primary-light"}`}>
               <Camera size={15} className="inline mr-2" /> QR Scannen
             </button>
           </div>
@@ -184,7 +184,7 @@ export default function StaffScanPage() {
                   <button
                     onClick={() => lookupContract(contractNumber)}
                     disabled={loading || !contractNumber}
-                    className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all disabled:opacity-50"
+                    className="bg-accent hover:bg-accent/90 text-white font-bold px-6 py-3 rounded-xl text-sm transition-all disabled:opacity-50"
                   >
                     {loading ? (
                       <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
@@ -233,7 +233,7 @@ export default function StaffScanPage() {
                     </div>
 
                     <div className="p-4 border-t border-black/[0.04] grid grid-cols-2 gap-3">
-                      <button onClick={() => registerCheckIn("in")} disabled={loading} className="bg-accent hover:bg-accent-dark text-white font-bold py-3.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
+                      <button onClick={() => registerCheckIn("in")} disabled={loading} className="bg-accent hover:bg-accent/90 text-white font-bold py-3.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
                         <ArrowRight size={15} /> Check-in
                       </button>
                       <button onClick={() => registerCheckIn("out")} disabled={loading} className="bg-primary-dark hover:bg-primary text-white font-bold py-3.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
@@ -262,7 +262,7 @@ export default function StaffScanPage() {
               ].map(s => (
                 <div key={s.label} className="bg-surface rounded-xl p-4 border border-black/[0.04] text-center">
                   <s.icon size={18} className="text-muted mx-auto mb-2" />
-                  <p className="text-lg font-black">{s.value}</p>
+                  <p className="text-lg font-bold">{s.value}</p>
                   <p className="text-xs text-muted">{s.label}</p>
                 </div>
               ))}

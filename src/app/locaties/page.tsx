@@ -45,7 +45,7 @@ export default function LocatiesPage() {
                   </div>
                   <span className="text-xs font-bold bg-accent/10 text-accent px-3 py-1 rounded-full uppercase tracking-wider">Hoofdvestiging</span>
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-black mb-2">Sant Climent de Peralta</h2>
+                <h2 className="text-3xl sm:text-4xl font-bold mb-2">Sant Climent de Peralta</h2>
                 <a
                   href="https://www.google.com/maps/search/?api=1&query=Ctra+de+Palamos+91+17110+Sant+Climent+de+Peralta+Girona"
                   target="_blank"
@@ -54,15 +54,15 @@ export default function LocatiesPage() {
                 >
                   <Navigation size={13} /> Ctra de Palamós, 91 · 17110 Girona
                 </a>
-                <p className="text-warm-gray leading-relaxed mb-4">
+                <p className="text-gray-500 leading-relaxed mb-4">
                   Ons hoofdterrein ligt aan de Ctra de Palamós in het rustige Sant Climent de Peralta, provincie Girona. 
                   Het terrein is centraal gelegen ten opzichte van de populairste badplaatsen aan de Costa Brava: Pals, Begur, L&apos;Estartit en Palamós liggen allemaal op slechts 6 tot 15 kilometer afstand. 
                   Direct aan de doorgaande weg, makkelijk bereikbaar vanuit alle richtingen.
                 </p>
-                <p className="text-warm-gray leading-relaxed mb-4">
+                <p className="text-gray-500 leading-relaxed mb-4">
                   Het terrein is volledig afgesloten en beveiligd met het Securitas Direct alarmsysteem en 24/7 camerabewaking. Op het terrein bevindt zich ook onze volledig uitgeruste werkplaats waar wij reparaties, onderhoud en het gepatenteerde CaravanRepair® schadeherstel uitvoeren.
                 </p>
-                <p className="text-warm-gray leading-relaxed mb-8">
+                <p className="text-gray-500 leading-relaxed mb-8">
                   Het dichtstbijzijnde vliegveld is Girona-Costa Brava Airport (40 min rijden) met regelmatige vluchten vanuit Nederland en België. Barcelona El Prat is circa 1,5 uur rijden. Wij spreken Nederlands, Engels en Spaans.
                 </p>
 
@@ -79,17 +79,17 @@ export default function LocatiesPage() {
                       </div>
                       <div>
                         <p className="font-bold text-sm mb-0.5">{f.title}</p>
-                        <p className="text-xs text-warm-gray">{f.desc}</p>
+                        <p className="text-xs text-gray-500">{f.desc}</p>
                       </div>
                     </div>
                   ))}
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <button onClick={() => setQuizOpen(true)} className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 cursor-pointer">
+                  <button onClick={() => setQuizOpen(true)} className="bg-accent hover:bg-accent/90 text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 cursor-pointer">
                     Afspraak maken <ArrowRight size={14} />
                   </button>
-                  <a href="tel:+34650036755" className="text-surface-dark hover:text-primary font-bold px-6 py-3 rounded-xl text-sm transition-colors inline-flex items-center gap-2 border border-sand-dark/[0.08]">
+                  <a href="tel:+34650036755" className="text-gray-900 hover:text-primary font-bold px-6 py-3 rounded-xl text-sm transition-colors inline-flex items-center gap-2 border border-gray-300/[0.08]">
                     <Phone size={15} /> +34 650 036 755
                   </a>
                 </div>
@@ -98,7 +98,7 @@ export default function LocatiesPage() {
 
             <A delay={0.15}>
               {/* Map placeholder */}
-              <div className="bg-surface rounded-2xl overflow-hidden border border-sand-dark/[0.04]">
+              <div className="bg-surface rounded-2xl overflow-hidden border border-gray-300/[0.04]">
                 <div className="aspect-square sm:aspect-[4/3] relative">
                   <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2975.8!2d3.14!3d42.01!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12ba8d9e42ceae9f%3A0x4af8d0d99ced30a2!2sCtra.%20de%20Palam%C3%B3s%2C%2091%2C%2017110%20Sant%20Climent%20de%20Peralta%2C%20Girona%2C%20Spain!5e0!3m2!1snl!2snl!4v1"
@@ -111,8 +111,8 @@ export default function LocatiesPage() {
                     title="Locatie Caravanstalling Spanje"
                   />
                 </div>
-                <div className="p-5 bg-surface/80 backdrop-blur-sm border-t border-sand-dark/[0.04]">
-                  <p className="text-xs text-warm-gray font-medium">
+                <div className="p-5 bg-surface/80 backdrop-blur-sm border-t border-gray-300/[0.04]">
+                  <p className="text-xs text-gray-500 font-medium">
                     <MapPin size={12} className="inline mr-1" />
                     Ctra de Palamós, 91 · 17110 Sant Climent de Peralta, Girona, Spanje
                   </p>
@@ -129,9 +129,9 @@ export default function LocatiesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
           <A className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
             <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3"><MapPin size={11} className="text-primary" /><span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Omgeving</span></span>
-            <h2 className="text-2xl sm:text-4xl font-black mb-3">Populaire bestemmingen</h2>
+            <h2 className="text-2xl sm:text-4xl font-bold mb-3">Populaire bestemmingen</h2>
             <div className="divider-animated mt-3 mb-4" />
-            <p className="text-warm-gray text-sm">Onze stalling ligt centraal, op korte afstand van de mooiste badplaatsen en dorpen.</p>
+            <p className="text-gray-500 text-sm">Onze stalling ligt centraal, op korte afstand van de mooiste badplaatsen en dorpen.</p>
           </A>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 max-w-5xl mx-auto">
@@ -144,8 +144,8 @@ export default function LocatiesPage() {
               <A key={p.place} delay={i * 0.08}>
                 <div className="card-premium p-4 sm:p-6 h-full text-center">
                   <p className="stat-number text-xl mb-1">{p.km}</p>
-                  <h3 className="font-black text-lg mb-2">{p.place}</h3>
-                  <p className="text-xs text-warm-gray leading-relaxed mb-3">{p.desc}</p>
+                  <h3 className="font-bold text-lg mb-2">{p.place}</h3>
+                  <p className="text-xs text-gray-500 leading-relaxed mb-3">{p.desc}</p>
                   <div className="flex items-center justify-center gap-1">
                     <Star size={11} className="text-warning" fill="currentColor" />
                     <span className="text-xs font-medium">{p.rating}</span>
@@ -165,25 +165,25 @@ export default function LocatiesPage() {
               <A delay={0}>
                 <div ref={statYears.ref}>
                   <p className="stat-number text-3xl sm:text-4xl mb-1">{statYears.value}+</p>
-                  <p className="text-xs text-warm-gray font-medium">Jaar ervaring</p>
+                  <p className="text-xs text-gray-500 font-medium">Jaar ervaring</p>
                 </div>
               </A>
               <A delay={0.1}>
                 <div ref={statStaff.ref}>
                   <p className="stat-number text-3xl sm:text-4xl mb-1">{statStaff.value}</p>
-                  <p className="text-xs text-warm-gray font-medium">Medewerkers in seizoen</p>
+                  <p className="text-xs text-gray-500 font-medium">Medewerkers in seizoen</p>
                 </div>
               </A>
               <A delay={0.2}>
                 <div>
                   <p className="stat-number text-3xl sm:text-4xl mb-1">4.9/5</p>
-                  <p className="text-xs text-warm-gray font-medium">Google reviews</p>
+                  <p className="text-xs text-gray-500 font-medium">Google reviews</p>
                 </div>
               </A>
               <A delay={0.3}>
                 <div ref={statTransport.ref}>
                   <p className="stat-number text-3xl sm:text-4xl mb-1">{statTransport.value}</p>
-                  <p className="text-xs text-warm-gray font-medium">Transporteenheden</p>
+                  <p className="text-xs text-gray-500 font-medium">Transporteenheden</p>
                 </div>
               </A>
             </div>
@@ -197,9 +197,9 @@ export default function LocatiesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
           <A className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
             <span className="inline-flex items-center gap-2 bg-ocean/8 rounded-full px-3 py-1 mb-3"><Navigation size={11} className="text-ocean" /><span className="text-ocean text-xs font-bold tracking-[0.15em] uppercase">Bereikbaarheid</span></span>
-            <h2 className="text-2xl sm:text-4xl font-black mb-3">Hoe komt u bij ons?</h2>
+            <h2 className="text-2xl sm:text-4xl font-bold mb-3">Hoe komt u bij ons?</h2>
             <div className="divider-animated mt-3 mb-4" />
-            <p className="text-warm-gray leading-relaxed text-sm">Met vliegtuig of auto — we zijn goed bereikbaar.</p>
+            <p className="text-gray-500 leading-relaxed text-sm">Met vliegtuig of auto — we zijn goed bereikbaar.</p>
           </A>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -214,7 +214,7 @@ export default function LocatiesPage() {
                     <f.icon size={22} />
                   </div>
                   <h3 className="font-bold mb-2">{f.title}</h3>
-                  <p className="text-sm text-warm-gray leading-relaxed">{f.desc}</p>
+                  <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
                 </div>
               </A>
             ))}
@@ -228,11 +228,11 @@ export default function LocatiesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
           <A className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
             <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3"><HelpCircle size={11} className="text-primary" /><span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Veelgestelde vragen</span></span>
-            <h2 className="text-2xl sm:text-4xl font-black mb-3">Vragen over onze locatie?</h2>
+            <h2 className="text-2xl sm:text-4xl font-bold mb-3">Vragen over onze locatie?</h2>
             <div className="divider-animated mt-3" />
           </A>
           <A>
-            <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">
+            <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-gray-300/[0.06] px-6 sm:px-8">
               {locatieFaqs.map(f => <FaqItem key={f.q} q={f.q} a={f.a} />)}
             </div>
           </A>

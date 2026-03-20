@@ -38,9 +38,9 @@ export default function BlogPostPage() {
         <Header />
         <div className="min-h-[60vh] flex items-center justify-center bg-surface">
           <div className="text-center">
-            <h1 className="text-2xl font-black mb-4">Artikel niet gevonden</h1>
-            <p className="text-warm-gray mb-6">Dit artikel bestaat niet of is verwijderd.</p>
-            <Link href="/blog" className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all">
+            <h1 className="text-2xl font-bold mb-4">Artikel niet gevonden</h1>
+            <p className="text-gray-500 mb-6">Dit artikel bestaat niet of is verwijderd.</p>
+            <Link href="/blog" className="inline-flex items-center gap-2 bg-primary hover:bg-primary-light text-white font-bold px-6 py-3 rounded-xl text-sm transition-all">
               <ArrowLeft size={15} /> Terug naar blog
             </Link>
           </div>
@@ -76,7 +76,7 @@ export default function BlogPostPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative bg-hero text-white py-16 sm:py-24 overflow-hidden">
+      <section className="relative bg-primary text-white py-16 sm:py-24 overflow-hidden">
         <div className="absolute inset-0">
           <Image src={post.image} alt="Achtergrondafbeelding" fill sizes="100vw" className="img-cover opacity-20" priority />
           <div className="hero-overlay absolute inset-0" />
@@ -94,7 +94,7 @@ export default function BlogPostPage() {
               <span className="flex items-center gap-1.5 text-white/60 text-xs"><Calendar size={11} /> {new Date(post.date).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
               <span className="flex items-center gap-1.5 text-white/60 text-xs"><Clock size={11} /> {post.readTime} leestijd</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.1] mb-4">{post.title}</h1>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.1] mb-4">{post.title}</h1>
             <p className="text-white/70 text-base sm:text-lg leading-relaxed max-w-3xl">{post.excerpt}</p>
           </motion.div>
         </div>
@@ -117,35 +117,35 @@ export default function BlogPostPage() {
                           <React.Fragment key={j}>
                             {headingCount > 1 && headingCount % 2 === 0 && (
                               <div className="flex items-center gap-4 my-10">
-                                <div className="flex-1 h-px bg-sand-dark/20" />
+                                <div className="flex-1 h-px bg-gray-300/20" />
                                 <span className="text-primary/40 text-lg">&#9830;</span>
-                                <div className="flex-1 h-px bg-sand-dark/20" />
+                                <div className="flex-1 h-px bg-gray-300/20" />
                               </div>
                             )}
-                            <h2 className="text-xl sm:text-2xl font-black mt-10 mb-4">{line.replace('## ', '')}</h2>
+                            <h2 className="text-xl sm:text-2xl font-bold mt-10 mb-4">{line.replace('## ', '')}</h2>
                           </React.Fragment>
                         );
                       }
                       if (line.startsWith('> ')) {
                         return (
-                          <blockquote key={j} className="border-l-4 border-primary pl-5 my-6 italic text-surface-dark/80 text-[15px] leading-relaxed">
+                          <blockquote key={j} className="border-l-4 border-primary pl-5 my-6 italic text-gray-900/80 text-[15px] leading-relaxed">
                             {line.replace('> ', '')}
                           </blockquote>
                         );
                       }
                       if (line.startsWith('**') && line.endsWith('**')) {
-                        return <p key={j} className="font-bold text-surface-dark mb-2">{line.replace(/\*\*/g, '')}</p>;
+                        return <p key={j} className="font-bold text-gray-900 mb-2">{line.replace(/\*\*/g, '')}</p>;
                       }
                       if (line.startsWith('- ')) {
-                        return <li key={j} className="text-warm-gray leading-relaxed ml-4 mb-1 list-disc">{line.replace('- ', '')}</li>;
+                        return <li key={j} className="text-gray-500 leading-relaxed ml-4 mb-1 list-disc">{line.replace('- ', '')}</li>;
                       }
                       if (line.trim() === '') return null;
                       const parts = line.split(/(\*\*.*?\*\*)/g);
                       return (
-                        <p key={j} className="text-warm-gray leading-relaxed mb-4">
+                        <p key={j} className="text-gray-500 leading-relaxed mb-4">
                           {parts.map((part, k) => {
                             if (part.startsWith('**') && part.endsWith('**')) {
-                              return <strong key={k} className="text-surface-dark font-semibold">{part.replace(/\*\*/g, '')}</strong>;
+                              return <strong key={k} className="text-gray-900 font-semibold">{part.replace(/\*\*/g, '')}</strong>;
                             }
                             return <span key={k}>{part}</span>;
                           })}
@@ -160,18 +160,18 @@ export default function BlogPostPage() {
 
           {/* Service CTA */}
           {post.cta && (
-            <div className="mt-10 p-6 sm:p-8 bg-sand/50 rounded-2xl border border-sand-dark/20 text-center">
+            <div className="mt-10 p-6 sm:p-8 bg-gray-50 rounded-2xl border border-gray-200 text-center">
               <p className="text-xs font-bold text-primary tracking-[0.15em] uppercase mb-2">Tip</p>
-              <p className="font-black text-lg mb-4">Laat het ons voor u regelen</p>
-              <Link href={post.cta.href} className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all shadow-sm">
+              <p className="font-bold text-lg mb-4">Laat het ons voor u regelen</p>
+              <Link href={post.cta.href} className="inline-flex items-center gap-2 bg-primary hover:bg-primary-light text-white font-bold px-6 py-3 rounded-xl text-sm transition-all shadow-sm">
                 {post.cta.label} <ArrowRight size={14} />
               </Link>
             </div>
           )}
 
           {/* Share */}
-          <div className="mt-12 pt-8 border-t border-sand-dark/20 flex items-center justify-between">
-            <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-dark transition-colors">
+          <div className="mt-12 pt-8 border-t border-gray-200 flex items-center justify-between">
+            <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-light transition-colors">
               <ArrowLeft size={14} /> Alle artikelen
             </Link>
             <button
@@ -182,7 +182,7 @@ export default function BlogPostPage() {
                   navigator.clipboard.writeText(window.location.href);
                 }
               }}
-              className="inline-flex items-center gap-2 text-sm font-semibold text-warm-gray hover:text-primary transition-colors"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-primary transition-colors"
             >
               <Share2 size={14} /> Delen
             </button>
@@ -194,7 +194,7 @@ export default function BlogPostPage() {
       {relatedPosts.length > 0 && (
         <section className="py-16 sm:py-20 bg-surface">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <h2 className="text-2xl font-black mb-2">Meer lezen</h2>
+            <h2 className="text-2xl font-bold mb-2">Meer lezen</h2>
             <div className="section-divider mt-3 mb-10" />
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {relatedPosts.map(rp => (
@@ -220,12 +220,12 @@ export default function BlogPostPage() {
       )}
 
       {/* CTA */}
-      <section className="bg-hero relative overflow-hidden">
+      <section className="bg-primary relative overflow-hidden">
         <div className="absolute inset-0 dot-pattern opacity-20" />
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-14 sm:py-16 text-center relative">
-          <h2 className="text-2xl font-black text-white mb-4">Uw caravan veilig stallen?</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">Uw caravan veilig stallen?</h2>
           <p className="text-white/60 mb-6 max-w-md mx-auto text-sm">Neem contact op of vraag direct een stallingsplek aan. Wij reageren binnen 24 uur.</p>
-          <Link href="/reserveren" className="bg-primary hover:bg-primary-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all duration-200 inline-flex items-center gap-2 shadow-sm">
+          <Link href="/reserveren" className="bg-primary hover:bg-primary-light text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all duration-200 inline-flex items-center gap-2 shadow-sm">
             Direct reserveren <ArrowRight size={15} />
           </Link>
         </div>

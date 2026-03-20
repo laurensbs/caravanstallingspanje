@@ -19,22 +19,18 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative bg-hero text-white/60 overflow-hidden">
-      {/* Gradient glow */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
-
+    <footer className="relative bg-primary text-white/60 overflow-hidden">
       {/* CTA Banner */}
       <div className="relative border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
-          <div className="bg-gradient-to-r from-primary/12 via-primary/6 to-transparent rounded-3xl p-6 sm:p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6 border border-primary/10">
+          <div className="bg-white/[0.06] rounded-2xl p-6 sm:p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6 border border-white/8">
             <div>
               <h3 className="text-white text-xl sm:text-2xl md:text-3xl font-bold mb-2">{t('footer.cta.title')}</h3>
-              <p className="text-white/70 text-sm max-w-lg">{t('footer.cta.desc')}</p>
+              <p className="text-white/60 text-sm max-w-lg">{t('footer.cta.desc')}</p>
             </div>
             <Link
               href="/stalling"
-              className="shrink-0 bg-gradient-to-r from-primary to-primary-light hover:from-primary-light hover:to-primary text-white font-bold px-8 py-4 rounded-2xl text-sm transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] inline-flex items-center gap-2"
+              className="shrink-0 bg-primary hover:bg-primary-light text-white font-semibold px-8 py-4 rounded-xl text-sm transition-all duration-200 shadow-lg shadow-primary/20 hover:shadow-primary/30 inline-flex items-center gap-2"
             >
               {t('footer.cta.btn')} <ArrowRight size={16} />
             </Link>
@@ -53,12 +49,12 @@ export default function Footer() {
           {/* Brand */}
           <motion.div variants={fadeUp}>
             <div className="flex items-center gap-2.5 mb-5">
-              <div className="w-9 h-9 bg-gradient-to-br from-primary to-primary-light rounded-xl flex items-center justify-center shadow-lg shadow-primary/10">
-                <span className="text-white font-black text-xs">CS</span>
+              <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center">
+                <span className="text-white font-bold text-xs">CS</span>
               </div>
               <div>
                 <span className="text-white font-bold text-sm block leading-tight">CARAVANSTALLING</span>
-                <span className="text-primary-light text-[9px] font-bold tracking-[0.2em] uppercase">Spanje</span>
+                <span className="text-primary-light text-[9px] font-semibold tracking-[0.2em] uppercase">Spanje</span>
               </div>
             </div>
             <p className="text-sm leading-relaxed mb-4">
@@ -218,7 +214,7 @@ export default function Footer() {
                 <button
                   type="submit"
                   disabled={newsletterStatus === 'loading'}
-                  className="bg-primary hover:bg-primary-light text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all inline-flex items-center gap-1.5 shrink-0 disabled:opacity-60"
+                  className="bg-primary hover:bg-primary-light text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-all inline-flex items-center gap-1.5 shrink-0 disabled:opacity-60"
                 >
                   <Send size={13} /> Inschrijven
                 </button>

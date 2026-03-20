@@ -31,8 +31,8 @@ export default function ContactPage() {
           <A>
             <div className="text-center mb-10">
               <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3"><span className="w-1.5 h-1.5 rounded-full bg-primary" /><span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Contact</span></span>
-              <h2 className="text-xl sm:text-3xl font-black mb-2">Hoe wilt u contact opnemen?</h2>
-              <p className="text-warm-gray text-sm sm:text-base max-w-xl mx-auto">Kies de manier die u het beste uitkomt.</p>
+              <h2 className="text-xl sm:text-3xl font-bold mb-2">Hoe wilt u contact opnemen?</h2>
+              <p className="text-gray-500 text-sm sm:text-base max-w-xl mx-auto">Kies de manier die u het beste uitkomt.</p>
             </div>
           </A>
 
@@ -49,7 +49,7 @@ export default function ContactPage() {
                     <div className="inline-flex items-center gap-2 bg-white/20 rounded-full px-3 py-1 text-xs font-bold mb-3">
                       <Star size={12} /> Aanbevolen
                     </div>
-                    <h3 className="text-lg sm:text-2xl font-black mb-1">Ontvang een voorstel op maat</h3>
+                    <h3 className="text-lg sm:text-2xl font-bold mb-1">Ontvang een voorstel op maat</h3>
                     <p className="text-white/80 text-sm leading-relaxed max-w-lg">
                       Beantwoord een paar korte vragen — wij sturen u binnen 1 werkdag een persoonlijk voorstel.
                     </p>
@@ -68,11 +68,11 @@ export default function ContactPage() {
             {/* Call */}
             <A delay={0.1}>
               <a href="tel:+34650036755" className="block card-premium p-4 sm:p-6 h-full">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-hero/10 rounded-xl flex items-center justify-center mb-3">
-                  <Phone size={18} className="text-hero" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-3">
+                  <Phone size={18} className="text-primary" />
                 </div>
-                <h3 className="font-black text-base sm:text-lg mb-1">Bel ons</h3>
-                <p className="text-warm-gray text-xs sm:text-sm leading-relaxed mb-2">Direct aan de lijn — NL, EN, ES.</p>
+                <h3 className="font-bold text-base sm:text-lg mb-1">Bel ons</h3>
+                <p className="text-gray-500 text-xs sm:text-sm leading-relaxed mb-2">Direct aan de lijn — NL, EN, ES.</p>
                 <p className="text-primary font-bold text-sm">+34 650 036 755</p>
               </a>
             </A>
@@ -83,8 +83,8 @@ export default function ContactPage() {
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#25D366]/10 rounded-xl flex items-center justify-center mb-3">
                   <MessageCircle size={18} className="text-[#25D366]" />
                 </div>
-                <h3 className="font-black text-base sm:text-lg mb-1">WhatsApp</h3>
-                <p className="text-warm-gray text-xs sm:text-sm leading-relaxed mb-2">Foto&apos;s, vragen of snelle reactie.</p>
+                <h3 className="font-bold text-base sm:text-lg mb-1">WhatsApp</h3>
+                <p className="text-gray-500 text-xs sm:text-sm leading-relaxed mb-2">Foto&apos;s, vragen of snelle reactie.</p>
                 <p className="text-[#25D366] font-bold text-sm">Start gesprek →</p>
               </a>
             </A>
@@ -95,8 +95,8 @@ export default function ContactPage() {
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-3">
                   <Mail size={18} className="text-primary" />
                 </div>
-                <h3 className="font-black text-base sm:text-lg mb-1">E-mail</h3>
-                <p className="text-warm-gray text-xs sm:text-sm leading-relaxed mb-2">Reactie binnen 1 werkdag.</p>
+                <h3 className="font-bold text-base sm:text-lg mb-1">E-mail</h3>
+                <p className="text-gray-500 text-xs sm:text-sm leading-relaxed mb-2">Reactie binnen 1 werkdag.</p>
                 <p className="text-primary font-bold text-xs sm:text-sm break-all">info@caravanstalling-spanje.com</p>
               </a>
             </A>
@@ -104,7 +104,7 @@ export default function ContactPage() {
 
           {/* Trust bar */}
           <A delay={0.25}>
-            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-warm-gray">
+            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-gray-500">
               <span className="inline-flex items-center gap-1.5"><Star size={14} className="text-yellow-500 fill-yellow-500" /> 4.8 Google Reviews</span>
               <span className="inline-flex items-center gap-1.5"><Shield size={14} className="text-accent" /> 15+ jaar ervaring</span>
               <span className="inline-flex items-center gap-1.5"><Users size={14} className="text-primary" /> 200+ tevreden klanten</span>
@@ -133,7 +133,7 @@ export default function ContactPage() {
             <A delay={0.1}>
               <div>
                 <p className="text-xs font-bold tracking-[0.2em] uppercase text-primary mb-3">Onze locatie</p>
-                <h2 className="text-xl sm:text-3xl font-black mb-4">Bezoek ons in Spanje</h2>
+                <h2 className="text-xl sm:text-3xl font-bold mb-4">Bezoek ons in Spanje</h2>
                 <div className="space-y-4 mb-6">
                   {[
                     { icon: MapPin, label: 'Adres', value: 'Ctra de Palamós, 91\n17110 Sant Climent de Peralta\nGirona, Spanje' },
@@ -142,11 +142,11 @@ export default function ContactPage() {
                     { icon: Mail, label: 'E-mail', value: 'info@caravanstalling-spanje.com', href: 'mailto:info@caravanstalling-spanje.com' },
                   ].map(c => (
                     <div key={c.label} className="flex gap-4">
-                      <div className="w-10 h-10 bg-card rounded-xl flex items-center justify-center border border-sand-dark/[0.06] shrink-0">
+                      <div className="w-10 h-10 bg-card rounded-xl flex items-center justify-center border border-gray-300/[0.06] shrink-0">
                         <c.icon size={16} className="text-primary" />
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-0.5">{c.label}</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-0.5">{c.label}</p>
                         {c.href ? (
                           <a href={c.href} className="text-sm font-medium hover:text-primary transition-colors">{c.value}</a>
                         ) : (
@@ -167,10 +167,10 @@ export default function ContactPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
           <A>
             <div className="card-premium overflow-hidden relative">
-              <div className="absolute top-0 left-0 right-0 z-10 bg-white/70 backdrop-blur-md px-5 py-3 flex items-center gap-2 border-b border-sand-dark/10">
+              <div className="absolute top-0 left-0 right-0 z-10 bg-white/70 backdrop-blur-md px-5 py-3 flex items-center gap-2 border-b border-gray-100">
                 <MapPin size={14} className="text-primary" />
                 <span className="text-sm font-bold">Caravanstalling Spanje</span>
-                <span className="text-xs text-warm-gray ml-auto hidden sm:inline">Ctra de Palamós, 91 · Sant Climent de Peralta</span>
+                <span className="text-xs text-gray-500 ml-auto hidden sm:inline">Ctra de Palamós, 91 · Sant Climent de Peralta</span>
               </div>
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2975.8!2d3.14!3d42.01!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12ba8d9e42ceae9f%3A0x4af8d0d99ced30a2!2sCtra.%20de%20Palam%C3%B3s%2C%2091%2C%2017110%20Sant%20Climent%20de%20Peralta%2C%20Girona%2C%20Spain!5e0!3m2!1snl!2snl!4v1"

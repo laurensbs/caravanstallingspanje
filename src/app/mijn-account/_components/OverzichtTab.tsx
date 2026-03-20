@@ -43,8 +43,8 @@ export default function OverzichtTab({ customer, caravans, invoices, contracts, 
               <Sun size={18} className="text-primary" />
               <span className="text-sm font-medium text-primary">{greeting}</span>
             </div>
-            <h2 className="text-2xl md:text-3xl font-black text-surface-dark">{customer.name}</h2>
-            <p className="text-sm text-warm-gray/70 mt-2">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{customer.name}</h2>
+            <p className="text-sm text-gray-500/70 mt-2">
               {caravans.length > 0
                 ? `${caravans.length} caravan${caravans.length > 1 ? 's' : ''} veilig gestald · ${contracts.filter(c => c.status === 'actief').length} actief contract${contracts.filter(c => c.status === 'actief').length !== 1 ? 'en' : ''}`
                 : 'Welkom bij uw persoonlijke stallingportaal'
@@ -64,20 +64,20 @@ export default function OverzichtTab({ customer, caravans, invoices, contracts, 
       {nextActions.length > 0 && (
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
           className="card-premium p-5">
-          <h3 className="text-xs font-bold text-warm-gray/60 uppercase tracking-widest mb-3 flex items-center gap-2">
+          <h3 className="text-xs font-bold text-gray-500/60 uppercase tracking-widest mb-3 flex items-center gap-2">
             <div className="w-1.5 h-1.5 bg-primary rounded-full" /> Volgende acties
           </h3>
           <div className="space-y-2">
             {nextActions.map((a, i) => (
               <button key={i} onClick={() => setTab(a.tab)} className={`w-full flex items-center gap-4 rounded-xl p-4 border transition-all hover:shadow-md hover:-translate-y-0.5 text-left ${a.color}`}>
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${a.urgent ? 'bg-danger/10' : 'bg-sand/60'}`}>
-                  <a.icon size={18} className={a.urgent ? 'text-danger' : 'text-warm-gray'} />
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${a.urgent ? 'bg-danger/10' : 'bg-gray-100'}`}>
+                  <a.icon size={18} className={a.urgent ? 'text-danger' : 'text-gray-500'} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-bold ${a.urgent ? 'text-danger' : 'text-surface-dark'}`}>{a.label}</p>
-                  <p className="text-xs text-warm-gray/70">{a.desc}</p>
+                  <p className={`text-sm font-bold ${a.urgent ? 'text-danger' : 'text-gray-900'}`}>{a.label}</p>
+                  <p className="text-xs text-gray-500/70">{a.desc}</p>
                 </div>
-                <ArrowRight size={16} className="text-warm-gray/40 shrink-0" />
+                <ArrowRight size={16} className="text-gray-500/40 shrink-0" />
               </button>
             ))}
           </div>
@@ -94,7 +94,7 @@ export default function OverzichtTab({ customer, caravans, invoices, contracts, 
             className="card-premium p-6">
             <div className={`w-12 h-12 bg-gradient-to-br ${s.bg} rounded-xl flex items-center justify-center mb-4 shadow-sm`}><s.icon size={22} className={s.text} /></div>
             <p className="stat-number text-3xl">{s.value}</p>
-            <p className="text-sm text-warm-gray/70 mt-1 font-medium">{s.label}</p>
+            <p className="text-sm text-gray-500/70 mt-1 font-medium">{s.label}</p>
           </motion.div>
         ))}
       </div>
@@ -112,7 +112,7 @@ export default function OverzichtTab({ customer, caravans, invoices, contracts, 
             <div className={`w-11 h-11 bg-gradient-to-br ${a.color} rounded-xl flex items-center justify-center mx-auto mb-2.5 group-hover:scale-110 transition-transform shadow-sm`}>
               <a.icon size={18} />
             </div>
-            <p className="text-xs font-bold text-surface-dark">{a.label}</p>
+            <p className="text-xs font-bold text-gray-900">{a.label}</p>
           </button>
         ))}
       </motion.div>
@@ -121,17 +121,17 @@ export default function OverzichtTab({ customer, caravans, invoices, contracts, 
       {caravans.length > 0 && (
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.4 }}
           className="card-premium p-6">
-          <h3 className="font-bold text-surface-dark flex items-center gap-2 mb-4"><Caravan size={18} className="text-primary" /> Uw caravans</h3>
+          <h3 className="font-bold text-gray-900 flex items-center gap-2 mb-4"><Caravan size={18} className="text-primary" /> Uw caravans</h3>
           <div className="space-y-3">
             {caravans.map(c => (
-              <div key={c.id} className="bg-gradient-to-r from-sand/40 to-transparent rounded-xl border border-sand-dark/10 p-4 flex items-center justify-between hover:shadow-sm transition-all">
+              <div key={c.id} className="bg-gradient-to-r from-gray-100 to-transparent rounded-xl border border-gray-100 p-4 flex items-center justify-between hover:shadow-sm transition-all">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 bg-gradient-to-br from-ocean/15 to-ocean/5 rounded-lg flex items-center justify-center shadow-sm">
                     <Caravan size={18} className="text-ocean" />
                   </div>
                   <div>
                     <p className="font-bold text-sm">{c.brand} {c.model}</p>
-                    <p className="text-xs text-warm-gray/60">{c.license_plate} &middot; Plek {c.spot_label}</p>
+                    <p className="text-xs text-gray-500/60">{c.license_plate} &middot; Plek {c.spot_label}</p>
                   </div>
                 </div>
                 <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full ${c.status === 'gestald' ? 'bg-accent/10 text-accent border border-accent/20' : 'bg-warning/10 text-warning border border-warning/20'}`}>
@@ -146,7 +146,7 @@ export default function OverzichtTab({ customer, caravans, invoices, contracts, 
       {/* Status Timeline */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.45 }}
         className="card-premium p-6">
-        <h3 className="font-bold text-surface-dark flex items-center gap-2 mb-6"><Activity size={18} className="text-primary" /> Status tijdlijn</h3>
+        <h3 className="font-bold text-gray-900 flex items-center gap-2 mb-6"><Activity size={18} className="text-primary" /> Status tijdlijn</h3>
         <div className="space-y-0">
           {(() => {
             const timeline: { icon: React.ElementType; label: string; date: string; status: 'done' | 'active' | 'upcoming'; color: string }[] = [];
@@ -175,7 +175,7 @@ export default function OverzichtTab({ customer, caravans, invoices, contracts, 
 
             timeline.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-            if (timeline.length === 0) return <p className="text-sm text-warm-gray/70">Geen recente activiteit</p>;
+            if (timeline.length === 0) return <p className="text-sm text-gray-500/70">Geen recente activiteit</p>;
 
             return timeline.slice(0, 8).map((item, i) => (
               <div key={i} className="flex gap-4 relative">
@@ -183,11 +183,11 @@ export default function OverzichtTab({ customer, caravans, invoices, contracts, 
                   <div className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center flex-shrink-0 ${item.status === 'upcoming' ? 'opacity-40' : ''}`}>
                     <item.icon size={14} className="text-white" />
                   </div>
-                  {i < Math.min(timeline.length, 8) - 1 && <div className="w-px h-8 bg-sand-dark/30" />}
+                  {i < Math.min(timeline.length, 8) - 1 && <div className="w-px h-8 bg-gray-200" />}
                 </div>
                 <div className={`pb-6 ${item.status === 'upcoming' ? 'opacity-50' : ''}`}>
-                  <p className="text-sm font-medium text-surface-dark">{item.label}</p>
-                  <p className="text-xs text-warm-gray/70">{fmtDate(item.date)}</p>
+                  <p className="text-sm font-medium text-gray-900">{item.label}</p>
+                  <p className="text-xs text-gray-500/70">{fmtDate(item.date)}</p>
                 </div>
               </div>
             ));

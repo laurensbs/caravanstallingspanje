@@ -190,7 +190,7 @@ export default function StaffInspectiesPage() {
     <div>
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between mb-6">
-        <h1 className="text-xl md:text-2xl font-black text-surface-dark">Inspecties</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900">Inspecties</h1>
         <button onClick={startInspection} className="bg-gradient-to-r from-accent to-accent-dark hover:from-accent-dark hover:to-accent text-white font-bold px-5 py-3 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-accent/20 transition-all hover:-translate-y-0.5">
           <Plus size={16} /> <span className="hidden sm:inline">Nieuwe inspectie</span><span className="sm:hidden">Nieuw</span>
         </button>
@@ -200,7 +200,7 @@ export default function StaffInspectiesPage() {
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="card-premium mb-5 p-3">
         <div className="flex gap-2 overflow-x-auto no-scrollbar">
           {['', 'gepland', 'afgerond'].map(s => (
-            <button key={s} onClick={() => setFilter(s)} className={`px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${filter === s ? 'bg-gradient-to-r from-accent to-accent-dark text-white shadow-lg shadow-accent/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>
+            <button key={s} onClick={() => setFilter(s)} className={`px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${filter === s ? 'bg-gradient-to-r from-accent to-accent-dark text-white shadow-lg shadow-accent/20' : 'bg-gray-50 hover:bg-gray-300/20 text-gray-500'}`}>
               {s || 'Alle'}
             </button>
           ))}
@@ -218,7 +218,7 @@ export default function StaffInspectiesPage() {
             <div className="w-14 h-14 bg-gradient-to-br from-ocean/15 to-ocean/5 rounded-2xl flex items-center justify-center mx-auto mb-3">
               <Search size={22} className="text-ocean" />
             </div>
-            <p className="text-sm text-warm-gray/70 font-bold">Geen inspecties gevonden</p>
+            <p className="text-sm text-gray-500/70 font-bold">Geen inspecties gevonden</p>
           </motion.div>
         ) : inspections.map(insp => {
           const cl = insp.checklist || {};
@@ -230,18 +230,18 @@ export default function StaffInspectiesPage() {
               <button onClick={() => setExpandedInspection(expanded ? null : insp.id)} className="w-full p-4 flex items-center gap-3 text-left">
                 {/* Score circle */}
                 <div className={`w-13 h-13 rounded-xl flex items-center justify-center shrink-0 shadow-sm ${pct === 100 ? 'bg-gradient-to-br from-accent/20 to-accent/10' : pct >= 70 ? 'bg-gradient-to-br from-warning/20 to-warning/10' : 'bg-gradient-to-br from-danger/20 to-danger/10'}`}>
-                  <span className={`text-sm font-black ${pct === 100 ? 'text-primary-dark' : pct >= 70 ? 'text-warning' : 'text-danger'}`}>{pct}%</span>
+                  <span className={`text-sm font-bold ${pct === 100 ? 'text-primary-dark' : pct >= 70 ? 'text-warning' : 'text-danger'}`}>{pct}%</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-bold text-surface-dark truncate">{insp.caravan_brand} {insp.caravan_model}</h3>
-                  <p className="text-xs text-warm-gray/70 truncate">{insp.caravan_license_plate} · {insp.location_name}</p>
-                  <p className="text-xs text-warm-gray/50 mt-0.5">{fmtDate(insp.inspected_at || insp.created_at)}</p>
+                  <h3 className="text-sm font-bold text-gray-900 truncate">{insp.caravan_brand} {insp.caravan_model}</h3>
+                  <p className="text-xs text-gray-500/70 truncate">{insp.caravan_license_plate} · {insp.location_name}</p>
+                  <p className="text-xs text-gray-500/50 mt-0.5">{fmtDate(insp.inspected_at || insp.created_at)}</p>
                 </div>
-                <ChevronRight size={16} className={`text-warm-gray/50 transition-transform ${expanded ? 'rotate-90' : ''}`} />
+                <ChevronRight size={16} className={`text-gray-500/50 transition-transform ${expanded ? 'rotate-90' : ''}`} />
               </button>
               
               {expanded && (
-                <div className="px-4 pb-4 border-t border-sand-dark/10">
+                <div className="px-4 pb-4 border-t border-gray-100">
                   {/* Checklist badges */}
                   <div className="mt-3 flex flex-wrap gap-1.5">
                     {CHECKLIST_ITEMS.map(item => (
@@ -250,7 +250,7 @@ export default function StaffInspectiesPage() {
                       </span>
                     ))}
                   </div>
-                  {insp.notes && <p className="text-sm text-warm-gray/70 mt-3 italic">{insp.notes}</p>}
+                  {insp.notes && <p className="text-sm text-gray-500/70 mt-3 italic">{insp.notes}</p>}
                 </div>
               )}
             </motion.div>
@@ -263,18 +263,18 @@ export default function StaffInspectiesPage() {
         <div className="fixed inset-0 bg-surface z-50 flex flex-col md:bg-black/60 md:backdrop-blur-sm md:items-center md:justify-center md:p-4">
           <div className="flex-1 flex flex-col md:bg-surface md:rounded-2xl md:w-full md:max-w-lg md:max-h-[90vh] md:flex-initial md:shadow-2xl">
             {/* Wizard header */}
-            <div className="flex items-center justify-between p-4 border-b border-sand-dark/20 shrink-0">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 shrink-0">
               <div>
-                <h2 className="text-lg font-bold text-surface-dark">Nieuwe inspectie</h2>
-                <p className="text-xs text-warm-gray/70">Stap {formStep + 1} van {STEPS.length}: {STEPS[formStep]}</p>
+                <h2 className="text-lg font-bold text-gray-900">Nieuwe inspectie</h2>
+                <p className="text-xs text-gray-500/70">Stap {formStep + 1} van {STEPS.length}: {STEPS[formStep]}</p>
               </div>
-              <button onClick={() => { setShowForm(false); stopCamera(); }} className="text-warm-gray/70 hover:text-warm-gray p-1" aria-label="Sluiten"><X size={20}/></button>
+              <button onClick={() => { setShowForm(false); stopCamera(); }} className="text-gray-500/70 hover:text-gray-500 p-1" aria-label="Sluiten"><X size={20}/></button>
             </div>
 
             {/* Progress bar */}
             <div className="flex gap-1 px-4 pt-3 shrink-0">
               {STEPS.map((_, i) => (
-                <div key={i} className={`h-1 flex-1 rounded-full transition-all ${i <= formStep ? 'bg-accent/100' : 'bg-sand'}`} />
+                <div key={i} className={`h-1 flex-1 rounded-full transition-all ${i <= formStep ? 'bg-accent/100' : 'bg-gray-100'}`} />
               ))}
             </div>
 
@@ -284,21 +284,21 @@ export default function StaffInspectiesPage() {
               {formStep === 0 && (
                 <div className="space-y-4">
                   <div>
-                    <label className="text-xs font-bold text-warm-gray uppercase tracking-wider block mb-2">Caravan *</label>
-                    <select required value={form.caravan_id} onChange={e=>setForm({...form,caravan_id:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:ring-2 focus:ring-accent/20 outline-none">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">Caravan *</label>
+                    <select required value={form.caravan_id} onChange={e=>setForm({...form,caravan_id:e.target.value})} className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm bg-gray-50 focus:ring-2 focus:ring-accent/20 outline-none">
                       <option value="">Selecteer caravan</option>
                       {caravans.map(c => <option key={c.id} value={c.id}>{c.brand} {c.model} — {c.license_plate}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-warm-gray uppercase tracking-wider block mb-2">Type inspectie</label>
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">Type inspectie</label>
                     <div className="grid grid-cols-3 gap-2">
                       {[
                         { value: 'tweewekelijks', label: '2-wekelijks' },
                         { value: 'jaarlijks', label: 'Jaarlijks' },
                         { value: 'ad_hoc', label: 'Ad hoc' },
                       ].map(t => (
-                        <button key={t.value} type="button" onClick={() => setForm({...form, inspection_type: t.value})} className={`py-3 rounded-xl text-sm font-semibold transition-all ${form.inspection_type === t.value ? 'bg-accent/100 text-white shadow-md' : 'bg-sand/40 text-warm-gray hover:bg-sand-dark/20'}`}>
+                        <button key={t.value} type="button" onClick={() => setForm({...form, inspection_type: t.value})} className={`py-3 rounded-xl text-sm font-semibold transition-all ${form.inspection_type === t.value ? 'bg-accent/100 text-white shadow-md' : 'bg-gray-50 text-gray-500 hover:bg-gray-300/20'}`}>
                           {t.label}
                         </button>
                       ))}
@@ -310,20 +310,20 @@ export default function StaffInspectiesPage() {
               {/* Step 1: Checklist - big tap targets */}
               {formStep === 1 && (
                 <div className="space-y-2">
-                  <p className="text-sm text-warm-gray/70 mb-3">Tik op elk item dat in orde is</p>
+                  <p className="text-sm text-gray-500/70 mb-3">Tik op elk item dat in orde is</p>
                   {CHECKLIST_ITEMS.map(item => (
-                    <button key={item.key} type="button" onClick={() => setChecklist({...checklist, [item.key]: !checklist[item.key]})} className={`w-full flex items-center gap-3 p-4 rounded-xl text-left transition-all ${checklist[item.key] ? 'bg-accent/10 border-2 border-accent-light' : 'bg-sand/40 border-2 border-transparent'}`}>
+                    <button key={item.key} type="button" onClick={() => setChecklist({...checklist, [item.key]: !checklist[item.key]})} className={`w-full flex items-center gap-3 p-4 rounded-xl text-left transition-all ${checklist[item.key] ? 'bg-accent/10 border-2 border-accent-light' : 'bg-gray-50 border-2 border-transparent'}`}>
                       <span className="text-xl">{item.emoji}</span>
-                      <span className={`text-sm font-medium flex-1 ${checklist[item.key] ? 'text-accent-dark' : 'text-warm-gray'}`}>{item.label}</span>
+                      <span className={`text-sm font-medium flex-1 ${checklist[item.key] ? 'text-accent-dark' : 'text-gray-500'}`}>{item.label}</span>
                       {checklist[item.key] ? (
                         <CheckCircle size={20} className="text-accent shrink-0" />
                       ) : (
-                        <div className="w-5 h-5 rounded-full border-2 border-sand-dark/30 shrink-0" />
+                        <div className="w-5 h-5 rounded-full border-2 border-gray-200 shrink-0" />
                       )}
                     </button>
                   ))}
-                  <div className="mt-4 p-3 bg-sand/40 rounded-xl text-center">
-                    <span className="text-sm font-bold text-warm-gray">{passedCount(checklist)} / {CHECKLIST_ITEMS.length} items goedgekeurd</span>
+                  <div className="mt-4 p-3 bg-gray-50 rounded-xl text-center">
+                    <span className="text-sm font-bold text-gray-500">{passedCount(checklist)} / {CHECKLIST_ITEMS.length} items goedgekeurd</span>
                   </div>
                 </div>
               )}
@@ -331,7 +331,7 @@ export default function StaffInspectiesPage() {
               {/* Step 2: Camera & Photos */}
               {formStep === 2 && (
                 <div className="space-y-4">
-                  <p className="text-sm text-warm-gray/70">Maak foto&apos;s van eventuele schade of bijzonderheden</p>
+                  <p className="text-sm text-gray-500/70">Maak foto&apos;s van eventuele schade of bijzonderheden</p>
                   
                   {/* Camera viewfinder */}
                   {showCamera ? (
@@ -348,9 +348,9 @@ export default function StaffInspectiesPage() {
                       </div>
                     </div>
                   ) : (
-                    <button onClick={startCamera} className="w-full aspect-[4/3] rounded-2xl border-2 border-dashed border-sand-dark/30 flex flex-col items-center justify-center gap-3 bg-sand/40 hover:bg-sand-dark/20 transition-colors">
-                      <Camera size={32} className="text-warm-gray/50" />
-                      <span className="text-sm font-semibold text-warm-gray/70">Camera openen</span>
+                    <button onClick={startCamera} className="w-full aspect-[4/3] rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-3 bg-gray-50 hover:bg-gray-300/20 transition-colors">
+                      <Camera size={32} className="text-gray-500/50" />
+                      <span className="text-sm font-semibold text-gray-500/70">Camera openen</span>
                     </button>
                   )}
 
@@ -371,7 +371,7 @@ export default function StaffInspectiesPage() {
                     </div>
                   )}
                   
-                  <p className="text-xs text-warm-gray/50 text-center">{photos.length} foto{photos.length !== 1 ? '\'s' : ''} toegevoegd</p>
+                  <p className="text-xs text-gray-500/50 text-center">{photos.length} foto{photos.length !== 1 ? '\'s' : ''} toegevoegd</p>
                 </div>
               )}
 
@@ -379,29 +379,29 @@ export default function StaffInspectiesPage() {
               {formStep === 3 && (
                 <div className="space-y-4">
                   <div>
-                    <label className="text-xs font-bold text-warm-gray uppercase tracking-wider block mb-2">Opmerkingen</label>
-                    <textarea value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:ring-2 focus:ring-accent/20 outline-none" rows={4} placeholder="Eventuele bijzonderheden, schade, etc." />
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">Opmerkingen</label>
+                    <textarea value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})} className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm bg-gray-50 focus:ring-2 focus:ring-accent/20 outline-none" rows={4} placeholder="Eventuele bijzonderheden, schade, etc." />
                   </div>
 
                   {/* Summary */}
-                  <div className="bg-sand/40 rounded-xl p-4 space-y-3">
-                    <h3 className="font-bold text-sm text-surface-dark">Samenvatting</h3>
+                  <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+                    <h3 className="font-bold text-sm text-gray-900">Samenvatting</h3>
                     <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div className="text-warm-gray/70">Caravan</div>
-                      <div className="font-medium text-surface-dark">{caravans.find(c => String(c.id) === form.caravan_id)?.brand || '-'} {caravans.find(c => String(c.id) === form.caravan_id)?.model || ''}</div>
-                      <div className="text-warm-gray/70">Type</div>
-                      <div className="font-medium text-surface-dark capitalize">{form.inspection_type}</div>
-                      <div className="text-warm-gray/70">Score</div>
+                      <div className="text-gray-500/70">Caravan</div>
+                      <div className="font-medium text-gray-900">{caravans.find(c => String(c.id) === form.caravan_id)?.brand || '-'} {caravans.find(c => String(c.id) === form.caravan_id)?.model || ''}</div>
+                      <div className="text-gray-500/70">Type</div>
+                      <div className="font-medium text-gray-900 capitalize">{form.inspection_type}</div>
+                      <div className="text-gray-500/70">Score</div>
                       <div className={`font-bold ${passedPct(checklist) === 100 ? 'text-accent' : passedPct(checklist) >= 70 ? 'text-warning' : 'text-danger'}`}>
                         {passedCount(checklist)}/{CHECKLIST_ITEMS.length} ({passedPct(checklist)}%)
                       </div>
-                      <div className="text-warm-gray/70">Foto&apos;s</div>
-                      <div className="font-medium text-surface-dark">{photos.length}</div>
+                      <div className="text-gray-500/70">Foto&apos;s</div>
+                      <div className="font-medium text-gray-900">{photos.length}</div>
                     </div>
                     
                     {/* Failed items */}
                     {CHECKLIST_ITEMS.filter(item => !checklist[item.key]).length > 0 && (
-                      <div className="mt-2 pt-2 border-t border-sand-dark/30">
+                      <div className="mt-2 pt-2 border-t border-gray-200">
                         <p className="text-xs font-bold text-danger mb-1.5">Niet goedgekeurd:</p>
                         <div className="flex flex-wrap gap-1">
                           {CHECKLIST_ITEMS.filter(item => !checklist[item.key]).map(item => (
@@ -416,18 +416,18 @@ export default function StaffInspectiesPage() {
             </div>
 
             {/* Navigation buttons */}
-            <div className="p-4 border-t border-sand-dark/20 flex gap-3 shrink-0 safe-bottom">
+            <div className="p-4 border-t border-gray-200 flex gap-3 shrink-0 safe-bottom">
               {formStep > 0 && (
-                <button type="button" onClick={() => { setFormStep(formStep - 1); if (formStep === 2) stopCamera(); }} className="flex-1 py-3.5 rounded-xl text-sm font-semibold text-warm-gray bg-sand hover:bg-sand-dark/30 transition-colors flex items-center justify-center gap-2">
+                <button type="button" onClick={() => { setFormStep(formStep - 1); if (formStep === 2) stopCamera(); }} className="flex-1 py-3.5 rounded-xl text-sm font-semibold text-gray-500 bg-gray-100 hover:bg-gray-200 transition-colors flex items-center justify-center gap-2">
                   <RotateCcw size={14}/> Vorige
                 </button>
               )}
               {formStep < STEPS.length - 1 ? (
-                <button type="button" onClick={() => { if (formStep === 0 && !form.caravan_id) { alert('Selecteer eerst een caravan'); return; } setFormStep(formStep + 1); if (formStep === 1) stopCamera(); }} className="flex-1 bg-accent hover:bg-accent-dark text-white font-bold py-3.5 rounded-xl text-sm shadow-lg shadow-accent/20 transition-all flex items-center justify-center gap-2">
+                <button type="button" onClick={() => { if (formStep === 0 && !form.caravan_id) { alert('Selecteer eerst een caravan'); return; } setFormStep(formStep + 1); if (formStep === 1) stopCamera(); }} className="flex-1 bg-accent hover:bg-accent/90 text-white font-bold py-3.5 rounded-xl text-sm shadow-lg shadow-accent/20 transition-all flex items-center justify-center gap-2">
                   Volgende <ChevronRight size={14}/>
                 </button>
               ) : (
-                <button type="button" onClick={() => setShowConfirmSubmit(true)} className="flex-1 bg-accent hover:bg-accent-dark text-white font-bold py-3.5 rounded-xl text-sm shadow-lg shadow-accent/20 transition-all flex items-center justify-center gap-2">
+                <button type="button" onClick={() => setShowConfirmSubmit(true)} className="flex-1 bg-accent hover:bg-accent/90 text-white font-bold py-3.5 rounded-xl text-sm shadow-lg shadow-accent/20 transition-all flex items-center justify-center gap-2">
                   <CheckCircle size={14}/> Inspectie afronden
                 </button>
               )}

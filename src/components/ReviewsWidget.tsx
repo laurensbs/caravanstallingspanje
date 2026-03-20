@@ -49,7 +49,7 @@ export default function ReviewsWidget({ limit }: { limit?: number }) {
         <div className="inline-flex items-center gap-2 bg-warning/15 text-warning px-4 py-1.5 rounded-full text-xs font-bold mb-8">
           <Star size={13} fill="currentColor" /> {avgRating}/5 — Google Reviews
         </div>
-        <h2 className="text-2xl sm:text-4xl font-black text-white mb-10">Wat onze klanten zeggen</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold text-white mb-10">Wat onze klanten zeggen</h2>
 
         {/* Carousel */}
         <div className="relative min-h-[180px] sm:min-h-[160px]">

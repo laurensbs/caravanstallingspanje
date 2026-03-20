@@ -42,7 +42,7 @@ export default function HubPage() {
       <Header />
 
       {/* Hero */}
-      <section className="relative bg-hero text-white py-20 sm:py-36 overflow-hidden wave-divider">
+      <section className="relative bg-primary text-white py-20 sm:py-36 overflow-hidden wave-divider">
         <div className="absolute inset-0">
           <Image
             src="https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=1920&q=80"
@@ -65,7 +65,7 @@ export default function HubPage() {
               <Palmtree size={14} className="text-primary-light" />
               <span className="text-xs font-bold tracking-[0.2em] uppercase text-primary-light">Costa Brava Gids</span>
             </motion.div>
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.08] mb-5">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-[1.08] mb-5">
               Ontdek de <span className="gradient-text">Costa Brava</span>
             </h1>
             <p className="text-white/65 max-w-2xl mx-auto text-sm sm:text-lg leading-relaxed mb-8">
@@ -74,7 +74,7 @@ export default function HubPage() {
 
             {/* Search bar */}
             <div className="max-w-xl mx-auto relative">
-              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-warm-gray/50" />
+              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500/50" />
               <input
                 type="text"
                 placeholder="Zoek campings, stranden, plaatsen..."
@@ -99,9 +99,9 @@ export default function HubPage() {
 
       {/* Stats bar */}
       {data?.stats && (
-        <section className="bg-card border-b border-sand-dark/20 -mt-1 relative z-10">
+        <section className="bg-card border-b border-gray-200 -mt-1 relative z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <div className="grid grid-cols-3 sm:grid-cols-6 divide-x divide-sand-dark/15">
+            <div className="grid grid-cols-3 sm:grid-cols-6 divide-x divide-gray-200-dark/15">
               {[
                 { n: data.stats.campings, l: 'Campings' },
                 { n: data.stats.places, l: 'Plaatsen' },
@@ -111,8 +111,8 @@ export default function HubPage() {
                 { n: data.stats.blogPosts, l: 'Artikelen' },
               ].map(s => (
                 <div key={s.l} className="py-4 sm:py-5 text-center">
-                  <p className="text-lg sm:text-2xl font-black text-surface-dark">{s.n}</p>
-                  <p className="text-xs sm:text-xs text-warm-gray font-medium">{s.l}</p>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900">{s.n}</p>
+                  <p className="text-xs sm:text-xs text-gray-500 font-medium">{s.l}</p>
                 </div>
               ))}
             </div>
@@ -134,7 +134,7 @@ export default function HubPage() {
                       <cat.icon size={18} className={cat.text} />
                     </div>
                     <div>
-                      <h2 className="text-xl sm:text-2xl font-black text-surface-dark">{cat.label}</h2>
+                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900">{cat.label}</h2>
                       <div className="section-divider mt-1" />
                     </div>
                   </div>
@@ -159,9 +159,9 @@ export default function HubPage() {
       {data && Object.values(data.stats || {}).every(v => v === 0) && (
         <section className="py-20 bg-surface">
           <div className="max-w-2xl mx-auto px-4 text-center">
-            <Palmtree size={48} className="text-warm-gray/30 mx-auto mb-4" />
-            <h2 className="text-2xl font-black text-surface-dark mb-2">Hub wordt geladen</h2>
-            <p className="text-warm-gray leading-relaxed">De Costa Brava gids wordt momenteel gevuld met informatie. Kom snel terug!</p>
+            <Palmtree size={48} className="text-gray-500/30 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Hub wordt geladen</h2>
+            <p className="text-gray-500 leading-relaxed">De Costa Brava gids wordt momenteel gevuld met informatie. Kom snel terug!</p>
           </div>
         </section>
       )}
@@ -209,47 +209,47 @@ function GuideCard({ item, type }: { item: Item; type: string }) {
 
   return (
     <Link href={hrefMap[type] || '#'} className="group block min-w-[280px] sm:min-w-0 snap-start">
-      <div className="bg-card rounded-2xl overflow-hidden border border-sand-dark/15 h-full flex flex-col card-hover">
-        <div className="relative aspect-[16/10] overflow-hidden bg-sand">
+      <div className="bg-card rounded-2xl overflow-hidden border border-gray-200 h-full flex flex-col card-hover">
+        <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
           {cover ? (
             <Image src={cover} alt={name} fill sizes="(max-width: 640px) 85vw, (max-width: 1024px) 50vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-sand to-sand-dark flex items-center justify-center">
-              <MapPin size={32} className="text-warm-gray/30" />
+            <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-300 flex items-center justify-center">
+              <MapPin size={32} className="text-gray-500/30" />
             </div>
           )}
           <div className="absolute top-3 left-3 flex gap-1.5">
             {type === 'campings' && item.stars && (
-              <span className="bg-white/90 backdrop-blur-sm text-surface-dark text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5">
+              <span className="bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5">
                 <Star size={10} className="text-amber-500 fill-amber-500" /> {item.stars as number}
               </span>
             )}
             {type === 'beaches' && item.beach_type && (
-              <span className="bg-white/90 backdrop-blur-sm text-surface-dark text-xs font-bold px-2 py-0.5 rounded-full">
+              <span className="bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-bold px-2 py-0.5 rounded-full">
                 {({ zand: 'Zand', kiezel: 'Kiezel', cala: 'Cala', rots: 'Rots' } as Record<string, string>)[item.beach_type as string] || item.beach_type as string}
               </span>
             )}
             {type === 'attractions' && item.category && (
-              <span className="bg-white/90 backdrop-blur-sm text-surface-dark text-xs font-bold px-2 py-0.5 rounded-full">
+              <span className="bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-bold px-2 py-0.5 rounded-full">
                 {({ museum: 'Museum', natuur: 'Natuur', historisch: 'Historisch', activiteit: 'Activiteit', park: 'Park' } as Record<string, string>)[item.category as string] || item.category as string}
               </span>
             )}
             {type === 'restaurants' && item.price_range && (
-              <span className="bg-white/90 backdrop-blur-sm text-surface-dark text-xs font-bold px-2 py-0.5 rounded-full">
+              <span className="bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-bold px-2 py-0.5 rounded-full">
                 {item.price_range as string}
               </span>
             )}
           </div>
         </div>
         <div className="p-5 flex flex-col flex-1">
-          <h3 className="font-bold text-[15px] leading-snug text-surface-dark group-hover:text-primary transition-colors line-clamp-2 mb-1.5">{name}</h3>
+          <h3 className="font-bold text-[15px] leading-snug text-gray-900 group-hover:text-primary transition-colors line-clamp-2 mb-1.5">{name}</h3>
           {(type === 'campings' || type === 'beaches' || type === 'restaurants') && (item.town || item.place_name) && (
-            <p className="text-xs text-warm-gray flex items-center gap-1 mb-2"><MapPin size={10} /> {(item.town || item.place_name) as string}</p>
+            <p className="text-xs text-gray-500 flex items-center gap-1 mb-2"><MapPin size={10} /> {(item.town || item.place_name) as string}</p>
           )}
           {type === 'restaurants' && item.cuisine_type && (
-            <p className="text-xs text-warm-gray mb-2">{item.cuisine_type as string}</p>
+            <p className="text-xs text-gray-500 mb-2">{item.cuisine_type as string}</p>
           )}
-          {desc && <p className="text-sm text-warm-gray leading-relaxed flex-1 line-clamp-2 mb-3">{desc}</p>}
+          {desc && <p className="text-sm text-gray-500 leading-relaxed flex-1 line-clamp-2 mb-3">{desc}</p>}
           <span className="inline-flex items-center gap-1 text-primary font-semibold text-xs group-hover:gap-2 transition-all mt-auto">
             Bekijk details <ChevronRight size={12} />
           </span>

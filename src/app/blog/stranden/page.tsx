@@ -44,7 +44,7 @@ export default function StrandenPage() {
           </>
         ),
         renderMeta: (item) => (
-          <div className="flex items-center gap-1 text-xs text-warm-gray">
+          <div className="flex items-center gap-1 text-xs text-gray-500">
             {item.town && <span>{String(item.town)}</span>}
             {item.length_meters && <span>· {Number(item.length_meters)}m</span>}
           </div>

@@ -17,9 +17,9 @@ export default function BrandSlider() {
   const items = [...BRANDS, ...BRANDS];
 
   return (
-    <section className="py-8 sm:py-12 bg-surface overflow-hidden border-y border-sand-dark/[0.06]">
+    <section className="py-8 sm:py-12 bg-surface overflow-hidden border-y border-gray-300/[0.06]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-6">
-        <p className="text-xs font-bold tracking-[0.2em] uppercase text-warm-gray/50 text-center">
+        <p className="text-xs font-bold tracking-[0.2em] uppercase text-gray-500/50 text-center">
           Wij werken met alle merken
         </p>
       </div>

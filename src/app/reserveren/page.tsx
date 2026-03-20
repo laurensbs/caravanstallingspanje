@@ -243,7 +243,7 @@ function BookingPageInner() {
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <p className="text-accent-light text-xs font-bold tracking-[0.2em] uppercase mb-3">Online reserveren</p>
-            <h1 className="text-3xl sm:text-4xl font-black text-white mb-3">Reserveer uw stallingsplek</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">Reserveer uw stallingsplek</h1>
             <p className="text-white/60 text-sm max-w-lg mx-auto mb-6">In enkele stappen uw caravan veilig gestald aan de Costa Brava.</p>
             <div className="flex items-center justify-center gap-4 text-xs text-white/70">
               <span className="flex items-center gap-1.5"><Shield size={12} className="text-white/60" /> Gratis annuleren</span>
@@ -262,7 +262,7 @@ function BookingPageInner() {
               <button
                 key={i}
                 onClick={() => { if (i < step) setStep(i); }}
-                className={`flex items-center gap-1.5 text-xs font-semibold transition-colors ${i <= step ? 'text-primary' : 'text-muted'} ${i < step ? 'cursor-pointer hover:text-primary-dark' : 'cursor-default'}`}
+                className={`flex items-center gap-1.5 text-xs font-semibold transition-colors ${i <= step ? 'text-primary' : 'text-muted'} ${i < step ? 'cursor-pointer hover:text-primary-light' : 'cursor-default'}`}
               >
                 <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 transition-all duration-300 ${i < step ? 'bg-primary text-white' : i === step ? 'bg-primary text-white ring-4 ring-primary/20' : 'bg-black/[0.06] text-muted'}`}>
                   {i < step ? <CheckCircle size={12} /> : i + 1}
@@ -292,7 +292,7 @@ function BookingPageInner() {
               {step === 0 && (
                 <div className="space-y-8">
                   <div>
-                    <h2 className="text-xl font-black mb-1">Kies uw stallingtype</h2>
+                    <h2 className="text-xl font-bold mb-1">Kies uw stallingtype</h2>
                     <p className="text-sm text-muted">Alle prijzen inclusief beveiliging, verzekering en tweewekelijkse controle.</p>
                   </div>
 
@@ -318,7 +318,7 @@ function BookingPageInner() {
                         <h3 className="font-bold text-lg">{type.label}</h3>
                         <p className="text-sm text-muted mt-1 mb-4">{type.desc}</p>
                         <div className="mb-5">
-                          <span className="text-3xl font-black">€{type.price}</span>
+                          <span className="text-3xl font-bold">€{type.price}</span>
                           <span className="text-muted text-sm">/mnd</span>
                         </div>
                         <ul className="space-y-2">
@@ -337,7 +337,7 @@ function BookingPageInner() {
                       <label htmlFor="caravanLength" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Lengte caravan *</label>
                       <div className="relative">
                         <Ruler size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/40" />
-                        <select id="caravanLength" value={form.caravanLength} onChange={e => update("caravanLength", e.target.value)} required aria-required="true" aria-invalid={!!fieldErrors.caravanLength} aria-describedby={fieldErrors.caravanLength ? "err-caravanLength" : undefined} className="w-full pl-10 pr-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none appearance-none">
+                        <select id="caravanLength" value={form.caravanLength} onChange={e => update("caravanLength", e.target.value)} required aria-required="true" aria-invalid={!!fieldErrors.caravanLength} aria-describedby={fieldErrors.caravanLength ? "err-caravanLength" : undefined} className="w-full pl-10 pr-4 py-3 bg-surface border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none appearance-none">
                           <option value="">Selecteer...</option>
                           <option value="< 5m">&lt; 5 meter</option>
                           <option value="5-6m">5 - 6 meter</option>
@@ -352,7 +352,7 @@ function BookingPageInner() {
                       <label htmlFor="startDate" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Startdatum *</label>
                       <div className="relative">
                         <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/40" />
-                        <input id="startDate" type="date" value={form.startDate} onChange={e => update("startDate", e.target.value)} required aria-required="true" aria-invalid={!!fieldErrors.startDate} aria-describedby={fieldErrors.startDate ? "err-startDate" : undefined} className="w-full pl-10 pr-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="startDate" type="date" value={form.startDate} onChange={e => update("startDate", e.target.value)} required aria-required="true" aria-invalid={!!fieldErrors.startDate} aria-describedby={fieldErrors.startDate ? "err-startDate" : undefined} className="w-full pl-10 pr-4 py-3 bg-surface border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                       {fieldErrors.startDate && <p id="err-startDate" role="alert" className="text-danger text-xs mt-1">{fieldErrors.startDate}</p>}
                     </div>
@@ -360,7 +360,7 @@ function BookingPageInner() {
                       <label htmlFor="locationId" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Locatie *</label>
                       <div className="relative">
                         <MapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/40" />
-                        <select id="locationId" value={form.locationId} onChange={e => update("locationId", e.target.value)} aria-required="true" className="w-full pl-10 pr-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none appearance-none">
+                        <select id="locationId" value={form.locationId} onChange={e => update("locationId", e.target.value)} aria-required="true" className="w-full pl-10 pr-4 py-3 bg-surface border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none appearance-none">
                           <option value={1}>Sant Climent de Peralta</option>
                           <option value={2}>Pals</option>
                           <option value={3}>Blanes</option>
@@ -392,7 +392,7 @@ function BookingPageInner() {
               {step === 1 && (
                 <div className="space-y-8">
                   <div>
-                    <h2 className="text-xl font-black mb-1">Uw caravan</h2>
+                    <h2 className="text-xl font-bold mb-1">Uw caravan</h2>
                     <p className="text-sm text-muted">Vul de gegevens van uw caravan in.</p>
                   </div>
 
@@ -400,26 +400,26 @@ function BookingPageInner() {
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
                         <label htmlFor="brand" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Merk *</label>
-                        <input id="brand" value={form.brand} onChange={e => update("brand", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.brand} aria-describedby={fieldErrors.brand ? "err-brand" : undefined} placeholder="bijv. Hobby, Fendt, Knaus..." className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="brand" value={form.brand} onChange={e => update("brand", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.brand} aria-describedby={fieldErrors.brand ? "err-brand" : undefined} placeholder="bijv. Hobby, Fendt, Knaus..." className="w-full px-4 py-3 bg-surface border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                         {fieldErrors.brand && <p id="err-brand" role="alert" className="text-danger text-xs mt-1">{fieldErrors.brand}</p>}
                       </div>
                       <div>
                         <label htmlFor="model" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Model</label>
-                        <input id="model" value={form.model} onChange={e => update("model", e.target.value)} placeholder="bijv. De Luxe 490 KMF" className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="model" value={form.model} onChange={e => update("model", e.target.value)} placeholder="bijv. De Luxe 490 KMF" className="w-full px-4 py-3 bg-surface border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                     </div>
                     <div className="grid sm:grid-cols-3 gap-4">
                       <div>
                         <label htmlFor="licensePlate" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Kenteken</label>
-                        <input id="licensePlate" value={form.licensePlate} onChange={e => update("licensePlate", e.target.value)} placeholder="XX-YYY-Z" className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="licensePlate" value={form.licensePlate} onChange={e => update("licensePlate", e.target.value)} placeholder="XX-YYY-Z" className="w-full px-4 py-3 bg-surface border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                       <div>
                         <label htmlFor="year" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Bouwjaar</label>
-                        <input id="year" type="number" value={form.year} onChange={e => update("year", e.target.value)} placeholder="2020" className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="year" type="number" value={form.year} onChange={e => update("year", e.target.value)} placeholder="2020" className="w-full px-4 py-3 bg-surface border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                       <div>
                         <label htmlFor="weight" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Gewicht (kg)</label>
-                        <input id="weight" type="number" value={form.weight} onChange={e => update("weight", e.target.value)} placeholder="1500" className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="weight" type="number" value={form.weight} onChange={e => update("weight", e.target.value)} placeholder="1500" className="w-full px-4 py-3 bg-surface border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                     </div>
                     <label className="flex items-center gap-3 p-3 bg-surface rounded-xl cursor-pointer">
@@ -434,7 +434,7 @@ function BookingPageInner() {
               {step === 2 && (
                 <div className="space-y-8">
                   <div>
-                    <h2 className="text-xl font-black mb-1">Uw gegevens</h2>
+                    <h2 className="text-xl font-bold mb-1">Uw gegevens</h2>
                     <p className="text-sm text-muted">Vul uw contactgegevens in voor de reservering.</p>
                   </div>
 
@@ -442,24 +442,24 @@ function BookingPageInner() {
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
                         <label htmlFor="firstName" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Voornaam *</label>
-                        <input id="firstName" value={form.firstName} onChange={e => update("firstName", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.firstName} aria-describedby={fieldErrors.firstName ? "err-firstName" : undefined} className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="firstName" value={form.firstName} onChange={e => update("firstName", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.firstName} aria-describedby={fieldErrors.firstName ? "err-firstName" : undefined} className="w-full px-4 py-3 bg-surface border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                         {fieldErrors.firstName && <p id="err-firstName" role="alert" className="text-danger text-xs mt-1">{fieldErrors.firstName}</p>}
                       </div>
                       <div>
                         <label htmlFor="lastName" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Achternaam *</label>
-                        <input id="lastName" value={form.lastName} onChange={e => update("lastName", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.lastName} aria-describedby={fieldErrors.lastName ? "err-lastName" : undefined} className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="lastName" value={form.lastName} onChange={e => update("lastName", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.lastName} aria-describedby={fieldErrors.lastName ? "err-lastName" : undefined} className="w-full px-4 py-3 bg-surface border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                         {fieldErrors.lastName && <p id="err-lastName" role="alert" className="text-danger text-xs mt-1">{fieldErrors.lastName}</p>}
                       </div>
                     </div>
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
                         <label htmlFor="bookingEmail" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">E-mailadres *</label>
-                        <input id="bookingEmail" type="email" value={form.email} onChange={e => update("email", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.email} aria-describedby={fieldErrors.email ? "err-email" : undefined} className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="bookingEmail" type="email" value={form.email} onChange={e => update("email", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.email} aria-describedby={fieldErrors.email ? "err-email" : undefined} className="w-full px-4 py-3 bg-surface border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                         {fieldErrors.email && <p id="err-email" role="alert" className="text-danger text-xs mt-1">{fieldErrors.email}</p>}
                       </div>
                       <div>
                         <label htmlFor="bookingPhone" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Telefoonnummer *</label>
-                        <input id="bookingPhone" type="tel" value={form.phone} onChange={e => update("phone", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.phone} aria-describedby={fieldErrors.phone ? "err-phone" : undefined} placeholder="+31 6 ..." className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
+                        <input id="bookingPhone" type="tel" value={form.phone} onChange={e => update("phone", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.phone} aria-describedby={fieldErrors.phone ? "err-phone" : undefined} placeholder="+31 6 ..." className="w-full px-4 py-3 bg-surface border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                         {fieldErrors.phone && <p id="err-phone" role="alert" className="text-danger text-xs mt-1">{fieldErrors.phone}</p>}
                       </div>
                     </div>
@@ -479,7 +479,7 @@ function BookingPageInner() {
               {step === 3 && (
                 <div className="space-y-8">
                   <div>
-                    <h2 className="text-xl font-black mb-1">Extra services</h2>
+                    <h2 className="text-xl font-bold mb-1">Extra services</h2>
                     <p className="text-sm text-muted">Optioneel: voeg extra services toe aan uw boeking.</p>
                   </div>
 
@@ -501,7 +501,7 @@ function BookingPageInner() {
                           </div>
                           <div className="shrink-0 text-right">
                             <span className="text-xs text-muted line-through">\u20AC{BUNDLE_DEAL.normalPrice}</span>
-                            <span className="text-lg font-black text-primary block">\u20AC{BUNDLE_DEAL.bundlePrice}</span>
+                            <span className="text-lg font-bold text-primary block">\u20AC{BUNDLE_DEAL.bundlePrice}</span>
                           </div>
                           <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${hasBundle ? "bg-primary border-primary" : "border-zinc-300"}`}>
                             {hasBundle && <CheckCircle size={14} className="text-white" />}
@@ -512,7 +512,7 @@ function BookingPageInner() {
                   })()}
 
                   <div className="relative">
-                    <div className="absolute inset-x-0 top-1/2 border-t border-sand-dark/20" />
+                    <div className="absolute inset-x-0 top-1/2 border-t border-gray-200" />
                     <p className="relative text-center text-xs text-muted bg-surface px-3 mx-auto w-fit">of kies individuele services</p>
                   </div>
 
@@ -540,7 +540,7 @@ function BookingPageInner() {
                           {extra.onRequest ? (
                             <span className="text-xs font-semibold text-muted">Op aanvraag</span>
                           ) : (
-                            <span className="text-lg font-black">\u20AC{extra.price}</span>
+                            <span className="text-lg font-bold">\u20AC{extra.price}</span>
                           )}
                         </div>
                         {!extra.onRequest && (
@@ -594,7 +594,7 @@ function BookingPageInner() {
                       })}
                       <div className="border-t border-black/[0.06] pt-3 mt-3 flex justify-between">
                         <span className="font-bold">Maandelijks</span>
-                        <span className="font-black text-xl text-accent">€{selectedType?.price}/mnd</span>
+                        <span className="font-bold text-xl text-accent">€{selectedType?.price}/mnd</span>
                       </div>
                       {extrasTotal > 0 && (
                         <div className="flex justify-between text-sm">
@@ -615,7 +615,7 @@ function BookingPageInner() {
                       <CheckCircle size={40} className="text-success" />
                     </div>
                   </motion.div>
-                  <h2 className="text-2xl font-black mb-2">Boeking succesvol!</h2>
+                  <h2 className="text-2xl font-bold mb-2">Boeking succesvol!</h2>
                   <p className="text-muted mb-8 max-w-md mx-auto">Uw stallingsplek is gereserveerd. U ontvangt een bevestiging per e-mail.</p>
 
                   <div className="bg-surface rounded-2xl p-6 border border-black/[0.04] max-w-md mx-auto text-left space-y-3 mb-8">
@@ -635,7 +635,7 @@ function BookingPageInner() {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted">Maandtarief</span>
-                      <span className="font-black text-accent">€{selectedType?.price}/mnd</span>
+                      <span className="font-bold text-accent">€{selectedType?.price}/mnd</span>
                     </div>
                   </div>
 
@@ -661,7 +661,7 @@ function BookingPageInner() {
               <button
                 onClick={() => setStep(s => Math.max(0, s - 1))}
                 disabled={step === 0}
-                className="flex items-center gap-2 text-sm font-semibold text-muted hover:text-primary-dark transition-colors disabled:opacity-30"
+                className="flex items-center gap-2 text-sm font-semibold text-muted hover:text-primary-light transition-colors disabled:opacity-30"
               >
                 <ArrowLeft size={15} /> Vorige
               </button>
@@ -673,7 +673,7 @@ function BookingPageInner() {
                   else { if (validateStep(step)) setStep(s => s + 1); }
                 }}
                 disabled={!canProceed() || loading}
-                className="bg-accent hover:bg-accent-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-accent hover:bg-accent/90 text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>

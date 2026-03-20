@@ -38,9 +38,9 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(({
           ref={ref}
           id={selectId}
           className={`
-            w-full ${icon ? 'pl-10' : 'pl-4'} pr-8 py-3 bg-sand/40 border rounded-xl text-sm text-surface-dark
+            w-full ${icon ? 'pl-10' : 'pl-4'} pr-8 py-3 bg-gray-50 border rounded-xl text-sm text-gray-900
             focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all appearance-none
-            ${error ? 'border-danger/50' : 'border-sand-dark/40'}
+            ${error ? 'border-danger/50' : 'border-gray-300/40'}
             ${className}
           `}
           {...props}

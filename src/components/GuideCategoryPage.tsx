@@ -71,13 +71,13 @@ export default function GuideCategoryPage({ config }: { config: GuideCategoryCon
           {/* Search & filters */}
           <div className="flex flex-col sm:flex-row gap-3 mb-8">
             <div className="relative flex-1">
-              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-warm-gray/40" />
+              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500/40" />
               <input
                 type="text"
                 placeholder="Zoeken..."
                 value={search}
                 onChange={e => { setSearch(e.target.value); setPage(1); }}
-                className="w-full pl-10 pr-4 py-3 bg-card border border-sand-dark/20 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                className="w-full pl-10 pr-4 py-3 bg-card border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20"
               />
             </div>
             {config.filters?.map(f => (
@@ -85,7 +85,7 @@ export default function GuideCategoryPage({ config }: { config: GuideCategoryCon
                 key={f.key}
                 value={filters[f.key] || ''}
                 onChange={e => { setFilters(prev => ({ ...prev, [f.key]: e.target.value })); setPage(1); }}
-                className="px-4 py-3 bg-card border border-sand-dark/20 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                className="px-4 py-3 bg-card border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20"
               >
                 <option value="">{f.label}</option>
                 {f.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -94,17 +94,17 @@ export default function GuideCategoryPage({ config }: { config: GuideCategoryCon
           </div>
 
           {/* Results count */}
-          <p className="text-sm text-warm-gray mb-6">{total} resultaten</p>
+          <p className="text-sm text-gray-500 mb-6">{total} resultaten</p>
 
           {/* Grid */}
           {loading ? (
             <div className="py-20 text-center">
               <Loader2 size={24} className="animate-spin text-primary mx-auto mb-2" />
-              <p className="text-sm text-warm-gray">Laden...</p>
+              <p className="text-sm text-gray-500">Laden...</p>
             </div>
           ) : items.length === 0 ? (
             <div className="py-20 text-center">
-              <p className="text-warm-gray">Geen resultaten gevonden. Probeer een andere zoekterm.</p>
+              <p className="text-gray-500">Geen resultaten gevonden. Probeer een andere zoekterm.</p>
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -122,7 +122,7 @@ export default function GuideCategoryPage({ config }: { config: GuideCategoryCon
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="w-9 h-9 rounded-lg bg-card border border-sand-dark/20 flex items-center justify-center text-warm-gray disabled:opacity-30"
+                className="w-9 h-9 rounded-lg bg-card border border-gray-200 flex items-center justify-center text-gray-500 disabled:opacity-30"
               >
                 <ChevronLeft size={16} />
               </button>
@@ -133,11 +133,11 @@ export default function GuideCategoryPage({ config }: { config: GuideCategoryCon
                   const showEllipsis = prev && p - prev > 1;
                   return (
                     <span key={p}>
-                      {showEllipsis && <span className="px-1 text-warm-gray/40">...</span>}
+                      {showEllipsis && <span className="px-1 text-gray-500/40">...</span>}
                       <button
                         onClick={() => setPage(p)}
                         className={`w-9 h-9 rounded-lg text-xs font-semibold transition-colors ${
-                          p === page ? 'bg-primary text-white' : 'bg-card border border-sand-dark/20 text-warm-gray hover:bg-sand/50'
+                          p === page ? 'bg-primary text-white' : 'bg-card border border-gray-200 text-gray-500 hover:bg-gray-50'
                         }`}
                       >
                         {p}
@@ -148,7 +148,7 @@ export default function GuideCategoryPage({ config }: { config: GuideCategoryCon
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="w-9 h-9 rounded-lg bg-card border border-sand-dark/20 flex items-center justify-center text-warm-gray disabled:opacity-30"
+                className="w-9 h-9 rounded-lg bg-card border border-gray-200 flex items-center justify-center text-gray-500 disabled:opacity-30"
               >
                 <ChevronRight size={16} />
               </button>
@@ -184,13 +184,13 @@ function CategoryCard({ item, basePath, renderBadges, renderMeta }: {
 
   return (
     <Link href={`${basePath}/${item.slug}`} className="group block h-full">
-      <div className="bg-card rounded-2xl overflow-hidden border border-sand-dark/15 h-full flex flex-col card-hover">
-        <div className="relative aspect-[16/10] overflow-hidden bg-sand">
+      <div className="bg-card rounded-2xl overflow-hidden border border-gray-200 h-full flex flex-col card-hover">
+        <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
           {cover ? (
             <Image src={cover} alt={name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-sand to-sand-dark flex items-center justify-center">
-              <MapPin size={32} className="text-warm-gray/30" />
+            <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-300 flex items-center justify-center">
+              <MapPin size={32} className="text-gray-500/30" />
             </div>
           )}
           {renderBadges && (
@@ -198,9 +198,9 @@ function CategoryCard({ item, basePath, renderBadges, renderMeta }: {
           )}
         </div>
         <div className="p-5 flex flex-col flex-1">
-          <h3 className="font-bold text-[15px] leading-snug text-surface-dark group-hover:text-primary transition-colors mb-1.5 line-clamp-2">{name}</h3>
+          <h3 className="font-bold text-[15px] leading-snug text-gray-900 group-hover:text-primary transition-colors mb-1.5 line-clamp-2">{name}</h3>
           {renderMeta && <div className="mb-2">{renderMeta(item)}</div>}
-          {desc && <p className="text-sm text-warm-gray leading-relaxed flex-1 line-clamp-3 mb-3">{desc}</p>}
+          {desc && <p className="text-sm text-gray-500 leading-relaxed flex-1 line-clamp-3 mb-3">{desc}</p>}
           <span className="inline-flex items-center gap-1 text-primary font-semibold text-xs group-hover:gap-2 transition-all mt-auto">
             Meer informatie <ChevronRight size={12} />
           </span>

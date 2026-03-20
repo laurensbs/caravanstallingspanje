@@ -51,15 +51,15 @@ export default function Modal({ open, onClose, title, description, children, siz
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.2, ease: [0.25, 0.4, 0.25, 1] }}
-            className={`relative bg-white rounded-2xl shadow-2xl border border-sand-dark/20 w-full ${sizes[size]} max-h-[90vh] overflow-y-auto`}
+            className={`relative bg-white rounded-2xl shadow-2xl border border-gray-200 w-full ${sizes[size]} max-h-[90vh] overflow-y-auto`}
           >
             {title && (
               <div className="flex items-start justify-between p-6 pb-0">
                 <div>
-                  <h3 className="text-lg font-bold text-surface-dark">{title}</h3>
-                  {description && <p className="text-sm text-warm-gray mt-1">{description}</p>}
+                  <h3 className="text-lg font-bold text-gray-900">{title}</h3>
+                  {description && <p className="text-sm text-gray-500 mt-1">{description}</p>}
                 </div>
-                <button onClick={onClose} className="p-1.5 hover:bg-sand rounded-lg transition-colors text-warm-gray hover:text-surface-dark" aria-label="Sluiten">
+                <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-900" aria-label="Sluiten">
                   <X size={18} />
                 </button>
               </div>

@@ -23,7 +23,7 @@ export default function AdminGidsBlogPage() {
           { key: 'title', label: 'Titel' },
           { key: 'category', label: 'Categorie' },
           { key: 'is_published', label: 'Status', render: (item) => (
-            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${item.is_published ? 'bg-accent/10 text-accent' : 'bg-warm-gray/10 text-warm-gray'}`}>
+            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${item.is_published ? 'bg-accent/10 text-accent' : 'bg-warm-gray/10 text-gray-500'}`}>
               {item.is_published ? 'Gepubliceerd' : 'Concept'}
             </span>
           )},

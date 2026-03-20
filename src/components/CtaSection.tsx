@@ -16,16 +16,13 @@ interface CtaSectionProps {
 }
 
 export default function CtaSection({ title, subtitle, hours, primaryLabel, primaryHref = '/contact', onPrimaryClick, primaryColor = 'primary', secondaryPhone = true, secondaryLabel, secondaryHref }: CtaSectionProps) {
-  const btnColor = primaryColor === 'accent' ? 'bg-accent hover:bg-accent-dark' : 'bg-primary hover:bg-primary-dark';
+  const btnColor = primaryColor === 'accent' ? 'bg-accent hover:bg-accent/90' : 'bg-primary hover:bg-primary-light';
   return (
-    <section className="bg-hero relative overflow-hidden curve-divider-top">
-      <div className="absolute inset-0 dot-pattern opacity-15" />
-      <div className="absolute -top-20 -left-20 w-72 h-72 bg-primary/8 rounded-full blur-3xl animate-float-slow pointer-events-none" />
-      <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-accent/6 rounded-full blur-3xl animate-float-reverse pointer-events-none" />
+    <section className="bg-primary relative overflow-hidden">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center relative">
         <AnimateIn>
-          <h2 className="text-2xl sm:text-4xl font-black text-white mb-4">{title}</h2>
-          <p className="text-white/55 mb-4 max-w-lg mx-auto leading-relaxed">{subtitle}</p>
+          <h2 className="text-2xl sm:text-4xl font-bold text-white mb-4">{title}</h2>
+          <p className="text-white/75 mb-4 max-w-lg mx-auto leading-relaxed">{subtitle}</p>
           {hours && <p className="text-white/70 text-sm mb-8">{hours}</p>}
           {!hours && <div className="mb-4" />}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">

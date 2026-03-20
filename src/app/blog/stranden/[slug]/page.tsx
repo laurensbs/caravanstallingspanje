@@ -29,10 +29,10 @@ export default function StrandDetailPage() {
         ),
         renderInfo: (item) => (
           <div className="space-y-3 text-sm">
-            {item.beach_type && <div className="flex justify-between"><span className="text-warm-gray">Type</span><span className="font-semibold">{beachTypeLabels[String(item.beach_type)] || String(item.beach_type)}</span></div>}
-            {item.length_meters && <div className="flex justify-between"><span className="text-warm-gray">Lengte</span><span className="font-semibold">{Number(item.length_meters)}m</span></div>}
-            {item.town && <div className="flex justify-between"><span className="text-warm-gray">Plaats</span><span className="font-semibold">{String(item.town)}</span></div>}
-            {item.blue_flag && <div className="flex justify-between"><span className="text-warm-gray">Blue Flag</span><span className="font-semibold text-blue-500">Ja</span></div>}
+            {item.beach_type && <div className="flex justify-between"><span className="text-gray-500">Type</span><span className="font-semibold">{beachTypeLabels[String(item.beach_type)] || String(item.beach_type)}</span></div>}
+            {item.length_meters && <div className="flex justify-between"><span className="text-gray-500">Lengte</span><span className="font-semibold">{Number(item.length_meters)}m</span></div>}
+            {item.town && <div className="flex justify-between"><span className="text-gray-500">Plaats</span><span className="font-semibold">{String(item.town)}</span></div>}
+            {item.blue_flag && <div className="flex justify-between"><span className="text-gray-500">Blue Flag</span><span className="font-semibold text-blue-500">Ja</span></div>}
           </div>
         ),
         renderAmenities: (item) => {
@@ -40,7 +40,7 @@ export default function StrandDetailPage() {
           if (facilities.length === 0) return null;
           return (
             <>
-              <h2 className="text-lg font-black mb-3">Voorzieningen</h2>
+              <h2 className="text-lg font-bold mb-3">Voorzieningen</h2>
               <div className="flex flex-wrap gap-2">
                 {facilities.map(f => <span key={f} className="bg-ocean/10 text-ocean text-xs font-medium px-3 py-1.5 rounded-full">{f}</span>)}
               </div>

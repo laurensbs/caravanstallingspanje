@@ -4,7 +4,7 @@ export default function Skeleton({ className = '', count = 1 }: { className?: st
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className={`animate-shimmer rounded-xl bg-gradient-to-r from-sand via-sand/40 to-sand ${className}`}
+          className={`animate-shimmer rounded-xl bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100 ${className}`}
         />
       ))}
     </>

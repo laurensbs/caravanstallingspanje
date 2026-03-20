@@ -42,7 +42,7 @@ export default function StaffTakenPage() {
 
   return (
     <div>
-      <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="text-xl md:text-2xl font-black text-surface-dark mb-5">Mijn taken</motion.h1>
+      <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="text-xl md:text-2xl font-bold text-gray-900 mb-5">Mijn taken</motion.h1>
 
       {/* Filter pills - scrollable on mobile */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="card-premium mb-5 p-3">
@@ -53,7 +53,7 @@ export default function StaffTakenPage() {
             { v: 'afgerond', label: 'Klaar' },
             { v: '', label: 'Alle' },
           ].map(s => (
-            <button key={s.v} onClick={() => setStatusFilter(s.v)} className={`px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${statusFilter === s.v ? 'bg-gradient-to-r from-accent to-accent-dark text-white shadow-lg shadow-accent/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>
+            <button key={s.v} onClick={() => setStatusFilter(s.v)} className={`px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${statusFilter === s.v ? 'bg-gradient-to-r from-accent to-accent-dark text-white shadow-lg shadow-accent/20' : 'bg-gray-50 hover:bg-gray-300/20 text-gray-500'}`}>
               {s.label}
             </button>
           ))}
@@ -62,7 +62,7 @@ export default function StaffTakenPage() {
 
       {/* Task count */}
       {!loading && tasks.length > 0 && (
-        <p className="text-xs text-warm-gray/70 mb-3 px-1">{tasks.length} {tasks.length === 1 ? 'taak' : 'taken'}</p>
+        <p className="text-xs text-gray-500/70 mb-3 px-1">{tasks.length} {tasks.length === 1 ? 'taak' : 'taken'}</p>
       )}
 
       {/* Task list */}
@@ -76,7 +76,7 @@ export default function StaffTakenPage() {
             <div className="w-14 h-14 bg-gradient-to-br from-accent/15 to-accent/5 rounded-2xl flex items-center justify-center mx-auto mb-3">
               <CheckCircle size={22} className="text-accent" />
             </div>
-            <p className="text-sm text-warm-gray/70 font-bold">
+            <p className="text-sm text-gray-500/70 font-bold">
               {statusFilter === 'open' ? 'Geen openstaande taken!' : 'Geen taken gevonden'}
             </p>
           </motion.div>
@@ -93,14 +93,14 @@ export default function StaffTakenPage() {
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <h3 className="text-sm font-bold text-surface-dark truncate">{t.title}</h3>
+                      <h3 className="text-sm font-bold text-gray-900 truncate">{t.title}</h3>
                     </div>
-                    {t.description && <p className="text-xs text-warm-gray/70 line-clamp-2">{t.description}</p>}
+                    {t.description && <p className="text-xs text-gray-500/70 line-clamp-2">{t.description}</p>}
                     <div className="flex items-center gap-3 mt-1.5">
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${PRIORITY_COLORS[t.priority]}`}>{t.priority}</span>
-                      {t.location_name && <span className="text-xs text-warm-gray/70">{t.location_name}</span>}
+                      {t.location_name && <span className="text-xs text-gray-500/70">{t.location_name}</span>}
                       {t.due_date && (
-                        <span className={`text-xs ${overdue ? 'text-danger font-bold' : 'text-warm-gray/70'}`}>
+                        <span className={`text-xs ${overdue ? 'text-danger font-bold' : 'text-gray-500/70'}`}>
                           {overdue && '⚠ '}{fmtDate(t.due_date)}
                         </span>
                       )}

@@ -75,7 +75,7 @@ export default function ImageUploadZone({
 
   if (!entityId) {
     return (
-      <div className="border-2 border-dashed border-sand-dark/30 rounded-xl p-8 text-center text-warm-gray/60 text-sm">
+      <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center text-gray-500/60 text-sm">
         Sla het item eerst op voordat je afbeeldingen kunt uploaden
       </div>
     );
@@ -90,7 +90,7 @@ export default function ImageUploadZone({
         onDrop={handleDrop}
         onClick={() => fileRef.current?.click()}
         className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
-          dragOver ? 'border-primary bg-primary/5' : 'border-sand-dark/30 hover:border-primary/50 hover:bg-sand/30'
+          dragOver ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50 hover:bg-gray-50'
         }`}
       >
         <input
@@ -108,9 +108,9 @@ export default function ImageUploadZone({
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2">
-            <Upload size={24} className="text-warm-gray/40" />
-            <p className="text-sm text-warm-gray/70">Sleep afbeeldingen of klik om te uploaden</p>
-            <p className="text-xs text-warm-gray/40">JPEG, PNG, WebP, AVIF — max 5MB</p>
+            <Upload size={24} className="text-gray-500/40" />
+            <p className="text-sm text-gray-500/70">Sleep afbeeldingen of klik om te uploaden</p>
+            <p className="text-xs text-gray-500/40">JPEG, PNG, WebP, AVIF — max 5MB</p>
           </div>
         )}
       </div>
@@ -126,7 +126,7 @@ export default function ImageUploadZone({
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
                 <button
                   onClick={() => handleSetCover(img.id)}
-                  className={`p-1.5 rounded-lg ${img.is_cover ? 'bg-primary text-white' : 'bg-white/90 text-warm-gray hover:bg-primary hover:text-white'} transition-colors`}
+                  className={`p-1.5 rounded-lg ${img.is_cover ? 'bg-primary text-white' : 'bg-white/90 text-gray-500 hover:bg-primary hover:text-white'} transition-colors`}
                   title="Stel in als cover"
                 >
                   <Star size={14} />

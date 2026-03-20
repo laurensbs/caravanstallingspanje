@@ -185,7 +185,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-primary-light rounded-2xl mb-6 shadow-lg shadow-primary/20">
               <Shield className="text-white" size={28} />
             </div>
-            <h1 className="text-white font-black text-3xl tracking-tight">Beheerportaal</h1>
+            <h1 className="text-white font-bold text-3xl tracking-tight">Beheerportaal</h1>
             <p className="text-white/70 text-sm mt-3">Caravanstalling Spanje</p>
           </div>
 
@@ -290,12 +290,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   let lastSection = '';
 
   return (
-    <div className="flex h-screen bg-sand/40 overflow-hidden">
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
       {/* Sidebar */}
       <aside className={`fixed inset-y-0 left-0 z-40 w-[270px] bg-surface-dark transform transition-transform md:relative md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center justify-between h-16 px-5 border-b border-white/[0.06]">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-lg flex items-center justify-center text-white text-xs font-black">CS</div>
+            <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-lg flex items-center justify-center text-white text-xs font-bold">CS</div>
             <div>
               <span className="text-white font-bold text-sm block leading-tight">Caravanstalling</span>
               <span className="text-white/70 text-xs">{role === 'admin' ? 'Admin Panel' : 'Staff Portal'}</span>
@@ -339,29 +339,29 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
-        <header className="h-16 bg-surface border-b border-sand-dark/30 flex items-center justify-between px-6 shrink-0">
+        <header className="h-16 bg-surface border-b border-gray-200 flex items-center justify-between px-6 shrink-0">
           <div className="flex items-center gap-3">
-            <button className="md:hidden text-warm-gray/70 hover:text-warm-gray" onClick={() => setSidebarOpen(true)} aria-label="Menu openen"><Menu size={20} /></button>
-            <div className="flex items-center gap-2 bg-sand/40 rounded-xl px-3.5 py-2.5 w-full md:w-80 border border-sand-dark/20 relative">
-              <Search size={15} className="text-warm-gray/50" />
+            <button className="md:hidden text-gray-500/70 hover:text-gray-500" onClick={() => setSidebarOpen(true)} aria-label="Menu openen"><Menu size={20} /></button>
+            <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3.5 py-2.5 w-full md:w-80 border border-gray-200 relative">
+              <Search size={15} className="text-gray-500/50" />
               <input
                 placeholder="Zoek klanten, caravans, contracten..."
-                className="bg-transparent text-sm outline-none flex-1 text-warm-gray placeholder:text-warm-gray/50"
+                className="bg-transparent text-sm outline-none flex-1 text-gray-500 placeholder:text-gray-500/50"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 onFocus={() => { if (searchResults.length > 0) setShowSearch(true); }}
                 onBlur={() => setTimeout(() => setShowSearch(false), 200)}
               />
               {showSearch && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-surface rounded-xl border border-sand-dark/20 shadow-xl z-50 max-h-80 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-surface rounded-xl border border-gray-200 shadow-xl z-50 max-h-80 overflow-y-auto">
                   {searching ? (
-                    <div className="p-4 text-center text-sm text-warm-gray/70">Zoeken...</div>
+                    <div className="p-4 text-center text-sm text-gray-500/70">Zoeken...</div>
                   ) : searchResults.length === 0 ? (
-                    <div className="p-4 text-center text-sm text-warm-gray/70">Geen resultaten</div>
+                    <div className="p-4 text-center text-sm text-gray-500/70">Geen resultaten</div>
                   ) : searchResults.map((r, i) => (
-                    <Link key={i} href={r.href} className="flex items-center gap-3 px-4 py-3 hover:bg-sand/40 transition-colors border-b border-sand-dark/10 last:border-0">
-                      <span className="text-xs font-bold text-warm-gray/50 uppercase w-16 shrink-0">{r.type}</span>
-                      <span className="text-sm text-surface-dark truncate">{r.label}</span>
+                    <Link key={i} href={r.href} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0">
+                      <span className="text-xs font-bold text-gray-500/50 uppercase w-16 shrink-0">{r.type}</span>
+                      <span className="text-sm text-gray-900 truncate">{r.label}</span>
                     </Link>
                   ))}
                 </div>
@@ -370,25 +370,25 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </div>
           <div className="flex items-center gap-4">
             <div className="relative">
-              <button onClick={() => setShowNotifications(!showNotifications)} className="relative text-warm-gray/50 hover:text-warm-gray transition-colors" aria-label="Notificaties">
+              <button onClick={() => setShowNotifications(!showNotifications)} className="relative text-gray-500/50 hover:text-gray-500 transition-colors" aria-label="Notificaties">
                 <Bell size={19} />
                 {unreadCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[9px] font-bold rounded-full flex items-center justify-center">{unreadCount}</span>}
               </button>
               {showNotifications && (
-                <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-surface rounded-xl border border-sand-dark/20 shadow-xl z-50 max-h-96 overflow-y-auto">
-                  <div className="p-3 border-b border-sand-dark/20 flex items-center justify-between">
-                    <span className="text-sm font-bold text-surface-dark">Notificaties</span>
+                <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-surface rounded-xl border border-gray-200 shadow-xl z-50 max-h-96 overflow-y-auto">
+                  <div className="p-3 border-b border-gray-200 flex items-center justify-between">
+                    <span className="text-sm font-bold text-gray-900">Notificaties</span>
                     {unreadCount > 0 && <span className="text-xs font-bold text-primary">{unreadCount} nieuw</span>}
                   </div>
                   {notifications.length === 0 ? (
-                    <div className="p-6 text-center text-sm text-warm-gray/70">Geen notificaties</div>
+                    <div className="p-6 text-center text-sm text-gray-500/70">Geen notificaties</div>
                   ) : notifications.map(n => (
-                    <div key={n.id} className={`px-4 py-3 border-b border-sand-dark/10 last:border-0 ${!n.read ? 'bg-primary/[0.03]' : ''}`}>
+                    <div key={n.id} className={`px-4 py-3 border-b border-gray-100 last:border-0 ${!n.read ? 'bg-primary/[0.03]' : ''}`}>
                       <div className="flex items-start gap-2">
                         {!n.read && <div className="w-2 h-2 bg-primary rounded-full mt-1.5 shrink-0" />}
                         <div>
-                          <p className="text-sm text-surface-dark">{n.message}</p>
-                          <p className="text-xs text-warm-gray/50 mt-0.5">{new Date(n.created_at).toLocaleString('nl-NL', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' })}</p>
+                          <p className="text-sm text-gray-900">{n.message}</p>
+                          <p className="text-xs text-gray-500/50 mt-0.5">{new Date(n.created_at).toLocaleString('nl-NL', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' })}</p>
                         </div>
                       </div>
                     </div>
@@ -396,20 +396,20 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 </div>
               )}
             </div>
-            <div className="h-6 w-px bg-sand" />
+            <div className="h-6 w-px bg-gray-100" />
             <div className="flex items-center gap-2.5 text-sm">
               <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-sm shadow-primary/20">{userName.charAt(0)}</div>
               <div className="hidden md:block">
-                <p className="font-semibold text-sm text-surface-dark">{userName}</p>
-                <p className="text-xs text-warm-gray/70">{role}</p>
+                <p className="font-semibold text-sm text-gray-900">{userName}</p>
+                <p className="text-xs text-gray-500/70">{role}</p>
               </div>
-              <ChevronDown size={14} className="text-warm-gray/50" />
+              <ChevronDown size={14} className="text-gray-500/50" />
             </div>
           </div>
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 bg-sand/40">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-50">
           {children}
         </main>
       </div>

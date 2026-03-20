@@ -24,11 +24,11 @@ export default function CampingDetailPage() {
         renderInfo: (item) => (
           <div className="space-y-3 text-sm">
             {Number(item.stars) > 0 && (
-              <div className="flex justify-between"><span className="text-warm-gray">Sterren</span><span className="font-semibold flex items-center gap-1">{Array.from({ length: Number(item.stars) }).map((_, i) => <Star key={i} size={12} fill="#EAB308" className="text-yellow-500" />)}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Sterren</span><span className="font-semibold flex items-center gap-1">{Array.from({ length: Number(item.stars) }).map((_, i) => <Star key={i} size={12} fill="#EAB308" className="text-yellow-500" />)}</span></div>
             )}
-            {item.price_range && <div className="flex justify-between"><span className="text-warm-gray">Prijsklasse</span><span className="font-semibold">{String(item.price_range)}</span></div>}
-            {item.town && <div className="flex justify-between"><span className="text-warm-gray">Plaats</span><span className="font-semibold">{String(item.town)}</span></div>}
-            {item.region && <div className="flex justify-between"><span className="text-warm-gray">Regio</span><span className="font-semibold">{String(item.region)}</span></div>}
+            {item.price_range && <div className="flex justify-between"><span className="text-gray-500">Prijsklasse</span><span className="font-semibold">{String(item.price_range)}</span></div>}
+            {item.town && <div className="flex justify-between"><span className="text-gray-500">Plaats</span><span className="font-semibold">{String(item.town)}</span></div>}
+            {item.region && <div className="flex justify-between"><span className="text-gray-500">Regio</span><span className="font-semibold">{String(item.region)}</span></div>}
           </div>
         ),
         renderAmenities: (item) => {
@@ -39,15 +39,15 @@ export default function CampingDetailPage() {
             <>
               {amenities.length > 0 && (
                 <>
-                  <h2 className="text-lg font-black mb-3">Voorzieningen</h2>
+                  <h2 className="text-lg font-bold mb-3">Voorzieningen</h2>
                   <div className="flex flex-wrap gap-2 mb-6">
-                    {amenities.map(a => <span key={a} className="bg-sand text-surface-dark text-xs font-medium px-3 py-1.5 rounded-full">{a}</span>)}
+                    {amenities.map(a => <span key={a} className="bg-gray-100 text-gray-900 text-xs font-medium px-3 py-1.5 rounded-full">{a}</span>)}
                   </div>
                 </>
               )}
               {highlights.length > 0 && (
                 <>
-                  <h2 className="text-lg font-black mb-3">Highlights</h2>
+                  <h2 className="text-lg font-bold mb-3">Highlights</h2>
                   <div className="flex flex-wrap gap-2">
                     {highlights.map(h => <span key={h} className="bg-primary/10 text-primary text-xs font-medium px-3 py-1.5 rounded-full">{h}</span>)}
                   </div>

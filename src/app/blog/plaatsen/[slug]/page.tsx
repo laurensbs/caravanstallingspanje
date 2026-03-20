@@ -18,8 +18,8 @@ export default function PlaatsDetailPage() {
         ),
         renderInfo: (item) => (
           <div className="space-y-3 text-sm">
-            {item.region && <div className="flex justify-between"><span className="text-warm-gray">Regio</span><span className="font-semibold">{String(item.region)}</span></div>}
-            {item.population && <div className="flex justify-between"><span className="text-warm-gray">Inwoners</span><span className="font-semibold">{Number(item.population).toLocaleString('nl-NL')}</span></div>}
+            {item.region && <div className="flex justify-between"><span className="text-gray-500">Regio</span><span className="font-semibold">{String(item.region)}</span></div>}
+            {item.population && <div className="flex justify-between"><span className="text-gray-500">Inwoners</span><span className="font-semibold">{Number(item.population).toLocaleString('nl-NL')}</span></div>}
           </div>
         ),
         renderAmenities: (item) => {
@@ -27,7 +27,7 @@ export default function PlaatsDetailPage() {
           if (highlights.length === 0) return null;
           return (
             <>
-              <h2 className="text-lg font-black mb-3">Bezienswaardigheden</h2>
+              <h2 className="text-lg font-bold mb-3">Bezienswaardigheden</h2>
               <div className="flex flex-wrap gap-2">
                 {highlights.map(h => <span key={h} className="bg-accent/10 text-accent text-xs font-medium px-3 py-1.5 rounded-full">{h}</span>)}
               </div>

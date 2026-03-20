@@ -70,7 +70,7 @@ export default function DienstenPage() {
       </PageHero>
 
       {/* Sticky service nav */}
-      <nav className="sticky top-16 z-30 bg-card/95 backdrop-blur-xl border-b border-sand-dark/20 shadow-sm">
+      <nav className="sticky top-16 z-30 bg-card/95 backdrop-blur-xl border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex gap-1 overflow-x-auto py-2.5 no-scrollbar relative">
             {[
@@ -82,7 +82,7 @@ export default function DienstenPage() {
               { icon: Bike, label: 'Verhuur', href: '#verhuur', id: 'verhuur' },
               { icon: SprayCan, label: 'Schoonmaak', href: '#schoonmaak', id: 'schoonmaak' },
             ].map(s => (
-              <a key={s.label} href={s.href} className={`flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 ${activeSection === s.id ? 'text-primary bg-primary/8' : 'text-warm-gray hover:text-primary hover:bg-primary/5'}`}>
+              <a key={s.label} href={s.href} className={`flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 ${activeSection === s.id ? 'text-primary bg-primary/8' : 'text-gray-500 hover:text-primary hover:bg-primary/5'}`}>
                 <s.icon size={13} /> {s.label}
               </a>
             ))}
@@ -91,7 +91,7 @@ export default function DienstenPage() {
       </nav>
 
       {/* Compact service overview grid */}
-      <section className="py-8 sm:py-12 bg-surface border-b border-sand-dark/20">
+      <section className="py-8 sm:py-12 bg-surface border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
             {[
@@ -106,7 +106,7 @@ export default function DienstenPage() {
               <a key={s.label} href={s.href} className="card-premium p-4 text-center shine-on-hover group">
                 <s.icon size={20} className={`${s.color} mx-auto mb-2 group-hover:scale-110 transition-transform`} />
                 <p className="text-xs font-bold">{s.label}</p>
-                <p className="text-[10px] text-warm-gray mt-0.5">{s.price}</p>
+                <p className="text-[10px] text-gray-500 mt-0.5">{s.price}</p>
               </a>
             ))}
           </div>
@@ -124,11 +124,11 @@ export default function DienstenPage() {
                   <div className="w-12 h-12 bg-accent/10 text-accent rounded-xl flex items-center justify-center"><Shield size={22} /></div>
                   <span className="text-xs font-bold bg-accent/8 text-accent px-3 py-1 rounded-full uppercase tracking-wider">Buiten &amp; Binnen</span>
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-black mb-4">Beveiligde caravanstalling</h2>
-                <p className="text-warm-gray leading-relaxed mb-4">
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4">Beveiligde caravanstalling</h2>
+                <p className="text-gray-500 leading-relaxed mb-4">
                   Onze caravanstalling ligt in het prachtige Sant Climent de Peralta, aan de Costa Brava. Wij zijn dé specialist in het veilig en betrouwbaar stallen van caravans, campers, vouwwagens en boten. Al meer dan 20 jaar vertrouwen honderden eigenaren hun caravan aan ons toe.
                 </p>
-                <p className="text-warm-gray leading-relaxed mb-6">
+                <p className="text-gray-500 leading-relaxed mb-6">
                   Alle locaties zijn beveiligd met Securitas Direct alarmsysteem en 24/7 camerabewaking. Uw caravan is op onze stalling standaard verzekerd tegen schade en diefstal. Elke 2 weken worden alle caravans gecontroleerd op schades die kunnen ontstaan door weersomstandigheden. Jaarlijks voeren wij een volledige technische keuring uit.
                 </p>
 
@@ -145,19 +145,19 @@ export default function DienstenPage() {
                   ))}
                 </div>
 
-                <div className="flex items-center gap-6 mb-8 p-4 bg-sand/50 rounded-xl border border-sand-dark/20">
+                <div className="flex items-center gap-6 mb-8 p-4 bg-gray-50 rounded-xl border border-gray-200">
                   <div className="text-center">
-                    <p className="text-2xl font-black">€65</p>
-                    <p className="text-xs text-warm-gray font-medium">Buiten /mnd</p>
+                    <p className="text-2xl font-bold">€65</p>
+                    <p className="text-xs text-gray-500 font-medium">Buiten /mnd</p>
                   </div>
-                  <div className="w-px h-10 bg-sand-dark/30" />
+                  <div className="w-px h-10 bg-gray-200" />
                   <div className="text-center">
-                    <p className="text-2xl font-black">€95</p>
-                    <p className="text-xs text-warm-gray font-medium">Binnen /mnd</p>
+                    <p className="text-2xl font-bold">€95</p>
+                    <p className="text-xs text-gray-500 font-medium">Binnen /mnd</p>
                   </div>
                 </div>
 
-                <Link href="/stalling" className="bg-accent hover:bg-accent-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2">
+                <Link href="/stalling" className="bg-accent hover:bg-accent/90 text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2">
                   Bekijk stallingsopties <ArrowRight size={14} />
                 </Link>
               </div>
@@ -190,11 +190,11 @@ export default function DienstenPage() {
                   <div className="w-12 h-12 bg-ocean/10 text-ocean rounded-xl flex items-center justify-center"><Wrench size={22} /></div>
                   <span className="text-xs font-bold bg-ocean/8 text-ocean px-3 py-1 rounded-full uppercase tracking-wider">Werkplaats</span>
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-black mb-4">Reparatie &amp; onderhoud</h2>
-                <p className="text-warm-gray leading-relaxed mb-4">
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4">Reparatie &amp; onderhoud</h2>
+                <p className="text-gray-500 leading-relaxed mb-4">
                   Heeft u pech met uw caravan aan de Costa Brava? Of wilt u uw caravan laten checken voor het volgende seizoen? Onze goed uitgeruste werkplaats met ervaren monteurs helpt u met alle voorkomende reparaties en onderhoudswerkzaamheden. Van het wisselen van banden tot remrevisies, van dakluiken en ramen tot de airconditioning.
                 </p>
-                <p className="text-warm-gray leading-relaxed mb-6">
+                <p className="text-gray-500 leading-relaxed mb-6">
                   Wij besteden het hele jaar door aandacht aan uw caravan. Naast de technische aspecten zoals banden, remmen en verlichting verzorgen wij ook reparaties aan het interieur en exterieur. Alle merken en typen caravans zijn welkom. Twijfel niet en laat uw caravan voor de zekerheid bij ons checken, zodat u veilig op weg gaat.
                 </p>
 
@@ -234,7 +234,7 @@ export default function DienstenPage() {
             <div className="inline-flex items-center gap-2 bg-white/10 text-primary-light px-4 py-1.5 rounded-full text-xs font-bold mb-3">
               <Award size={14} /> Officieel Masterdealer
             </div>
-            <h2 className="text-2xl sm:text-4xl font-black mb-3 text-white">CaravanRepair® schadeherstel</h2>
+            <h2 className="text-2xl sm:text-4xl font-bold mb-3 text-white">CaravanRepair® schadeherstel</h2>
             <div className="divider-animated mt-3 mb-4" />
             <p className="text-white/60 leading-relaxed text-sm sm:text-base">
               CaravanRepair® is de grootste keten van erkende caravan- en camperschadespecialisten in Nederland en Europa. Caravanstalling Spanje is officieel CaravanRepair® Masterdealer — het hoogste niveau binnen het dealernetwerk.
@@ -244,7 +244,7 @@ export default function DienstenPage() {
           <A>
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
               <div>
-                <h3 className="text-xl font-black mb-4 text-white">Gepatenteerd reparatiesysteem</h3>
+                <h3 className="text-xl font-bold mb-4 text-white">Gepatenteerd reparatiesysteem</h3>
                 <p className="text-white/60 leading-relaxed mb-4">
                   Dankzij het gepatenteerde CaravanRepair® systeem zijn wij in staat om alle geprofileerde caravan- en camperwanden volledig onzichtbaar te herstellen. Of het nu gaat om een kleine deuk, hagelschade, een scheur, vochtschade, krassen of schade door een aanrijding — bij ons bent u aan het juiste adres.
                 </p>
@@ -308,7 +308,7 @@ export default function DienstenPage() {
 
           <A>
             <div className="mt-12 text-center">
-              <button onClick={() => openQuiz('schadeherstel')} className="bg-primary hover:bg-primary-dark text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-lg shadow-primary/20 hover:shadow-xl hover:-translate-y-0.5 cursor-pointer">
+              <button onClick={() => openQuiz('schadeherstel')} className="bg-primary hover:bg-primary-light text-white font-bold px-8 py-3.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shadow-lg shadow-primary/20 hover:shadow-xl hover:-translate-y-0.5 cursor-pointer">
                 Schade melden <ArrowRight size={14} />
               </button>
             </div>
@@ -327,11 +327,11 @@ export default function DienstenPage() {
                   <div className="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center"><Truck size={22} /></div>
                   <span className="text-xs font-bold bg-primary/8 text-primary px-3 py-1 rounded-full uppercase tracking-wider">7 eenheden</span>
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-black mb-4">Transport door heel Europa</h2>
-                <p className="text-warm-gray leading-relaxed mb-4">
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4">Transport door heel Europa</h2>
+                <p className="text-gray-500 leading-relaxed mb-4">
                   In het seizoen werken wij met een wagenpark van 7 transporteenheden en circa 12 medewerkers om alle caravans op gezette tijden op de camping af te leveren en weer op te halen. Of u nu uw caravan vanuit Nederland naar Spanje wilt laten brengen of tussen campings aan de Costa Brava wilt verplaatsen — wij regelen het.
                 </p>
-                <p className="text-warm-gray leading-relaxed mb-6">
+                <p className="text-gray-500 leading-relaxed mb-6">
                   Uw caravan wordt door ervaren chauffeurs veilig getransporteerd. Wij bereiden uw caravan voor op het transport, controleren de banden, verlichting en koppeling, en leveren hem rijklaar af op de gewenste locatie. Op verzoek is ook gesloten transport mogelijk voor maximale bescherming onderweg.
                 </p>
 
@@ -348,11 +348,11 @@ export default function DienstenPage() {
                   ))}
                 </div>
 
-                <button onClick={() => openQuiz('transport')} className="bg-primary hover:bg-primary-dark text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 cursor-pointer">
+                <button onClick={() => openQuiz('transport')} className="bg-primary hover:bg-primary-light text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 cursor-pointer">
                   Transport aanvragen <ArrowRight size={14} />
                 </button>
               </div>
-              <div className="bg-primary/5 rounded-2xl p-8 border border-sand-dark/20">
+              <div className="bg-primary/5 rounded-2xl p-8 border border-gray-200">
                 <h3 className="font-bold text-lg mb-4">Veelgevraagde routes</h3>
                 <div className="space-y-3">
                   {[
@@ -362,13 +362,13 @@ export default function DienstenPage() {
                     { route: 'Camping → Stalling (regionaal)', time: 'Zelfde dag' },
                     { route: 'Stalling → Camping (regionaal)', time: 'Zelfde dag' },
                   ].map(r => (
-                    <div key={r.route} className="flex items-center justify-between p-3 bg-card rounded-xl border border-sand-dark/20">
+                    <div key={r.route} className="flex items-center justify-between p-3 bg-card rounded-xl border border-gray-200">
                       <span className="text-sm font-medium">{r.route}</span>
                       <span className="text-xs text-primary font-bold">{r.time}</span>
                     </div>
                   ))}
                 </div>
-                <p className="text-xs text-warm-gray mt-4">Tarieven op aanvraag. Afhankelijk van afstand en type voertuig.</p>
+                <p className="text-xs text-gray-500 mt-4">Tarieven op aanvraag. Afhankelijk van afstand en type voertuig.</p>
               </div>
             </div>
           </A>
@@ -381,9 +381,9 @@ export default function DienstenPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
-              <div className="order-2 lg:order-1 bg-danger/5 rounded-2xl p-8 border border-sand-dark/20">
+              <div className="order-2 lg:order-1 bg-danger/5 rounded-2xl p-8 border border-gray-200">
                 <h3 className="font-bold text-lg mb-2">Huidig aanbod</h3>
-                <p className="text-sm text-warm-gray mb-4">Enkele voorbeelden uit ons wisselend aanbod:</p>
+                <p className="text-sm text-gray-500 mb-4">Enkele voorbeelden uit ons wisselend aanbod:</p>
                 <div className="space-y-3">
                   {[
                     { model: 'Hobby Prestige 650', year: '2002', beds: '5 slaapplaatsen', price: '€ 6.000' },
@@ -391,30 +391,30 @@ export default function DienstenPage() {
                     { model: 'Knaus Sport', year: '1997', beds: '4 slaapplaatsen', price: '€ 5.250' },
                     { model: 'Adria 430 Unica', year: '2001', beds: '4 slaapplaatsen', price: '€ 5.250' },
                   ].map(c => (
-                    <div key={c.model} className="flex items-center justify-between p-3 bg-card rounded-xl border border-sand-dark/20">
+                    <div key={c.model} className="flex items-center justify-between p-3 bg-card rounded-xl border border-gray-200">
                       <div>
                         <p className="text-sm font-bold">{c.model}</p>
-                        <p className="text-xs text-warm-gray">{c.year} · {c.beds}</p>
+                        <p className="text-xs text-gray-500">{c.year} · {c.beds}</p>
                       </div>
-                      <span className="text-sm font-black text-primary">{c.price}</span>
+                      <span className="text-sm font-bold text-primary">{c.price}</span>
                     </div>
                   ))}
                 </div>
-                <p className="text-xs text-warm-gray mt-4">Aanbod wijzigt regelmatig. Neem contact op voor actuele beschikbaarheid.</p>
+                <p className="text-xs text-gray-500 mt-4">Aanbod wijzigt regelmatig. Neem contact op voor actuele beschikbaarheid.</p>
               </div>
               <div className="order-1 lg:order-2">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 bg-danger/10 text-danger rounded-xl flex items-center justify-center"><ShoppingBag size={22} /></div>
                   <span className="text-xs font-bold bg-danger/8 text-danger px-3 py-1 rounded-full uppercase tracking-wider">Occasion</span>
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-black mb-4">Verkoop tweedehands caravans</h2>
-                <p className="text-warm-gray leading-relaxed mb-4">
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4">Verkoop tweedehands caravans</h2>
+                <p className="text-gray-500 leading-relaxed mb-4">
                   Op zoek naar een betaalbare caravan voor uw vakantie in Spanje? Wij verkopen gecontroleerde tweedehands caravans die direct klaarstaan voor gebruik aan de Costa Brava. Geen gedoe met transport vanuit Nederland — uw caravan staat al in Spanje.
                 </p>
-                <p className="text-warm-gray leading-relaxed mb-4">
+                <p className="text-gray-500 leading-relaxed mb-4">
                   Elke occasion caravan wordt door onze werkplaats nagekeken op technische staat, banden, remmen, elektra en gasinstallatie. Wij geven u eerlijk advies over de staat en eventueel benodigde reparaties. Met meer dan 20 jaar ervaring helpen wij ook onervaren kampeerders het perfecte model te vinden.
                 </p>
-                <p className="text-warm-gray leading-relaxed mb-6">
+                <p className="text-gray-500 leading-relaxed mb-6">
                   Wilt u uw eigen caravan verkopen? Wij verzorgen ook de verkoopbemiddeling. Van taxatie en foto&apos;s tot de administratieve afhandeling — u hoeft zelf niets te doen.
                 </p>
 
@@ -430,7 +430,7 @@ export default function DienstenPage() {
                   ))}
                 </div>
 
-                <button onClick={() => openQuiz('verkoop')} className="bg-hero hover:bg-primary text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 cursor-pointer">
+                <button onClick={() => openQuiz('verkoop')} className="bg-primary hover:bg-primary text-white font-bold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2 cursor-pointer">
                   Aanbod bekijken <ArrowRight size={14} />
                 </button>
               </div>
@@ -445,9 +445,9 @@ export default function DienstenPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
           <A className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
             <div className="w-12 h-12 bg-accent/10 text-accent rounded-xl flex items-center justify-center mx-auto mb-3"><Bike size={22} /></div>
-            <h2 className="text-2xl sm:text-4xl font-black mb-3">Verhuur</h2>
+            <h2 className="text-2xl sm:text-4xl font-bold mb-3">Verhuur</h2>
             <div className="divider-animated mt-3 mb-4" />
-            <p className="text-warm-gray leading-relaxed text-sm">Extra&apos;s voor uw verblijf aan de Costa Brava. Direct leverbaar op uw camping.</p>
+            <p className="text-gray-500 leading-relaxed text-sm">Extra&apos;s voor uw verblijf aan de Costa Brava. Direct leverbaar op uw camping.</p>
           </A>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
@@ -482,15 +482,15 @@ export default function DienstenPage() {
                   <div className={`w-12 h-12 ${v.color} rounded-xl flex items-center justify-center mb-5`}>
                     <v.icon size={22} />
                   </div>
-                  <h3 className="font-black text-lg mb-3">{v.title}</h3>
-                  <p className="text-sm text-warm-gray leading-relaxed mb-4 flex-1">{v.desc}</p>
+                  <h3 className="font-bold text-lg mb-3">{v.title}</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed mb-4 flex-1">{v.desc}</p>
                   <div className="space-y-2 mb-5">
                     {v.features.map(f => (
                       <div key={f} className="flex items-center gap-2 text-xs"><CheckCircle size={12} className="text-success shrink-0" /> {f}</div>
                     ))}
                   </div>
-                  <div className="pt-4 border-t border-sand-dark/20">
-                    <p className="text-sm font-black text-primary">{v.price}</p>
+                  <div className="pt-4 border-t border-gray-200">
+                    <p className="text-sm font-bold text-primary">{v.price}</p>
                   </div>
                 </div>
               </A>
@@ -510,15 +510,15 @@ export default function DienstenPage() {
                   <div className="w-12 h-12 bg-ocean/10 text-ocean rounded-xl flex items-center justify-center"><SprayCan size={22} /></div>
                   <span className="text-xs font-bold bg-ocean/8 text-ocean px-3 py-1 rounded-full uppercase tracking-wider">Exterieur &amp; Interieur</span>
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-black mb-4">Professionele schoonmaak</h2>
-                <p className="text-warm-gray leading-relaxed mb-4">
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4">Professionele schoonmaak</h2>
+                <p className="text-gray-500 leading-relaxed mb-4">
                   Hygiëne van uw caravan is belangrijk, zeker bij langdurige stalling aan de Costa Brava. Wij bieden diverse schoonmaakpakketten aan — van een basiswas van het exterieur tot een complete interieur- en exterieurbehandeling inclusief polishbehandeling en dakbehandeling.
                 </p>
-                <p className="text-warm-gray leading-relaxed mb-6">
+                <p className="text-gray-500 leading-relaxed mb-6">
                   Naast stoomreiniging en waxen van de buitenkant zorgen wij ook voor een grondige reiniging van het interieur. Het seizoensklaar pakket maakt uw caravan helemaal klaar voor het nieuwe seizoen: schoon van binnen en van buiten, technisch gecontroleerd en opgepoetst.
                 </p>
 
-                <div className="bg-sand/50 rounded-xl border border-sand-dark/20 overflow-hidden mb-8">
+                <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden mb-8">
                   {[
                     { service: 'Basiswas exterieur', price: '€75' },
                     { service: 'Complete schoonmaak (ext. + int.)', price: '€150' },
@@ -527,7 +527,7 @@ export default function DienstenPage() {
                     { service: 'Dakbehandeling', price: '€85' },
                     { service: 'Seizoensklaar pakket', price: '€245' },
                   ].map((s, i) => (
-                    <div key={s.service} className={`flex items-center justify-between px-5 py-3 text-sm ${i !== 5 ? 'border-b border-sand-dark/20' : ''}`}>
+                    <div key={s.service} className={`flex items-center justify-between px-5 py-3 text-sm ${i !== 5 ? 'border-b border-gray-200' : ''}`}>
                       <span>{s.service}</span>
                       <span className="font-bold text-primary">{s.price}</span>
                     </div>
@@ -538,9 +538,9 @@ export default function DienstenPage() {
                   Schoonmaak boeken <ArrowRight size={14} />
                 </button>
               </div>
-              <div className="bg-ocean/5 rounded-2xl p-8 border border-sand-dark/20">
+              <div className="bg-ocean/5 rounded-2xl p-8 border border-gray-200">
                 <h3 className="font-bold text-lg mb-4">Seizoensklaar pakket</h3>
-                <p className="text-sm text-warm-gray leading-relaxed mb-4">Ons meest complete pakket om uw caravan helemaal klaar te maken voor het nieuwe seizoen:</p>
+                <p className="text-sm text-gray-500 leading-relaxed mb-4">Ons meest complete pakket om uw caravan helemaal klaar te maken voor het nieuwe seizoen:</p>
                 <div className="space-y-3">
                   {[
                     'Volledige buitenwas met stoomreiniger',
@@ -555,9 +555,9 @@ export default function DienstenPage() {
                     <div key={f} className="flex items-center gap-2.5 text-sm"><CheckCircle size={13} className="text-success shrink-0" /> {f}</div>
                   ))}
                 </div>
-                <div className="mt-6 p-4 bg-card rounded-xl border border-sand-dark/20 text-center">
-                  <p className="text-3xl font-black">€245</p>
-                  <p className="text-xs text-warm-gray">Compleet pakket</p>
+                <div className="mt-6 p-4 bg-card rounded-xl border border-gray-200 text-center">
+                  <p className="text-3xl font-bold">€245</p>
+                  <p className="text-xs text-gray-500">Compleet pakket</p>
                 </div>
               </div>
             </div>
@@ -570,11 +570,11 @@ export default function DienstenPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
             <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3"><HelpCircle size={11} className="text-primary" /><span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Veelgestelde vragen</span></span>
-            <h2 className="text-2xl sm:text-4xl font-black mb-3">Vragen over onze diensten?</h2>
+            <h2 className="text-2xl sm:text-4xl font-bold mb-3">Vragen over onze diensten?</h2>
             <div className="divider-animated mt-3" />
           </A>
           <A>
-            <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">
+            <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-gray-300/[0.06] px-6 sm:px-8">
               {dienstenFaqs.map(f => <FaqItem key={f.q} q={f.q} a={f.a} />)}
             </div>
           </A>

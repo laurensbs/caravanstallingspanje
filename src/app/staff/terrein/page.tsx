@@ -38,7 +38,7 @@ export default function StaffTerreinPage() {
 
   return (
     <div>
-      <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="text-2xl font-black text-surface-dark mb-6">Terreinoverzicht</motion.h1>
+      <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="text-2xl font-bold text-gray-900 mb-6">Terreinoverzicht</motion.h1>
 
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="card-premium p-4 mb-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -61,26 +61,26 @@ export default function StaffTerreinPage() {
                   <div className="w-10 h-10 bg-gradient-to-br from-accent/15 to-accent/5 rounded-xl flex items-center justify-center shadow-sm">
                     <MapPin size={18} className="text-accent" />
                   </div>
-                  <div><h3 className="font-bold text-surface-dark">{loc.name}</h3><p className="text-xs text-warm-gray/70">{loc.address}</p></div>
+                  <div><h3 className="font-bold text-gray-900">{loc.name}</h3><p className="text-xs text-gray-500/70">{loc.address}</p></div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="text-right"><div className="stat-number text-sm">{loc.occupied_spots}/{loc.total_spots}</div><div className="w-24 h-2.5 bg-sand rounded-full overflow-hidden mt-1"><motion.div initial={{ width: 0 }} animate={{ width: `${occupancy}%` }} transition={{ duration: 0.6, delay: 0.2 }} className="h-full bg-gradient-to-r from-accent to-accent-light rounded-full" /></div></div>
-                  {expanded ? <ChevronUp size={16} className="text-warm-gray/70" /> : <ChevronDown size={16} className="text-warm-gray/70" />}
+                  <div className="text-right"><div className="stat-number text-sm">{loc.occupied_spots}/{loc.total_spots}</div><div className="w-24 h-2.5 bg-gray-100 rounded-full overflow-hidden mt-1"><motion.div initial={{ width: 0 }} animate={{ width: `${occupancy}%` }} transition={{ duration: 0.6, delay: 0.2 }} className="h-full bg-gradient-to-r from-accent to-accent-light rounded-full" /></div></div>
+                  {expanded ? <ChevronUp size={16} className="text-gray-500/70" /> : <ChevronDown size={16} className="text-gray-500/70" />}
                 </div>
               </button>
 
               {expanded && (
-                <div className="border-t border-sand-dark/20 px-5 pb-5">
-                  {spotsLoading ? <div className="py-6 text-center text-sm text-warm-gray/70">Laden...</div> :
-                  zones.length === 0 ? <div className="py-6 text-center text-sm text-warm-gray/70">Geen plekken geconfigureerd</div> :
+                <div className="border-t border-gray-200 px-5 pb-5">
+                  {spotsLoading ? <div className="py-6 text-center text-sm text-gray-500/70">Laden...</div> :
+                  zones.length === 0 ? <div className="py-6 text-center text-sm text-gray-500/70">Geen plekken geconfigureerd</div> :
                   zones.map(zone => {
                     const zoneSpots = spots.filter(s => s.zone === zone);
                     return (
                       <div key={zone} className="mt-4">
-                        <h4 className="text-xs font-bold text-warm-gray/60 uppercase tracking-wider mb-2">Zone {zone}</h4>
+                        <h4 className="text-xs font-bold text-gray-500/60 uppercase tracking-wider mb-2">Zone {zone}</h4>
                         <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-2">
                           {zoneSpots.map(spot => (
-                            <div key={spot.id} className={`border rounded-lg p-1.5 text-center text-xs cursor-default group relative ${SPOT_COLORS[spot.status] || 'bg-sand'}`} title={spot.status === 'bezet' ? `${spot.caravan_brand} ${spot.caravan_model}\n${spot.caravan_license_plate}\n${spot.customer_name}` : spot.status}>
+                            <div key={spot.id} className={`border rounded-lg p-1.5 text-center text-xs cursor-default group relative ${SPOT_COLORS[spot.status] || 'bg-gray-100'}`} title={spot.status === 'bezet' ? `${spot.caravan_brand} ${spot.caravan_model}\n${spot.caravan_license_plate}\n${spot.customer_name}` : spot.status}>
                               <div className="font-medium">{spot.label}</div>
                               <div className="text-xs opacity-60">{spot.spot_type === 'binnen' ? 'B' : 'U'}</div>
                             </div>

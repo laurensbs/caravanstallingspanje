@@ -92,19 +92,19 @@ export default function TarievenPage() {
                   <div className={`w-12 h-12 ${p.color} rounded-xl flex items-center justify-center mb-5`}>
                     <Shield size={20} />
                   </div>
-                  <h3 className="text-xl font-black mb-1">{p.title}</h3>
-                  <p className="text-xs text-warm-gray leading-relaxed mb-5">{p.desc}</p>
+                  <h3 className="text-xl font-bold mb-1">{p.title}</h3>
+                  <p className="text-xs text-gray-500 leading-relaxed mb-5">{p.desc}</p>
                   <div className="flex items-end gap-1 mb-6">
-                    <span className="text-sm text-warm-gray">Vanaf</span>
-                    <span className="text-4xl font-black">€{p.price}</span>
-                    <span className="text-warm-gray text-sm">{p.period}</span>
+                    <span className="text-sm text-gray-500">Vanaf</span>
+                    <span className="text-4xl font-bold">€{p.price}</span>
+                    <span className="text-gray-500 text-sm">{p.period}</span>
                   </div>
                   <ul className="space-y-2.5 mb-8 flex-1">
                     {p.features.map(f => (
                       <li key={f} className="flex items-center gap-2.5 text-sm"><CheckCircle size={14} className="text-success shrink-0" /> {f}</li>
                     ))}
                   </ul>
-                  <button onClick={() => setQuizOpen(true)} className={`w-full font-bold px-6 py-3.5 rounded-xl text-sm transition-all inline-flex items-center justify-center gap-2 cursor-pointer hover:-translate-y-0.5 ${p.popular ? 'bg-accent hover:bg-accent-dark text-white shadow-lg shadow-accent/20 hover:shadow-xl' : 'bg-hero/[0.04] hover:bg-sand-dark/[0.08] text-surface-dark'}`}>
+                  <button onClick={() => setQuizOpen(true)} className={`w-full font-bold px-6 py-3.5 rounded-xl text-sm transition-all inline-flex items-center justify-center gap-2 cursor-pointer hover:-translate-y-0.5 ${p.popular ? 'bg-accent hover:bg-accent/90 text-white shadow-lg shadow-accent/20 hover:shadow-xl' : 'bg-gray-50 hover:bg-gray-300/[0.08] text-gray-900'}`}>
                     {p.cta} <ArrowRight size={14} />
                   </button>
                 </div>
@@ -119,14 +119,14 @@ export default function TarievenPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-2xl mx-auto mb-10">
             <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3"><span className="w-1.5 h-1.5 rounded-full bg-primary" /><span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Vergelijking</span></span>
-            <h2 className="text-2xl sm:text-3xl font-black mb-4">Wat is inbegrepen?</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4">Wat is inbegrepen?</h2>
             <div className="divider-animated mt-3 mb-4" />
           </A>
 
           {/* Shared features */}
           <A>
             <div className="card-premium p-6 sm:p-8 mb-6 max-w-3xl mx-auto">
-              <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-4">Beide stallingstypen inclusief</p>
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Beide stallingstypen inclusief</p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {['Securitas Direct alarm', '24/7 camerabewaking', 'Standaard verzekerd', 'Eigen vaste plek', 'Tweewekelijkse controle', 'Jaarlijkse technische keuring', 'Jaarrond beschikbaar'].map(f => (
                   <div key={f} className="flex items-center gap-2 text-sm"><CheckCircle size={14} className="text-success shrink-0" /> {f}</div>
@@ -143,10 +143,10 @@ export default function TarievenPage() {
                   <div className="w-10 h-10 bg-accent/10 text-accent rounded-xl flex items-center justify-center"><Shield size={18} /></div>
                   <div>
                     <h3 className="font-bold">Buitenstalling</h3>
-                    <p className="text-xs text-warm-gray">€65/maand</p>
+                    <p className="text-xs text-gray-500">€65/maand</p>
                   </div>
                 </div>
-                <p className="text-sm text-warm-gray leading-relaxed">Uw caravan op een beveiligd buitenterrein. Het milde Spaanse klimaat beschermt tegen vorst en strooizout.</p>
+                <p className="text-sm text-gray-500 leading-relaxed">Uw caravan op een beveiligd buitenterrein. Het milde Spaanse klimaat beschermt tegen vorst en strooizout.</p>
               </div>
             </A>
             <A delay={0.1}>
@@ -155,10 +155,10 @@ export default function TarievenPage() {
                   <div className="w-10 h-10 bg-ocean/10 text-ocean rounded-xl flex items-center justify-center"><Shield size={18} /></div>
                   <div>
                     <h3 className="font-bold">Binnenstalling</h3>
-                    <p className="text-xs text-warm-gray">€95/maand</p>
+                    <p className="text-xs text-gray-500">€95/maand</p>
                   </div>
                 </div>
-                <p className="text-sm text-warm-gray leading-relaxed mb-4">Maximale bescherming in onze geïsoleerde hal. Extra voordelen:</p>
+                <p className="text-sm text-gray-500 leading-relaxed mb-4">Maximale bescherming in onze geïsoleerde hal. Extra voordelen:</p>
                 <div className="space-y-2">
                   {['Overdekte geïsoleerde hal', 'Geen UV-schade of verbleking', 'Stabiele temperatuur jaarrond', 'Geen mos- of algvorming'].map(f => (
                     <div key={f} className="flex items-center gap-2 text-sm"><CheckCircle size={13} className="text-ocean shrink-0" /> {f}</div>
@@ -176,9 +176,9 @@ export default function TarievenPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
           <A className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
             <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3"><Sparkles size={11} className="text-primary" /><span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Extra diensten</span></span>
-            <h2 className="text-2xl sm:text-4xl font-black mb-3">Aanvullende services</h2>
+            <h2 className="text-2xl sm:text-4xl font-bold mb-3">Aanvullende services</h2>
             <div className="divider-animated mt-3 mb-4" />
-            <p className="text-warm-gray leading-relaxed text-sm">Schoonmaak, transport, verhuur en meer.</p>
+            <p className="text-gray-500 leading-relaxed text-sm">Schoonmaak, transport, verhuur en meer.</p>
           </A>
 
           <A>
@@ -193,7 +193,7 @@ export default function TarievenPage() {
                 }>
                   <div className="space-y-0">
                     {group.items.map((e, i) => (
-                      <div key={e.service} className={`flex items-center justify-between py-3 text-sm ${i !== group.items.length - 1 ? 'border-b border-sand-dark/10' : ''}`}>
+                      <div key={e.service} className={`flex items-center justify-between py-3 text-sm ${i !== group.items.length - 1 ? 'border-b border-gray-100' : ''}`}>
                         <span className="font-medium">{e.service}</span>
                         <span className={`font-bold shrink-0 ml-4 ${e.price === 'Inbegrepen' ? 'text-success' : e.price === 'Op aanvraag' ? 'text-primary' : ''}`}>{e.price}</span>
                       </div>
@@ -215,10 +215,10 @@ export default function TarievenPage() {
                 <Sparkles className="text-primary" size={28} />
               </div>
               <div className="flex-1">
-                <h3 className="font-black text-lg mb-1">CaravanRepair® Masterdealer</h3>
-                <p className="text-sm text-warm-gray leading-relaxed">Wand-, hagel- en vochtschade? Als officieel Masterdealer bieden wij het gepatenteerde CaravanRepair® herstelsysteem met levenslange garantie.</p>
+                <h3 className="font-bold text-lg mb-1">CaravanRepair® Masterdealer</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">Wand-, hagel- en vochtschade? Als officieel Masterdealer bieden wij het gepatenteerde CaravanRepair® herstelsysteem met levenslange garantie.</p>
               </div>
-              <Link href="/diensten#caravanrepair" className="bg-accent hover:bg-accent-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shrink-0 shadow-sm">
+              <Link href="/diensten#caravanrepair" className="bg-accent hover:bg-accent/90 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all inline-flex items-center gap-2 shrink-0 shadow-sm">
                 Meer info <ArrowRight size={14} />
               </Link>
             </div>
@@ -231,12 +231,12 @@ export default function TarievenPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
             <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3"><HelpCircle size={11} className="text-primary" /><span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Veelgestelde vragen</span></span>
-            <h2 className="text-2xl sm:text-4xl font-black mb-3">Heeft u vragen?</h2>
+            <h2 className="text-2xl sm:text-4xl font-bold mb-3">Heeft u vragen?</h2>
             <div className="divider-animated mt-3" />
           </A>
 
           <A>
-            <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-sand-dark/[0.06] px-6 sm:px-8">
+            <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-gray-300/[0.06] px-6 sm:px-8">
               {faqs.map(f => <FaqItem key={f.q} q={f.q} a={f.a} />)}
             </div>
           </A>

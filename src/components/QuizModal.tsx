@@ -209,8 +209,8 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
   const toggleArray = (field: 'repair_types' | 'damage_types' | 'rental_items', value: string) => {
     setData(d => ({ ...d, [field]: d[field].includes(value) ? d[field].filter((v: string) => v !== value) : [...d[field], value] }));
   };
-  const chip = (selected: boolean) => `px-3 py-1.5 rounded-lg text-xs border transition-all ${selected ? 'border-primary bg-primary/[0.05] text-primary font-bold' : 'border-sand-dark/30 text-warm-gray hover:border-primary/20'}`;
-  const gridBtn = (selected: boolean) => `p-3 rounded-xl text-center text-xs border transition-all ${selected ? 'border-primary bg-primary/[0.05] text-primary font-bold' : 'border-sand-dark/30 text-warm-gray hover:border-primary/20'}`;
+  const chip = (selected: boolean) => `px-3 py-1.5 rounded-lg text-xs border transition-all ${selected ? 'border-primary bg-primary/[0.05] text-primary font-bold' : 'border-gray-200 text-gray-500 hover:border-primary/20'}`;
+  const gridBtn = (selected: boolean) => `p-3 rounded-xl text-center text-xs border transition-all ${selected ? 'border-primary bg-primary/[0.05] text-primary font-bold' : 'border-gray-200 text-gray-500 hover:border-primary/20'}`;
 
   return (
     <AnimatePresence>
@@ -231,7 +231,7 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
             onClick={(e) => e.stopPropagation()}
           >
             {/* Progress bar */}
-            <div className="h-1 bg-sand">
+            <div className="h-1 bg-gray-100">
               <motion.div
                 className="h-full bg-primary"
                 animate={{ width: `${progress}%` }}
@@ -242,7 +242,7 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
             {/* Close button */}
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-surface flex items-center justify-center text-warm-gray hover:text-primary transition-colors z-10"
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-surface flex items-center justify-center text-gray-500 hover:text-primary transition-colors z-10"
               aria-label="Sluiten"
             >
               <X size={16} />
@@ -254,8 +254,8 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
                 {step === 'interest' && (
                   <motion.div key="interest" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
                     <p className="text-primary text-xs font-bold tracking-[0.15em] uppercase mb-2">Stap 1 van 3</p>
-                    <h3 className="text-xl font-black mb-1">Waarmee kunnen wij u helpen?</h3>
-                    <p className="text-sm text-warm-gray mb-6">Selecteer wat het beste bij uw situatie past.</p>
+                    <h3 className="text-xl font-bold mb-1">Waarmee kunnen wij u helpen?</h3>
+                    <p className="text-sm text-gray-500 mb-6">Selecteer wat het beste bij uw situatie past.</p>
                     <div className="grid grid-cols-2 gap-2.5">
                       {INTERESTS.map(i => (
                         <button
@@ -265,12 +265,12 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
                             setStep('details');
                           }}
                           className={`text-left p-4 rounded-xl border transition-all hover:border-primary/30 hover:bg-primary/[0.03] group ${
-                            data.interest === i.id ? 'border-primary bg-primary/[0.05]' : 'border-sand-dark/30'
+                            data.interest === i.id ? 'border-primary bg-primary/[0.05]' : 'border-gray-200'
                           }`}
                         >
                           <i.icon size={20} className="text-primary mb-2" />
                           <p className="text-sm font-bold leading-tight">{i.label}</p>
-                          <p className="text-xs text-warm-gray mt-0.5">{i.desc}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">{i.desc}</p>
                         </button>
                       ))}
                     </div>
@@ -281,8 +281,8 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
                 {step === 'details' && (
                   <motion.div key="details" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
                     <p className="text-primary text-xs font-bold tracking-[0.15em] uppercase mb-2">Stap 2 van 3</p>
-                    <h3 className="text-xl font-black mb-1">Vertel ons meer</h3>
-                    <p className="text-sm text-warm-gray mb-6">
+                    <h3 className="text-xl font-bold mb-1">Vertel ons meer</h3>
+                    <p className="text-sm text-gray-500 mb-6">
                       {data.interest === 'stalling' && 'Zo kunnen wij u een passend stallingsvoorstel doen.'}
                       {data.interest === 'reparatie' && 'Vertel ons wat er aan uw caravan moet gebeuren.'}
                       {data.interest === 'schadeherstel' && 'Beschrijf de schade zodat wij een offerte kunnen maken.'}
@@ -296,7 +296,7 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
                     {/* ══ STALLING ══ */}
                     {data.interest === 'stalling' && (<>
                       <div className="mb-5">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Voorkeur stallingtype</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Voorkeur stallingtype</p>
                         <div className="grid grid-cols-3 gap-2">
                           {STORAGE_TYPES.map(s => (
                             <button key={s.id} onClick={() => setData({ ...data, storage_type: s.id })} className={gridBtn(data.storage_type === s.id)}>
@@ -307,19 +307,19 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
                         </div>
                       </div>
                       <div className="mb-5">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Merk caravan</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Merk caravan</p>
                         <div className="flex flex-wrap gap-1.5">
                           {BRANDS.map(b => <button key={b} onClick={() => setData({ ...data, caravan_brand: b })} className={chip(data.caravan_brand === b)}>{b}</button>)}
                         </div>
                       </div>
                       <div className="mb-5">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Lengte caravan</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Lengte caravan</p>
                         <div className="grid grid-cols-3 gap-1.5">
                           {LENGTHS.map(l => <button key={l} onClick={() => setData({ ...data, caravan_length: l })} className={chip(data.caravan_length === l)}>{l}</button>)}
                         </div>
                       </div>
                       <div className="mb-6">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Wanneer wilt u starten?</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Wanneer wilt u starten?</p>
                         <div className="grid grid-cols-2 gap-2">
                           {TIMEFRAMES.map(t => <button key={t.id} onClick={() => setData({ ...data, timeframe: t.id })} className={gridBtn(data.timeframe === t.id)}>{t.label}</button>)}
                         </div>
@@ -329,77 +329,77 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
                     {/* ══ REPARATIE ══ */}
                     {data.interest === 'reparatie' && (<>
                       <div className="mb-5">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Merk caravan</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Merk caravan</p>
                         <div className="flex flex-wrap gap-1.5">
                           {BRANDS.map(b => <button key={b} onClick={() => setData({ ...data, caravan_brand: b })} className={chip(data.caravan_brand === b)}>{b}</button>)}
                         </div>
                       </div>
                       <div className="mb-5">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Type reparatie (meerdere mogelijk)</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Type reparatie (meerdere mogelijk)</p>
                         <div className="flex flex-wrap gap-1.5">
                           {REPAIR_TYPES.map(r => <button key={r} onClick={() => toggleArray('repair_types', r)} className={chip(data.repair_types.includes(r))}>{r}</button>)}
                         </div>
                       </div>
                       <div className="mb-5">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Hoe urgent?</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Hoe urgent?</p>
                         <div className="grid grid-cols-2 gap-2">
                           {URGENCIES.map(u => <button key={u.id} onClick={() => setData({ ...data, urgency: u.id })} className={gridBtn(data.urgency === u.id)}>{u.label}</button>)}
                         </div>
                       </div>
                       <div className="mb-6">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Toelichting (optioneel)</p>
-                        <textarea value={data.description} onChange={e => setData({ ...data, description: e.target.value })} className="w-full px-4 py-3 bg-sand/40 border border-sand-dark/40 rounded-xl text-sm focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all resize-none h-20" placeholder="Eventuele bijzonderheden..." />
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Toelichting (optioneel)</p>
+                        <textarea value={data.description} onChange={e => setData({ ...data, description: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-300/40 rounded-xl text-sm focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all resize-none h-20" placeholder="Eventuele bijzonderheden..." />
                       </div>
                     </>)}
 
                     {/* ══ SCHADEHERSTEL (CaravanRepair®) ══ */}
                     {data.interest === 'schadeherstel' && (<>
                       <div className="mb-5">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Merk caravan</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Merk caravan</p>
                         <div className="flex flex-wrap gap-1.5">
                           {BRANDS.map(b => <button key={b} onClick={() => setData({ ...data, caravan_brand: b })} className={chip(data.caravan_brand === b)}>{b}</button>)}
                         </div>
                       </div>
                       <div className="mb-5">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Type schade (meerdere mogelijk)</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Type schade (meerdere mogelijk)</p>
                         <div className="flex flex-wrap gap-1.5">
                           {DAMAGE_TYPES.map(d => <button key={d} onClick={() => toggleArray('damage_types', d)} className={chip(data.damage_types.includes(d))}>{d}</button>)}
                         </div>
                       </div>
                       <div className="mb-5">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Via verzekering?</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Via verzekering?</p>
                         <div className="grid grid-cols-3 gap-2">
                           {INSURANCE_OPTIONS.map(i => <button key={i.id} onClick={() => setData({ ...data, insurance: i.id })} className={gridBtn(data.insurance === i.id)}>{i.label}</button>)}
                         </div>
                       </div>
                       <div className="mb-6">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Omschrijving schade (optioneel)</p>
-                        <textarea value={data.description} onChange={e => setData({ ...data, description: e.target.value })} className="w-full px-4 py-3 bg-sand/40 border border-sand-dark/40 rounded-xl text-sm focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all resize-none h-20" placeholder="Beschrijf kort wat er is gebeurd..." />
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Omschrijving schade (optioneel)</p>
+                        <textarea value={data.description} onChange={e => setData({ ...data, description: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-300/40 rounded-xl text-sm focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all resize-none h-20" placeholder="Beschrijf kort wat er is gebeurd..." />
                       </div>
                     </>)}
 
                     {/* ══ TRANSPORT ══ */}
                     {data.interest === 'transport' && (<>
                       <div className="mb-5">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Merk caravan</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Merk caravan</p>
                         <div className="flex flex-wrap gap-1.5">
                           {BRANDS.map(b => <button key={b} onClick={() => setData({ ...data, caravan_brand: b })} className={chip(data.caravan_brand === b)}>{b}</button>)}
                         </div>
                       </div>
                       <div className="mb-5">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Lengte caravan</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Lengte caravan</p>
                         <div className="grid grid-cols-3 gap-1.5">
                           {LENGTHS.map(l => <button key={l} onClick={() => setData({ ...data, caravan_length: l })} className={chip(data.caravan_length === l)}>{l}</button>)}
                         </div>
                       </div>
                       <div className="mb-5">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Gewenste route</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Gewenste route</p>
                         <div className="grid grid-cols-1 gap-2">
                           {TRANSPORT_ROUTES.map(r => <button key={r.id} onClick={() => setData({ ...data, route: r.id })} className={gridBtn(data.route === r.id)}>{r.label}</button>)}
                         </div>
                       </div>
                       <div className="mb-6">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Wanneer?</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Wanneer?</p>
                         <div className="grid grid-cols-2 gap-2">
                           {TIMEFRAMES.map(t => <button key={t.id} onClick={() => setData({ ...data, timeframe: t.id })} className={gridBtn(data.timeframe === t.id)}>{t.label}</button>)}
                         </div>
@@ -409,25 +409,25 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
                     {/* ══ VERKOOP ══ */}
                     {data.interest === 'verkoop' && (<>
                       <div className="mb-5">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Wat wilt u?</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Wat wilt u?</p>
                         <div className="grid grid-cols-1 gap-2">
                           {SALE_TYPES.map(s => <button key={s.id} onClick={() => setData({ ...data, sale_type: s.id })} className={gridBtn(data.sale_type === s.id)}>{s.label}</button>)}
                         </div>
                       </div>
                       <div className="mb-5">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Merk caravan</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Merk caravan</p>
                         <div className="flex flex-wrap gap-1.5">
                           {BRANDS.map(b => <button key={b} onClick={() => setData({ ...data, caravan_brand: b })} className={chip(data.caravan_brand === b)}>{b}</button>)}
                         </div>
                       </div>
                       <div className="mb-5">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">{data.sale_type === 'verkopen' ? 'Vraagprijs' : 'Budget'}</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">{data.sale_type === 'verkopen' ? 'Vraagprijs' : 'Budget'}</p>
                         <div className="flex flex-wrap gap-1.5">
                           {BUDGETS.map(b => <button key={b} onClick={() => setData({ ...data, budget: b })} className={chip(data.budget === b)}>{b}</button>)}
                         </div>
                       </div>
                       <div className="mb-6">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Wanneer?</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Wanneer?</p>
                         <div className="grid grid-cols-2 gap-2">
                           {TIMEFRAMES.map(t => <button key={t.id} onClick={() => setData({ ...data, timeframe: t.id })} className={gridBtn(data.timeframe === t.id)}>{t.label}</button>)}
                         </div>
@@ -437,19 +437,19 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
                     {/* ══ VERHUUR ══ */}
                     {data.interest === 'verhuur' && (<>
                       <div className="mb-5">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Wat wilt u huren? (meerdere mogelijk)</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Wat wilt u huren? (meerdere mogelijk)</p>
                         <div className="flex flex-wrap gap-1.5">
                           {RENTAL_ITEMS.map(r => <button key={r} onClick={() => toggleArray('rental_items', r)} className={chip(data.rental_items.includes(r))}>{r}</button>)}
                         </div>
                       </div>
                       <div className="mb-5">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Huurperiode</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Huurperiode</p>
                         <div className="grid grid-cols-2 gap-2">
                           {RENTAL_PERIODS.map(p => <button key={p.id} onClick={() => setData({ ...data, rental_period: p.id })} className={gridBtn(data.rental_period === p.id)}>{p.label}</button>)}
                         </div>
                       </div>
                       <div className="mb-6">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Wanneer nodig?</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Wanneer nodig?</p>
                         <div className="grid grid-cols-2 gap-2">
                           {TIMEFRAMES.map(t => <button key={t.id} onClick={() => setData({ ...data, timeframe: t.id })} className={gridBtn(data.timeframe === t.id)}>{t.label}</button>)}
                         </div>
@@ -459,7 +459,7 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
                     {/* ══ SCHOONMAAK ══ */}
                     {data.interest === 'schoonmaak' && (<>
                       <div className="mb-5">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Welk pakket?</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Welk pakket?</p>
                         <div className="grid grid-cols-2 gap-2">
                           {CLEANING_PACKAGES.map(c => (
                             <button key={c.id} onClick={() => setData({ ...data, cleaning_package: c.id })} className={gridBtn(data.cleaning_package === c.id)}>
@@ -470,13 +470,13 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
                         </div>
                       </div>
                       <div className="mb-5">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Merk caravan</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Merk caravan</p>
                         <div className="flex flex-wrap gap-1.5">
                           {BRANDS.map(b => <button key={b} onClick={() => setData({ ...data, caravan_brand: b })} className={chip(data.caravan_brand === b)}>{b}</button>)}
                         </div>
                       </div>
                       <div className="mb-6">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Wanneer?</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Wanneer?</p>
                         <div className="grid grid-cols-2 gap-2">
                           {TIMEFRAMES.map(t => <button key={t.id} onClick={() => setData({ ...data, timeframe: t.id })} className={gridBtn(data.timeframe === t.id)}>{t.label}</button>)}
                         </div>
@@ -486,18 +486,18 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
                     {/* ══ ANDERS ══ */}
                     {data.interest === 'anders' && (<>
                       <div className="mb-6">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2.5">Uw vraag of opmerking</p>
-                        <textarea value={data.description} onChange={e => setData({ ...data, description: e.target.value })} className="w-full px-4 py-3 bg-sand/40 border border-sand-dark/40 rounded-xl text-sm focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all resize-none h-28" placeholder="Stel uw vraag of vertel ons hoe wij u kunnen helpen..." />
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Uw vraag of opmerking</p>
+                        <textarea value={data.description} onChange={e => setData({ ...data, description: e.target.value })} className="w-full px-4 py-3 bg-gray-50 border border-gray-300/40 rounded-xl text-sm focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all resize-none h-28" placeholder="Stel uw vraag of vertel ons hoe wij u kunnen helpen..." />
                       </div>
                     </>)}
 
                     <div className="flex items-center gap-3">
-                      <button onClick={() => setStep('interest')} className="flex items-center gap-1 text-sm text-warm-gray hover:text-primary transition-colors">
+                      <button onClick={() => setStep('interest')} className="flex items-center gap-1 text-sm text-gray-500 hover:text-primary transition-colors">
                         <ArrowLeft size={14} /> Terug
                       </button>
                       <button
                         onClick={() => setStep('contact')}
-                        className="flex-1 bg-primary hover:bg-primary-dark text-white font-bold py-3 rounded-xl text-sm transition-all flex items-center justify-center gap-2"
+                        className="flex-1 bg-primary hover:bg-primary-light text-white font-bold py-3 rounded-xl text-sm transition-all flex items-center justify-center gap-2"
                       >
                         Verder <ArrowRight size={14} />
                       </button>
@@ -509,42 +509,42 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
                 {step === 'contact' && (
                   <motion.div key="contact" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
                     <p className="text-primary text-xs font-bold tracking-[0.15em] uppercase mb-2">Stap 3 van 3</p>
-                    <h3 className="text-xl font-black mb-1">Waar mogen wij u bereiken?</h3>
-                    <p className="text-sm text-warm-gray mb-6">Wij nemen binnen 24 uur contact met u op met een persoonlijk voorstel.</p>
+                    <h3 className="text-xl font-bold mb-1">Waar mogen wij u bereiken?</h3>
+                    <p className="text-sm text-gray-500 mb-6">Wij nemen binnen 24 uur contact met u op met een persoonlijk voorstel.</p>
 
                     <div className="space-y-4 mb-6">
                       <div>
-                        <label className="text-xs font-bold text-warm-gray block mb-1.5">E-mailadres *</label>
+                        <label className="text-xs font-bold text-gray-500 block mb-1.5">E-mailadres *</label>
                         <div className="relative">
-                          <Mail size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-warm-gray/40" />
+                          <Mail size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500/40" />
                           <input
                             type="email"
                             required
                             value={data.email}
                             onChange={e => setData({ ...data, email: e.target.value })}
-                            className="w-full pl-10 pr-4 py-3 bg-sand/40 border border-sand-dark/40 rounded-xl text-sm focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all"
+                            className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300/40 rounded-xl text-sm focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all"
                             placeholder="uw@email.com"
                           />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="text-xs font-bold text-warm-gray block mb-1.5">Naam</label>
+                          <label className="text-xs font-bold text-gray-500 block mb-1.5">Naam</label>
                           <input
                             type="text"
                             value={data.name}
                             onChange={e => setData({ ...data, name: e.target.value })}
-                            className="w-full px-4 py-3 bg-sand/40 border border-sand-dark/40 rounded-xl text-sm focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all"
+                            className="w-full px-4 py-3 bg-gray-50 border border-gray-300/40 rounded-xl text-sm focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all"
                             placeholder="Uw naam"
                           />
                         </div>
                         <div>
-                          <label className="text-xs font-bold text-warm-gray block mb-1.5">Telefoon</label>
+                          <label className="text-xs font-bold text-gray-500 block mb-1.5">Telefoon</label>
                           <input
                             type="tel"
                             value={data.phone}
                             onChange={e => setData({ ...data, phone: e.target.value })}
-                            className="w-full px-4 py-3 bg-sand/40 border border-sand-dark/40 rounded-xl text-sm focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all"
+                            className="w-full px-4 py-3 bg-gray-50 border border-gray-300/40 rounded-xl text-sm focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all"
                             placeholder="+31 6..."
                           />
                         </div>
@@ -552,13 +552,13 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
                     </div>
 
                     <div className="flex items-center gap-3 mb-4">
-                      <button onClick={() => setStep('details')} className="flex items-center gap-1 text-sm text-warm-gray hover:text-primary transition-colors">
+                      <button onClick={() => setStep('details')} className="flex items-center gap-1 text-sm text-gray-500 hover:text-primary transition-colors">
                         <ArrowLeft size={14} /> Terug
                       </button>
                       <button
                         onClick={handleSubmit}
                         disabled={!data.email || submitting}
-                        className="flex-1 bg-primary hover:bg-primary-dark text-white font-bold py-3.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
+                        className="flex-1 bg-primary hover:bg-primary-light text-white font-bold py-3.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
                       >
                         {submitting ? (
                           <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg> Versturen...</>
@@ -568,7 +568,7 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
                       </button>
                     </div>
 
-                    <div className="flex items-center justify-center gap-3 text-xs text-warm-gray/60">
+                    <div className="flex items-center justify-center gap-3 text-xs text-gray-500/60">
                       <span className="flex items-center gap-1"><Shield size={10} /> Geen spam</span>
                       <span className="flex items-center gap-1"><CheckCircle size={10} /> Binnen 24 uur reactie</span>
                     </div>
@@ -582,36 +582,36 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
                       <div className="w-16 h-16 bg-accent/15 rounded-full flex items-center justify-center mx-auto mb-5">
                         <CheckCircle className="text-accent" size={32} />
                       </div>
-                      <h3 className="text-xl font-black mb-2">Bedankt{data.name ? `, ${data.name}` : ''}!</h3>
-                      <p className="text-sm text-warm-gray leading-relaxed mb-6">
-                        Wij hebben uw gegevens ontvangen en nemen <strong className="text-surface-dark">binnen 24 uur</strong> contact met u op met een persoonlijk voorstel.
+                      <h3 className="text-xl font-bold mb-2">Bedankt{data.name ? `, ${data.name}` : ''}!</h3>
+                      <p className="text-sm text-gray-500 leading-relaxed mb-6">
+                        Wij hebben uw gegevens ontvangen en nemen <strong className="text-gray-900">binnen 24 uur</strong> contact met u op met een persoonlijk voorstel.
                       </p>
 
-                      <div className="bg-sand/50 rounded-xl p-4 mb-6 text-left">
-                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-2">Uw aanvraag</p>
+                      <div className="bg-gray-50 rounded-xl p-4 mb-6 text-left">
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Uw aanvraag</p>
                         <div className="space-y-1 text-sm">
-                          {data.interest && <p><span className="text-warm-gray">Interesse:</span> {INTERESTS.find(i => i.id === data.interest)?.label}</p>}
-                          {data.caravan_brand && <p><span className="text-warm-gray">Merk:</span> {data.caravan_brand}</p>}
-                          {data.storage_type && <p><span className="text-warm-gray">Stallingtype:</span> {STORAGE_TYPES.find(s => s.id === data.storage_type)?.label}</p>}
-                          {data.caravan_length && <p><span className="text-warm-gray">Lengte:</span> {data.caravan_length}</p>}
-                          {data.route && <p><span className="text-warm-gray">Route:</span> {TRANSPORT_ROUTES.find(r => r.id === data.route)?.label}</p>}
-                          {data.sale_type && <p><span className="text-warm-gray">Type:</span> {SALE_TYPES.find(s => s.id === data.sale_type)?.label}</p>}
-                          {data.budget && <p><span className="text-warm-gray">{data.sale_type === 'verkopen' ? 'Vraagprijs' : 'Budget'}:</span> {data.budget}</p>}
-                          {data.repair_types.length > 0 && <p><span className="text-warm-gray">Reparatie:</span> {data.repair_types.join(', ')}</p>}
-                          {data.urgency && <p><span className="text-warm-gray">Urgentie:</span> {URGENCIES.find(u => u.id === data.urgency)?.label}</p>}
-                          {data.damage_types.length > 0 && <p><span className="text-warm-gray">Schade:</span> {data.damage_types.join(', ')}</p>}
-                          {data.insurance && <p><span className="text-warm-gray">Verzekering:</span> {INSURANCE_OPTIONS.find(i => i.id === data.insurance)?.label}</p>}
-                          {data.rental_items.length > 0 && <p><span className="text-warm-gray">Verhuur:</span> {data.rental_items.join(', ')}</p>}
-                          {data.rental_period && <p><span className="text-warm-gray">Periode:</span> {RENTAL_PERIODS.find(p => p.id === data.rental_period)?.label}</p>}
-                          {data.cleaning_package && <p><span className="text-warm-gray">Pakket:</span> {CLEANING_PACKAGES.find(c => c.id === data.cleaning_package)?.label}</p>}
-                          {data.timeframe && <p><span className="text-warm-gray">Wanneer:</span> {TIMEFRAMES.find(t => t.id === data.timeframe)?.label}</p>}
-                          {data.description && <p><span className="text-warm-gray">Toelichting:</span> {data.description}</p>}
+                          {data.interest && <p><span className="text-gray-500">Interesse:</span> {INTERESTS.find(i => i.id === data.interest)?.label}</p>}
+                          {data.caravan_brand && <p><span className="text-gray-500">Merk:</span> {data.caravan_brand}</p>}
+                          {data.storage_type && <p><span className="text-gray-500">Stallingtype:</span> {STORAGE_TYPES.find(s => s.id === data.storage_type)?.label}</p>}
+                          {data.caravan_length && <p><span className="text-gray-500">Lengte:</span> {data.caravan_length}</p>}
+                          {data.route && <p><span className="text-gray-500">Route:</span> {TRANSPORT_ROUTES.find(r => r.id === data.route)?.label}</p>}
+                          {data.sale_type && <p><span className="text-gray-500">Type:</span> {SALE_TYPES.find(s => s.id === data.sale_type)?.label}</p>}
+                          {data.budget && <p><span className="text-gray-500">{data.sale_type === 'verkopen' ? 'Vraagprijs' : 'Budget'}:</span> {data.budget}</p>}
+                          {data.repair_types.length > 0 && <p><span className="text-gray-500">Reparatie:</span> {data.repair_types.join(', ')}</p>}
+                          {data.urgency && <p><span className="text-gray-500">Urgentie:</span> {URGENCIES.find(u => u.id === data.urgency)?.label}</p>}
+                          {data.damage_types.length > 0 && <p><span className="text-gray-500">Schade:</span> {data.damage_types.join(', ')}</p>}
+                          {data.insurance && <p><span className="text-gray-500">Verzekering:</span> {INSURANCE_OPTIONS.find(i => i.id === data.insurance)?.label}</p>}
+                          {data.rental_items.length > 0 && <p><span className="text-gray-500">Verhuur:</span> {data.rental_items.join(', ')}</p>}
+                          {data.rental_period && <p><span className="text-gray-500">Periode:</span> {RENTAL_PERIODS.find(p => p.id === data.rental_period)?.label}</p>}
+                          {data.cleaning_package && <p><span className="text-gray-500">Pakket:</span> {CLEANING_PACKAGES.find(c => c.id === data.cleaning_package)?.label}</p>}
+                          {data.timeframe && <p><span className="text-gray-500">Wanneer:</span> {TIMEFRAMES.find(t => t.id === data.timeframe)?.label}</p>}
+                          {data.description && <p><span className="text-gray-500">Toelichting:</span> {data.description}</p>}
                         </div>
                       </div>
 
-                      <p className="text-xs text-warm-gray mb-4">Liever direct contact?</p>
+                      <p className="text-xs text-gray-500 mb-4">Liever direct contact?</p>
                       <div className="flex gap-2">
-                        <a href="tel:+34650036755" className="flex-1 bg-hero hover:bg-primary text-white font-bold py-3 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
+                        <a href="tel:+34650036755" className="flex-1 bg-primary hover:bg-primary text-white font-bold py-3 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
                           <Phone size={14} /> Bellen
                         </a>
                         <a href="https://wa.me/34650036755" target="_blank" rel="noopener noreferrer" className="flex-1 bg-[#25D366] hover:bg-[#22C35E] text-white font-bold py-3 rounded-xl text-sm transition-all flex items-center justify-center gap-2">

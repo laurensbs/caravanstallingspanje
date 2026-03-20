@@ -51,46 +51,46 @@ export default function ReviewsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <div><h1 className="text-2xl font-black text-surface-dark">Reviews</h1><p className="text-sm text-warm-gray/70 mt-1">{total} reviews · Gemiddeld: {avg} ★</p></div>
+        <div><h1 className="text-2xl font-bold text-gray-900">Reviews</h1><p className="text-sm text-gray-500/70 mt-1">{total} reviews · Gemiddeld: {avg} ★</p></div>
       </div>
 
       <div className="flex gap-2 mb-6">
         {[{ v: '', l: 'Alle' }, { v: 'true', l: 'Gepubliceerd' }, { v: 'false', l: 'Ongepubliceerd' }].map(s => (
-          <button key={s.v} onClick={() => setFilter(s.v)} className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${filter === s.v ? 'bg-primary text-white shadow-md shadow-primary/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>{s.l}</button>
+          <button key={s.v} onClick={() => setFilter(s.v)} className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${filter === s.v ? 'bg-primary text-white shadow-md shadow-primary/20' : 'bg-gray-50 hover:bg-gray-300/20 text-gray-500'}`}>{s.l}</button>
         ))}
       </div>
 
       <div className="space-y-4">
         {reviews.length === 0 ? (
-          <div className="bg-surface rounded-2xl border border-sand-dark/20 p-8 text-center text-warm-gray/70">Geen reviews gevonden</div>
+          <div className="bg-surface rounded-2xl border border-gray-200 p-8 text-center text-gray-500/70">Geen reviews gevonden</div>
         ) : reviews.map(r => (
-          <div key={r.id} className={`bg-surface rounded-2xl border p-5 transition-all ${r.is_published ? 'border-sand-dark/20' : 'border-warning/30 bg-warning/[0.02]'}`}>
+          <div key={r.id} className={`bg-surface rounded-2xl border p-5 transition-all ${r.is_published ? 'border-gray-200' : 'border-warning/30 bg-warning/[0.02]'}`}>
             <div className="flex items-start justify-between mb-3">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <div className="flex">{[1,2,3,4,5].map(s => <Star key={s} size={14} className={s <= r.rating ? 'text-warning fill-warning' : 'text-sand-dark/40'} />)}</div>
-                  {r.title && <span className="font-bold text-sm text-surface-dark">{r.title}</span>}
+                  <div className="flex">{[1,2,3,4,5].map(s => <Star key={s} size={14} className={s <= r.rating ? 'text-warning fill-warning' : 'text-gray-300'} />)}</div>
+                  {r.title && <span className="font-bold text-sm text-gray-900">{r.title}</span>}
                 </div>
-                <p className="text-xs text-warm-gray/70">{r.customer_name} · {r.customer_email} · {fmtDate(r.created_at)}</p>
+                <p className="text-xs text-gray-500/70">{r.customer_name} · {r.customer_email} · {fmtDate(r.created_at)}</p>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={() => togglePublish(r.id, !r.is_published)} className={`flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${r.is_published ? 'bg-accent/10 text-accent hover:bg-accent/20' : 'bg-sand/40 text-warm-gray hover:bg-sand-dark/20'}`}>
+                <button onClick={() => togglePublish(r.id, !r.is_published)} className={`flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${r.is_published ? 'bg-accent/10 text-accent hover:bg-accent/20' : 'bg-gray-50 text-gray-500 hover:bg-gray-300/20'}`}>
                   {r.is_published ? <><Eye size={12} /> Gepubliceerd</> : <><EyeOff size={12} /> Verborgen</>}
                 </button>
               </div>
             </div>
-            {r.comment && <p className="text-sm text-warm-gray leading-relaxed mb-3">{r.comment}</p>}
+            {r.comment && <p className="text-sm text-gray-500 leading-relaxed mb-3">{r.comment}</p>}
             {r.admin_reply && (
               <div className="bg-primary/[0.04] border border-primary/20 rounded-xl p-3 mb-3">
                 <p className="text-xs font-semibold text-primary mb-1">Uw reactie:</p>
-                <p className="text-sm text-warm-gray">{r.admin_reply}</p>
+                <p className="text-sm text-gray-500">{r.admin_reply}</p>
               </div>
             )}
             {replyId === r.id ? (
               <div className="flex gap-2">
-                <input value={replyText} onChange={e => setReplyText(e.target.value)} placeholder="Schrijf een reactie..." className="flex-1 border border-sand-dark/30 rounded-lg px-3 py-2 text-sm bg-sand/40 focus:ring-2 focus:ring-primary/20 outline-none" />
+                <input value={replyText} onChange={e => setReplyText(e.target.value)} placeholder="Schrijf een reactie..." className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:ring-2 focus:ring-primary/20 outline-none" />
                 <button onClick={() => submitReply(r.id)} disabled={!replyText.trim()} className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50">Plaatsen</button>
-                <button onClick={() => setReplyId(null)} className="text-sm text-warm-gray/70 px-3">Annuleren</button>
+                <button onClick={() => setReplyId(null)} className="text-sm text-gray-500/70 px-3">Annuleren</button>
               </div>
             ) : (
               <button onClick={() => { setReplyId(r.id); setReplyText(r.admin_reply || ''); }} className="text-xs text-ocean font-medium flex items-center gap-1 hover:text-ocean-dark transition-colors">

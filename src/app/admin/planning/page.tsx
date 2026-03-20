@@ -125,8 +125,8 @@ export default function PlanningPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black text-surface-dark">Planning</h1>
-          <p className="text-sm text-warm-gray/70 mt-1">Overzicht van contracten, transport en taken</p>
+          <h1 className="text-2xl font-bold text-gray-900">Planning</h1>
+          <p className="text-sm text-gray-500/70 mt-1">Overzicht van contracten, transport en taken</p>
         </div>
         <div className="flex items-center gap-2">
           {/* Filter */}
@@ -134,7 +134,7 @@ export default function PlanningPage() {
             <select
               value={filter}
               onChange={e => setFilter(e.target.value)}
-              className="appearance-none bg-surface border border-sand-dark/30 rounded-xl pl-9 pr-8 py-2 text-sm font-medium text-warm-gray focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="appearance-none bg-surface border border-gray-200 rounded-xl pl-9 pr-8 py-2 text-sm font-medium text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/20"
             >
               <option value="all">Alles</option>
               <option value="contract_start">Contract start</option>
@@ -142,28 +142,28 @@ export default function PlanningPage() {
               <option value="transport_pickup">Ophalen</option>
               <option value="transport_delivery">Afleveren</option>
             </select>
-            <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray/70" />
+            <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500/70" />
           </div>
         </div>
       </div>
 
       <div className="grid lg:grid-cols-[1fr_340px] gap-6">
         {/* Calendar Grid */}
-        <div className="bg-surface rounded-2xl border border-sand-dark/20 overflow-hidden">
+        <div className="bg-surface rounded-2xl border border-gray-200 overflow-hidden">
           {/* Month Navigation */}
-          <div className="flex items-center justify-between p-4 border-b border-sand-dark/20">
-            <button onClick={prevMonth} className="p-2 hover:bg-sand/40 rounded-xl transition-colors"><ChevronLeft size={18} /></button>
+          <div className="flex items-center justify-between p-4 border-b border-gray-200">
+            <button onClick={prevMonth} className="p-2 hover:bg-gray-50 rounded-xl transition-colors"><ChevronLeft size={18} /></button>
             <div className="text-center">
-              <h2 className="text-lg font-black text-surface-dark">{MONTHS_NL[month]} {year}</h2>
+              <h2 className="text-lg font-bold text-gray-900">{MONTHS_NL[month]} {year}</h2>
               <button onClick={goToday} className="text-xs text-accent font-semibold hover:underline">Vandaag</button>
             </div>
-            <button onClick={nextMonth} className="p-2 hover:bg-sand/40 rounded-xl transition-colors"><ChevronRight size={18} /></button>
+            <button onClick={nextMonth} className="p-2 hover:bg-gray-50 rounded-xl transition-colors"><ChevronRight size={18} /></button>
           </div>
 
           {/* Day Headers */}
-          <div className="grid grid-cols-7 border-b border-sand-dark/20">
+          <div className="grid grid-cols-7 border-b border-gray-200">
             {DAYS_NL.map(d => (
-              <div key={d} className="text-center text-xs font-semibold text-warm-gray/70 py-2">{d}</div>
+              <div key={d} className="text-center text-xs font-semibold text-gray-500/70 py-2">{d}</div>
             ))}
           </div>
 
@@ -171,7 +171,7 @@ export default function PlanningPage() {
           <div className="grid grid-cols-7">
             {/* Empty cells before first day */}
             {Array.from({ length: firstDay }).map((_, i) => (
-              <div key={`empty-${i}`} className="min-h-[80px] border-b border-r border-sand-dark/10 bg-sand/40/30" />
+              <div key={`empty-${i}`} className="min-h-[80px] border-b border-r border-gray-100 bg-gray-50/30" />
             ))}
 
             {/* Days */}
@@ -186,14 +186,14 @@ export default function PlanningPage() {
                 <button
                   key={day}
                   onClick={() => setSelectedDate(dateStr === selectedDate ? null : dateStr)}
-                  className={`min-h-[80px] border-b border-r border-sand-dark/10 p-1.5 text-left transition-all hover:bg-accent/[0.03] ${isSelected ? 'bg-accent/[0.06] ring-1 ring-inset ring-primary/20' : ''}`}
+                  className={`min-h-[80px] border-b border-r border-gray-100 p-1.5 text-left transition-all hover:bg-accent/[0.03] ${isSelected ? 'bg-accent/[0.06] ring-1 ring-inset ring-primary/20' : ''}`}
                 >
-                  <span className={`inline-flex items-center justify-center w-7 h-7 text-xs font-bold rounded-full ${isToday ? 'bg-accent text-white' : 'text-warm-gray'}`}>{day}</span>
+                  <span className={`inline-flex items-center justify-center w-7 h-7 text-xs font-bold rounded-full ${isToday ? 'bg-accent text-white' : 'text-gray-500'}`}>{day}</span>
                   <div className="mt-1 space-y-0.5">
                     {dayEvents.slice(0, 3).map(e => (
                       <div key={e.id} className="flex items-center gap-1">
                         <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${TYPE_COLORS[e.type] || 'bg-warm-gray'}`} />
-                        <span className="text-xs text-warm-gray truncate">{e.title}</span>
+                        <span className="text-xs text-gray-500 truncate">{e.title}</span>
                       </div>
                     ))}
                     {dayEvents.length > 3 && (
@@ -209,54 +209,54 @@ export default function PlanningPage() {
         {/* Sidebar - Selected Day Events */}
         <div className="space-y-4">
           {/* Legend */}
-          <div className="bg-surface rounded-2xl border border-sand-dark/20 p-4">
-            <h3 className="text-xs font-bold text-warm-gray/70 uppercase tracking-wider mb-3">Legenda</h3>
+          <div className="bg-surface rounded-2xl border border-gray-200 p-4">
+            <h3 className="text-xs font-bold text-gray-500/70 uppercase tracking-wider mb-3">Legenda</h3>
             <div className="space-y-2">
               {Object.entries(TYPE_LABELS).map(([key, label]) => (
                 <div key={key} className="flex items-center gap-2">
                   <span className={`w-3 h-3 rounded-full ${TYPE_COLORS[key]}`} />
-                  <span className="text-xs text-warm-gray">{label}</span>
+                  <span className="text-xs text-gray-500">{label}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Selected Events */}
-          <div className="bg-surface rounded-2xl border border-sand-dark/20 p-4">
-            <h3 className="text-xs font-bold text-warm-gray/70 uppercase tracking-wider mb-3">
+          <div className="bg-surface rounded-2xl border border-gray-200 p-4">
+            <h3 className="text-xs font-bold text-gray-500/70 uppercase tracking-wider mb-3">
               {selectedDate ? new Date(selectedDate + 'T00:00:00').toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' }) : 'Selecteer een datum'}
             </h3>
             {selectedDate ? (
               selectedEvents.length > 0 ? (
                 <div className="space-y-2">
                   {selectedEvents.map(e => (
-                    <div key={e.id} className="flex items-start gap-3 p-3 bg-sand/40 rounded-xl">
+                    <div key={e.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
                       <span className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${TYPE_COLORS[e.type]}`} />
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-surface-dark truncate">{e.title}</p>
-                        <p className="text-xs text-warm-gray/70">{e.subtitle}</p>
-                        <span className="text-xs font-semibold text-warm-gray/50 mt-1 block">{TYPE_LABELS[e.type]}</span>
+                        <p className="text-sm font-semibold text-gray-900 truncate">{e.title}</p>
+                        <p className="text-xs text-gray-500/70">{e.subtitle}</p>
+                        <span className="text-xs font-semibold text-gray-500/50 mt-1 block">{TYPE_LABELS[e.type]}</span>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
                 <div className="text-center py-6">
-                  <Calendar size={24} className="text-warm-gray/40 mx-auto mb-2" />
-                  <p className="text-xs text-warm-gray/70">Geen items op deze datum</p>
+                  <Calendar size={24} className="text-gray-500/40 mx-auto mb-2" />
+                  <p className="text-xs text-gray-500/70">Geen items op deze datum</p>
                 </div>
               )
             ) : (
               <div className="text-center py-6">
-                <Calendar size={24} className="text-warm-gray/40 mx-auto mb-2" />
-                <p className="text-xs text-warm-gray/70">Klik op een datum voor details</p>
+                <Calendar size={24} className="text-gray-500/40 mx-auto mb-2" />
+                <p className="text-xs text-gray-500/70">Klik op een datum voor details</p>
               </div>
             )}
           </div>
 
           {/* Upcoming Events */}
-          <div className="bg-surface rounded-2xl border border-sand-dark/20 p-4">
-            <h3 className="text-xs font-bold text-warm-gray/70 uppercase tracking-wider mb-3">Komende items</h3>
+          <div className="bg-surface rounded-2xl border border-gray-200 p-4">
+            <h3 className="text-xs font-bold text-gray-500/70 uppercase tracking-wider mb-3">Komende items</h3>
             <div className="space-y-2">
               {filteredEvents
                 .filter(e => e.date >= today)
@@ -266,21 +266,21 @@ export default function PlanningPage() {
                   <button
                     key={e.id}
                     onClick={() => { setSelectedDate(e.date); setCurrentDate(new Date(e.date + 'T00:00:00')); }}
-                    className="w-full flex items-start gap-3 p-2.5 hover:bg-sand/40 rounded-xl transition-colors text-left"
+                    className="w-full flex items-start gap-3 p-2.5 hover:bg-gray-50 rounded-xl transition-colors text-left"
                   >
                     <div className="text-center shrink-0">
-                      <div className="text-xs text-warm-gray/70 font-semibold">{new Date(e.date + 'T00:00:00').toLocaleDateString('nl-NL', { month: 'short' })}</div>
-                      <div className="text-lg font-black text-surface-dark">{new Date(e.date + 'T00:00:00').getDate()}</div>
+                      <div className="text-xs text-gray-500/70 font-semibold">{new Date(e.date + 'T00:00:00').toLocaleDateString('nl-NL', { month: 'short' })}</div>
+                      <div className="text-lg font-bold text-gray-900">{new Date(e.date + 'T00:00:00').getDate()}</div>
                     </div>
                     <div className="min-w-0 pt-0.5">
-                      <p className="text-xs font-semibold text-surface-dark truncate">{e.title}</p>
-                      <p className="text-xs text-warm-gray/70 truncate">{e.subtitle}</p>
+                      <p className="text-xs font-semibold text-gray-900 truncate">{e.title}</p>
+                      <p className="text-xs text-gray-500/70 truncate">{e.subtitle}</p>
                     </div>
                     <span className={`w-2 h-2 rounded-full mt-2 shrink-0 ${TYPE_COLORS[e.type]}`} />
                   </button>
                 ))}
               {filteredEvents.filter(e => e.date >= today).length === 0 && (
-                <p className="text-xs text-warm-gray/70 text-center py-4">Geen komende items</p>
+                <p className="text-xs text-gray-500/70 text-center py-4">Geen komende items</p>
               )}
             </div>
           </div>

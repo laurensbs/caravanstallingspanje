@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description: 'Dé specialist in het veilig stallen, onderhouden, repareren en transporteren van uw caravan aan de Costa Brava. 2000+ caravans, 3 locaties.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://caravanstalling-spanje.com'),
   manifest: '/manifest.json',
-  themeColor: '#C4653A',
+  themeColor: '#1B4D3E',
   appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Caravanstalling' },
   openGraph: {
     type: 'website',
@@ -47,11 +47,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <link rel="apple-touch-icon" href="/images/icon-192.svg" />
       </head>
-      <body className="bg-surface text-surface-dark antialiased pb-16 md:pb-0">
+      <body className="bg-surface text-gray-900 antialiased pb-16 md:pb-0">
         <a href="#main-content" className="skip-link">Ga naar inhoud</a>
         <script
           type="application/ld+json"

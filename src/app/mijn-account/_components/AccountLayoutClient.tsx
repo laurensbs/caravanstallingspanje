@@ -75,24 +75,24 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     setResetLoading(false);
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-sand/40"><div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" /></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-gray-50"><div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" /></div>;
 
   // Not authenticated — show login/register/forgot/reset
   if (!auth) {
     if (resetToken && !resetSuccess) return (
       <>
         <Header />
-        <div className="min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-sand/40 via-surface to-sand/60 p-4">
-          <div className="bg-surface rounded-3xl shadow-xl shadow-sand-dark/20 border border-sand-dark/20 p-8 sm:p-10 w-full max-w-md">
+        <div className="min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-gray-100 via-surface to-gray-100 p-4">
+          <div className="bg-surface rounded-3xl shadow-xl shadow-gray-200/30 border border-gray-200 p-8 sm:p-10 w-full max-w-md">
             <div className="text-center mb-8">
               <div className="w-14 h-14 bg-gradient-to-br from-primary to-primary-light rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/20"><KeyRound className="text-white" size={24}/></div>
-              <h1 className="text-2xl font-black text-surface-dark">Wachtwoord instellen</h1>
-              <p className="text-sm text-warm-gray/70 mt-1">Stel uw nieuwe wachtwoord in</p>
+              <h1 className="text-2xl font-bold text-gray-900">Wachtwoord instellen</h1>
+              <p className="text-sm text-gray-500/70 mt-1">Stel uw nieuwe wachtwoord in</p>
             </div>
             {resetMsg && <div className={`text-sm p-3 rounded-xl mb-5 flex items-center gap-2 ${resetSuccess ? 'bg-accent/10 border border-accent/30 text-primary-dark' : 'bg-danger/10 border border-danger/30 text-danger'}`}>{resetSuccess ? <CheckCircle2 size={14}/> : <AlertCircle size={14}/>}{resetMsg}</div>}
             <form onSubmit={handleResetPassword} className="space-y-4">
-              <div><label className="text-sm font-semibold text-warm-gray/70 block mb-2">Nieuw wachtwoord</label><input type="password" required minLength={8} value={resetForm.password} onChange={e=>setResetForm({...resetForm,password:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
-              <div><label className="text-sm font-semibold text-warm-gray/70 block mb-2">Herhaal wachtwoord</label><input type="password" required minLength={8} value={resetForm.confirm} onChange={e=>setResetForm({...resetForm,confirm:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
+              <div><label className="text-sm font-semibold text-gray-500/70 block mb-2">Nieuw wachtwoord</label><input type="password" required minLength={8} value={resetForm.password} onChange={e=>setResetForm({...resetForm,password:e.target.value})} className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
+              <div><label className="text-sm font-semibold text-gray-500/70 block mb-2">Herhaal wachtwoord</label><input type="password" required minLength={8} value={resetForm.confirm} onChange={e=>setResetForm({...resetForm,confirm:e.target.value})} className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"/></div>
               <button type="submit" disabled={resetLoading} className="w-full bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-primary/20 disabled:opacity-50">{resetLoading ? 'Bezig...' : 'Wachtwoord instellen'}</button>
             </form>
           </div>
@@ -104,23 +104,23 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     return (
       <>
         <Header />
-        <div className="min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-sand/40 via-surface to-sand/60 p-4 relative overflow-hidden">
+        <div className="min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-gray-100 via-surface to-gray-100 p-4 relative overflow-hidden">
           <div className="absolute top-20 right-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
           <div className="absolute bottom-20 left-20 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
-          <div className="bg-surface rounded-3xl shadow-xl shadow-sand-dark/20 border border-sand-dark/20 p-6 sm:p-10 w-full max-w-md relative">
+          <div className="bg-surface rounded-3xl shadow-xl shadow-gray-200/30 border border-gray-200 p-6 sm:p-10 w-full max-w-md relative">
             <div className="text-center mb-6">
               <div className="w-14 h-14 bg-gradient-to-br from-primary to-primary-light rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/20"><Shield className="text-white" size={24}/></div>
               {showForgot ? (
-                <><h1 className="text-2xl font-black text-surface-dark">Wachtwoord vergeten</h1><p className="text-sm text-warm-gray/70 mt-1">Vul uw e-mailadres in voor een resetlink</p></>
+                <><h1 className="text-2xl font-bold text-gray-900">Wachtwoord vergeten</h1><p className="text-sm text-gray-500/70 mt-1">Vul uw e-mailadres in voor een resetlink</p></>
               ) : (
-                <><h1 className="text-2xl font-black text-surface-dark">Mijn Account</h1><p className="text-sm text-warm-gray/70 mt-1">Caravanstalling Spanje</p></>
+                <><h1 className="text-2xl font-bold text-gray-900">Mijn Account</h1><p className="text-sm text-gray-500/70 mt-1">Caravanstalling Spanje</p></>
               )}
             </div>
 
             {!showForgot && (
-              <div className="flex bg-sand/60 rounded-xl p-1 mb-6">
-                <button type="button" onClick={() => { setIsRegister(false); setLoginError(''); }} className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ${!isRegister ? 'bg-white text-surface-dark shadow-sm' : 'text-warm-gray/60 hover:text-warm-gray'}`}>Inloggen</button>
-                <button type="button" onClick={() => { setIsRegister(true); setLoginError(''); }} className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ${isRegister ? 'bg-white text-surface-dark shadow-sm' : 'text-warm-gray/60 hover:text-warm-gray'}`}>Registreren</button>
+              <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
+                <button type="button" onClick={() => { setIsRegister(false); setLoginError(''); }} className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ${!isRegister ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500/60 hover:text-gray-500'}`}>Inloggen</button>
+                <button type="button" onClick={() => { setIsRegister(true); setLoginError(''); }} className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ${isRegister ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500/60 hover:text-gray-500'}`}>Registreren</button>
               </div>
             )}
 
@@ -129,28 +129,28 @@ function AuthGate({ children }: { children: React.ReactNode }) {
               <div className="space-y-4">
                 {forgotMsg && <div className="bg-accent/10 border border-accent/30 text-primary-dark text-sm p-3 rounded-xl flex items-center gap-2"><CheckCircle2 size={14}/>{forgotMsg}</div>}
                 <form onSubmit={handleForgotPassword} className="space-y-4">
-                  <div><label className="text-sm font-semibold text-warm-gray/70 block mb-2">E-mailadres</label><input type="email" required value={forgotEmail} onChange={e=>setForgotEmail(e.target.value)} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3.5 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="uw@email.nl"/></div>
+                  <div><label className="text-sm font-semibold text-gray-500/70 block mb-2">E-mailadres</label><input type="email" required value={forgotEmail} onChange={e=>setForgotEmail(e.target.value)} className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="uw@email.nl"/></div>
                   <button type="submit" disabled={forgotLoading} className="w-full bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-primary/20 disabled:opacity-50">{forgotLoading ? 'Verzenden...' : 'Resetlink versturen'}</button>
                 </form>
-                <p className="text-center text-sm text-warm-gray/70">Weet u uw wachtwoord? <button type="button" onClick={()=>{setShowForgot(false);setForgotMsg('');}} className="text-primary font-semibold hover:underline">Terug naar inloggen</button></p>
+                <p className="text-center text-sm text-gray-500/70">Weet u uw wachtwoord? <button type="button" onClick={()=>{setShowForgot(false);setForgotMsg('');}} className="text-primary font-semibold hover:underline">Terug naar inloggen</button></p>
               </div>
             ) : isRegister ? (
               <form onSubmit={register} className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
-                  <div><label className="text-sm font-semibold text-warm-gray/70 block mb-2">Voornaam *</label><input required value={registerForm.first_name} onChange={e=>setRegisterForm({...registerForm,first_name:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3.5 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Jan"/></div>
-                  <div><label className="text-sm font-semibold text-warm-gray/70 block mb-2">Achternaam *</label><input required value={registerForm.last_name} onChange={e=>setRegisterForm({...registerForm,last_name:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3.5 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Janssen"/></div>
+                  <div><label className="text-sm font-semibold text-gray-500/70 block mb-2">Voornaam *</label><input required value={registerForm.first_name} onChange={e=>setRegisterForm({...registerForm,first_name:e.target.value})} className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Jan"/></div>
+                  <div><label className="text-sm font-semibold text-gray-500/70 block mb-2">Achternaam *</label><input required value={registerForm.last_name} onChange={e=>setRegisterForm({...registerForm,last_name:e.target.value})} className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Janssen"/></div>
                 </div>
-                <div><label className="text-sm font-semibold text-warm-gray/70 block mb-2">E-mail *</label><input type="email" required value={registerForm.email} onChange={e=>setRegisterForm({...registerForm,email:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3.5 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="uw@email.nl"/></div>
-                <div><label className="text-sm font-semibold text-warm-gray/70 block mb-2">Telefoon</label><input value={registerForm.phone} onChange={e=>setRegisterForm({...registerForm,phone:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3.5 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="+31 6 12345678"/></div>
-                <div><label className="text-sm font-semibold text-warm-gray/70 block mb-2">Wachtwoord *</label><div className="relative"><input type={showPw?'text':'password'} required minLength={8} value={registerForm.password} onChange={e=>setRegisterForm({...registerForm,password:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3.5 text-sm pr-12 bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Min. 8 tekens"/><button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-warm-gray/50 hover:text-warm-gray p-1" aria-label={showPw?"Wachtwoord verbergen":"Wachtwoord tonen"}>{showPw?<EyeOff size={18}/>:<Eye size={18}/>}</button></div></div>
+                <div><label className="text-sm font-semibold text-gray-500/70 block mb-2">E-mail *</label><input type="email" required value={registerForm.email} onChange={e=>setRegisterForm({...registerForm,email:e.target.value})} className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="uw@email.nl"/></div>
+                <div><label className="text-sm font-semibold text-gray-500/70 block mb-2">Telefoon</label><input value={registerForm.phone} onChange={e=>setRegisterForm({...registerForm,phone:e.target.value})} className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="+31 6 12345678"/></div>
+                <div><label className="text-sm font-semibold text-gray-500/70 block mb-2">Wachtwoord *</label><div className="relative"><input type={showPw?'text':'password'} required minLength={8} value={registerForm.password} onChange={e=>setRegisterForm({...registerForm,password:e.target.value})} className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm pr-12 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Min. 8 tekens"/><button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500/50 hover:text-gray-500 p-1" aria-label={showPw?"Wachtwoord verbergen":"Wachtwoord tonen"}>{showPw?<EyeOff size={18}/>:<Eye size={18}/>}</button></div></div>
                 <button type="submit" className="w-full bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-primary/20">Registreren</button>
               </form>
             ) : (
               <form onSubmit={login} className="space-y-4">
-                <div><label className="text-sm font-semibold text-warm-gray/70 block mb-2">E-mail</label><input type="email" required value={loginForm.email} onChange={e=>setLoginForm({...loginForm,email:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3.5 text-sm bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="uw@email.nl"/></div>
-                <div><label className="text-sm font-semibold text-warm-gray/70 block mb-2">Wachtwoord</label><div className="relative"><input type={showPw?'text':'password'} required value={loginForm.password} onChange={e=>setLoginForm({...loginForm,password:e.target.value})} className="w-full border border-sand-dark/30 rounded-xl px-4 py-3.5 text-sm pr-12 bg-sand/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Uw wachtwoord"/><button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-warm-gray/50 hover:text-warm-gray p-1" aria-label={showPw?"Wachtwoord verbergen":"Wachtwoord tonen"}>{showPw?<EyeOff size={18}/>:<Eye size={18}/>}</button></div></div>
+                <div><label className="text-sm font-semibold text-gray-500/70 block mb-2">E-mail</label><input type="email" required value={loginForm.email} onChange={e=>setLoginForm({...loginForm,email:e.target.value})} className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="uw@email.nl"/></div>
+                <div><label className="text-sm font-semibold text-gray-500/70 block mb-2">Wachtwoord</label><div className="relative"><input type={showPw?'text':'password'} required value={loginForm.password} onChange={e=>setLoginForm({...loginForm,password:e.target.value})} className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm pr-12 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Uw wachtwoord"/><button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500/50 hover:text-gray-500 p-1" aria-label={showPw?"Wachtwoord verbergen":"Wachtwoord tonen"}>{showPw?<EyeOff size={18}/>:<Eye size={18}/>}</button></div></div>
                 <button type="submit" className="w-full bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-primary/20">Inloggen</button>
-                <button type="button" onClick={()=>setShowForgot(true)} className="w-full text-center text-sm text-warm-gray/60 hover:text-primary transition-colors py-1">Wachtwoord vergeten?</button>
+                <button type="button" onClick={()=>setShowForgot(true)} className="w-full text-center text-sm text-gray-500/60 hover:text-primary transition-colors py-1">Wachtwoord vergeten?</button>
               </form>
             )}
           </div>
@@ -172,7 +172,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
               <div className="inline-flex items-center gap-2 text-primary text-sm font-semibold mb-3">
                 <div className="w-8 h-px bg-primary" /> MIJN ACCOUNT
               </div>
-              <h1 className="text-3xl md:text-4xl font-black">Welkom, {customer?.name}</h1>
+              <h1 className="text-3xl md:text-4xl font-bold">Welkom, {customer?.name}</h1>
               <p className="text-white/70 text-sm mt-2">Klantnummer: {customer?.customer_number}</p>
             </div>
             <button onClick={logout} className="hidden sm:flex items-center gap-2 text-sm text-white/60 hover:text-white bg-surface/5 border border-white/10 px-4 py-2.5 rounded-xl transition-all hover:bg-surface/10">
@@ -187,17 +187,17 @@ function AuthGate({ children }: { children: React.ReactNode }) {
         <div className="flex gap-6">
           {/* Desktop sidebar */}
           <aside className="hidden lg:block w-56 shrink-0">
-            <nav className="bg-surface rounded-2xl shadow-lg shadow-sand-dark/20 border border-sand-dark/20 p-2 sticky top-24">
+            <nav className="bg-surface rounded-2xl shadow-lg shadow-gray-200/30 border border-gray-200 p-2 sticky top-24">
               {NAV.map(item => {
                 const active = item.href === '/mijn-account' ? pathname === '/mijn-account' : pathname.startsWith(item.href);
                 return (
-                  <Link key={item.href} href={item.href} className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all mb-1 ${active ? 'bg-primary text-white shadow-md shadow-primary/20' : 'text-warm-gray/70 hover:text-warm-gray hover:bg-sand/40'}`}>
+                  <Link key={item.href} href={item.href} className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all mb-1 ${active ? 'bg-primary text-white shadow-md shadow-primary/20' : 'text-gray-500/70 hover:text-gray-500 hover:bg-gray-50'}`}>
                     <item.icon size={18} />{item.label}
                   </Link>
                 );
               })}
-              <hr className="my-2 border-sand-dark/20" />
-              <button onClick={logout} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-warm-gray/50 hover:text-danger hover:bg-danger/5 transition-all w-full">
+              <hr className="my-2 border-gray-200" />
+              <button onClick={logout} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-500/50 hover:text-danger hover:bg-danger/5 transition-all w-full">
                 <LogOut size={18} /> Uitloggen
               </button>
             </nav>
@@ -210,12 +210,12 @@ function AuthGate({ children }: { children: React.ReactNode }) {
       </section>
 
       {/* Mobile bottom nav */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-surface border-t border-sand-dark/20 z-50">
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-surface border-t border-gray-200 z-50">
         <div className="flex justify-around py-1 pb-[env(safe-area-inset-bottom)]">
           {NAV.map(item => {
             const active = item.href === '/mijn-account' ? pathname === '/mijn-account' : pathname.startsWith(item.href);
             return (
-              <Link key={item.href} href={item.href} className={`flex flex-col items-center gap-0.5 py-2 px-3 min-w-[60px] min-h-[48px] justify-center rounded-xl transition-all ${active ? 'text-primary' : 'text-warm-gray/50'}`}>
+              <Link key={item.href} href={item.href} className={`flex flex-col items-center gap-0.5 py-2 px-3 min-w-[60px] min-h-[48px] justify-center rounded-xl transition-all ${active ? 'text-primary' : 'text-gray-500/50'}`}>
                 <item.icon size={20} />
                 <span className="text-xs font-medium">{item.label}</span>
               </Link>
@@ -231,7 +231,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
 
 function LayoutInner({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-sand/40"><div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" /></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50"><div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" /></div>}>
       <AuthGate>{children}</AuthGate>
     </Suspense>
   );

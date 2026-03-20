@@ -57,9 +57,9 @@ export default function NotificationCenter({ userType }: { userType: string; use
     <div className="relative">
       <button
         onClick={() => setOpen(o => !o)}
-        className="relative p-2 rounded-xl hover:bg-sand transition-colors"
+        className="relative p-2 rounded-xl hover:bg-gray-100 transition-colors"
       >
-        <Bell size={20} className="text-warm-gray" />
+        <Bell size={20} className="text-gray-500" />
         {unreadCount > 0 && (
           <motion.span
             initial={{ scale: 0 }}
@@ -80,20 +80,20 @@ export default function NotificationCenter({ userType }: { userType: string; use
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.96 }}
               transition={{ duration: 0.2 }}
-              className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-sand-dark/30 z-50 overflow-hidden"
+              className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 overflow-hidden"
             >
-              <div className="flex items-center justify-between p-4 border-b border-sand-dark/20">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200">
                 <h3 className="font-bold text-sm">Notificaties</h3>
-                <button onClick={() => setOpen(false)} className="p-1 hover:bg-sand rounded-lg transition-colors">
-                  <X size={16} className="text-warm-gray" />
+                <button onClick={() => setOpen(false)} className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
+                  <X size={16} className="text-gray-500" />
                 </button>
               </div>
 
               <div className="max-h-[400px] overflow-y-auto">
                 {notifications.length === 0 ? (
                   <div className="text-center py-12 px-4">
-                    <Bell size={32} className="text-warm-gray/20 mx-auto mb-3" />
-                    <p className="text-sm text-warm-gray">Geen notificaties</p>
+                    <Bell size={32} className="text-gray-500/20 mx-auto mb-3" />
+                    <p className="text-sm text-gray-500">Geen notificaties</p>
                   </div>
                 ) : (
                   notifications.slice(0, 20).map(n => {
@@ -102,9 +102,9 @@ export default function NotificationCenter({ userType }: { userType: string; use
                       <div
                         key={n.id}
                         onClick={() => markAsRead(n.id)}
-                        className={`flex items-start gap-3 p-4 border-b border-sand-dark/10 hover:bg-sand/30 transition-colors cursor-pointer ${!n.is_read ? 'bg-primary/[0.02]' : ''}`}
+                        className={`flex items-start gap-3 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer ${!n.is_read ? 'bg-primary/[0.02]' : ''}`}
                       >
-                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${!n.is_read ? 'bg-primary/10 text-primary' : 'bg-sand text-warm-gray'}`}>
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${!n.is_read ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-500'}`}>
                           <Icon size={16} />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -112,12 +112,12 @@ export default function NotificationCenter({ userType }: { userType: string; use
                             <p className="text-sm font-semibold truncate">{n.title}</p>
                             {!n.is_read && <span className="w-2 h-2 bg-primary rounded-full shrink-0" />}
                           </div>
-                          {n.message && <p className="text-xs text-warm-gray mt-0.5 line-clamp-2">{n.message}</p>}
-                          <p className="text-xs text-warm-gray/60 mt-1">{new Date(n.created_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
+                          {n.message && <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{n.message}</p>}
+                          <p className="text-xs text-gray-500/60 mt-1">{new Date(n.created_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
                         </div>
                         {!n.is_read && (
-                          <button onClick={(e) => { e.stopPropagation(); markAsRead(n.id); }} className="p-1 hover:bg-sand rounded-lg transition-colors shrink-0">
-                            <Check size={14} className="text-warm-gray" />
+                          <button onClick={(e) => { e.stopPropagation(); markAsRead(n.id); }} className="p-1 hover:bg-gray-100 rounded-lg transition-colors shrink-0">
+                            <Check size={14} className="text-gray-500" />
                           </button>
                         )}
                       </div>

@@ -26,10 +26,10 @@ export default function DashboardCharts({ stats }: Props) {
   return (
     <div className="grid lg:grid-cols-2 gap-6 mb-8">
       {/* Occupancy — Pie Chart */}
-      <div className="bg-surface rounded-2xl p-6 border border-sand-dark/20">
-        <h2 className="font-bold text-surface-dark flex items-center gap-2 mb-5"><BarChart3 size={16} className="text-ocean" /> Bezettingsgraad</h2>
+      <div className="bg-surface rounded-2xl p-6 border border-gray-200">
+        <h2 className="font-bold text-gray-900 flex items-center gap-2 mb-5"><BarChart3 size={16} className="text-ocean" /> Bezettingsgraad</h2>
         <div className="flex items-center justify-between mb-4">
-          <div><p className="text-3xl font-black text-surface-dark">{pct}%</p><p className="text-xs text-warm-gray/70">{stored} van {total} plekken bezet</p></div>
+          <div><p className="text-3xl font-bold text-gray-900">{pct}%</p><p className="text-xs text-gray-500/70">{stored} van {total} plekken bezet</p></div>
         </div>
         <div className="h-48">
           <ResponsiveContainer width="100%" height="100%">
@@ -43,7 +43,7 @@ export default function DashboardCharts({ stats }: Props) {
         </div>
         <div className="flex justify-center gap-4 mt-2">
           {pieData.map(d => (
-            <div key={d.name} className="flex items-center gap-1.5 text-xs text-warm-gray/70">
+            <div key={d.name} className="flex items-center gap-1.5 text-xs text-gray-500/70">
               <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: d.color }} />
               {d.name} ({d.value})
             </div>
@@ -52,16 +52,16 @@ export default function DashboardCharts({ stats }: Props) {
       </div>
 
       {/* Revenue — Bar Chart */}
-      <div className="bg-surface rounded-2xl p-6 border border-sand-dark/20">
-        <h2 className="font-bold text-surface-dark flex items-center gap-2 mb-5"><TrendingUp size={16} className="text-accent" /> Maandomzet</h2>
+      <div className="bg-surface rounded-2xl p-6 border border-gray-200">
+        <h2 className="font-bold text-gray-900 flex items-center gap-2 mb-5"><TrendingUp size={16} className="text-accent" /> Maandomzet</h2>
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="bg-accent/[0.06] rounded-xl p-4 border border-accent/20">
-            <p className="text-xs text-warm-gray/70 mb-1">Jaaromzet {new Date().getFullYear()}</p>
-            <p className="text-xl font-black text-surface-dark">{fmt(stats.yearRevenue)}</p>
+            <p className="text-xs text-gray-500/70 mb-1">Jaaromzet {new Date().getFullYear()}</p>
+            <p className="text-xl font-bold text-gray-900">{fmt(stats.yearRevenue)}</p>
           </div>
           <div className="bg-warning/[0.06] rounded-xl p-4 border border-warning/20">
-            <p className="text-xs text-warm-gray/70 mb-1">Openstaand</p>
-            <p className="text-xl font-black text-surface-dark">{fmt(stats.openInvoiceAmount)}</p>
+            <p className="text-xs text-gray-500/70 mb-1">Openstaand</p>
+            <p className="text-xl font-bold text-gray-900">{fmt(stats.openInvoiceAmount)}</p>
           </div>
         </div>
         {(stats.monthlyRevenue?.length || 0) > 0 ? (
@@ -76,12 +76,12 @@ export default function DashboardCharts({ stats }: Props) {
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="h-48 flex items-center justify-center text-warm-gray/50 text-sm">Nog geen omzetdata</div>
+          <div className="h-48 flex items-center justify-center text-gray-500/50 text-sm">Nog geen omzetdata</div>
         )}
         {stats.activeContracts > 0 && (
-          <div className="bg-sand/40 rounded-xl p-3 text-center mt-2">
-            <p className="text-xs text-warm-gray/70">Gemiddelde maandelijkse omzet per contract</p>
-            <p className="text-lg font-black text-surface-dark">{fmt(stats.yearRevenue / 12 / stats.activeContracts)}</p>
+          <div className="bg-gray-50 rounded-xl p-3 text-center mt-2">
+            <p className="text-xs text-gray-500/70">Gemiddelde maandelijkse omzet per contract</p>
+            <p className="text-lg font-bold text-gray-900">{fmt(stats.yearRevenue / 12 / stats.activeContracts)}</p>
           </div>
         )}
       </div>

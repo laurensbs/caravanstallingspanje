@@ -53,7 +53,7 @@ export default function BezienswaardigheidPage() {
           </>
         ),
         renderMeta: (item) => (
-          <div className="flex items-center gap-1 text-xs text-warm-gray">
+          <div className="flex items-center gap-1 text-xs text-gray-500">
             {item.town && <span>{String(item.town)}</span>}
             {item.price_range && <span>· {String(item.price_range)}</span>}
           </div>
