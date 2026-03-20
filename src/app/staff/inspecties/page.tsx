@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Search, Plus, X, CheckCircle, Camera, AlertTriangle, Trash2, RotateCcw, ChevronRight, SwitchCamera } from 'lucide-react';
+import { motion } from 'framer-motion';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { toast } from 'sonner';
 
@@ -188,44 +189,47 @@ export default function StaffInspectiesPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between mb-6">
         <h1 className="text-xl md:text-2xl font-black text-surface-dark">Inspecties</h1>
-        <button onClick={startInspection} className="bg-accent hover:bg-accent-dark text-white font-bold px-4 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-accent/20 transition-all">
+        <button onClick={startInspection} className="bg-gradient-to-r from-accent to-accent-dark hover:from-accent-dark hover:to-accent text-white font-bold px-5 py-3 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-accent/20 transition-all hover:-translate-y-0.5">
           <Plus size={16} /> <span className="hidden sm:inline">Nieuwe inspectie</span><span className="sm:hidden">Nieuw</span>
         </button>
-      </div>
+      </motion.div>
 
       {/* Filters - horizontal scroll on mobile */}
-      <div className="bg-surface rounded-2xl border border-sand-dark/20 mb-5 p-3">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="card-premium mb-5 p-3">
         <div className="flex gap-2 overflow-x-auto no-scrollbar">
           {['', 'gepland', 'afgerond'].map(s => (
-            <button key={s} onClick={() => setFilter(s)} className={`px-3.5 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${filter === s ? 'bg-accent text-white shadow-md shadow-accent/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>
+            <button key={s} onClick={() => setFilter(s)} className={`px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${filter === s ? 'bg-gradient-to-r from-accent to-accent-dark text-white shadow-lg shadow-accent/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>
               {s || 'Alle'}
             </button>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* Inspection list - card based for mobile */}
       <div className="space-y-3">
         {loading ? (
-          <div className="bg-surface rounded-2xl border border-sand-dark/20 p-8 text-center">
+          <div className="card-premium p-8 text-center">
             <div className="animate-spin w-6 h-6 border-2 border-accent border-t-transparent rounded-full mx-auto" />
           </div>
         ) : inspections.length === 0 ? (
-          <div className="bg-surface rounded-2xl border border-sand-dark/20 p-10 text-center">
-            <Search size={28} className="text-warm-gray/40 mx-auto mb-3" />
-            <p className="text-sm text-warm-gray/70 font-medium">Geen inspecties gevonden</p>
-          </div>
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="card-premium p-10 text-center">
+            <div className="w-14 h-14 bg-gradient-to-br from-ocean/15 to-ocean/5 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <Search size={22} className="text-ocean" />
+            </div>
+            <p className="text-sm text-warm-gray/70 font-bold">Geen inspecties gevonden</p>
+          </motion.div>
         ) : inspections.map(insp => {
           const cl = insp.checklist || {};
           const pct = passedPct(cl);
           const expanded = expandedInspection === insp.id;
           return (
-            <div key={insp.id} className="bg-surface rounded-2xl border border-sand-dark/20 overflow-hidden hover:shadow-lg hover:shadow-sand-dark/20 transition-all">
+            <motion.div key={insp.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 + inspections.indexOf(insp) * 0.04 }}
+              className="card-premium overflow-hidden">
               <button onClick={() => setExpandedInspection(expanded ? null : insp.id)} className="w-full p-4 flex items-center gap-3 text-left">
                 {/* Score circle */}
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${pct === 100 ? 'bg-accent/15' : pct >= 70 ? 'bg-warning/15' : 'bg-danger/15'}`}>
+                <div className={`w-13 h-13 rounded-xl flex items-center justify-center shrink-0 shadow-sm ${pct === 100 ? 'bg-gradient-to-br from-accent/20 to-accent/10' : pct >= 70 ? 'bg-gradient-to-br from-warning/20 to-warning/10' : 'bg-gradient-to-br from-danger/20 to-danger/10'}`}>
                   <span className={`text-sm font-black ${pct === 100 ? 'text-primary-dark' : pct >= 70 ? 'text-warning' : 'text-danger'}`}>{pct}%</span>
                 </div>
                 <div className="flex-1 min-w-0">
@@ -249,7 +253,7 @@ export default function StaffInspectiesPage() {
                   {insp.notes && <p className="text-sm text-warm-gray/70 mt-3 italic">{insp.notes}</p>}
                 </div>
               )}
-            </div>
+            </motion.div>
           );
         })}
       </div>

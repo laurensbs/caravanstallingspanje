@@ -3,6 +3,7 @@ import { PRIORITY_COLORS } from "@/lib/format";
 
 import { useState, useEffect, useCallback } from 'react';
 import { CheckCircle, Clock, AlertCircle, AlertTriangle, Play, Check } from 'lucide-react';
+import { motion } from 'framer-motion';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { toast } from 'sonner';
 
@@ -41,10 +42,10 @@ export default function StaffTakenPage() {
 
   return (
     <div>
-      <h1 className="text-xl md:text-2xl font-black text-surface-dark mb-5">Mijn taken</h1>
+      <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="text-xl md:text-2xl font-black text-surface-dark mb-5">Mijn taken</motion.h1>
 
       {/* Filter pills - scrollable on mobile */}
-      <div className="bg-surface rounded-2xl border border-sand-dark/20 mb-5 p-3">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="card-premium mb-5 p-3">
         <div className="flex gap-2 overflow-x-auto no-scrollbar">
           {[
             { v: 'open', label: 'Open' },
@@ -52,12 +53,12 @@ export default function StaffTakenPage() {
             { v: 'afgerond', label: 'Klaar' },
             { v: '', label: 'Alle' },
           ].map(s => (
-            <button key={s.v} onClick={() => setStatusFilter(s.v)} className={`px-3.5 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${statusFilter === s.v ? 'bg-accent text-white shadow-md shadow-accent/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>
+            <button key={s.v} onClick={() => setStatusFilter(s.v)} className={`px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${statusFilter === s.v ? 'bg-gradient-to-r from-accent to-accent-dark text-white shadow-lg shadow-accent/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>
               {s.label}
             </button>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* Task count */}
       {!loading && tasks.length > 0 && (
@@ -65,23 +66,26 @@ export default function StaffTakenPage() {
       )}
 
       {/* Task list */}
-      <div className="space-y-2">
+      <div className="space-y-3">
         {loading ? (
-          <div className="bg-surface rounded-2xl border border-sand-dark/20 p-8 text-center">
+          <div className="card-premium p-8 text-center">
             <div className="animate-spin w-6 h-6 border-2 border-accent border-t-transparent rounded-full mx-auto" />
           </div>
         ) : tasks.length === 0 ? (
-          <div className="bg-surface rounded-2xl border border-sand-dark/20 p-10 text-center">
-            <CheckCircle size={28} className="text-accent/40 mx-auto mb-3" />
-            <p className="text-sm text-warm-gray/70 font-medium">
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="card-premium p-10 text-center">
+            <div className="w-14 h-14 bg-gradient-to-br from-accent/15 to-accent/5 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <CheckCircle size={22} className="text-accent" />
+            </div>
+            <p className="text-sm text-warm-gray/70 font-bold">
               {statusFilter === 'open' ? 'Geen openstaande taken!' : 'Geen taken gevonden'}
             </p>
-          </div>
+          </motion.div>
         ) : tasks.map(t => {
           const overdue = t.due_date && !t.completed_at && new Date(t.due_date) < new Date();
           const isUpdating = updatingId === t.id;
           return (
-            <div key={t.id} className={`bg-surface rounded-2xl border overflow-hidden transition-all ${overdue ? 'border-danger/30' : 'border-sand-dark/20'} ${isUpdating ? 'opacity-50' : ''}`}>
+            <motion.div key={t.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 + tasks.indexOf(t) * 0.03 }}
+              className={`card-premium overflow-hidden transition-all ${overdue ? 'ring-1 ring-danger/30' : ''} ${isUpdating ? 'opacity-50' : ''}`}>
               <div className="p-4">
                 <div className="flex items-start gap-3">
                   {/* Priority dot */}
@@ -108,12 +112,12 @@ export default function StaffTakenPage() {
                 {t.status !== 'afgerond' && (
                   <div className="flex gap-2 mt-3 ml-5">
                     {t.status === 'open' && (
-                      <button onClick={() => updateStatus(t.id, 'in_uitvoering')} disabled={isUpdating} className="flex-1 flex items-center justify-center gap-1.5 bg-warning/10 hover:bg-warning/15 text-warning font-semibold py-2.5 rounded-xl text-xs transition-colors active:scale-95">
-                        <Play size={12} fill="currentColor" /> Starten
+                      <button onClick={() => updateStatus(t.id, 'in_uitvoering')} disabled={isUpdating} className="flex-1 flex items-center justify-center gap-1.5 bg-gradient-to-r from-warning/15 to-warning/10 hover:from-warning/20 hover:to-warning/15 text-warning font-bold py-3 rounded-xl text-xs transition-all active:scale-95 min-h-[44px]">
+                        <Play size={13} fill="currentColor" /> Starten
                       </button>
                     )}
-                    <button onClick={() => setConfirmAction({ id: t.id, status: 'afgerond', title: t.title })} disabled={isUpdating} className="flex-1 flex items-center justify-center gap-1.5 bg-accent/10 hover:bg-accent/15 text-primary-dark font-semibold py-2.5 rounded-xl text-xs transition-colors active:scale-95">
-                      <Check size={12} strokeWidth={3} /> Afronden
+                    <button onClick={() => setConfirmAction({ id: t.id, status: 'afgerond', title: t.title })} disabled={isUpdating} className="flex-1 flex items-center justify-center gap-1.5 bg-gradient-to-r from-accent/15 to-accent/10 hover:from-accent/20 hover:to-accent/15 text-primary-dark font-bold py-3 rounded-xl text-xs transition-all active:scale-95 min-h-[44px]">
+                      <Check size={13} strokeWidth={3} /> Afronden
                     </button>
                   </div>
                 )}
@@ -122,7 +126,7 @@ export default function StaffTakenPage() {
                   <p className="text-xs text-accent mt-2 ml-5">✓ Afgerond op {fmtDate(t.completed_at)}</p>
                 )}
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>

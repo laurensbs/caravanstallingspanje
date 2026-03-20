@@ -1,6 +1,7 @@
 'use client';
-import { fmt, fmtDate, CUSTOMER_STATUS_COLORS } from '@/lib/format';
-import { Caravan, FileText, Receipt, MessageSquare, Wrench, Gift, ClipboardCheck, CheckCircle2, Clock, AlertCircle, Calendar, MapPin, Activity, ArrowRight, Sun } from 'lucide-react';
+import { fmt, fmtDate } from '@/lib/format';
+import { Caravan, FileText, Receipt, MessageSquare, Wrench, Gift, ClipboardCheck, CheckCircle2, Clock, AlertCircle, Calendar, MapPin, Activity, ArrowRight, Sun, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
 import type { CustomerData, CaravanItem, Invoice, Contract } from './types';
 
 interface Props {
@@ -33,8 +34,10 @@ export default function OverzichtTab({ customer, caravans, invoices, contracts, 
   return (
     <div className="space-y-6">
       {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-primary/[0.08] via-accent/[0.06] to-ocean/[0.08] rounded-2xl border border-primary/20 p-6 md:p-8">
-        <div className="flex items-start justify-between">
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+        className="bg-gradient-to-r from-primary/[0.08] via-accent/[0.06] to-ocean/[0.08] rounded-2xl border border-primary/20 p-6 md:p-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-48 h-48 bg-primary/[0.04] rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="relative flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <Sun size={18} className="text-primary" />
@@ -48,16 +51,25 @@ export default function OverzichtTab({ customer, caravans, invoices, contracts, 
               }
             </p>
           </div>
+          {caravans.length > 0 && (
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-accent/10 rounded-full">
+              <Sparkles size={13} className="text-accent" />
+              <span className="text-xs font-bold text-accent">Alles in orde</span>
+            </div>
+          )}
         </div>
-      </div>
+      </motion.div>
 
       {/* Next Actions */}
       {nextActions.length > 0 && (
-        <div className="bg-surface rounded-2xl border border-sand-dark/20 p-5">
-          <h3 className="text-sm font-bold text-warm-gray/70 uppercase tracking-wider mb-3">Volgende acties</h3>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
+          className="card-premium p-5">
+          <h3 className="text-xs font-bold text-warm-gray/60 uppercase tracking-widest mb-3 flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-primary rounded-full" /> Volgende acties
+          </h3>
           <div className="space-y-2">
             {nextActions.map((a, i) => (
-              <button key={i} onClick={() => setTab(a.tab)} className={`w-full flex items-center gap-4 rounded-xl p-4 border transition-all hover:shadow-md text-left ${a.color}`}>
+              <button key={i} onClick={() => setTab(a.tab)} className={`w-full flex items-center gap-4 rounded-xl p-4 border transition-all hover:shadow-md hover:-translate-y-0.5 text-left ${a.color}`}>
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${a.urgent ? 'bg-danger/10' : 'bg-sand/60'}`}>
                   <a.icon size={18} className={a.urgent ? 'text-danger' : 'text-warm-gray'} />
                 </div>
@@ -69,69 +81,71 @@ export default function OverzichtTab({ customer, caravans, invoices, contracts, 
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {[
-          { icon: Caravan, value: caravans.length, label: 'Gestalde caravans', bg: 'bg-ocean/10', text: 'text-ocean' },
-          { icon: FileText, value: contracts.filter(c => c.status === 'actief').length, label: 'Actieve contracten', bg: 'bg-accent/10', text: 'text-accent' },
-          { icon: Receipt, value: openInvoices.length, label: 'Openstaande facturen', bg: 'bg-warning/10', text: 'text-warning' },
-        ].map(s => (
-          <div key={s.label} className="bg-surface rounded-2xl border border-sand-dark/20 p-6 hover:shadow-lg hover:shadow-sand-dark/20 transition-all">
-            <div className={`w-11 h-11 ${s.bg} rounded-xl flex items-center justify-center mb-4`}><s.icon size={20} className={s.text} /></div>
-            <p className="text-3xl font-black text-surface-dark">{s.value}</p>
-            <p className="text-sm text-warm-gray/70 mt-1">{s.label}</p>
-          </div>
+          { icon: Caravan, value: caravans.length, label: 'Gestalde caravans', bg: 'from-ocean/15 to-ocean/5', text: 'text-ocean' },
+          { icon: FileText, value: contracts.filter(c => c.status === 'actief').length, label: 'Actieve contracten', bg: 'from-accent/15 to-accent/5', text: 'text-accent' },
+          { icon: Receipt, value: openInvoices.length, label: 'Openstaande facturen', bg: 'from-warning/15 to-warning/5', text: 'text-warning' },
+        ].map((s, i) => (
+          <motion.div key={s.label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 + i * 0.08 }}
+            className="card-premium p-6">
+            <div className={`w-12 h-12 bg-gradient-to-br ${s.bg} rounded-xl flex items-center justify-center mb-4 shadow-sm`}><s.icon size={22} className={s.text} /></div>
+            <p className="stat-number text-3xl">{s.value}</p>
+            <p className="text-sm text-warm-gray/70 mt-1 font-medium">{s.label}</p>
+          </motion.div>
         ))}
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.35 }}
+        className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { icon: Wrench, label: 'Service aanvragen', tab: 'diensten', color: 'bg-primary/10 text-primary' },
-          { icon: MessageSquare, label: 'Bericht sturen', tab: 'berichten', color: 'bg-ocean/10 text-ocean' },
-          { icon: Gift, label: 'Vriend uitnodigen', tab: 'doorverwijzen', color: 'bg-accent/10 text-accent' },
-          { icon: ClipboardCheck, label: 'Inspecties bekijken', tab: 'inspecties', color: 'bg-warning/10 text-warning' },
+          { icon: Wrench, label: 'Service aanvragen', tab: 'diensten', color: 'from-primary/12 to-primary/5 text-primary' },
+          { icon: MessageSquare, label: 'Bericht sturen', tab: 'berichten', color: 'from-ocean/12 to-ocean/5 text-ocean' },
+          { icon: Gift, label: 'Vriend uitnodigen', tab: 'doorverwijzen', color: 'from-accent/12 to-accent/5 text-accent' },
+          { icon: ClipboardCheck, label: 'Inspecties bekijken', tab: 'inspecties', color: 'from-warning/12 to-warning/5 text-warning' },
         ].map(a => (
-          <button key={a.tab} onClick={() => setTab(a.tab)} className="bg-surface rounded-xl border border-sand-dark/20 p-4 text-center hover:shadow-md transition-all group">
-            <div className={`w-10 h-10 ${a.color} rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform`}>
+          <button key={a.tab} onClick={() => setTab(a.tab)} className="card-premium p-4 text-center group">
+            <div className={`w-11 h-11 bg-gradient-to-br ${a.color} rounded-xl flex items-center justify-center mx-auto mb-2.5 group-hover:scale-110 transition-transform shadow-sm`}>
               <a.icon size={18} />
             </div>
-            <p className="text-xs font-semibold">{a.label}</p>
+            <p className="text-xs font-bold text-surface-dark">{a.label}</p>
           </button>
         ))}
-      </div>
+      </motion.div>
 
       {/* Caravan Summary Cards */}
       {caravans.length > 0 && (
-        <div className="bg-surface rounded-2xl border border-sand-dark/20 p-6">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.4 }}
+          className="card-premium p-6">
           <h3 className="font-bold text-surface-dark flex items-center gap-2 mb-4"><Caravan size={18} className="text-primary" /> Uw caravans</h3>
           <div className="space-y-3">
             {caravans.map(c => (
-              <div key={c.id} className="bg-white rounded-xl border border-sand-dark/10 p-4 flex items-center justify-between">
+              <div key={c.id} className="bg-gradient-to-r from-sand/40 to-transparent rounded-xl border border-sand-dark/10 p-4 flex items-center justify-between hover:shadow-sm transition-all">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-ocean/10 rounded-lg flex items-center justify-center">
+                  <div className="w-10 h-10 bg-gradient-to-br from-ocean/15 to-ocean/5 rounded-lg flex items-center justify-center shadow-sm">
                     <Caravan size={18} className="text-ocean" />
                   </div>
                   <div>
                     <p className="font-bold text-sm">{c.brand} {c.model}</p>
-                    <p className="text-xs text-warm-gray">{c.license_plate} &middot; Plek {c.spot_label}</p>
+                    <p className="text-xs text-warm-gray/60">{c.license_plate} &middot; Plek {c.spot_label}</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${c.status === 'gestald' ? 'bg-accent/10 text-accent' : 'bg-warning/10 text-warning'}`}>
-                    {c.status === 'gestald' ? <CheckCircle2 size={10} /> : <Clock size={10} />} {c.status}
-                  </span>
-                </div>
+                <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full ${c.status === 'gestald' ? 'bg-accent/10 text-accent border border-accent/20' : 'bg-warning/10 text-warning border border-warning/20'}`}>
+                  {c.status === 'gestald' ? <CheckCircle2 size={11} /> : <Clock size={11} />} {c.status}
+                </span>
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Status Timeline */}
-      <div className="bg-surface rounded-2xl border border-sand-dark/20 p-6">
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.45 }}
+        className="card-premium p-6">
         <h3 className="font-bold text-surface-dark flex items-center gap-2 mb-6"><Activity size={18} className="text-primary" /> Status tijdlijn</h3>
         <div className="space-y-0">
           {(() => {
@@ -179,7 +193,7 @@ export default function OverzichtTab({ customer, caravans, invoices, contracts, 
             ));
           })()}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

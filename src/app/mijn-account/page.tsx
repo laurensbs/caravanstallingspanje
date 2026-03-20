@@ -38,9 +38,11 @@ export default function MijnAccountPage() {
           caravans: '/mijn-account/caravans',
           contracten: '/mijn-account/caravans',
           facturen: '/mijn-account/caravans',
+          inspecties: '/mijn-account/caravans',
           berichten: '/mijn-account/berichten',
           diensten: '/mijn-account/aanvragen',
           profiel: '/mijn-account/profiel',
+          doorverwijzen: '/mijn-account/profiel',
         };
         router.push(routes[tab] || '/mijn-account');
       }}

@@ -40,9 +40,9 @@ export default function CaravansPage() {
   return (
     <div className="space-y-6">
       {/* Section tabs */}
-      <div className="flex gap-1.5 overflow-x-auto bg-surface rounded-2xl shadow-lg shadow-sand-dark/20 border border-sand-dark/20 p-1.5 no-scrollbar">
+      <div className="flex gap-1 overflow-x-auto bg-card rounded-2xl shadow-lg shadow-sand-dark/15 border border-sand-dark/15 p-1 no-scrollbar">
         {SECTIONS.map(s => (
-          <button key={s.id} onClick={() => setSection(s.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${section === s.id ? 'bg-primary text-white shadow-md shadow-primary/20' : 'text-warm-gray/70 hover:text-warm-gray hover:bg-sand/40'}`}>
+          <button key={s.id} onClick={() => setSection(s.id)} className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${section === s.id ? 'bg-gradient-to-r from-primary to-primary-light text-white shadow-lg shadow-primary/20' : 'text-warm-gray/60 hover:text-warm-gray hover:bg-sand/30'}`}>
             <s.icon size={16} />{s.label}
           </button>
         ))}
