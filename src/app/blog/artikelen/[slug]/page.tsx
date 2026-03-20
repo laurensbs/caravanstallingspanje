@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -18,6 +18,16 @@ export default function ArtikelDetailPage() {
   const [item, setItem] = useState<Item | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      setProgress(h > 0 ? Math.min(window.scrollY / h, 1) : 0);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -71,6 +81,11 @@ export default function ArtikelDetailPage() {
     <>
       <Header />
 
+      {/* Reading progress bar */}
+      <div className="fixed top-0 left-0 right-0 h-[3px] z-50">
+        <div className="h-full bg-gradient-to-r from-primary to-ocean transition-[width] duration-100" style={{ width: `${progress * 100}%` }} />
+      </div>
+
       {/* Hero */}
       <section className="relative bg-hero text-white py-16 sm:py-24 overflow-hidden">
         <div className="absolute inset-0">
@@ -104,29 +119,51 @@ export default function ArtikelDetailPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <motion.article initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
             <div className="prose-custom text-warm-gray leading-relaxed whitespace-pre-line text-[15px]">
-              {content.split('\n').map((line, i) => {
-                if (line.startsWith('## ')) {
-                  return <h2 key={i} className="text-xl sm:text-2xl font-black mt-10 mb-4 text-surface-dark">{line.replace('## ', '')}</h2>;
-                }
-                if (line.startsWith('### ')) {
-                  return <h3 key={i} className="text-lg font-bold mt-8 mb-3 text-surface-dark">{line.replace('### ', '')}</h3>;
-                }
-                if (line.startsWith('- ')) {
-                  return <li key={i} className="ml-4 mb-1 list-disc">{line.replace('- ', '')}</li>;
-                }
-                if (line.trim() === '') return <br key={i} />;
-                const parts = line.split(/(\*\*.*?\*\*)/g);
-                return (
-                  <p key={i} className="mb-4">
-                    {parts.map((part, k) => {
-                      if (part.startsWith('**') && part.endsWith('**')) {
-                        return <strong key={k} className="text-surface-dark font-semibold">{part.replace(/\*\*/g, '')}</strong>;
-                      }
-                      return <span key={k}>{part}</span>;
-                    })}
-                  </p>
-                );
-              })}
+              {(() => {
+                let headingCount = 0;
+                return content.split('\n').map((line, i) => {
+                  if (line.startsWith('## ')) {
+                    headingCount++;
+                    return (
+                      <React.Fragment key={i}>
+                        {headingCount > 1 && headingCount % 2 === 0 && (
+                          <div className="flex items-center gap-4 my-10">
+                            <div className="flex-1 h-px bg-sand-dark/20" />
+                            <span className="text-primary/40 text-lg">&#9830;</span>
+                            <div className="flex-1 h-px bg-sand-dark/20" />
+                          </div>
+                        )}
+                        <h2 className="text-xl sm:text-2xl font-black mt-10 mb-4 text-surface-dark">{line.replace('## ', '')}</h2>
+                      </React.Fragment>
+                    );
+                  }
+                  if (line.startsWith('### ')) {
+                    return <h3 key={i} className="text-lg font-bold mt-8 mb-3 text-surface-dark">{line.replace('### ', '')}</h3>;
+                  }
+                  if (line.startsWith('> ')) {
+                    return (
+                      <blockquote key={i} className="border-l-4 border-primary pl-5 my-6 italic text-surface-dark/80 text-[15px] leading-relaxed">
+                        {line.replace('> ', '')}
+                      </blockquote>
+                    );
+                  }
+                  if (line.startsWith('- ')) {
+                    return <li key={i} className="ml-4 mb-1 list-disc">{line.replace('- ', '')}</li>;
+                  }
+                  if (line.trim() === '') return <br key={i} />;
+                  const parts = line.split(/(\*\*.*?\*\*)/g);
+                  return (
+                    <p key={i} className="mb-4">
+                      {parts.map((part, k) => {
+                        if (part.startsWith('**') && part.endsWith('**')) {
+                          return <strong key={k} className="text-surface-dark font-semibold">{part.replace(/\*\*/g, '')}</strong>;
+                        }
+                        return <span key={k}>{part}</span>;
+                      })}
+                    </p>
+                  );
+                });
+              })()}
             </div>
           </motion.article>
 

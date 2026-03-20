@@ -9,6 +9,7 @@ import CtaSection from '@/components/CtaSection';
 import PageHero from '@/components/PageHero';
 import { FaqItem } from '@/components/FaqAccordion';
 import QuizModal from '@/components/QuizModal';
+import { useCountUp } from '@/lib/useCountUp';
 
 const stallingFaqs = [
   { q: 'Hoe is de beveiliging van het terrein geregeld?', a: 'Ons terrein is volledig omsloten en beveiligd met het Securitas Direct professioneel alarmsysteem met directe alarmopvolging. Daarnaast filmt een geavanceerd camerasysteem 24/7 alle bewegingen. Ons personeel is dagelijks aanwezig voor toezicht.' },
@@ -22,6 +23,9 @@ const stallingFaqs = [
 
 export default function StallingPage() {
   const [quizOpen, setQuizOpen] = useState(false);
+  const statYears = useCountUp(20);
+  const statClients = useCountUp(200);
+  const statDays = useCountUp(14);
   return (
     <>
       <Header />
@@ -33,19 +37,30 @@ export default function StallingPage() {
         <div className="absolute inset-0 line-pattern opacity-15 pointer-events-none" />
         <div className="max-w-5xl mx-auto px-4 sm:px-6 relative">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8">
-            {[
-              { num: '20+', label: 'Jaar ervaring' },
-              { num: '200+', label: 'Tevreden klanten' },
-              { num: '24/7', label: 'Camerabewaking' },
-              { num: '14', label: 'Daagse controles' },
-            ].map((s, i) => (
-              <A key={s.label} delay={i * 0.1}>
-                <div className="text-center">
-                  <p className="stat-number text-3xl sm:text-5xl mb-1.5">{s.num}</p>
-                  <p className="text-warm-gray text-xs sm:text-sm font-medium">{s.label}</p>
-                </div>
-              </A>
-            ))}
+            <A delay={0}>
+              <div className="text-center" ref={statYears.ref}>
+                <p className="stat-number text-3xl sm:text-5xl mb-1.5">{statYears.value}+</p>
+                <p className="text-warm-gray text-xs sm:text-sm font-medium">Jaar ervaring</p>
+              </div>
+            </A>
+            <A delay={0.1}>
+              <div className="text-center" ref={statClients.ref}>
+                <p className="stat-number text-3xl sm:text-5xl mb-1.5">{statClients.value}+</p>
+                <p className="text-warm-gray text-xs sm:text-sm font-medium">Tevreden klanten</p>
+              </div>
+            </A>
+            <A delay={0.2}>
+              <div className="text-center">
+                <p className="stat-number text-3xl sm:text-5xl mb-1.5">24/7</p>
+                <p className="text-warm-gray text-xs sm:text-sm font-medium">Camerabewaking</p>
+              </div>
+            </A>
+            <A delay={0.3}>
+              <div className="text-center" ref={statDays.ref}>
+                <p className="stat-number text-3xl sm:text-5xl mb-1.5">{statDays.value}</p>
+                <p className="text-warm-gray text-xs sm:text-sm font-medium">Daagse controles</p>
+              </div>
+            </A>
           </div>
         </div>
       </section>

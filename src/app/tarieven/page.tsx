@@ -87,7 +87,7 @@ export default function TarievenPage() {
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {plans.map((p, i) => (
               <A key={p.title} delay={i * 0.1}>
-                <div className={`card-premium p-7 sm:p-8 h-full flex flex-col ${p.popular ? 'ring-2 ring-accent/20 shadow-lg' : ''}`}>
+                <div className={`card-premium shine-on-hover p-7 sm:p-8 h-full flex flex-col ${p.popular ? 'ring-2 ring-accent/20 shadow-lg' : ''}`}>
                   {p.popular && <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-accent text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md uppercase tracking-wider">Populair</span>}
                   <div className={`w-12 h-12 ${p.color} rounded-xl flex items-center justify-center mb-5`}>
                     <Shield size={20} />
@@ -114,7 +114,7 @@ export default function TarievenPage() {
         </div>
       </section>
 
-      {/* Comparison Table */}
+      {/* Comparison — Visual Cards */}
       <section className="py-14 sm:py-24 bg-premium-warm relative">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <A className="text-center max-w-2xl mx-auto mb-10">
@@ -122,44 +122,55 @@ export default function TarievenPage() {
             <h2 className="text-2xl sm:text-3xl font-black mb-4">Wat is inbegrepen?</h2>
             <div className="divider-animated mt-3 mb-4" />
           </A>
+
+          {/* Shared features */}
           <A>
-            <div className="overflow-x-auto">
-              <table className="w-full bg-card rounded-2xl border border-sand-dark/[0.06] overflow-hidden text-sm">
-                <thead>
-                  <tr className="border-b border-sand-dark/10">
-                    <th className="text-left px-5 py-4 font-bold">Kenmerk</th>
-                    <th className="text-center px-4 py-4 font-bold bg-accent/5">Buiten <span className="block text-xs font-normal text-warm-gray">€65/mnd</span></th>
-                    <th className="text-center px-4 py-4 font-bold">Binnen <span className="block text-xs font-normal text-warm-gray">€95/mnd</span></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    { feature: 'Securitas Direct alarm', buiten: true, binnen: true },
-                    { feature: '24/7 camerabewaking', buiten: true, binnen: true },
-                    { feature: 'Standaard verzekerd', buiten: true, binnen: true },
-                    { feature: 'Eigen vaste plek', buiten: true, binnen: true },
-                    { feature: 'Tweewekelijkse controle', buiten: true, binnen: true },
-                    { feature: 'Jaarlijkse technische keuring', buiten: true, binnen: true },
-                    { feature: 'Jaarrond beschikbaar', buiten: true, binnen: true },
-                    { feature: 'Overdekte hal', buiten: false, binnen: true },
-                    { feature: 'Geen UV-schade', buiten: false, binnen: true },
-                    { feature: 'Stabiele temperatuur', buiten: false, binnen: true },
-                    { feature: 'Geen mos/algvorming', buiten: false, binnen: true },
-                  ].map((row, i) => (
-                    <tr key={row.feature} className={i % 2 === 0 ? 'bg-surface/50' : ''}>
-                      <td className="px-5 py-3 font-medium">{row.feature}</td>
-                      <td className="text-center px-4 py-3 bg-accent/5">{row.buiten ? <CheckCircle size={16} className="text-success mx-auto" /> : <span className="text-warm-gray/40">—</span>}</td>
-                      <td className="text-center px-4 py-3">{row.binnen ? <CheckCircle size={16} className="text-success mx-auto" /> : <span className="text-warm-gray/40">—</span>}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="card-premium p-6 sm:p-8 mb-6 max-w-3xl mx-auto">
+              <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-4">Beide stallingstypen inclusief</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {['Securitas Direct alarm', '24/7 camerabewaking', 'Standaard verzekerd', 'Eigen vaste plek', 'Tweewekelijkse controle', 'Jaarlijkse technische keuring', 'Jaarrond beschikbaar'].map(f => (
+                  <div key={f} className="flex items-center gap-2 text-sm"><CheckCircle size={14} className="text-success shrink-0" /> {f}</div>
+                ))}
+              </div>
             </div>
           </A>
+
+          {/* Unique features per type */}
+          <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto">
+            <A delay={0.05}>
+              <div className="card-premium p-6 h-full">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-accent/10 text-accent rounded-xl flex items-center justify-center"><Shield size={18} /></div>
+                  <div>
+                    <h3 className="font-bold">Buitenstalling</h3>
+                    <p className="text-xs text-warm-gray">€65/maand</p>
+                  </div>
+                </div>
+                <p className="text-sm text-warm-gray leading-relaxed">Uw caravan op een beveiligd buitenterrein. Het milde Spaanse klimaat beschermt tegen vorst en strooizout.</p>
+              </div>
+            </A>
+            <A delay={0.1}>
+              <div className="card-premium p-6 h-full ring-1 ring-ocean/20">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-ocean/10 text-ocean rounded-xl flex items-center justify-center"><Shield size={18} /></div>
+                  <div>
+                    <h3 className="font-bold">Binnenstalling</h3>
+                    <p className="text-xs text-warm-gray">€95/maand</p>
+                  </div>
+                </div>
+                <p className="text-sm text-warm-gray leading-relaxed mb-4">Maximale bescherming in onze geïsoleerde hal. Extra voordelen:</p>
+                <div className="space-y-2">
+                  {['Overdekte geïsoleerde hal', 'Geen UV-schade of verbleking', 'Stabiele temperatuur jaarrond', 'Geen mos- of algvorming'].map(f => (
+                    <div key={f} className="flex items-center gap-2 text-sm"><CheckCircle size={13} className="text-ocean shrink-0" /> {f}</div>
+                  ))}
+                </div>
+              </div>
+            </A>
+          </div>
         </div>
       </section>
 
-      {/* Extra Services */}
+      {/* Extra Services — Grouped & Collapsible */}
       <section className="py-14 sm:py-24 bg-surface relative overflow-hidden">
         <div className="absolute -bottom-32 -right-32 w-72 h-72 bg-primary/[0.03] rounded-full blur-3xl pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
@@ -171,12 +182,24 @@ export default function TarievenPage() {
           </A>
 
           <A>
-            <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-sand-dark/[0.06] overflow-hidden">
-              {extras.map((e, i) => (
-                <div key={e.service} className={`flex items-center justify-between px-6 py-4 text-sm ${i !== extras.length - 1 ? 'border-b border-sand-dark/[0.04]' : ''}`}>
-                  <span className="font-medium">{e.service}</span>
-                  <span className={`font-bold shrink-0 ml-4 ${e.price === 'Inbegrepen' ? 'text-success' : e.price === 'Op aanvraag' ? 'text-primary' : ''}`}>{e.price}</span>
-                </div>
+            <div className="max-w-3xl mx-auto space-y-4">
+              {[
+                { category: 'Schoonmaak & onderhoud', items: extras.filter((_, i) => i >= 2 && i <= 7) },
+                { category: 'Verhuur', items: extras.filter((_, i) => i >= 9 && i <= 11) },
+                { category: 'Overig', items: extras.filter((_, i) => i === 0 || i === 1 || i === 8) },
+              ].map(group => (
+                <FaqItem key={group.category} q={group.category} a={
+                  group.items.map(e => `${e.service}: ${e.price}`).join(' \u2022 ')
+                }>
+                  <div className="space-y-0">
+                    {group.items.map((e, i) => (
+                      <div key={e.service} className={`flex items-center justify-between py-3 text-sm ${i !== group.items.length - 1 ? 'border-b border-sand-dark/10' : ''}`}>
+                        <span className="font-medium">{e.service}</span>
+                        <span className={`font-bold shrink-0 ml-4 ${e.price === 'Inbegrepen' ? 'text-success' : e.price === 'Op aanvraag' ? 'text-primary' : ''}`}>{e.price}</span>
+                      </div>
+                    ))}
+                  </div>
+                </FaqItem>
               ))}
             </div>
           </A>

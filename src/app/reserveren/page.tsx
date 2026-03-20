@@ -2,7 +2,6 @@
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { StepIndicator } from "@/components/ui";
 import { Shield, CheckCircle, ArrowRight, ArrowLeft, MapPin, Calendar, Ruler, Truck, Sparkles, Zap, Droplets, Star, Lock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, Suspense } from "react";
@@ -255,10 +254,31 @@ function BookingPageInner() {
         </div>
       </section>
 
-      {/* Steps */}
-      <section className="bg-surface border-b border-black/[0.04] py-8">
+      {/* Steps — gradient progress bar */}
+      <section className="bg-surface border-b border-black/[0.04] py-6 sm:py-8">
         <div className="max-w-3xl mx-auto px-4">
-          <StepIndicator steps={STEPS} current={step} />
+          <div className="flex items-center justify-between mb-3">
+            {STEPS.map((s, i) => (
+              <button
+                key={i}
+                onClick={() => { if (i < step) setStep(i); }}
+                className={`flex items-center gap-1.5 text-xs font-semibold transition-colors ${i <= step ? 'text-primary' : 'text-muted'} ${i < step ? 'cursor-pointer hover:text-primary-dark' : 'cursor-default'}`}
+              >
+                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 transition-all duration-300 ${i < step ? 'bg-primary text-white' : i === step ? 'bg-primary text-white ring-4 ring-primary/20' : 'bg-black/[0.06] text-muted'}`}>
+                  {i < step ? <CheckCircle size={12} /> : i + 1}
+                </span>
+                <span className="hidden sm:inline">{s.label}</span>
+              </button>
+            ))}
+          </div>
+          <div className="h-1.5 bg-black/[0.06] rounded-full overflow-hidden">
+            <motion.div
+              className="h-full rounded-full bg-gradient-to-r from-primary to-accent"
+              initial={false}
+              animate={{ width: `${(step / (STEPS.length - 1)) * 100}%` }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+            />
+          </div>
         </div>
       </section>
 
@@ -290,21 +310,21 @@ function BookingPageInner() {
                     </p>
                   </div>
 
-                  <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                  <div className="grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
                     {STORAGE_TYPES.map(type => (
-                      <button key={type.id} onClick={() => update("storageType", type.id)} className={`relative text-left p-6 rounded-2xl border-2 transition-all duration-200 ${form.storageType === type.id ? "border-accent bg-surface shadow-lg shadow-primary/10 ring-1 ring-primary/10" : "border-transparent bg-surface hover:border-black/[0.08]"}`}>
-                        {type.popular && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white text-xs font-bold px-3 py-1 rounded-full">Populair</span>}
-                        <type.icon size={24} className={form.storageType === type.id ? "text-accent mb-3" : "text-muted mb-3"} />
-                        <h3 className="font-bold text-[15px]">{type.label}</h3>
-                        <p className="text-xs text-muted mt-1 mb-3">{type.desc}</p>
-                        <div className="mb-4">
-                          <span className="text-2xl font-black">€{type.price}</span>
-                          <span className="text-muted text-xs">/mnd</span>
+                      <button key={type.id} onClick={() => update("storageType", type.id)} className={`relative text-left p-8 rounded-2xl border-2 transition-all duration-200 shine-on-hover ${form.storageType === type.id ? "border-accent bg-surface shadow-lg shadow-primary/10 ring-1 ring-primary/10" : "border-transparent bg-surface hover:border-black/[0.08]"}`}>
+                        {type.popular && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">Populair</span>}
+                        <type.icon size={28} className={form.storageType === type.id ? "text-accent mb-4" : "text-muted mb-4"} />
+                        <h3 className="font-bold text-lg">{type.label}</h3>
+                        <p className="text-sm text-muted mt-1 mb-4">{type.desc}</p>
+                        <div className="mb-5">
+                          <span className="text-3xl font-black">€{type.price}</span>
+                          <span className="text-muted text-sm">/mnd</span>
                         </div>
-                        <ul className="space-y-1.5">
+                        <ul className="space-y-2">
                           {type.features.map(f => (
-                            <li key={f} className="flex items-center gap-2 text-xs text-muted">
-                              <CheckCircle size={12} className="text-success shrink-0" /> {f}
+                            <li key={f} className="flex items-center gap-2 text-sm text-muted">
+                              <CheckCircle size={14} className="text-success shrink-0" /> {f}
                             </li>
                           ))}
                         </ul>
@@ -469,7 +489,7 @@ function BookingPageInner() {
                     return (
                       <button onClick={toggleBundle} className={`w-full text-left p-5 rounded-2xl border-2 transition-all duration-200 relative upsell-highlight ${hasBundle ? "border-primary bg-primary/[0.04] shadow-lg shadow-primary/10 ring-1 ring-primary/10" : "border-primary/30 bg-gradient-to-r from-primary/[0.03] to-surface hover:border-primary/50"}`}>
                         <div className="absolute -top-3 left-4">
-                          <span className="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">Bespaar \u20AC{BUNDLE_DEAL.savings}</span>
+                          <span className="bg-primary text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md animate-pulse">&#9733; Bespaar €{BUNDLE_DEAL.savings}</span>
                         </div>
                         <div className="flex items-center gap-4 mt-1">
                           <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">

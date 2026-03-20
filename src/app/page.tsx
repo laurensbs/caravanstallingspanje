@@ -13,6 +13,7 @@ import BrandSlider from "@/components/BrandSlider";
 import QuizModal from "@/components/QuizModal";
 import { useT } from "@/lib/i18n";
 import { BLOG_POSTS } from "@/lib/blog-data";
+import { useCountUp } from "@/lib/useCountUp";
 
 const BLOG_PREVIEW = BLOG_POSTS.slice(0, 3);
 
@@ -24,6 +25,11 @@ export default function HomePage() {
   const [quizOpen, setQuizOpen] = useState(false);
   const [quizInterest, setQuizInterest] = useState<string | undefined>(undefined);
   const [availSpots, setAvailSpots] = useState<number | null>(null);
+
+  // Count-up stats for Social Proof Strip
+  const stat1 = useCountUp(2000, 2000);
+  const stat2 = useCountUp(20, 1600);
+  const stat3 = useCountUp(3, 1200);
 
   const reviewSchema = {
     '@context': 'https://schema.org',
@@ -183,7 +189,7 @@ export default function HomePage() {
                       </div>
                     </div>
                     <button type="submit" disabled={checkingAvail} className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3.5 rounded-xl text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow-md disabled:opacity-60">
-                      {checkingAvail ? <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg> Controleren...</> : <>Beschikbaarheid checken <ArrowRight size={15} /></>}
+                      {checkingAvail ? <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg> Controleren...</> : <>Direct plek reserveren <ArrowRight size={15} /></>}
                     </button>
                     <div className="flex items-center justify-center gap-3 mt-3 text-xs text-warm-gray/60">
                       <span className="flex items-center gap-1"><Shield size={10} /> Gratis annuleren</span>
@@ -268,48 +274,28 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ STALLING TYPES ═══ */}
-      <section className="py-14 sm:py-24 bg-surface relative overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/[0.03] rounded-full blur-3xl pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <A className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
-            <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-              <span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Stallingstypen</span>
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-black mb-3">Kies uw stallingtype</h2>
-            <div className="divider-animated mt-3 mb-4" />
-            <p className="text-warm-gray leading-relaxed text-sm">Inclusief beveiliging, verzekering en tweewekelijkse controle.</p>
-          </A>
-
-          <div className="grid sm:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto">
+      {/* ═══ SOCIAL PROOF STRIP ═══ */}
+      <section className="section-immersive">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 relative">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8">
             {[
-              { title: "Buitenstalling", price: "65", desc: "Uw caravan op een beveiligd buitenterrein met 24/7 bewaking. Het milde Spaanse klimaat beschermt tegen vorst en strooizout.", features: ["Eigen vaste plek met pleknummer", "Securitas Direct alarm", "24/7 camerabewaking", "Standaard verzekerd", "Tweewekelijkse controle", "Jaarlijkse technische keuring"], popular: false, icon: Shield },
-              { title: "Binnenstalling", price: "95", desc: "Maximale bescherming in onze geïsoleerde hal. Geen UV-schade, stabiele temperatuur — ideaal voor nieuwere caravans.", features: ["Geïsoleerde overdekte hal", "Geen UV-schade of verbleking", "Stabiele temperatuur", "Alle voordelen buitenstalling", "Premium locatie", "Beperkt beschikbaar"], popular: true, icon: Building },
-            ].map((p, i) => (
-              <A key={p.title} delay={i * 0.1}>
-                <div className={`card-premium p-7 sm:p-9 h-full flex flex-col ${p.popular ? 'ring-2 ring-primary/20' : ''}`}>
-                  {p.popular && <span className="absolute top-6 right-6 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">Meest gekozen</span>}
-                  <div className={`w-12 h-12 ${p.popular ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'} rounded-xl flex items-center justify-center mb-5`}>
-                    <p.icon size={22} />
-                  </div>
-                  <h3 className="text-xl font-black mb-1.5">{p.title}</h3>
-                  <p className="text-sm text-warm-gray mb-6 leading-relaxed">{p.desc}</p>
-                  <ul className="space-y-2.5 mb-8 flex-1">
-                    {p.features.map(f => (
-                      <li key={f} className="flex items-center gap-2.5 text-sm"><CheckCircle size={14} className="text-accent shrink-0" /> {f}</li>
-                    ))}
-                  </ul>
-                  <div className="flex items-end gap-1 mb-5">
-                    <span className="text-sm text-warm-gray">Vanaf</span>
-                    <span className="stat-number text-4xl">€{p.price}</span>
-                    <span className="text-warm-gray text-sm">/maand</span>
-                  </div>
-                  <button onClick={() => setQuizOpen(true)} className={`w-full py-3.5 rounded-xl text-sm font-bold transition-all duration-200 cursor-pointer inline-flex items-center justify-center gap-2 ${p.popular ? 'bg-primary hover:bg-primary-dark text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5' : 'bg-hero hover:bg-hero/90 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5'}`}>
-                    Stalling aanvragen <ArrowRight size={14} />
-                  </button>
-                </div>
-              </A>
+              { ref: stat1.ref, value: `${stat1.value}+`, label: "Caravans gestald" },
+              { ref: stat2.ref, value: `${stat2.value}+`, label: "Jaar ervaring" },
+              { ref: null, value: "4.9★", label: "Google Reviews" },
+              { ref: stat3.ref, value: `${stat3.value}`, label: "Locaties Costa Brava" },
+            ].map((s, i) => (
+              <motion.div
+                key={s.label}
+                ref={s.ref}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="text-center"
+              >
+                <div className="text-3xl sm:text-5xl font-black text-white mb-1 font-heading tracking-tight">{s.value}</div>
+                <div className="text-white/50 text-xs sm:text-sm font-medium">{s.label}</div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -357,26 +343,36 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ CARAVANREPAIR BANNER ═══ */}
-      <section className="bg-hero relative overflow-hidden">
-        <div className="absolute inset-0 line-pattern" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-16 relative">
-          <A>
-            <div className="flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
-              <div className="flex flex-col md:flex-row items-center gap-5">
-                <div className="w-14 h-14 bg-primary/15 rounded-2xl flex items-center justify-center shrink-0 animate-pulse-glow">
-                  <Sparkles className="text-primary-light" size={24} />
-                </div>
-                <div>
-                  <h3 className="text-white text-xl sm:text-2xl font-black mb-1">CaravanRepair® Masterdealer</h3>
-                  <p className="text-white/60 max-w-lg text-sm">Onzichtbaar schadeherstel van geprofileerde wanden. Alle verzekeraars erkend. Levenslange garantie.</p>
-                </div>
-              </div>
-              <Link href="/diensten" className="shrink-0 bg-primary hover:bg-primary-light text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all duration-200 inline-flex items-center gap-2 shadow-sm">
-                Meer informatie <ChevronRight size={15} />
-              </Link>
-            </div>
+      {/* ═══ VISUAL SHOWCASE ═══ */}
+      <section className="py-12 sm:py-20 bg-surface">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <A className="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
+            <span className="inline-flex items-center gap-2 bg-primary/8 rounded-full px-3 py-1 mb-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              <span className="text-primary text-xs font-bold tracking-[0.15em] uppercase">Ons terrein</span>
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-black mb-3">Neem een kijkje op ons terrein</h2>
+            <div className="divider-animated mt-3 mb-3" />
           </A>
+          <div className="grid grid-cols-2 gap-3 sm:gap-5 max-w-5xl mx-auto">
+            {[
+              { src: "https://u.cubeupload.com/laurensbos/caravanstoragespain2.jpg", label: "Beveiligd buitenterrein", sub: "24/7 Securitas Direct" },
+              { src: "https://u.cubeupload.com/laurensbos/caravanstoragespain5.jpg", label: "CaravanRepair® werkplaats", sub: "Alle merken & schadeherstel" },
+              { src: "https://u.cubeupload.com/laurensbos/caravanstoragespain4.jpg", label: "Europees transport", sub: "Ophaal- en bezorgservice" },
+              { src: "https://u.cubeupload.com/laurensbos/caravanstoragespain6.jpg", label: "Costa Brava locatie", sub: "Zon, ruimte en rust" },
+            ].map((photo, i) => (
+              <A key={photo.label} delay={i * 0.08}>
+                <div className="card-editorial aspect-[4/3] group">
+                  <Image src={photo.src} alt={photo.label} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="card-editorial-overlay" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 z-10">
+                    <h3 className="text-white font-bold text-sm sm:text-base">{photo.label}</h3>
+                    <p className="text-white/60 text-xs mt-0.5">{photo.sub}</p>
+                  </div>
+                </div>
+              </A>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -410,7 +406,7 @@ export default function HomePage() {
                     { label: "Volgende factuur", value: "€65,00", sub: "Vervaldatum: 01-04-2026" },
                     { label: "Laatste inspectie", value: "Goedgekeurd", sub: "02-03-2026 · Geen bijzonderheden" },
                   ].map(item => (
-                    <div key={item.label} className="bg-card rounded-xl p-4 border border-sand-dark/20">
+                    <div key={item.label} className="card-premium p-4">
                       <p className="text-xs text-warm-gray font-medium uppercase tracking-wider">{item.label}</p>
                       <p className="text-sm font-bold text-surface-dark mt-1">{item.value}</p>
                       <p className="text-xs text-warm-gray mt-0.5">{item.sub}</p>
@@ -437,14 +433,15 @@ export default function HomePage() {
               <A key={post.slug} delay={i * 0.08}>
                 <Link href={`/blog/${post.slug}`} className="group block h-full snap-start min-w-[280px] sm:min-w-0">
                   <div className="bg-card rounded-2xl overflow-hidden border border-sand-dark/20 h-full flex flex-col card-hover">
-                    <div className="relative aspect-[16/10] overflow-hidden">
+                    <div className="card-editorial relative aspect-[16/10] overflow-hidden">
                       <Image src={post.image} alt={post.title} fill sizes="(max-width: 640px) 80vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                      <div className="absolute top-3 left-3">
+                      <div className="card-editorial-overlay" />
+                      <div className="absolute bottom-3 left-3 right-3 z-10">
                         <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-white/90 text-primary">{post.category}</span>
+                        <h3 className="font-bold text-[15px] leading-snug text-white mt-2">{post.title}</h3>
                       </div>
                     </div>
                     <div className="p-6 flex flex-col flex-1">
-                      <h3 className="font-bold text-[15px] leading-snug mb-2 group-hover:text-primary transition-colors">{post.title}</h3>
                       <p className="text-sm text-warm-gray leading-relaxed flex-1 mb-4">{post.excerpt}</p>
                       <span className="inline-flex items-center gap-1.5 text-primary font-semibold text-xs group-hover:gap-2.5 transition-all">
                         Lees meer <ArrowRight size={12} />

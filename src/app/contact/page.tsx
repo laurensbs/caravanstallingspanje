@@ -166,7 +166,12 @@ export default function ContactPage() {
       <section className="bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
           <A>
-            <div className="rounded-2xl overflow-hidden border border-sand-dark/[0.04]">
+            <div className="card-premium overflow-hidden relative">
+              <div className="absolute top-0 left-0 right-0 z-10 bg-white/70 backdrop-blur-md px-5 py-3 flex items-center gap-2 border-b border-sand-dark/10">
+                <MapPin size={14} className="text-primary" />
+                <span className="text-sm font-bold">Caravanstalling Spanje</span>
+                <span className="text-xs text-warm-gray ml-auto hidden sm:inline">Ctra de Palamós, 91 · Sant Climent de Peralta</span>
+              </div>
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2975.8!2d3.14!3d42.01!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12ba8d9e42ceae9f%3A0x4af8d0d99ced30a2!2sCtra.%20de%20Palam%C3%B3s%2C%2091%2C%2017110%20Sant%20Climent%20de%20Peralta%2C%20Girona%2C%20Spain!5e0!3m2!1snl!2snl!4v1"
                 width="100%"

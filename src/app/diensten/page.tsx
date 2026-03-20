@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
@@ -25,7 +25,28 @@ const dienstenFaqs = [
 export default function DienstenPage() {
   const [quizOpen, setQuizOpen] = useState(false);
   const [quizInterest, setQuizInterest] = useState('');
+  const [activeSection, setActiveSection] = useState('stalling');
+  const observerRef = useRef<IntersectionObserver | null>(null);
   const openQuiz = (interest: string) => { setQuizInterest(interest); setQuizOpen(true); };
+
+  useEffect(() => {
+    const ids = ['stalling', 'reparatie', 'caravanrepair', 'transport', 'verkoop', 'verhuur', 'schoonmaak'];
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        }
+      },
+      { rootMargin: '-30% 0px -60% 0px' }
+    );
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) observerRef.current?.observe(el);
+    });
+    return () => observerRef.current?.disconnect();
+  }, []);
   return (
     <>
       <Header />
@@ -51,23 +72,46 @@ export default function DienstenPage() {
       {/* Sticky service nav */}
       <nav className="sticky top-16 z-30 bg-card/95 backdrop-blur-xl border-b border-sand-dark/20 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex gap-1 overflow-x-auto py-2.5 no-scrollbar">
+          <div className="flex gap-1 overflow-x-auto py-2.5 no-scrollbar relative">
             {[
-              { icon: Shield, label: 'Stalling', href: '#stalling' },
-              { icon: Wrench, label: 'Reparatie', href: '#reparatie' },
-              { icon: Sparkles, label: 'CaravanRepair®', href: '#caravanrepair' },
-              { icon: Truck, label: 'Transport', href: '#transport' },
-              { icon: ShoppingBag, label: 'Verkoop', href: '#verkoop' },
-              { icon: Bike, label: 'Verhuur', href: '#verhuur' },
-              { icon: SprayCan, label: 'Schoonmaak', href: '#schoonmaak' },
+              { icon: Shield, label: 'Stalling', href: '#stalling', id: 'stalling' },
+              { icon: Wrench, label: 'Reparatie', href: '#reparatie', id: 'reparatie' },
+              { icon: Sparkles, label: 'CaravanRepair®', href: '#caravanrepair', id: 'caravanrepair' },
+              { icon: Truck, label: 'Transport', href: '#transport', id: 'transport' },
+              { icon: ShoppingBag, label: 'Verkoop', href: '#verkoop', id: 'verkoop' },
+              { icon: Bike, label: 'Verhuur', href: '#verhuur', id: 'verhuur' },
+              { icon: SprayCan, label: 'Schoonmaak', href: '#schoonmaak', id: 'schoonmaak' },
             ].map(s => (
-              <a key={s.label} href={s.href} className="flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold text-warm-gray hover:text-primary hover:bg-primary/5 transition-all shrink-0">
+              <a key={s.label} href={s.href} className={`flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 ${activeSection === s.id ? 'text-primary bg-primary/8' : 'text-warm-gray hover:text-primary hover:bg-primary/5'}`}>
                 <s.icon size={13} /> {s.label}
               </a>
             ))}
           </div>
         </div>
       </nav>
+
+      {/* Compact service overview grid */}
+      <section className="py-8 sm:py-12 bg-surface border-b border-sand-dark/20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+            {[
+              { icon: Shield, label: 'Stalling', price: 'Vanaf €65/mnd', href: '#stalling', color: 'text-accent' },
+              { icon: Wrench, label: 'Reparatie', price: 'Op aanvraag', href: '#reparatie', color: 'text-ocean' },
+              { icon: Sparkles, label: 'CaravanRepair®', price: 'Verzekerd', href: '#caravanrepair', color: 'text-primary' },
+              { icon: Truck, label: 'Transport', price: 'Op aanvraag', href: '#transport', color: 'text-primary' },
+              { icon: ShoppingBag, label: 'Verkoop', price: 'Vanaf €5.250', href: '#verkoop', color: 'text-danger' },
+              { icon: Bike, label: 'Verhuur', price: 'Vanaf €65/wk', href: '#verhuur', color: 'text-accent' },
+              { icon: SprayCan, label: 'Schoonmaak', price: 'Vanaf €75', href: '#schoonmaak', color: 'text-ocean' },
+            ].map(s => (
+              <a key={s.label} href={s.href} className="card-premium p-4 text-center shine-on-hover group">
+                <s.icon size={20} className={`${s.color} mx-auto mb-2 group-hover:scale-110 transition-transform`} />
+                <p className="text-xs font-bold">{s.label}</p>
+                <p className="text-[10px] text-warm-gray mt-0.5">{s.price}</p>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ═══════════ STALLING ═══════════ */}
       <section id="stalling" className="py-14 sm:py-24 bg-card scroll-mt-28 relative overflow-hidden">
@@ -184,16 +228,15 @@ export default function DienstenPage() {
       </section>
 
       {/* ═══════════ CARAVANREPAIR® ═══════════ */}
-      <section id="caravanrepair" className="py-14 sm:py-24 bg-card scroll-mt-28 relative overflow-hidden">
-        <div className="absolute inset-0 line-pattern opacity-30 pointer-events-none" />
+      <section id="caravanrepair" className="section-immersive scroll-mt-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
           <A className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
-            <div className="inline-flex items-center gap-2 bg-primary/8 text-primary px-4 py-1.5 rounded-full text-xs font-bold mb-3">
+            <div className="inline-flex items-center gap-2 bg-white/10 text-primary-light px-4 py-1.5 rounded-full text-xs font-bold mb-3">
               <Award size={14} /> Officieel Masterdealer
             </div>
-            <h2 className="text-2xl sm:text-4xl font-black mb-3">CaravanRepair® schadeherstel</h2>
+            <h2 className="text-2xl sm:text-4xl font-black mb-3 text-white">CaravanRepair® schadeherstel</h2>
             <div className="divider-animated mt-3 mb-4" />
-            <p className="text-warm-gray leading-relaxed text-sm sm:text-base">
+            <p className="text-white/60 leading-relaxed text-sm sm:text-base">
               CaravanRepair® is de grootste keten van erkende caravan- en camperschadespecialisten in Nederland en Europa. Caravanstalling Spanje is officieel CaravanRepair® Masterdealer — het hoogste niveau binnen het dealernetwerk.
             </p>
           </A>
@@ -201,19 +244,19 @@ export default function DienstenPage() {
           <A>
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
               <div>
-                <h3 className="text-xl font-black mb-4">Gepatenteerd reparatiesysteem</h3>
-                <p className="text-warm-gray leading-relaxed mb-4">
+                <h3 className="text-xl font-black mb-4 text-white">Gepatenteerd reparatiesysteem</h3>
+                <p className="text-white/60 leading-relaxed mb-4">
                   Dankzij het gepatenteerde CaravanRepair® systeem zijn wij in staat om alle geprofileerde caravan- en camperwanden volledig onzichtbaar te herstellen. Of het nu gaat om een kleine deuk, hagelschade, een scheur, vochtschade, krassen of schade door een aanrijding — bij ons bent u aan het juiste adres.
                 </p>
-                <p className="text-warm-gray leading-relaxed mb-4">
+                <p className="text-white/60 leading-relaxed mb-4">
                   Waarom een complete zijwand vervangen als een reparatie volstaat? Het vervangen van een zijwand is vaak onnodig en sterk af te raden. Onze herstelmethode is duurzaam, sneller dan traditioneel herstel of wandvervanging, en het resultaat is volledig onzichtbaar.
                 </p>
-                <p className="text-warm-gray leading-relaxed mb-6">
-                  Op alle door ons uitgevoerde geprofileerde wandreparaties bieden wij <strong className="text-surface-dark">levenslange garantie</strong>. Ons systeem wordt erkend door alle verzekeraars in Nederland en Europa. Wij zorgen ook voor de volledige afwikkeling met uw verzekeraar.
+                <p className="text-white/60 leading-relaxed mb-6">
+                  Op alle door ons uitgevoerde geprofileerde wandreparaties bieden wij <strong className="text-white">levenslange garantie</strong>. Ons systeem wordt erkend door alle verzekeraars in Nederland en Europa. Wij zorgen ook voor de volledige afwikkeling met uw verzekeraar.
                 </p>
 
                 <div className="space-y-2 mb-8">
-                  <p className="text-sm font-bold mb-2">Schades die wij herstellen:</p>
+                  <p className="text-sm font-bold mb-2 text-white">Schades die wij herstellen:</p>
                   {[
                     'Hagel- en stormschade aan wanden',
                     'Aanrijdings- en parkeerschade',
@@ -222,42 +265,42 @@ export default function DienstenPage() {
                     'Krassen en beschadigingen',
                     'Schade aan geprofileerde wanden',
                   ].map(f => (
-                    <div key={f} className="flex items-center gap-2.5 text-sm"><CheckCircle size={14} className="text-success shrink-0" /> {f}</div>
+                    <div key={f} className="flex items-center gap-2.5 text-sm text-white/70"><CheckCircle size={14} className="text-primary-light shrink-0" /> {f}</div>
                   ))}
                 </div>
               </div>
 
               <div className="space-y-4">
-                <div className="card-premium p-6">
+                <div className="card-glass p-6">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center"><Sparkles size={18} className="text-primary" /></div>
-                    <h4 className="font-bold">Onzichtbaar herstel</h4>
+                    <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center"><Sparkles size={18} className="text-primary-light" /></div>
+                    <h4 className="font-bold text-white">Onzichtbaar herstel</h4>
                   </div>
-                  <p className="text-sm text-warm-gray leading-relaxed">Het gepatenteerde systeem garandeert dat reparaties aan geprofileerde wanden 100% onzichtbaar zijn. Geen verschil met de originele wand.</p>
+                  <p className="text-sm text-white/60 leading-relaxed">Het gepatenteerde systeem garandeert dat reparaties aan geprofileerde wanden 100% onzichtbaar zijn.</p>
                 </div>
 
-                <div className="card-premium p-6">
+                <div className="card-glass p-6">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center"><Shield size={18} className="text-accent" /></div>
-                    <h4 className="font-bold">Levenslange garantie</h4>
+                    <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center"><Shield size={18} className="text-accent-light" /></div>
+                    <h4 className="font-bold text-white">Levenslange garantie</h4>
                   </div>
-                  <p className="text-sm text-warm-gray leading-relaxed">Op alle geprofileerde wandreparaties ontvangt u levenslange garantie. Dat geeft een betrouwbaar en veilig gevoel voor de toekomst.</p>
+                  <p className="text-sm text-white/60 leading-relaxed">Op alle geprofileerde wandreparaties ontvangt u levenslange garantie.</p>
                 </div>
 
-                <div className="card-premium p-6">
+                <div className="card-glass p-6">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-ocean/10 rounded-xl flex items-center justify-center"><FileCheck size={18} className="text-ocean" /></div>
-                    <h4 className="font-bold">Erkend door alle verzekeraars</h4>
+                    <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center"><FileCheck size={18} className="text-ocean-light" /></div>
+                    <h4 className="font-bold text-white">Erkend door alle verzekeraars</h4>
                   </div>
-                  <p className="text-sm text-warm-gray leading-relaxed">Het CaravanRepair® systeem wordt erkend door alle verzekeraars. Wij verzorgen de complete afhandeling van uw schadeclaim.</p>
+                  <p className="text-sm text-white/60 leading-relaxed">Wij verzorgen de complete afhandeling van uw schadeclaim.</p>
                 </div>
 
-                <div className="card-premium p-6">
+                <div className="card-glass p-6">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-warning/10 rounded-xl flex items-center justify-center"><Zap size={18} className="text-warning" /></div>
-                    <h4 className="font-bold">Sneller &amp; duurzamer</h4>
+                    <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center"><Zap size={18} className="text-warning" /></div>
+                    <h4 className="font-bold text-white">Sneller &amp; duurzamer</h4>
                   </div>
-                  <p className="text-sm text-warm-gray leading-relaxed">Onze methode is sneller dan een complete wandvervanging en levert een duurzamer resultaat op. Geen onnodige vervanging van materiaal.</p>
+                  <p className="text-sm text-white/60 leading-relaxed">Sneller dan een complete wandvervanging en levert een duurzamer resultaat op.</p>
                 </div>
               </div>
             </div>

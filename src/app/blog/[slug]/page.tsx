@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -20,6 +21,16 @@ export default function BlogPostPage() {
   const { locale } = useLocale();
   const slug = params.slug as string;
   const post = getLocalizedPost(slug, locale);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      setProgress(h > 0 ? Math.min(window.scrollY / h, 1) : 0);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   if (!post) {
     return (
@@ -59,6 +70,11 @@ export default function BlogPostPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       <Header />
 
+      {/* Reading progress bar */}
+      <div className="fixed top-0 left-0 right-0 h-[3px] z-50">
+        <div className="h-full bg-gradient-to-r from-primary to-ocean transition-[width] duration-100" style={{ width: `${progress * 100}%` }} />
+      </div>
+
       {/* Hero */}
       <section className="relative bg-hero text-white py-16 sm:py-24 overflow-hidden">
         <div className="absolute inset-0">
@@ -88,37 +104,58 @@ export default function BlogPostPage() {
       <section className="py-12 sm:py-16 bg-card">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <motion.article initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }} className="prose-custom">
-            {post.content.map((block, i) => {
-              const lines = block.split('\n');
-              return (
-                <div key={i} className="mb-8">
-                  {lines.map((line, j) => {
-                    if (line.startsWith('## ')) {
-                      return <h2 key={j} className="text-xl sm:text-2xl font-black mt-10 mb-4">{line.replace('## ', '')}</h2>;
-                    }
-                    if (line.startsWith('**') && line.endsWith('**')) {
-                      return <p key={j} className="font-bold text-surface-dark mb-2">{line.replace(/\*\*/g, '')}</p>;
-                    }
-                    if (line.startsWith('- ')) {
-                      return <li key={j} className="text-warm-gray leading-relaxed ml-4 mb-1 list-disc">{line.replace('- ', '')}</li>;
-                    }
-                    if (line.trim() === '') return null;
-                    // Handle inline bold
-                    const parts = line.split(/(\*\*.*?\*\*)/g);
-                    return (
-                      <p key={j} className="text-warm-gray leading-relaxed mb-4">
-                        {parts.map((part, k) => {
-                          if (part.startsWith('**') && part.endsWith('**')) {
-                            return <strong key={k} className="text-surface-dark font-semibold">{part.replace(/\*\*/g, '')}</strong>;
-                          }
-                          return <span key={k}>{part}</span>;
-                        })}
-                      </p>
-                    );
-                  })}
-                </div>
-              );
-            })}
+            {(() => {
+              let headingCount = 0;
+              return post.content.map((block, i) => {
+                const lines = block.split('\n');
+                return (
+                  <div key={i} className="mb-8">
+                    {lines.map((line, j) => {
+                      if (line.startsWith('## ')) {
+                        headingCount++;
+                        return (
+                          <React.Fragment key={j}>
+                            {headingCount > 1 && headingCount % 2 === 0 && (
+                              <div className="flex items-center gap-4 my-10">
+                                <div className="flex-1 h-px bg-sand-dark/20" />
+                                <span className="text-primary/40 text-lg">&#9830;</span>
+                                <div className="flex-1 h-px bg-sand-dark/20" />
+                              </div>
+                            )}
+                            <h2 className="text-xl sm:text-2xl font-black mt-10 mb-4">{line.replace('## ', '')}</h2>
+                          </React.Fragment>
+                        );
+                      }
+                      if (line.startsWith('> ')) {
+                        return (
+                          <blockquote key={j} className="border-l-4 border-primary pl-5 my-6 italic text-surface-dark/80 text-[15px] leading-relaxed">
+                            {line.replace('> ', '')}
+                          </blockquote>
+                        );
+                      }
+                      if (line.startsWith('**') && line.endsWith('**')) {
+                        return <p key={j} className="font-bold text-surface-dark mb-2">{line.replace(/\*\*/g, '')}</p>;
+                      }
+                      if (line.startsWith('- ')) {
+                        return <li key={j} className="text-warm-gray leading-relaxed ml-4 mb-1 list-disc">{line.replace('- ', '')}</li>;
+                      }
+                      if (line.trim() === '') return null;
+                      const parts = line.split(/(\*\*.*?\*\*)/g);
+                      return (
+                        <p key={j} className="text-warm-gray leading-relaxed mb-4">
+                          {parts.map((part, k) => {
+                            if (part.startsWith('**') && part.endsWith('**')) {
+                              return <strong key={k} className="text-surface-dark font-semibold">{part.replace(/\*\*/g, '')}</strong>;
+                            }
+                            return <span key={k}>{part}</span>;
+                          })}
+                        </p>
+                      );
+                    })}
+                  </div>
+                );
+              });
+            })()}
           </motion.article>
 
           {/* Service CTA */}
@@ -162,16 +199,17 @@ export default function BlogPostPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {relatedPosts.map(rp => (
                 <Link key={rp.slug} href={`/blog/${rp.slug}`} className="group block">
-                  <div className="bg-card rounded-2xl overflow-hidden border border-sand-dark/20 card-hover">
+                  <div className="card-editorial">
                     <div className="relative aspect-[16/10] overflow-hidden">
                       <Image src={rp.image} alt={rp.title} fill sizes="(max-width: 640px) 100vw, 33vw" className="img-cover group-hover:scale-105 transition-transform duration-500" />
-                    </div>
-                    <div className="p-5">
-                      <div className="flex items-center gap-3 text-xs text-warm-gray mb-2">
-                        <span>{rp.category}</span>
-                        <span>{rp.readTime}</span>
+                      <div className="card-editorial-overlay" />
+                      <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
+                        <div className="flex items-center gap-3 text-xs text-white/70 mb-2">
+                          <span>{rp.category}</span>
+                          <span>{rp.readTime}</span>
+                        </div>
+                        <h3 className="font-bold text-[15px] leading-snug">{rp.title}</h3>
                       </div>
-                      <h3 className="font-bold text-[15px] leading-snug group-hover:text-primary transition-colors">{rp.title}</h3>
                     </div>
                   </div>
                 </Link>

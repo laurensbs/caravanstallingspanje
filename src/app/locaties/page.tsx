@@ -9,6 +9,7 @@ import CtaSection from '@/components/CtaSection';
 import PageHero from '@/components/PageHero';
 import { FaqItem } from '@/components/FaqAccordion';
 import QuizModal from '@/components/QuizModal';
+import { useCountUp } from '@/lib/useCountUp';
 
 const locatieFaqs = [
   { q: 'Waar ligt de stalling precies?', a: 'Onze stalling ligt in Sant Climent de Peralta, een klein dorp in de gemeente Forallac, provincie Girona. Centraal aan de Costa Brava, op 25 minuten van Pals en L\'Estartit, 35 minuten van Begur en 45 minuten van Girona Airport.' },
@@ -22,6 +23,9 @@ const locatieFaqs = [
 
 export default function LocatiesPage() {
   const [quizOpen, setQuizOpen] = useState(false);
+  const statYears = useCountUp(20);
+  const statStaff = useCountUp(12);
+  const statTransport = useCountUp(7);
   return (
     <>
       <Header />
@@ -158,19 +162,30 @@ export default function LocatiesPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <A>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-              {[
-                { val: '20+', lbl: 'Jaar ervaring' },
-                { val: '12', lbl: 'Medewerkers in seizoen' },
-                { val: '4.9/5', lbl: 'Google reviews' },
-                { val: '7', lbl: 'Transporteenheden' },
-              ].map((s, i) => (
-                <A key={s.lbl} delay={i * 0.1}>
-                  <div>
-                    <p className="stat-number text-3xl sm:text-4xl mb-1">{s.val}</p>
-                    <p className="text-xs text-warm-gray font-medium">{s.lbl}</p>
-                  </div>
-                </A>
-              ))}
+              <A delay={0}>
+                <div ref={statYears.ref}>
+                  <p className="stat-number text-3xl sm:text-4xl mb-1">{statYears.value}+</p>
+                  <p className="text-xs text-warm-gray font-medium">Jaar ervaring</p>
+                </div>
+              </A>
+              <A delay={0.1}>
+                <div ref={statStaff.ref}>
+                  <p className="stat-number text-3xl sm:text-4xl mb-1">{statStaff.value}</p>
+                  <p className="text-xs text-warm-gray font-medium">Medewerkers in seizoen</p>
+                </div>
+              </A>
+              <A delay={0.2}>
+                <div>
+                  <p className="stat-number text-3xl sm:text-4xl mb-1">4.9/5</p>
+                  <p className="text-xs text-warm-gray font-medium">Google reviews</p>
+                </div>
+              </A>
+              <A delay={0.3}>
+                <div ref={statTransport.ref}>
+                  <p className="stat-number text-3xl sm:text-4xl mb-1">{statTransport.value}</p>
+                  <p className="text-xs text-warm-gray font-medium">Transporteenheden</p>
+                </div>
+              </A>
             </div>
           </A>
         </div>
