@@ -39,6 +39,13 @@ const BUNDLE_DEAL = {
   savings: 51,
 };
 
+interface BookingForm {
+  storageType: string; caravanLength: string; startDate: string; locationId: number;
+  brand: string; model: string; licensePlate: string; year: string; weight: string;
+  hasMover: boolean; firstName: string; lastName: string; email: string; phone: string;
+  extras: string[];
+}
+
 function BookingPageInner() {
   const searchParams = useSearchParams();
   const [step, setStep] = useState(0);
@@ -46,24 +53,50 @@ function BookingPageInner() {
   const [availability, setAvailability] = useState<{ available: number; total: number } | null>(null);
   const [result, setResult] = useState<{ contractNumber: string; spotLabel: string; checkoutUrl: string | null } | null>(null);
 
-  const [form, setForm] = useState({
-    storageType: "buiten",
-    caravanLength: "",
-    startDate: "",
-    locationId: 1,
-    brand: "",
-    model: "",
-    licensePlate: "",
-    year: "",
-    weight: "",
-    hasMover: false,
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    extras: [] as string[],
+  const [form, setForm] = useState<BookingForm>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = sessionStorage.getItem('booking_form');
+        if (saved) return JSON.parse(saved);
+      } catch { /* ignore */ }
+    }
+    return {
+      storageType: "buiten",
+      caravanLength: "",
+      startDate: "",
+      locationId: 1,
+      brand: "",
+      model: "",
+      licensePlate: "",
+      year: "",
+      weight: "",
+      hasMover: false,
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      extras: [] as string[],
+    };
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  // Persist form to sessionStorage
+  useEffect(() => {
+    try { sessionStorage.setItem('booking_form', JSON.stringify(form)); } catch { /* ignore */ }
+  }, [form]);
+
+  // Also restore step if saved
+  useEffect(() => {
+    try {
+      const savedStep = sessionStorage.getItem('booking_step');
+      if (savedStep) { const s = parseInt(savedStep, 10); if (s >= 0 && s < 4) setStep(s); }
+    } catch { /* ignore */ }
+  }, []);
+
+  // Persist step (but not step 4 = confirmation)
+  useEffect(() => {
+    try { if (step < 4) sessionStorage.setItem('booking_step', String(step)); } catch { /* ignore */ }
+  }, [step]);
 
   // Handle success/cancel from Stripe
   useEffect(() => {
@@ -163,6 +196,7 @@ function BookingPageInner() {
       if (res.ok && data.success) {
         setResult(data);
         setStep(4);
+        try { sessionStorage.removeItem('booking_form'); sessionStorage.removeItem('booking_step'); } catch { /* ignore */ }
         toast.success("Boeking succesvol aangemaakt!");
         if (data.checkoutUrl) {
           // Redirect to Stripe checkout
@@ -259,7 +293,7 @@ function BookingPageInner() {
                   <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
                     {STORAGE_TYPES.map(type => (
                       <button key={type.id} onClick={() => update("storageType", type.id)} className={`relative text-left p-6 rounded-2xl border-2 transition-all duration-200 ${form.storageType === type.id ? "border-accent bg-surface shadow-lg shadow-primary/10 ring-1 ring-primary/10" : "border-transparent bg-surface hover:border-black/[0.08]"}`}>
-                        {type.popular && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white text-[10px] font-bold px-3 py-1 rounded-full">Populair</span>}
+                        {type.popular && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white text-xs font-bold px-3 py-1 rounded-full">Populair</span>}
                         <type.icon size={24} className={form.storageType === type.id ? "text-accent mb-3" : "text-muted mb-3"} />
                         <h3 className="font-bold text-[15px]">{type.label}</h3>
                         <p className="text-xs text-muted mt-1 mb-3">{type.desc}</p>
@@ -280,7 +314,7 @@ function BookingPageInner() {
 
                   <div className="grid sm:grid-cols-3 gap-4 bg-surface rounded-2xl p-6 border border-black/[0.04]">
                     <div>
-                      <label htmlFor="caravanLength" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Lengte caravan *</label>
+                      <label htmlFor="caravanLength" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Lengte caravan *</label>
                       <div className="relative">
                         <Ruler size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/40" />
                         <select id="caravanLength" value={form.caravanLength} onChange={e => update("caravanLength", e.target.value)} required aria-required="true" aria-invalid={!!fieldErrors.caravanLength} aria-describedby={fieldErrors.caravanLength ? "err-caravanLength" : undefined} className="w-full pl-10 pr-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none appearance-none">
@@ -295,7 +329,7 @@ function BookingPageInner() {
                       {fieldErrors.caravanLength && <p id="err-caravanLength" role="alert" className="text-danger text-xs mt-1">{fieldErrors.caravanLength}</p>}
                     </div>
                     <div>
-                      <label htmlFor="startDate" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Startdatum *</label>
+                      <label htmlFor="startDate" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Startdatum *</label>
                       <div className="relative">
                         <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/40" />
                         <input id="startDate" type="date" value={form.startDate} onChange={e => update("startDate", e.target.value)} required aria-required="true" aria-invalid={!!fieldErrors.startDate} aria-describedby={fieldErrors.startDate ? "err-startDate" : undefined} className="w-full pl-10 pr-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
@@ -303,7 +337,7 @@ function BookingPageInner() {
                       {fieldErrors.startDate && <p id="err-startDate" role="alert" className="text-danger text-xs mt-1">{fieldErrors.startDate}</p>}
                     </div>
                     <div>
-                      <label htmlFor="locationId" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Locatie *</label>
+                      <label htmlFor="locationId" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Locatie *</label>
                       <div className="relative">
                         <MapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted/40" />
                         <select id="locationId" value={form.locationId} onChange={e => update("locationId", e.target.value)} aria-required="true" className="w-full pl-10 pr-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none appearance-none">
@@ -345,26 +379,26 @@ function BookingPageInner() {
                   <div className="bg-surface rounded-2xl p-6 border border-black/[0.04] space-y-4">
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="brand" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Merk *</label>
+                        <label htmlFor="brand" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Merk *</label>
                         <input id="brand" value={form.brand} onChange={e => update("brand", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.brand} aria-describedby={fieldErrors.brand ? "err-brand" : undefined} placeholder="bijv. Hobby, Fendt, Knaus..." className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                         {fieldErrors.brand && <p id="err-brand" role="alert" className="text-danger text-xs mt-1">{fieldErrors.brand}</p>}
                       </div>
                       <div>
-                        <label htmlFor="model" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Model</label>
+                        <label htmlFor="model" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Model</label>
                         <input id="model" value={form.model} onChange={e => update("model", e.target.value)} placeholder="bijv. De Luxe 490 KMF" className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                     </div>
                     <div className="grid sm:grid-cols-3 gap-4">
                       <div>
-                        <label htmlFor="licensePlate" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Kenteken</label>
+                        <label htmlFor="licensePlate" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Kenteken</label>
                         <input id="licensePlate" value={form.licensePlate} onChange={e => update("licensePlate", e.target.value)} placeholder="XX-YYY-Z" className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                       <div>
-                        <label htmlFor="year" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Bouwjaar</label>
+                        <label htmlFor="year" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Bouwjaar</label>
                         <input id="year" type="number" value={form.year} onChange={e => update("year", e.target.value)} placeholder="2020" className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                       <div>
-                        <label htmlFor="weight" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Gewicht (kg)</label>
+                        <label htmlFor="weight" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Gewicht (kg)</label>
                         <input id="weight" type="number" value={form.weight} onChange={e => update("weight", e.target.value)} placeholder="1500" className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                       </div>
                     </div>
@@ -387,24 +421,24 @@ function BookingPageInner() {
                   <div className="bg-surface rounded-2xl p-6 border border-black/[0.04] space-y-4">
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="firstName" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Voornaam *</label>
+                        <label htmlFor="firstName" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Voornaam *</label>
                         <input id="firstName" value={form.firstName} onChange={e => update("firstName", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.firstName} aria-describedby={fieldErrors.firstName ? "err-firstName" : undefined} className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                         {fieldErrors.firstName && <p id="err-firstName" role="alert" className="text-danger text-xs mt-1">{fieldErrors.firstName}</p>}
                       </div>
                       <div>
-                        <label htmlFor="lastName" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Achternaam *</label>
+                        <label htmlFor="lastName" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Achternaam *</label>
                         <input id="lastName" value={form.lastName} onChange={e => update("lastName", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.lastName} aria-describedby={fieldErrors.lastName ? "err-lastName" : undefined} className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                         {fieldErrors.lastName && <p id="err-lastName" role="alert" className="text-danger text-xs mt-1">{fieldErrors.lastName}</p>}
                       </div>
                     </div>
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="bookingEmail" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">E-mailadres *</label>
+                        <label htmlFor="bookingEmail" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">E-mailadres *</label>
                         <input id="bookingEmail" type="email" value={form.email} onChange={e => update("email", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.email} aria-describedby={fieldErrors.email ? "err-email" : undefined} className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                         {fieldErrors.email && <p id="err-email" role="alert" className="text-danger text-xs mt-1">{fieldErrors.email}</p>}
                       </div>
                       <div>
-                        <label htmlFor="bookingPhone" className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Telefoonnummer *</label>
+                        <label htmlFor="bookingPhone" className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Telefoonnummer *</label>
                         <input id="bookingPhone" type="tel" value={form.phone} onChange={e => update("phone", e.target.value)} aria-required="true" aria-invalid={!!fieldErrors.phone} aria-describedby={fieldErrors.phone ? "err-phone" : undefined} placeholder="+31 6 ..." className="w-full px-4 py-3 bg-surface border border-sand-dark/30 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none" />
                         {fieldErrors.phone && <p id="err-phone" role="alert" className="text-danger text-xs mt-1">{fieldErrors.phone}</p>}
                       </div>
@@ -435,14 +469,14 @@ function BookingPageInner() {
                     return (
                       <button onClick={toggleBundle} className={`w-full text-left p-5 rounded-2xl border-2 transition-all duration-200 relative upsell-highlight ${hasBundle ? "border-primary bg-primary/[0.04] shadow-lg shadow-primary/10 ring-1 ring-primary/10" : "border-primary/30 bg-gradient-to-r from-primary/[0.03] to-surface hover:border-primary/50"}`}>
                         <div className="absolute -top-3 left-4">
-                          <span className="bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">Bespaar \u20AC{BUNDLE_DEAL.savings}</span>
+                          <span className="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">Bespaar \u20AC{BUNDLE_DEAL.savings}</span>
                         </div>
                         <div className="flex items-center gap-4 mt-1">
                           <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
                             <Star size={22} className="text-primary" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-bold text-sm flex items-center gap-2">{BUNDLE_DEAL.label} <span className="text-[10px] font-semibold bg-accent/10 text-accent px-2 py-0.5 rounded-full">Meest gekozen</span></h4>
+                            <h4 className="font-bold text-sm flex items-center gap-2">{BUNDLE_DEAL.label} <span className="text-xs font-semibold bg-accent/10 text-accent px-2 py-0.5 rounded-full">Meest gekozen</span></h4>
                             <p className="text-xs text-muted mt-0.5">Premium schoonmaak + klaarzet-service + technische keuring</p>
                           </div>
                           <div className="shrink-0 text-right">
@@ -478,7 +512,7 @@ function BookingPageInner() {
                         <div className="flex-1 min-w-0">
                           <h4 className="font-bold text-sm flex items-center gap-2">
                             {extra.label}
-                            {extra.popular && <span className="text-[10px] font-semibold bg-warning/10 text-warning px-2 py-0.5 rounded-full">Populair</span>}
+                            {extra.popular && <span className="text-xs font-semibold bg-warning/10 text-warning px-2 py-0.5 rounded-full">Populair</span>}
                           </h4>
                           <p className="text-xs text-muted mt-0.5">{extra.desc}</p>
                         </div>

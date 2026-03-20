@@ -3,6 +3,27 @@ import { sql } from '@/lib/db';
 import { getCustomerSession } from '@/lib/auth';
 import { validateBody, serviceRequestSchema } from '@/lib/validations';
 
+export async function GET(req: NextRequest) {
+  try {
+    const token = req.cookies.get('customer_token')?.value;
+    if (!token) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    const session = await getCustomerSession(token);
+    if (!session) return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+
+    const requests = await sql`
+      SELECT sr.*, ca.brand || ' ' || COALESCE(ca.model,'') as caravan_name, ca.license_plate
+      FROM service_requests sr
+      LEFT JOIN caravans ca ON sr.caravan_id = ca.id
+      WHERE sr.customer_id = ${session.id}
+      ORDER BY sr.created_at DESC
+    `;
+    return NextResponse.json({ requests });
+  } catch (error) {
+    console.error('Customer service requests fetch error:', error);
+    return NextResponse.json({ error: 'Failed to fetch service requests' }, { status: 500 });
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const token = req.cookies.get('customer_token')?.value;

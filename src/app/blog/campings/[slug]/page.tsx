@@ -12,12 +12,12 @@ export default function CampingDetailPage() {
         renderBadges: (item) => (
           <>
             {Number(item.stars) > 0 && (
-              <span className="flex items-center gap-0.5 bg-yellow-400 text-yellow-900 text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow">
+              <span className="flex items-center gap-0.5 bg-yellow-400 text-yellow-900 text-xs font-bold px-2.5 py-0.5 rounded-full shadow">
                 <Star size={10} fill="currentColor" /> {String(item.stars)} sterren
               </span>
             )}
             {item.price_range && (
-              <span className="bg-white/20 backdrop-blur text-white text-[11px] font-semibold px-2.5 py-0.5 rounded-full">{String(item.price_range)}</span>
+              <span className="bg-white/20 backdrop-blur text-white text-xs font-semibold px-2.5 py-0.5 rounded-full">{String(item.price_range)}</span>
             )}
           </>
         ),

@@ -76,7 +76,7 @@ export default function StaffTerreinPage() {
                           {zoneSpots.map(spot => (
                             <div key={spot.id} className={`border rounded-lg p-1.5 text-center text-xs cursor-default group relative ${SPOT_COLORS[spot.status] || 'bg-sand'}`} title={spot.status === 'bezet' ? `${spot.caravan_brand} ${spot.caravan_model}\n${spot.caravan_license_plate}\n${spot.customer_name}` : spot.status}>
                               <div className="font-medium">{spot.label}</div>
-                              <div className="text-[10px] opacity-60">{spot.spot_type === 'binnen' ? 'B' : 'U'}</div>
+                              <div className="text-xs opacity-60">{spot.spot_type === 'binnen' ? 'B' : 'U'}</div>
                             </div>
                           ))}
                         </div>

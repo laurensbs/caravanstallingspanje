@@ -97,7 +97,7 @@ export default function HomePage() {
                 ].map(s => (
                   <div key={s.l} className="text-center">
                     <div className="text-xl sm:text-2xl font-black text-white">{s.v}</div>
-                    <div className="text-[10px] text-white/70 mt-0.5 font-medium">{s.l}</div>
+                    <div className="text-xs text-white/70 mt-0.5 font-medium">{s.l}</div>
                   </div>
                 ))}
               </div>
@@ -135,22 +135,22 @@ export default function HomePage() {
                 ) : (
                   <form onSubmit={handleBooking} className="space-y-4">
                     <div>
-                      <label className="text-[11px] font-semibold text-warm-gray block mb-2 uppercase tracking-wider">Type stalling</label>
+                      <label className="text-xs font-semibold text-warm-gray block mb-2 uppercase tracking-wider">Type stalling</label>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {[
                           { val: "buiten", label: "Buitenstalling", price: "€65/mnd" },
                           { val: "binnen", label: "Binnenstalling", price: "€95/mnd" },
                         ].map(o => (
                           <button key={o.val} type="button" onClick={() => setBooking({ ...booking, type: o.val })} className={`p-3 rounded-xl text-center transition-all text-xs border ${booking.type === o.val ? "bg-primary/[0.07] border-primary text-primary font-bold ring-1 ring-primary/20" : "bg-sand/50 border-sand-dark/30 text-warm-gray hover:border-primary/20"}`}>
-                            <div className="font-semibold text-[12px]">{o.label}</div>
-                            <div className={`text-[10px] mt-0.5 ${booking.type === o.val ? "text-primary/60" : "text-warm-gray/60"}`}>{o.price}</div>
+                            <div className="font-semibold text-sm">{o.label}</div>
+                            <div className={`text-xs mt-0.5 ${booking.type === o.val ? "text-primary/60" : "text-warm-gray/60"}`}>{o.price}</div>
                           </button>
                         ))}
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="text-[11px] font-semibold text-warm-gray block mb-2 uppercase tracking-wider">Lengte caravan</label>
+                        <label className="text-xs font-semibold text-warm-gray block mb-2 uppercase tracking-wider">Lengte caravan</label>
                         <div className="relative">
                           <Ruler size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray/40" />
                           <select value={booking.length} onChange={e => setBooking({ ...booking, length: e.target.value })} required className="w-full pl-9 pr-3 py-3 bg-sand/40 border border-sand-dark/40 rounded-xl text-sm text-surface-dark focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all appearance-none">
@@ -164,7 +164,7 @@ export default function HomePage() {
                         </div>
                       </div>
                       <div>
-                        <label className="text-[11px] font-semibold text-warm-gray block mb-2 uppercase tracking-wider">Startdatum</label>
+                        <label className="text-xs font-semibold text-warm-gray block mb-2 uppercase tracking-wider">Startdatum</label>
                         <div className="relative">
                           <Calendar size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray/40" />
                           <input type="date" required value={booking.start} onChange={e => setBooking({ ...booking, start: e.target.value })} className="w-full pl-9 pr-3 py-3 bg-sand/40 border border-sand-dark/40 rounded-xl text-sm text-surface-dark focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all" />
@@ -172,7 +172,7 @@ export default function HomePage() {
                       </div>
                     </div>
                     <div>
-                      <label className="text-[11px] font-semibold text-warm-gray block mb-2 uppercase tracking-wider">Locatie</label>
+                      <label className="text-xs font-semibold text-warm-gray block mb-2 uppercase tracking-wider">Locatie</label>
                       <div className="relative">
                         <MapPin size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-gray/40" />
                         <select value={booking.location} onChange={e => setBooking({ ...booking, location: e.target.value })} className="w-full pl-9 pr-3 py-3 bg-sand/40 border border-sand-dark/40 rounded-xl text-sm text-surface-dark focus:ring-2 focus:ring-primary/15 focus:border-primary/30 outline-none transition-all appearance-none">
@@ -185,7 +185,7 @@ export default function HomePage() {
                     <button type="submit" disabled={checkingAvail} className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3.5 rounded-xl text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow-md disabled:opacity-60">
                       {checkingAvail ? <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg> Controleren...</> : <>Beschikbaarheid checken <ArrowRight size={15} /></>}
                     </button>
-                    <div className="flex items-center justify-center gap-3 mt-3 text-[10px] text-warm-gray/60">
+                    <div className="flex items-center justify-center gap-3 mt-3 text-xs text-warm-gray/60">
                       <span className="flex items-center gap-1"><Shield size={10} /> Gratis annuleren</span>
                       <span className="flex items-center gap-1"><CheckCircle size={10} /> Direct bevestiging</span>
                       <span className="flex items-center gap-1"><Star size={10} /> 4.9/5</span>
@@ -228,10 +228,10 @@ export default function HomePage() {
                       <s.icon size={24} />
                     </div>
                     <span className="font-black text-sm sm:text-base text-center leading-tight">{s.label}</span>
-                    <span className="text-white/60 text-[11px] mt-0.5">{s.desc}</span>
+                    <span className="text-white/60 text-xs mt-0.5">{s.desc}</span>
                   </div>
                   <div className="absolute bottom-2 inset-x-2">
-                    <div className="bg-primary/80 backdrop-blur-sm rounded-lg py-1.5 text-white text-[10px] font-bold text-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="bg-primary/80 backdrop-blur-sm rounded-lg py-1.5 text-white text-xs font-bold text-center opacity-0 group-hover:opacity-100 transition-opacity">
                       Direct aanvragen →
                     </div>
                   </div>
@@ -257,7 +257,7 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-10 sm:pb-16 w-full">
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
               <div>
-                <p className="text-primary-light/80 text-[11px] font-bold tracking-[0.2em] uppercase mb-2">Sant Climent de Peralta, Girona</p>
+                <p className="text-primary-light/80 text-xs font-bold tracking-[0.2em] uppercase mb-2">Sant Climent de Peralta, Girona</p>
                 <h3 className="text-white text-xl sm:text-3xl font-black leading-tight">3 beveiligde locaties<br className="sm:hidden" /> aan de Costa Brava</h3>
               </div>
               <Link href="/locaties" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/15 text-white text-sm font-semibold px-5 py-2.5 rounded-xl backdrop-blur-sm transition-all">
@@ -289,7 +289,7 @@ export default function HomePage() {
             ].map((p, i) => (
               <A key={p.title} delay={i * 0.1}>
                 <div className={`card-premium p-7 sm:p-9 h-full flex flex-col ${p.popular ? 'ring-2 ring-primary/20' : ''}`}>
-                  {p.popular && <span className="absolute top-6 right-6 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">Meest gekozen</span>}
+                  {p.popular && <span className="absolute top-6 right-6 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">Meest gekozen</span>}
                   <div className={`w-12 h-12 ${p.popular ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'} rounded-xl flex items-center justify-center mb-5`}>
                     <p.icon size={22} />
                   </div>
@@ -345,10 +345,10 @@ export default function HomePage() {
                       <div className="w-12 h-12 sm:w-14 sm:h-14 bg-primary/8 rounded-2xl flex items-center justify-center">
                         <s.icon size={22} className="text-primary" />
                       </div>
-                      <span className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-primary text-white text-[11px] font-black rounded-full flex items-center justify-center shadow-lg shadow-primary/30">{s.step}</span>
+                      <span className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-primary text-white text-xs font-black rounded-full flex items-center justify-center shadow-lg shadow-primary/30">{s.step}</span>
                     </div>
                     <h3 className="font-bold text-[14px] sm:text-[15px] mb-1.5">{s.title}</h3>
-                    <p className="text-[12px] sm:text-sm text-warm-gray leading-relaxed">{s.desc}</p>
+                    <p className="text-sm text-warm-gray leading-relaxed">{s.desc}</p>
                   </div>
                 </A>
               ))}
@@ -411,7 +411,7 @@ export default function HomePage() {
                     { label: "Laatste inspectie", value: "Goedgekeurd", sub: "02-03-2026 · Geen bijzonderheden" },
                   ].map(item => (
                     <div key={item.label} className="bg-card rounded-xl p-4 border border-sand-dark/20">
-                      <p className="text-[11px] text-warm-gray font-medium uppercase tracking-wider">{item.label}</p>
+                      <p className="text-xs text-warm-gray font-medium uppercase tracking-wider">{item.label}</p>
                       <p className="text-sm font-bold text-surface-dark mt-1">{item.value}</p>
                       <p className="text-xs text-warm-gray mt-0.5">{item.sub}</p>
                     </div>
@@ -440,7 +440,7 @@ export default function HomePage() {
                     <div className="relative aspect-[16/10] overflow-hidden">
                       <Image src={post.image} alt={post.title} fill sizes="(max-width: 640px) 80vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
                       <div className="absolute top-3 left-3">
-                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white/90 text-primary">{post.category}</span>
+                        <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-white/90 text-primary">{post.category}</span>
                       </div>
                     </div>
                     <div className="p-6 flex flex-col flex-1">

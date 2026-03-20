@@ -3,6 +3,8 @@ import { PRIORITY_COLORS } from "@/lib/format";
 
 import { useState, useEffect, useCallback } from 'react';
 import { CheckCircle, Clock, AlertCircle, AlertTriangle, Play, Check } from 'lucide-react';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { toast } from 'sonner';
 
 interface Task { id: number; title: string; description: string; priority: string; status: string; location_name: string; due_date: string; completed_at: string; created_at: string; }
 
@@ -13,6 +15,7 @@ export default function StaffTakenPage() {
   const [statusFilter, setStatusFilter] = useState('open');
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{ id: number; status: string; title: string } | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -28,8 +31,10 @@ export default function StaffTakenPage() {
   const updateStatus = async (id: number, status: string) => {
     setUpdatingId(id);
     await fetch(`/api/staff/tasks/${id}/status`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }), credentials: 'include' });
+    toast.success(status === 'afgerond' ? 'Taak afgerond!' : 'Taak gestart');
     fetchData();
     setUpdatingId(null);
+    setConfirmAction(null);
   };
 
   const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) : '';
@@ -88,10 +93,10 @@ export default function StaffTakenPage() {
                     </div>
                     {t.description && <p className="text-xs text-warm-gray/70 line-clamp-2">{t.description}</p>}
                     <div className="flex items-center gap-3 mt-1.5">
-                      <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${PRIORITY_COLORS[t.priority]}`}>{t.priority}</span>
-                      {t.location_name && <span className="text-[11px] text-warm-gray/70">{t.location_name}</span>}
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${PRIORITY_COLORS[t.priority]}`}>{t.priority}</span>
+                      {t.location_name && <span className="text-xs text-warm-gray/70">{t.location_name}</span>}
                       {t.due_date && (
-                        <span className={`text-[11px] ${overdue ? 'text-danger font-bold' : 'text-warm-gray/70'}`}>
+                        <span className={`text-xs ${overdue ? 'text-danger font-bold' : 'text-warm-gray/70'}`}>
                           {overdue && '⚠ '}{fmtDate(t.due_date)}
                         </span>
                       )}
@@ -107,20 +112,30 @@ export default function StaffTakenPage() {
                         <Play size={12} fill="currentColor" /> Starten
                       </button>
                     )}
-                    <button onClick={() => updateStatus(t.id, 'afgerond')} disabled={isUpdating} className="flex-1 flex items-center justify-center gap-1.5 bg-accent/10 hover:bg-accent/15 text-primary-dark font-semibold py-2.5 rounded-xl text-xs transition-colors active:scale-95">
+                    <button onClick={() => setConfirmAction({ id: t.id, status: 'afgerond', title: t.title })} disabled={isUpdating} className="flex-1 flex items-center justify-center gap-1.5 bg-accent/10 hover:bg-accent/15 text-primary-dark font-semibold py-2.5 rounded-xl text-xs transition-colors active:scale-95">
                       <Check size={12} strokeWidth={3} /> Afronden
                     </button>
                   </div>
                 )}
                 
                 {t.status === 'afgerond' && t.completed_at && (
-                  <p className="text-[11px] text-accent mt-2 ml-5">✓ Afgerond op {fmtDate(t.completed_at)}</p>
+                  <p className="text-xs text-accent mt-2 ml-5">✓ Afgerond op {fmtDate(t.completed_at)}</p>
                 )}
               </div>
             </div>
           );
         })}
       </div>
+
+      <ConfirmDialog
+        open={!!confirmAction}
+        onClose={() => setConfirmAction(null)}
+        onConfirm={() => confirmAction && updateStatus(confirmAction.id, confirmAction.status)}
+        title="Taak afronden?"
+        description={confirmAction ? `Weet u zeker dat u "${confirmAction.title}" als afgerond wilt markeren?` : ''}
+        confirmLabel="Ja, afronden"
+        loading={!!updatingId}
+      />
 
       <style jsx global>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }

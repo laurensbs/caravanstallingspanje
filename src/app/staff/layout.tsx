@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, useCallback, ReactNode } from 'react';
 import { LayoutDashboard, ClipboardList, Search as SearchIcon, MapPin, LogOut, Menu, X, Eye, EyeOff, Wrench, QrCode, Bell, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useVisibleInterval } from '@/hooks/useVisibleInterval';
 
 const NAV_ITEMS = [
   { href: '/staff', label: 'Dashboard', icon: LayoutDashboard },
@@ -36,26 +37,22 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
+  const loadNotifications = useCallback(async () => {
     if (!authenticated) return;
-    const loadNotifications = async () => {
-      try {
-        const res = await fetch('/api/staff/dashboard', { credentials: 'include' });
-        if (!res.ok) return;
-        const data = await res.json();
-        const items: {type:string;text:string}[] = [];
-        if (data.stats?.tasks_open > 0) items.push({ type: 'taak', text: `${data.stats.tasks_open} open taken` });
-        if (data.stats?.tasks_today > 0) items.push({ type: 'urgent', text: `${data.stats.tasks_today} taken voor vandaag` });
-        if (data.stats?.inspections_due > 0) items.push({ type: 'inspectie', text: `${data.stats.inspections_due} geplande inspecties` });
-        if (data.stats?.transports_today > 0) items.push({ type: 'transport', text: `${data.stats.transports_today} transporten vandaag` });
-        setNotifications(items);
-        setUnreadCount(items.length);
-      } catch {}
-    };
-    loadNotifications();
-    const iv = setInterval(loadNotifications, 30000);
-    return () => clearInterval(iv);
+    try {
+      const res = await fetch('/api/staff/dashboard', { credentials: 'include' });
+      if (!res.ok) return;
+      const data = await res.json();
+      const items: {type:string;text:string}[] = [];
+      if (data.stats?.tasks_open > 0) items.push({ type: 'taak', text: `${data.stats.tasks_open} open taken` });
+      if (data.stats?.tasks_today > 0) items.push({ type: 'urgent', text: `${data.stats.tasks_today} taken voor vandaag` });
+      if (data.stats?.inspections_due > 0) items.push({ type: 'inspectie', text: `${data.stats.inspections_due} geplande inspecties` });
+      if (data.stats?.transports_today > 0) items.push({ type: 'transport', text: `${data.stats.transports_today} transporten vandaag` });
+      setNotifications(items);
+      setUnreadCount(items.length);
+    } catch {}
   }, [authenticated]);
+  useVisibleInterval(loadNotifications, 30000);
 
   const login = async (e: React.FormEvent) => {
     e.preventDefault(); setLoginError(''); setLoginLoading(true);
@@ -102,14 +99,14 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
             </div>
           )}
           <div>
-            <label className="text-white/70 text-[10px] font-bold uppercase tracking-widest block mb-2.5">E-mailadres</label>
+            <label className="text-white/70 text-xs font-bold uppercase tracking-widest block mb-2.5">E-mailadres</label>
             <div className="relative">
               <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/20" />
               <input type="email" required value={loginEmail} onChange={e=>{ setLoginEmail(e.target.value); setLoginError(''); }} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl pl-10 pr-4 py-3.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 placeholder:text-white/15 transition-all" placeholder="medewerker@voorbeeld.com" autoFocus autoComplete="email" />
             </div>
           </div>
           <div>
-            <label className="text-white/70 text-[10px] font-bold uppercase tracking-widest block mb-2.5">Wachtwoord</label>
+            <label className="text-white/70 text-xs font-bold uppercase tracking-widest block mb-2.5">Wachtwoord</label>
             <div className="relative">
               <input type={showPw ? 'text' : 'password'} required value={password} onChange={e=>{ setPassword(e.target.value); setLoginError(''); }} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3.5 text-white text-sm pr-10 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 placeholder:text-white/15 transition-all" placeholder="••••••••" autoFocus autoComplete="current-password" />
               <button type="button" onClick={()=>setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/60 transition-colors" aria-label={showPw ? "Wachtwoord verbergen" : "Wachtwoord tonen"}>{showPw ? <EyeOff size={16}/> : <Eye size={16}/>}</button>
@@ -134,7 +131,7 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
             </div>
             <div>
               <h2 className="text-white font-bold text-sm">Staff Portal</h2>
-              <p className="text-white/70 text-[10px]">Caravanstalling Spanje</p>
+              <p className="text-white/70 text-xs">Caravanstalling Spanje</p>
             </div>
           </div>
         </div>
@@ -142,7 +139,7 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
           {NAV_ITEMS.map(item => {
             const active = pathname === item.href;
             return (
-              <Link key={item.href} href={item.href} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${active ? 'bg-white/[0.08] text-white shadow-sm' : 'text-white/60 hover:text-white/80 hover:bg-white/[0.03]'}`}>
+              <Link key={item.href} href={item.href} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${active ? 'bg-white/[0.08] text-white shadow-sm' : 'text-white/60 hover:text-white/80 hover:bg-white/[0.03]'}`}>
                 <item.icon size={17} className={active ? 'text-primary-light' : ''}/>{item.label}
                 {active && <div className="w-1.5 h-1.5 rounded-full bg-primary-light ml-auto" />}
               </Link>
@@ -152,7 +149,7 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
         <div className="p-4 border-t border-white/[0.06]">
           <div className="flex items-center gap-3 mb-3 px-3">
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-dark rounded-lg flex items-center justify-center text-white text-xs font-bold">{staffName.charAt(0)}</div>
-            <p className="text-white text-xs font-semibold truncate flex-1">{staffName}</p>
+            <p className="text-white text-sm font-semibold truncate flex-1">{staffName}</p>
             <div className="relative">
               <button onClick={() => { setShowNotifications(!showNotifications); setUnreadCount(0); }} className="relative text-white/70 hover:text-white/60 transition-colors" aria-label="Meldingen">
                 <Bell size={17} />
@@ -179,7 +176,7 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
               )}
             </div>
           </div>
-          <button onClick={logout} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-white/70 hover:text-red-400 hover:bg-red-400/5 w-full transition-all">
+          <button onClick={logout} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/70 hover:text-red-400 hover:bg-red-400/5 w-full transition-all">
             <LogOut size={17}/> Uitloggen
           </button>
         </div>
@@ -229,7 +226,7 @@ export default function StaffLayout({ children }: { children: ReactNode }) {
             return (
               <Link key={item.href} href={item.href} className={`flex flex-col items-center justify-center py-2.5 gap-0.5 transition-colors ${active ? 'text-primary-light' : 'text-white/70 active:text-white/60'}`}>
                 <item.icon size={20} strokeWidth={active ? 2.5 : 1.5} />
-                <span className={`text-[10px] font-medium ${active ? 'text-primary-light' : ''}`}>{item.label}</span>
+                <span className={`text-xs font-medium ${active ? 'text-primary-light' : ''}`}>{item.label}</span>
                 {active && <div className="w-1 h-1 rounded-full bg-primary-light mt-0.5" />}
               </Link>
             );

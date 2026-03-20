@@ -1,10 +1,12 @@
 'use client';
 import { fmt, fmtDate, CONTRACT_STATUS_COLORS } from "@/lib/format";
 
-import { useState } from 'react';
-import { FileText, Plus, X, ChevronLeft, ChevronRight, RefreshCw, Edit2 } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { Plus, ChevronLeft, ChevronRight, RefreshCw, Edit2, Download, CheckSquare, Square } from 'lucide-react';
 import { useAdminData } from '@/hooks/useAdminData';
 import Modal from '@/components/ui/Modal';
+import FilterBar, { type FilterConfig } from '@/components/admin/FilterBar';
+import { toast } from 'sonner';
 
 interface Contract { id: number; contract_number: string; customer_name: string; caravan_name: string; license_plate: string; location_name: string; start_date: string; end_date: string; monthly_rate: number; status: string; auto_renew: boolean; }
 interface CustomerOption { id: number; first_name: string; last_name: string; }
@@ -12,10 +14,28 @@ interface CaravanOption { id: number; brand: string; model: string; license_plat
 interface LocationOption { id: number; name: string; }
 interface SpotOption { id: number; label: string; zone: string; status: string; }
 
+const FILTER_CONFIG: FilterConfig = {
+  search: { placeholder: 'Zoek op klant, contractnr, kenteken...' },
+  statuses: [
+    { value: '', label: 'Alle' },
+    { value: 'actief', label: 'Actief' },
+    { value: 'verlopen', label: 'Verlopen' },
+    { value: 'opgezegd', label: 'Opgezegd' },
+    { value: 'concept', label: 'Concept' },
+  ],
+  sort: { options: [
+    { value: 'created_at', label: 'Aangemaakt' },
+    { value: 'start_date', label: 'Startdatum' },
+    { value: 'end_date', label: 'Einddatum' },
+    { value: 'monthly_rate', label: 'Tarief' },
+    { value: 'customer_name', label: 'Klant' },
+    { value: 'status', label: 'Status' },
+  ] },
+};
 
 export default function ContractenPage() {
-  const [statusFilter, setStatusFilter] = useState('');
-  const { items: contracts, total, page, setPage, loading, refetch: fetchData } = useAdminData<Contract>({ endpoint: '/api/admin/contracts', dataKey: 'contracts', params: { status: statusFilter } });
+  const [filters, setFilters] = useState<Record<string, string>>({});
+  const { items: contracts, total, page, setPage, loading, refetch: fetchData } = useAdminData<Contract>({ endpoint: '/api/admin/contracts', dataKey: 'contracts', params: filters });
   const [showForm, setShowForm] = useState(false);
   const [customers, setCustomers] = useState<CustomerOption[]>([]);
   const [caravans, setCaravans] = useState<CaravanOption[]>([]);
@@ -23,6 +43,31 @@ export default function ContractenPage() {
   const [spots, setSpots] = useState<SpotOption[]>([]);
   const [form, setForm] = useState({ customer_id: '', caravan_id: '', location_id: '', spot_id: '', start_date: '', end_date: '', monthly_rate: '', deposit: '0', auto_renew: true });
   const [editing, setEditing] = useState<Contract | null>(null);
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+
+  const updateFilter = (key: string, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+    setPage(1);
+  };
+  const resetFilters = () => { setFilters({}); setPage(1); };
+
+  const toggleSelect = (id: number) => {
+    setSelected(prev => { const next = new Set(prev); if (next.has(id)) next.delete(id); else next.add(id); return next; });
+  };
+  const toggleAll = () => {
+    if (selected.size === contracts.length) setSelected(new Set());
+    else setSelected(new Set(contracts.map(c => c.id)));
+  };
+
+  const exportCSV = useCallback(() => {
+    const rows = contracts.filter(c => selected.size === 0 || selected.has(c.id));
+    const headers = ['Contractnr', 'Klant', 'Caravan', 'Kenteken', 'Locatie', 'Startdatum', 'Einddatum', 'Maandtarief', 'Status', 'Auto-verlenging'];
+    const csv = [headers.join(';'), ...rows.map(c => [c.contract_number, c.customer_name, c.caravan_name, c.license_plate, c.location_name, c.start_date?.split('T')[0] || '', c.end_date?.split('T')[0] || '', c.monthly_rate, c.status, c.auto_renew ? 'Ja' : 'Nee'].join(';'))].join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `contracten-export-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+    URL.revokeObjectURL(url);
+  }, [contracts, selected]);
 
   const openForm = async () => {
     const [custRes, caravRes, locRes] = await Promise.all([
@@ -30,12 +75,9 @@ export default function ContractenPage() {
       fetch('/api/admin/caravans?limit=500', { credentials: 'include' }),
       fetch('/api/admin/locations', { credentials: 'include' }),
     ]);
-    const custData = await custRes.json();
-    const caravData = await caravRes.json();
-    const locData = await locRes.json();
-    setCustomers(custData.customers || []);
-    setCaravans(caravData.caravans || []);
-    setLocations(locData.locations || []);
+    setCustomers((await custRes.json()).customers || []);
+    setCaravans((await caravRes.json()).caravans || []);
+    setLocations((await locRes.json()).locations || []);
     setForm({ customer_id: '', caravan_id: '', location_id: '', spot_id: '', start_date: '', end_date: '', monthly_rate: '', deposit: '0', auto_renew: true });
     setShowForm(true);
   };
@@ -55,6 +97,7 @@ export default function ContractenPage() {
       await fetch('/api/admin/contracts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form), credentials: 'include' });
     }
     setShowForm(false); setEditing(null); fetchData();
+    toast.success(editing ? 'Contract bijgewerkt' : 'Contract aangemaakt');
   };
 
   const openEdit = async (c: Contract) => {
@@ -73,26 +116,38 @@ export default function ContractenPage() {
 
   const filteredCaravans = form.customer_id ? caravans.filter(c => String(c.customer_id) === form.customer_id) : caravans;
   const totalPages = Math.ceil(total / 50);
+  const totalMonthly = contracts.filter(c => c.status === 'actief').reduce((s, c) => s + Number(c.monthly_rate), 0);
 
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <div><h1 className="text-2xl font-black text-surface-dark">Contracten</h1><p className="text-sm text-warm-gray/70 mt-1">{total} contracten</p></div>
-        <button onClick={openForm} className="bg-primary hover:bg-primary-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all"><Plus size={16} /> Nieuw contract</button>
-      </div>
-
-      <div className="bg-surface rounded-2xl border border-sand-dark/20 mb-6 p-4">
-        <div className="flex gap-2">
-          {['', 'actief', 'verlopen', 'opgezegd', 'concept'].map(s => (
-            <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }} className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${statusFilter === s ? 'bg-primary text-white shadow-md shadow-primary/20' : 'bg-sand/40 hover:bg-sand-dark/20 text-warm-gray'}`}>{s || 'Alle'}</button>
-          ))}
+        <div><h1 className="text-2xl font-black text-surface-dark">Contracten</h1><p className="text-sm text-warm-gray/70 mt-1">{total} contracten · Maandomzet actief: {fmt(totalMonthly)}</p></div>
+        <div className="flex items-center gap-2">
+          <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2.5 bg-sand/40 hover:bg-sand-dark/20 text-warm-gray rounded-xl text-sm font-medium border border-sand-dark/20 transition-all">
+            <Download size={14} /> CSV {selected.size > 0 ? `(${selected.size})` : ''}
+          </button>
+          <button onClick={openForm} className="bg-primary hover:bg-primary-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all"><Plus size={16} /> Nieuw contract</button>
         </div>
       </div>
+
+      <FilterBar config={FILTER_CONFIG} values={filters} onChange={updateFilter} onReset={resetFilters} />
+
+      {selected.size > 0 && (
+        <div className="mb-4 flex items-center gap-3 bg-primary/[0.06] rounded-xl px-4 py-3 border border-primary/20">
+          <span className="text-sm font-semibold text-primary">{selected.size} geselecteerd</span>
+          <button onClick={() => setSelected(new Set())} className="text-xs text-warm-gray/70 hover:text-warm-gray underline ml-auto">Deselecteren</button>
+        </div>
+      )}
 
       <div className="bg-surface rounded-2xl border border-sand-dark/20 overflow-hidden">
         <div className="table-responsive">
         <table className="w-full text-sm min-w-[800px]">
           <thead className="bg-sand/40 border-b border-sand-dark/20"><tr>
+            <th className="w-10 px-4 py-3.5">
+              <button onClick={toggleAll} className="text-warm-gray/50 hover:text-warm-gray transition-colors" aria-label="Alles selecteren">
+                {selected.size === contracts.length && contracts.length > 0 ? <CheckSquare size={16} className="text-primary" /> : <Square size={16} />}
+              </button>
+            </th>
             <th className="text-left px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Contract</th>
             <th className="text-left px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Klant</th>
             <th className="text-left px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Caravan</th>
@@ -103,10 +158,15 @@ export default function ContractenPage() {
             <th className="text-right px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Acties</th>
           </tr></thead>
           <tbody className="divide-y divide-sand-dark/10">
-            {loading ? <tr><td colSpan={8} className="px-4 py-8 text-center text-warm-gray/70">Laden...</td></tr> :
-            contracts.length === 0 ? <tr><td colSpan={7} className="px-4 py-8 text-center text-warm-gray/70">Geen contracten</td></tr> :
+            {loading ? <tr><td colSpan={9} className="px-4 py-8 text-center text-warm-gray/70">Laden...</td></tr> :
+            contracts.length === 0 ? <tr><td colSpan={9} className="px-4 py-8 text-center text-warm-gray/70">Geen contracten gevonden</td></tr> :
             contracts.map(c => (
-              <tr key={c.id} className="hover:bg-sand/30 transition-colors">
+              <tr key={c.id} className={`hover:bg-sand/30 transition-colors ${selected.has(c.id) ? 'bg-primary/[0.03]' : ''}`}>
+                <td className="w-10 px-4 py-3">
+                  <button onClick={() => toggleSelect(c.id)} className="text-warm-gray/50 hover:text-warm-gray transition-colors" aria-label={`Selecteer ${c.contract_number}`}>
+                    {selected.has(c.id) ? <CheckSquare size={16} className="text-primary" /> : <Square size={16} />}
+                  </button>
+                </td>
                 <td className="px-4 py-3 font-mono text-xs text-warm-gray">{c.contract_number}</td>
                 <td className="px-4 py-3 text-surface-dark">{c.customer_name}</td>
                 <td className="px-4 py-3"><p className="text-sm text-surface-dark">{c.caravan_name}</p><p className="text-xs text-warm-gray/70">{c.license_plate}</p></td>

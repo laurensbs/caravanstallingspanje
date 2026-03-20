@@ -25,7 +25,7 @@ export default function Tabs({ tabs, active, onChange, size = 'md' }: TabsProps)
         >
           {tab.label}
           {tab.count !== undefined && (
-            <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+            <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-xs font-bold ${
               active === tab.id ? 'bg-primary/10 text-primary' : 'bg-sand-dark/50 text-warm-gray'
             }`}>
               {tab.count}

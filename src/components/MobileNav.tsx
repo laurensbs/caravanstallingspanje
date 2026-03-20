@@ -41,7 +41,7 @@ export default function MobileNav() {
                 />
               )}
               <item.icon size={20} className="relative" />
-              <span className="relative text-[10px] font-semibold">{item.label}</span>
+              <span className="relative text-xs font-semibold">{item.label}</span>
             </Link>
           );
         })}

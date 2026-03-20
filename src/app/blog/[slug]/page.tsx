@@ -72,7 +72,7 @@ export default function BlogPostPage() {
               <ArrowLeft size={12} /> Terug naar blog
             </Link>
             <div className="flex items-center gap-3 mb-5">
-              <span className={`text-[11px] font-bold px-3 py-1 rounded-full ${categoryColors[post.category] || 'bg-primary/10 text-primary'}`}>
+              <span className={`text-xs font-bold px-3 py-1 rounded-full ${categoryColors[post.category] || 'bg-primary/10 text-primary'}`}>
                 {post.category}
               </span>
               <span className="flex items-center gap-1.5 text-white/60 text-xs"><Calendar size={11} /> {new Date(post.date).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
@@ -167,7 +167,7 @@ export default function BlogPostPage() {
                       <Image src={rp.image} alt={rp.title} fill sizes="(max-width: 640px) 100vw, 33vw" className="img-cover group-hover:scale-105 transition-transform duration-500" />
                     </div>
                     <div className="p-5">
-                      <div className="flex items-center gap-3 text-[11px] text-warm-gray mb-2">
+                      <div className="flex items-center gap-3 text-xs text-warm-gray mb-2">
                         <span>{rp.category}</span>
                         <span>{rp.readTime}</span>
                       </div>

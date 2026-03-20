@@ -27,7 +27,7 @@ export default function AttractionDetailPage() {
         renderBadges: (item) => (
           <>
             {item.category && (
-              <span className={`${categoryColors[String(item.category)] || 'bg-warm-gray'} text-white text-[11px] font-semibold px-2.5 py-0.5 rounded-full shadow`}>
+              <span className={`${categoryColors[String(item.category)] || 'bg-warm-gray'} text-white text-xs font-semibold px-2.5 py-0.5 rounded-full shadow`}>
                 {categoryLabels[String(item.category)] || String(item.category)}
               </span>
             )}

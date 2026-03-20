@@ -42,14 +42,14 @@ function BarChartSimple({ data, height = 200 }: { data: { label: string; value: 
     <div className="flex items-end gap-2" style={{ height }}>
       {data.map((d, i) => (
         <div key={i} className="flex-1 flex flex-col items-center gap-1">
-          <span className="text-[10px] font-bold text-warm-gray">€{(d.value / 1000).toFixed(1)}k</span>
+          <span className="text-xs font-bold text-warm-gray">€{(d.value / 1000).toFixed(1)}k</span>
           <motion.div
             initial={{ height: 0 }}
             animate={{ height: `${(d.value / max) * 100}%` }}
             transition={{ delay: i * 0.05, duration: 0.4 }}
             className="w-full bg-gradient-to-t from-primary to-primary/60 rounded-t-lg min-h-[4px]"
           />
-          <span className="text-[10px] text-warm-gray/70">{d.label}</span>
+          <span className="text-xs text-warm-gray/70">{d.label}</span>
         </div>
       ))}
     </div>

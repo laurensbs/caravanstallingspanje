@@ -34,12 +34,12 @@ export default function StrandenPage() {
         renderBadges: (item) => (
           <>
             {item.beach_type && (
-              <span className="bg-ocean text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">
+              <span className="bg-ocean text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow">
                 {beachTypeLabels[String(item.beach_type)] || String(item.beach_type)}
               </span>
             )}
             {item.blue_flag && (
-              <span className="bg-blue-500 text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">🏴 Blue Flag</span>
+              <span className="bg-blue-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow">🏴 Blue Flag</span>
             )}
           </>
         ),

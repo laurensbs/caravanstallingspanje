@@ -78,7 +78,7 @@ export default function DienstenPage() {
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 bg-accent/10 text-accent rounded-xl flex items-center justify-center"><Shield size={22} /></div>
-                  <span className="text-[10px] font-bold bg-accent/8 text-accent px-3 py-1 rounded-full uppercase tracking-wider">Buiten &amp; Binnen</span>
+                  <span className="text-xs font-bold bg-accent/8 text-accent px-3 py-1 rounded-full uppercase tracking-wider">Buiten &amp; Binnen</span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-black mb-4">Beveiligde caravanstalling</h2>
                 <p className="text-warm-gray leading-relaxed mb-4">
@@ -104,12 +104,12 @@ export default function DienstenPage() {
                 <div className="flex items-center gap-6 mb-8 p-4 bg-sand/50 rounded-xl border border-sand-dark/20">
                   <div className="text-center">
                     <p className="text-2xl font-black">€65</p>
-                    <p className="text-[10px] text-warm-gray font-medium">Buiten /mnd</p>
+                    <p className="text-xs text-warm-gray font-medium">Buiten /mnd</p>
                   </div>
                   <div className="w-px h-10 bg-sand-dark/30" />
                   <div className="text-center">
                     <p className="text-2xl font-black">€95</p>
-                    <p className="text-[10px] text-warm-gray font-medium">Binnen /mnd</p>
+                    <p className="text-xs text-warm-gray font-medium">Binnen /mnd</p>
                   </div>
                 </div>
 
@@ -144,7 +144,7 @@ export default function DienstenPage() {
               <div className="order-1 lg:order-2">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 bg-ocean/10 text-ocean rounded-xl flex items-center justify-center"><Wrench size={22} /></div>
-                  <span className="text-[10px] font-bold bg-ocean/8 text-ocean px-3 py-1 rounded-full uppercase tracking-wider">Werkplaats</span>
+                  <span className="text-xs font-bold bg-ocean/8 text-ocean px-3 py-1 rounded-full uppercase tracking-wider">Werkplaats</span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-black mb-4">Reparatie &amp; onderhoud</h2>
                 <p className="text-warm-gray leading-relaxed mb-4">
@@ -282,7 +282,7 @@ export default function DienstenPage() {
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center"><Truck size={22} /></div>
-                  <span className="text-[10px] font-bold bg-primary/8 text-primary px-3 py-1 rounded-full uppercase tracking-wider">7 eenheden</span>
+                  <span className="text-xs font-bold bg-primary/8 text-primary px-3 py-1 rounded-full uppercase tracking-wider">7 eenheden</span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-black mb-4">Transport door heel Europa</h2>
                 <p className="text-warm-gray leading-relaxed mb-4">
@@ -362,7 +362,7 @@ export default function DienstenPage() {
               <div className="order-1 lg:order-2">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 bg-danger/10 text-danger rounded-xl flex items-center justify-center"><ShoppingBag size={22} /></div>
-                  <span className="text-[10px] font-bold bg-danger/8 text-danger px-3 py-1 rounded-full uppercase tracking-wider">Occasion</span>
+                  <span className="text-xs font-bold bg-danger/8 text-danger px-3 py-1 rounded-full uppercase tracking-wider">Occasion</span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-black mb-4">Verkoop tweedehands caravans</h2>
                 <p className="text-warm-gray leading-relaxed mb-4">
@@ -465,7 +465,7 @@ export default function DienstenPage() {
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 bg-ocean/10 text-ocean rounded-xl flex items-center justify-center"><SprayCan size={22} /></div>
-                  <span className="text-[10px] font-bold bg-ocean/8 text-ocean px-3 py-1 rounded-full uppercase tracking-wider">Exterieur &amp; Interieur</span>
+                  <span className="text-xs font-bold bg-ocean/8 text-ocean px-3 py-1 rounded-full uppercase tracking-wider">Exterieur &amp; Interieur</span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-black mb-4">Professionele schoonmaak</h2>
                 <p className="text-warm-gray leading-relaxed mb-4">

@@ -270,7 +270,7 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
                         >
                           <i.icon size={20} className="text-primary mb-2" />
                           <p className="text-sm font-bold leading-tight">{i.label}</p>
-                          <p className="text-[11px] text-warm-gray mt-0.5">{i.desc}</p>
+                          <p className="text-xs text-warm-gray mt-0.5">{i.desc}</p>
                         </button>
                       ))}
                     </div>
@@ -301,7 +301,7 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
                           {STORAGE_TYPES.map(s => (
                             <button key={s.id} onClick={() => setData({ ...data, storage_type: s.id })} className={gridBtn(data.storage_type === s.id)}>
                               <div className="font-semibold">{s.label}</div>
-                              {s.price && <div className="text-[10px] mt-0.5 opacity-70">{s.price}</div>}
+                              {s.price && <div className="text-xs mt-0.5 opacity-70">{s.price}</div>}
                             </button>
                           ))}
                         </div>
@@ -464,7 +464,7 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
                           {CLEANING_PACKAGES.map(c => (
                             <button key={c.id} onClick={() => setData({ ...data, cleaning_package: c.id })} className={gridBtn(data.cleaning_package === c.id)}>
                               <div className="font-semibold">{c.label}</div>
-                              <div className="text-[10px] mt-0.5 opacity-70">{c.price}</div>
+                              <div className="text-xs mt-0.5 opacity-70">{c.price}</div>
                             </button>
                           ))}
                         </div>
@@ -568,7 +568,7 @@ export default function QuizModal({ open, onClose, source = 'quiz', initialInter
                       </button>
                     </div>
 
-                    <div className="flex items-center justify-center gap-3 text-[10px] text-warm-gray/60">
+                    <div className="flex items-center justify-center gap-3 text-xs text-warm-gray/60">
                       <span className="flex items-center gap-1"><Shield size={10} /> Geen spam</span>
                       <span className="flex items-center gap-1"><CheckCircle size={10} /> Binnen 24 uur reactie</span>
                     </div>

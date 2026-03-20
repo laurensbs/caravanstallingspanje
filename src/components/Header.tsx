@@ -130,7 +130,7 @@ export default function Header() {
                 CS
               </div>
               <div className="hidden sm:block">
-                <span className={`text-[13px] font-bold block leading-tight tracking-tight transition-colors ${textColor}`}>
+                <span className={`text-sm font-bold block leading-tight tracking-tight transition-colors ${textColor}`}>
                   Caravanstalling
                 </span>
                 <span className="text-primary text-[9px] font-bold tracking-[0.15em] uppercase">Spanje</span>
@@ -148,7 +148,7 @@ export default function Header() {
                 >
                   <Link
                     href={item.href}
-                    className={`relative px-3.5 py-2 text-[13px] font-medium rounded-lg transition-all duration-200 flex items-center gap-1
+                    className={`relative px-3.5 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-1
                       ${pathname === item.href
                         ? `${scrolled || !isHome ? 'text-primary' : 'text-white'}`
                         : `${mutedColor} hover:${textColor}`
@@ -177,7 +177,7 @@ export default function Header() {
                           onMouseLeave={() => { megaTimeout.current = setTimeout(() => setMegaOpen(false), 200); }}
                         >
                           <div className="bg-card rounded-2xl shadow-2xl border border-sand-dark/20 p-5 w-[520px]">
-                            <p className="text-[10px] font-bold text-warm-gray uppercase tracking-widest mb-3 px-1">Onze diensten</p>
+                            <p className="text-xs font-bold text-warm-gray uppercase tracking-widest mb-3 px-1">Onze diensten</p>
                             <div className="grid grid-cols-2 gap-1">
                               {DIENSTEN_ITEMS.map(d => (
                                 <Link
@@ -189,8 +189,8 @@ export default function Header() {
                                     <d.icon size={16} className="text-primary" />
                                   </div>
                                   <div>
-                                    <p className="text-[13px] font-semibold text-surface-dark leading-tight">{d.label}</p>
-                                    <p className="text-[11px] text-warm-gray mt-0.5">{d.desc}</p>
+                                    <p className="text-sm font-semibold text-surface-dark leading-tight">{d.label}</p>
+                                    <p className="text-xs text-warm-gray mt-0.5">{d.desc}</p>
                                   </div>
                                 </Link>
                               ))}
@@ -216,7 +216,7 @@ export default function Header() {
                 <span className="text-sm">{currentFlag}</span>
               </button>
 
-              <button onClick={() => { setQuizOpen(true); setOpen(false); }} className="inline-flex items-center gap-1.5 bg-primary hover:bg-primary-dark text-white text-[13px] font-semibold px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer">
+              <button onClick={() => { setQuizOpen(true); setOpen(false); }} className="inline-flex items-center gap-1.5 bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer">
                 <span className="hidden sm:inline">Stalling aanvragen</span>
                 <span className="sm:hidden">Stalling</span>
               </button>
@@ -260,7 +260,7 @@ export default function Header() {
               </div>
 
               {/* Diensten as large tiles */}
-              <p className="text-[10px] font-bold uppercase tracking-widest text-warm-gray/60 mb-3">Onze diensten</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-warm-gray/60 mb-3">Onze diensten</p>
               <div className="grid grid-cols-3 gap-2 mb-6">
                 {DIENSTEN_ITEMS.map(d => (
                   <Link
@@ -271,7 +271,7 @@ export default function Header() {
                     <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
                       <d.icon size={18} className="text-primary" />
                     </div>
-                    <span className="text-[11px] font-semibold text-surface-dark leading-tight">{d.label.split(' ')[0]}</span>
+                    <span className="text-xs font-semibold text-surface-dark leading-tight">{d.label.split(' ')[0]}</span>
                   </Link>
                 ))}
               </div>

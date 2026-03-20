@@ -12,17 +12,17 @@ export default function RestaurantDetailPage() {
         renderBadges: (item) => (
           <>
             {item.cuisine_type && (
-              <span className="bg-primary text-white text-[11px] font-semibold px-2.5 py-0.5 rounded-full shadow">
+              <span className="bg-primary text-white text-xs font-semibold px-2.5 py-0.5 rounded-full shadow">
                 {String(item.cuisine_type)}
               </span>
             )}
             {item.michelin_stars && Number(item.michelin_stars) > 0 && (
-              <span className="bg-red-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow">
+              <span className="bg-red-600 text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow">
                 ★ Michelin {String(item.michelin_stars)}
               </span>
             )}
             {item.price_range && (
-              <span className="bg-white/20 backdrop-blur text-white text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
+              <span className="bg-white/20 backdrop-blur text-white text-xs font-semibold px-2.5 py-0.5 rounded-full">
                 {String(item.price_range)}
               </span>
             )}

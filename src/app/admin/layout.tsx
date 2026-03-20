@@ -3,11 +3,12 @@
 import { useState, useEffect, useCallback, ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useVisibleInterval } from '@/hooks/useVisibleInterval';
 import {
   LayoutDashboard, Users, Caravan, MapPin, FileText, Receipt, UserCog,
   ClipboardList, Truck, Settings, LogOut, Menu, X, Bell, Search, ChevronDown,
   Wrench, MessageSquare, Shield, Eye, EyeOff, Lock, User, ArrowRight, AlertCircle,
-  BarChart3, CalendarDays, Package, Target, Map, Palmtree, Mountain, UtensilsCrossed, BookOpen, Tent,
+  BarChart3, CalendarDays, Package, Target, Map, Palmtree, Mountain, UtensilsCrossed, BookOpen, Tent, Star, Tag,
 } from 'lucide-react';
 
 type NavItem = { href: string; icon: typeof LayoutDashboard; label: string; section: string; roles: string[] };
@@ -33,6 +34,8 @@ const NAV: NavItem[] = [
   { href: '/admin/gids/restaurants', icon: UtensilsCrossed, label: 'Restaurants', section: '', roles: ['admin'] },
   { href: '/admin/gids/blog', icon: BookOpen, label: 'Blog Artikelen', section: '', roles: ['admin'] },
   { href: '/admin/berichten', icon: MessageSquare, label: 'Berichten', section: 'Overig', roles: ['admin', 'staff'] },
+  { href: '/admin/reviews', icon: Star, label: 'Reviews', section: '', roles: ['admin'] },
+  { href: '/admin/kortingscodes', icon: Tag, label: 'Kortingscodes', section: '', roles: ['admin'] },
   { href: '/admin/medewerkers', icon: UserCog, label: 'Medewerkers', section: '', roles: ['admin'] },
   { href: '/admin/instellingen', icon: Settings, label: 'Instellingen', section: '', roles: ['admin'] },
 ];
@@ -76,29 +79,25 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }, [checkAuth]);
 
   // Load notifications
-  useEffect(() => {
+  const loadNotifs = useCallback(() => {
     if (!authenticated) return;
-    const loadNotifs = () => {
-      fetch('/api/admin/dashboard', { credentials: 'include' })
-        .then(r => r.json())
-        .then(d => {
-          const notifs: typeof notifications = [];
-          if (d.stats?.openInvoices > 0) notifs.push({ id: 1, message: `${d.stats.openInvoices} openstaande facturen`, type: 'factuur', created_at: new Date().toISOString(), read: false });
-          if (d.stats?.pendingTasks > 0) notifs.push({ id: 2, message: `${d.stats.pendingTasks} openstaande taken`, type: 'taak', created_at: new Date().toISOString(), read: false });
-          if (d.stats?.pendingServices > 0) notifs.push({ id: 3, message: `${d.stats.pendingServices} dienstaanvragen wachten op actie`, type: 'dienst', created_at: new Date().toISOString(), read: false });
-          if ((d.recent || []).length > 0) {
-            d.recent.slice(0, 5).forEach((a: { id: number; action: string; entity_label: string; created_at: string }, i: number) => {
-              notifs.push({ id: 10 + i, message: `${a.action}: ${a.entity_label}`, type: 'activiteit', created_at: a.created_at, read: true });
-            });
-          }
-          setNotifications(notifs);
-        })
-        .catch(() => {});
-    };
-    loadNotifs();
-    const interval = setInterval(loadNotifs, 30000);
-    return () => clearInterval(interval);
+    fetch('/api/admin/dashboard', { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => {
+        const notifs: typeof notifications = [];
+        if (d.stats?.openInvoices > 0) notifs.push({ id: 1, message: `${d.stats.openInvoices} openstaande facturen`, type: 'factuur', created_at: new Date().toISOString(), read: false });
+        if (d.stats?.pendingTasks > 0) notifs.push({ id: 2, message: `${d.stats.pendingTasks} openstaande taken`, type: 'taak', created_at: new Date().toISOString(), read: false });
+        if (d.stats?.pendingServices > 0) notifs.push({ id: 3, message: `${d.stats.pendingServices} dienstaanvragen wachten op actie`, type: 'dienst', created_at: new Date().toISOString(), read: false });
+        if ((d.recent || []).length > 0) {
+          d.recent.slice(0, 5).forEach((a: { id: number; action: string; entity_label: string; created_at: string }, i: number) => {
+            notifs.push({ id: 10 + i, message: `${a.action}: ${a.entity_label}`, type: 'activiteit', created_at: a.created_at, read: true });
+          });
+        }
+        setNotifications(notifs);
+      })
+      .catch(() => {});
   }, [authenticated]);
+  useVisibleInterval(loadNotifs, 30000);
 
   // Global search
   useEffect(() => {
@@ -193,7 +192,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           <div className="bg-surface/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-3xl p-8 space-y-5 shadow-2xl">
             {/* Role selector tabs */}
             <div>
-              <label className="text-white/70 text-[10px] font-bold uppercase tracking-widest block mb-2.5">Inloggen als</label>
+              <label className="text-white/70 text-xs font-bold uppercase tracking-widest block mb-2.5">Inloggen als</label>
               <div className="flex bg-surface/[0.04] rounded-xl p-1 border border-white/[0.06]">
                 {(['admin', 'staff'] as const).map(r => (
                   <button
@@ -216,7 +215,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <form onSubmit={handleLogin} className="space-y-4">
               {/* Email field */}
               <div>
-                <label className="text-white/70 text-[10px] font-bold uppercase tracking-widest block mb-2.5">E-mailadres</label>
+                <label className="text-white/70 text-xs font-bold uppercase tracking-widest block mb-2.5">E-mailadres</label>
                 <div className="relative">
                   <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/20" />
                   <input
@@ -234,7 +233,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
               {/* Password field */}
               <div>
-                <label className="text-white/70 text-[10px] font-bold uppercase tracking-widest block mb-2.5">Wachtwoord</label>
+                <label className="text-white/70 text-xs font-bold uppercase tracking-widest block mb-2.5">Wachtwoord</label>
                 <div className="relative">
                   <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/20" />
                   <input
@@ -275,10 +274,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
           {/* Trust badges */}
           <div className="flex items-center justify-center gap-5 mt-6">
-            <span className="flex items-center gap-1.5 text-[11px] text-white/20 font-medium">
+            <span className="flex items-center gap-1.5 text-xs text-white/20 font-medium">
               <Shield size={12} /> Beveiligde verbinding
             </span>
-            <span className="flex items-center gap-1.5 text-[11px] text-white/20 font-medium">
+            <span className="flex items-center gap-1.5 text-xs text-white/20 font-medium">
               <Lock size={12} /> Versleuteld
             </span>
           </div>
@@ -296,10 +295,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <aside className={`fixed inset-y-0 left-0 z-40 w-[270px] bg-surface-dark transform transition-transform md:relative md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center justify-between h-16 px-5 border-b border-white/[0.06]">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-lg flex items-center justify-center text-white text-[10px] font-black">CS</div>
+            <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-lg flex items-center justify-center text-white text-xs font-black">CS</div>
             <div>
               <span className="text-white font-bold text-sm block leading-tight">Caravanstalling</span>
-              <span className="text-white/70 text-[10px]">{role === 'admin' ? 'Admin Panel' : 'Staff Portal'}</span>
+              <span className="text-white/70 text-xs">{role === 'admin' ? 'Admin Panel' : 'Staff Portal'}</span>
             </div>
           </div>
           <button className="md:hidden text-white/70" onClick={() => setSidebarOpen(false)} aria-label="Zijmenu sluiten"><X size={20} /></button>
@@ -310,12 +309,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             let sectionHeader = null;
             if (n.section && n.section !== lastSection) {
               lastSection = n.section;
-              sectionHeader = <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest px-3 pt-5 pb-1.5">{n.section}</p>;
+              sectionHeader = <p className="text-xs font-bold text-white/20 uppercase tracking-widest px-3 pt-5 pb-1.5">{n.section}</p>;
             }
             return (
               <div key={n.href}>
                 {sectionHeader}
-                <Link href={n.href} onClick={() => setSidebarOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${active ? 'bg-surface/[0.08] text-white shadow-sm' : 'text-white/60 hover:text-white/80 hover:bg-surface/[0.03]'}`}>
+                <Link href={n.href} onClick={() => setSidebarOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${active ? 'bg-surface/[0.08] text-white shadow-sm' : 'text-white/60 hover:text-white/80 hover:bg-surface/[0.03]'}`}>
                   <n.icon size={17} className={active ? 'text-primary' : ''} /> {n.label}
                   {active && <div className="w-1.5 h-1.5 rounded-full bg-primary ml-auto" />}
                 </Link>
@@ -327,11 +326,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-3 px-3 mb-3">
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-lg flex items-center justify-center text-white text-xs font-bold">{userName.charAt(0)}</div>
             <div className="flex-1 min-w-0">
-              <p className="text-white text-xs font-semibold truncate">{userName}</p>
-              <p className="text-white/70 text-[10px]">{role}</p>
+              <p className="text-white text-sm font-semibold truncate">{userName}</p>
+              <p className="text-white/70 text-xs">{role}</p>
             </div>
           </div>
-          <button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-white/70 hover:text-danger hover:bg-red-400/5 w-full transition-all">
+          <button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/70 hover:text-danger hover:bg-red-400/5 w-full transition-all">
             <LogOut size={17} /> Uitloggen
           </button>
         </div>
@@ -361,7 +360,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                     <div className="p-4 text-center text-sm text-warm-gray/70">Geen resultaten</div>
                   ) : searchResults.map((r, i) => (
                     <Link key={i} href={r.href} className="flex items-center gap-3 px-4 py-3 hover:bg-sand/40 transition-colors border-b border-sand-dark/10 last:border-0">
-                      <span className="text-[10px] font-bold text-warm-gray/50 uppercase w-16 shrink-0">{r.type}</span>
+                      <span className="text-xs font-bold text-warm-gray/50 uppercase w-16 shrink-0">{r.type}</span>
                       <span className="text-sm text-surface-dark truncate">{r.label}</span>
                     </Link>
                   ))}
@@ -379,7 +378,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-surface rounded-xl border border-sand-dark/20 shadow-xl z-50 max-h-96 overflow-y-auto">
                   <div className="p-3 border-b border-sand-dark/20 flex items-center justify-between">
                     <span className="text-sm font-bold text-surface-dark">Notificaties</span>
-                    {unreadCount > 0 && <span className="text-[10px] font-bold text-primary">{unreadCount} nieuw</span>}
+                    {unreadCount > 0 && <span className="text-xs font-bold text-primary">{unreadCount} nieuw</span>}
                   </div>
                   {notifications.length === 0 ? (
                     <div className="p-6 text-center text-sm text-warm-gray/70">Geen notificaties</div>
@@ -389,7 +388,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                         {!n.read && <div className="w-2 h-2 bg-primary rounded-full mt-1.5 shrink-0" />}
                         <div>
                           <p className="text-sm text-surface-dark">{n.message}</p>
-                          <p className="text-[10px] text-warm-gray/50 mt-0.5">{new Date(n.created_at).toLocaleString('nl-NL', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' })}</p>
+                          <p className="text-xs text-warm-gray/50 mt-0.5">{new Date(n.created_at).toLocaleString('nl-NL', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' })}</p>
                         </div>
                       </div>
                     </div>
@@ -402,7 +401,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-sm shadow-primary/20">{userName.charAt(0)}</div>
               <div className="hidden md:block">
                 <p className="font-semibold text-sm text-surface-dark">{userName}</p>
-                <p className="text-[11px] text-warm-gray/70">{role}</p>
+                <p className="text-xs text-warm-gray/70">{role}</p>
               </div>
               <ChevronDown size={14} className="text-warm-gray/50" />
             </div>

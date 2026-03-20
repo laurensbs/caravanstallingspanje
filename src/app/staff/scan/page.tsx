@@ -172,7 +172,7 @@ export default function StaffScanPage() {
           {mode === "manual" && (
             <div className="mb-8">
               <div className="bg-surface rounded-2xl p-6 border border-black/[0.04]">
-                <label className="text-[11px] font-semibold text-muted block mb-2 uppercase tracking-wider">Contractnummer</label>
+                <label className="text-xs font-semibold text-muted block mb-2 uppercase tracking-wider">Contractnummer</label>
                 <div className="flex gap-3">
                   <input
                     value={contractNumber}
@@ -263,7 +263,7 @@ export default function StaffScanPage() {
                 <div key={s.label} className="bg-surface rounded-xl p-4 border border-black/[0.04] text-center">
                   <s.icon size={18} className="text-muted mx-auto mb-2" />
                   <p className="text-lg font-black">{s.value}</p>
-                  <p className="text-[10px] text-muted">{s.label}</p>
+                  <p className="text-xs text-muted">{s.label}</p>
                 </div>
               ))}
             </div>

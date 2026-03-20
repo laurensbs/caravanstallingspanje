@@ -15,7 +15,7 @@ export default function PlaatsenPage() {
         renderBadges: (item) => (
           <>
             {item.is_featured && (
-              <span className="bg-primary text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">Aanbevolen</span>
+              <span className="bg-primary text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow">Aanbevolen</span>
             )}
           </>
         ),

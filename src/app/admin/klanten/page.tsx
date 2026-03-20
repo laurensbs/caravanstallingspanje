@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Search, Plus, X, ChevronLeft, ChevronRight, Edit2, Eye, Mail, Phone } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { Search, Plus, X, ChevronLeft, ChevronRight, Edit2, Eye, Mail, Phone, Download, CheckSquare, Square, Filter } from 'lucide-react';
 import { useAdminData } from '@/hooks/useAdminData';
 import Modal from '@/components/ui/Modal';
 
@@ -13,11 +13,39 @@ interface Customer {
 
 export default function KlantenPage() {
   const [search, setSearch] = useState('');
-  const { items: customers, total, page, setPage, loading, refetch: fetchCustomers } = useAdminData<Customer>({ endpoint: '/api/admin/customers', dataKey: 'customers', params: { search } });
+  const [countryFilter, setCountryFilter] = useState('');
+  const { items: customers, total, page, setPage, loading, refetch: fetchCustomers } = useAdminData<Customer>({ endpoint: '/api/admin/customers', dataKey: 'customers', params: { search, country: countryFilter } });
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Customer | null>(null);
   const [form, setForm] = useState({ first_name: '', last_name: '', email: '', phone: '', address: '', city: '', postal_code: '', country: 'Nederland', company_name: '', notes: '' });
+  const [selected, setSelected] = useState<Set<number>>(new Set());
   const limit = 50;
+
+  const toggleSelect = (id: number) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAll = () => {
+    if (selected.size === customers.length) setSelected(new Set());
+    else setSelected(new Set(customers.map(c => c.id)));
+  };
+
+  const exportCSV = useCallback(() => {
+    const rows = customers.filter(c => selected.size === 0 || selected.has(c.id));
+    const headers = ['Klantnr', 'Voornaam', 'Achternaam', 'Email', 'Telefoon', 'Adres', 'Postcode', 'Plaats', 'Land', 'Bedrijf'];
+    const csv = [headers.join(';'), ...rows.map(c => [c.customer_number, c.first_name, c.last_name, c.email, c.phone || '', c.address || '', c.postal_code || '', c.city || '', c.country || '', c.company_name || ''].join(';'))].join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `klanten-export-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [customers, selected]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,18 +72,41 @@ export default function KlantenPage() {
           <h1 className="text-2xl font-black text-surface-dark">Klanten</h1>
           <p className="text-sm text-warm-gray/70 mt-1">{total.toLocaleString('nl-NL')} klanten totaal</p>
         </div>
-        <button onClick={() => { setEditing(null); setForm({ first_name: '', last_name: '', email: '', phone: '', address: '', city: '', postal_code: '', country: 'Nederland', company_name: '', notes: '' }); setShowForm(true); }} className="bg-primary hover:bg-primary-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all">
-          <Plus size={16} /> Nieuwe klant
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2.5 bg-sand/40 hover:bg-sand-dark/20 text-warm-gray rounded-xl text-sm font-medium border border-sand-dark/20 transition-all">
+            <Download size={14} /> CSV {selected.size > 0 ? `(${selected.size})` : ''}
+          </button>
+          <button onClick={() => { setEditing(null); setForm({ first_name: '', last_name: '', email: '', phone: '', address: '', city: '', postal_code: '', country: 'Nederland', company_name: '', notes: '' }); setShowForm(true); }} className="bg-primary hover:bg-primary-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all">
+            <Plus size={16} /> Nieuwe klant
+          </button>
+        </div>
       </div>
 
-      {/* Search */}
+      {/* Search & Filters */}
       <div className="bg-surface rounded-2xl border border-sand-dark/20 mb-6 p-4">
-        <div className="flex items-center gap-2 bg-sand/40 rounded-xl px-3.5 py-2.5 border border-sand-dark/20">
-          <Search size={15} className="text-warm-gray/50" />
-          <input placeholder="Zoek op naam, email, klantnummer..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} className="bg-transparent text-sm outline-none flex-1 text-warm-gray placeholder:text-warm-gray/50" />
-          {search && <button onClick={() => setSearch('')} aria-label="Zoekopdracht wissen"><X size={14} className="text-warm-gray/70" /></button>}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 bg-sand/40 rounded-xl px-3.5 py-2.5 border border-sand-dark/20 flex-1 min-w-[200px]">
+            <Search size={15} className="text-warm-gray/50" />
+            <input placeholder="Zoek op naam, email, klantnummer..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} className="bg-transparent text-sm outline-none flex-1 text-warm-gray placeholder:text-warm-gray/50" />
+            {search && <button onClick={() => setSearch('')} aria-label="Zoekopdracht wissen"><X size={14} className="text-warm-gray/70" /></button>}
+          </div>
+          <div className="flex items-center gap-2">
+            <Filter size={14} className="text-warm-gray/50" />
+            <select value={countryFilter} onChange={e => { setCountryFilter(e.target.value); setPage(1); }} className="bg-sand/40 border border-sand-dark/20 rounded-xl px-3 py-2.5 text-sm text-warm-gray outline-none">
+              <option value="">Alle landen</option>
+              <option value="NL">Nederland</option>
+              <option value="BE">België</option>
+              <option value="DE">Duitsland</option>
+              <option value="ES">Spanje</option>
+            </select>
+          </div>
         </div>
+        {selected.size > 0 && (
+          <div className="mt-3 flex items-center gap-3 bg-primary/[0.06] rounded-xl px-4 py-2.5 border border-primary/20">
+            <span className="text-sm font-semibold text-primary">{selected.size} geselecteerd</span>
+            <button onClick={() => setSelected(new Set())} className="text-xs text-warm-gray/70 hover:text-warm-gray underline">Deselecteren</button>
+          </div>
+        )}
       </div>
 
       {/* Table */}
@@ -64,6 +115,11 @@ export default function KlantenPage() {
           <table className="w-full text-sm">
             <thead className="bg-sand/40 border-b border-sand-dark/20">
               <tr>
+                <th className="w-10 px-4 py-3.5">
+                  <button onClick={toggleAll} className="text-warm-gray/50 hover:text-warm-gray transition-colors" aria-label="Alles selecteren">
+                    {selected.size === customers.length && customers.length > 0 ? <CheckSquare size={16} className="text-primary" /> : <Square size={16} />}
+                  </button>
+                </th>
                 <th className="text-left px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Klantnr</th>
                 <th className="text-left px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Naam</th>
                 <th className="text-left px-4 py-3.5 text-xs font-semibold text-warm-gray/70 uppercase tracking-wider">Contact</th>
@@ -74,11 +130,16 @@ export default function KlantenPage() {
             </thead>
             <tbody className="divide-y divide-sand-dark/10">
               {loading ? (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-warm-gray/70">Laden...</td></tr>
+                <tr><td colSpan={7} className="px-4 py-8 text-center text-warm-gray/70">Laden...</td></tr>
               ) : customers.length === 0 ? (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-warm-gray/70">Geen klanten gevonden</td></tr>
+                <tr><td colSpan={7} className="px-4 py-8 text-center text-warm-gray/70">Geen klanten gevonden</td></tr>
               ) : customers.map(c => (
-                <tr key={c.id} className="hover:bg-sand/30 transition-colors">
+                <tr key={c.id} className={`hover:bg-sand/30 transition-colors ${selected.has(c.id) ? 'bg-primary/[0.03]' : ''}`}>
+                  <td className="w-10 px-4 py-3.5">
+                    <button onClick={() => toggleSelect(c.id)} className="text-warm-gray/50 hover:text-warm-gray transition-colors" aria-label={`Selecteer ${c.first_name} ${c.last_name}`}>
+                      {selected.has(c.id) ? <CheckSquare size={16} className="text-primary" /> : <Square size={16} />}
+                    </button>
+                  </td>
                   <td className="px-4 py-3.5 font-mono text-xs text-warm-gray/70">{c.customer_number}</td>
                   <td className="px-4 py-3.5">
                     <p className="font-semibold text-surface-dark">{c.first_name} {c.last_name}</p>

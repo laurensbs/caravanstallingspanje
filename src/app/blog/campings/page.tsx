@@ -28,12 +28,12 @@ export default function CampingsPage() {
         renderBadges: (item) => (
           <>
             {Number(item.stars) > 0 && (
-              <span className="flex items-center gap-0.5 bg-yellow-400 text-yellow-900 text-[11px] font-bold px-2 py-0.5 rounded-full shadow">
+              <span className="flex items-center gap-0.5 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-0.5 rounded-full shadow">
                 <Star size={10} fill="currentColor" /> {String(item.stars)}
               </span>
             )}
             {item.is_featured && (
-              <span className="bg-primary text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">Aanbevolen</span>
+              <span className="bg-primary text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow">Aanbevolen</span>
             )}
           </>
         ),

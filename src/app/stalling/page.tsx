@@ -126,7 +126,7 @@ export default function StallingPage() {
             ].map((t, i) => (
               <A key={t.title} delay={i * 0.1}>
                 <div className={`card-premium p-7 sm:p-9 h-full flex flex-col ${t.tag ? 'ring-2 ring-primary/20' : ''}`}>
-                  {t.tag && <span className="absolute top-6 right-6 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">{t.tag}</span>}
+                  {t.tag && <span className="absolute top-6 right-6 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">{t.tag}</span>}
                   <div className={`w-12 h-12 ${t.tag ? 'bg-primary/8 text-primary' : 'bg-accent/8 text-accent'} rounded-xl flex items-center justify-center mb-5`}>
                     <t.icon size={22} />
                   </div>
@@ -274,9 +274,9 @@ export default function StallingPage() {
                   })}
                 </div>
                 <div className="flex items-center justify-center gap-5 mt-5 pt-4 border-t border-sand-dark/15">
-                  <span className="flex items-center gap-1.5 text-[11px] font-medium text-warm-gray"><span className="w-2.5 h-2.5 bg-accent/60 rounded-full" /> Vrij</span>
-                  <span className="flex items-center gap-1.5 text-[11px] font-medium text-warm-gray"><span className="w-2.5 h-2.5 bg-sand-dark/40 rounded-full" /> Bezet</span>
-                  <span className="flex items-center gap-1.5 text-[11px] font-medium text-warm-gray"><span className="w-2.5 h-2.5 bg-primary/60 rounded-full" /> Gereserveerd</span>
+                  <span className="flex items-center gap-1.5 text-xs font-medium text-warm-gray"><span className="w-2.5 h-2.5 bg-accent/60 rounded-full" /> Vrij</span>
+                  <span className="flex items-center gap-1.5 text-xs font-medium text-warm-gray"><span className="w-2.5 h-2.5 bg-sand-dark/40 rounded-full" /> Bezet</span>
+                  <span className="flex items-center gap-1.5 text-xs font-medium text-warm-gray"><span className="w-2.5 h-2.5 bg-primary/60 rounded-full" /> Gereserveerd</span>
                 </div>
               </div>
             </div>

@@ -74,9 +74,9 @@ export default function StaffDashboard() {
               {t.priority === 'urgent' ? <AlertTriangle size={16} className="text-danger shrink-0" /> : <Clock size={16} className="text-warm-gray/50 shrink-0" />}
               <div className="flex-1 min-w-0">
                 <h3 className="text-sm font-semibold text-surface-dark">{t.title}</h3>
-                <p className="text-[11px] text-warm-gray/70 mt-0.5">{t.location_name || 'Alle locaties'} {t.due_date ? `· Deadline: ${new Date(t.due_date).toLocaleDateString('nl-NL')}` : ''}</p>
+                <p className="text-xs text-warm-gray/70 mt-0.5">{t.location_name || 'Alle locaties'} {t.due_date ? `· Deadline: ${new Date(t.due_date).toLocaleDateString('nl-NL')}` : ''}</p>
               </div>
-              <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border ${PRIORITY_BADGES[t.priority] || 'bg-sand/40 text-warm-gray border-sand-dark/30'}`}>{t.priority}</span>
+              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${PRIORITY_BADGES[t.priority] || 'bg-sand/40 text-warm-gray border-sand-dark/30'}`}>{t.priority}</span>
             </div>
           ))}
         </div>

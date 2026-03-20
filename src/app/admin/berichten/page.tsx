@@ -163,7 +163,7 @@ export default function BerichtenPage() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        {Number(c.unread_count) > 0 && <span className="w-5 h-5 bg-warning/100 text-white rounded-full text-[10px] font-bold flex items-center justify-center flex-shrink-0">{c.unread_count}</span>}
+                        {Number(c.unread_count) > 0 && <span className="w-5 h-5 bg-warning/100 text-white rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0">{c.unread_count}</span>}
                         <span className={`text-sm truncate ${Number(c.unread_count) > 0 ? 'font-semibold text-surface-dark' : 'text-warm-gray'}`}>{c.customer_name || 'Onbekend'}</span>
                       </div>
                       <p className="text-xs font-medium text-surface-dark mt-0.5 truncate">{c.subject}</p>
@@ -171,7 +171,7 @@ export default function BerichtenPage() {
                     </div>
                     <div className="flex flex-col items-end gap-1 flex-shrink-0">
                       <span className="text-xs text-warm-gray/70">{fmtDate(c.last_message_at)}</span>
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${c.status === 'open' ? 'bg-accent/15 text-primary-dark' : 'bg-sand text-warm-gray'}`}>{c.status}</span>
+                      <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${c.status === 'open' ? 'bg-accent/15 text-primary-dark' : 'bg-sand text-warm-gray'}`}>{c.status}</span>
                     </div>
                   </div>
                 </button>
@@ -207,7 +207,7 @@ export default function BerichtenPage() {
                     <div className={`max-w-[75%] rounded-2xl px-4 py-3 ${m.sender_type === 'admin' ? 'bg-primary text-white' : 'bg-sand text-surface-dark'}`}>
                       <div className="flex items-center gap-2 mb-1">
                         <span className={`text-xs font-semibold ${m.sender_type === 'admin' ? 'text-white/80' : 'text-warm-gray'}`}>{m.sender_name}</span>
-                        <span className={`text-[10px] ${m.sender_type === 'admin' ? 'text-white/60' : 'text-warm-gray/70'}`}>
+                        <span className={`text-xs ${m.sender_type === 'admin' ? 'text-white/60' : 'text-warm-gray/70'}`}>
                           {new Date(m.created_at).toLocaleString('nl-NL', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' })}
                         </span>
                       </div>

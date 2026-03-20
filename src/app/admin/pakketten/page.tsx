@@ -194,8 +194,8 @@ export default function DienstenPakkettenPage() {
             <div key={pkg.id} className={`bg-surface rounded-2xl border p-6 transition-all hover:shadow-lg ${pkg.is_active ? 'border-sand-dark/20' : 'border-red-100 bg-danger/10/30'}`}>
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${pkg.is_active ? 'bg-accent/15 text-accent-dark' : 'bg-danger/15 text-danger'}`}>{pkg.is_active ? 'Actief' : 'Inactief'}</span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sand text-warm-gray ml-1">{CATEGORIES.find(c => c.value === pkg.category)?.label || pkg.category}</span>
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${pkg.is_active ? 'bg-accent/15 text-accent-dark' : 'bg-danger/15 text-danger'}`}>{pkg.is_active ? 'Actief' : 'Inactief'}</span>
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-sand text-warm-gray ml-1">{CATEGORIES.find(c => c.value === pkg.category)?.label || pkg.category}</span>
                 </div>
                 <div className="flex gap-1">
                   <button onClick={() => toggleActive(pkg)} className="p-1.5 rounded-lg hover:bg-sand-dark/20 text-warm-gray/70 hover:text-warm-gray transition-colors">

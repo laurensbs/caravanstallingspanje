@@ -62,7 +62,7 @@ export default function ReviewsWidget({ limit = 4 }: { limit?: number }) {
                   </div>
                   <div>
                     <p className="font-semibold text-sm">{review.name}</p>
-                    <p className="text-[11px] text-warm-gray">Google • {new Date(review.date).toLocaleDateString('nl-NL', { month: 'short', year: 'numeric' })}</p>
+                    <p className="text-xs text-warm-gray">Google • {new Date(review.date).toLocaleDateString('nl-NL', { month: 'short', year: 'numeric' })}</p>
                   </div>
                 </div>
                 <div className="flex gap-0.5">

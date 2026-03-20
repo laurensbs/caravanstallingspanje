@@ -43,12 +43,12 @@ export default function BezienswaardigheidPage() {
         renderBadges: (item) => (
           <>
             {item.category && (
-              <span className={`${categoryColors[String(item.category)] || 'bg-warm-gray'} text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow`}>
+              <span className={`${categoryColors[String(item.category)] || 'bg-warm-gray'} text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow`}>
                 {categoryLabels[String(item.category)] || String(item.category)}
               </span>
             )}
             {item.is_featured && (
-              <span className="bg-primary text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">Aanbevolen</span>
+              <span className="bg-primary text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow">Aanbevolen</span>
             )}
           </>
         ),

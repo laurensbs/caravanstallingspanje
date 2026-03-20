@@ -88,7 +88,7 @@ export default function TarievenPage() {
             {plans.map((p, i) => (
               <A key={p.title} delay={i * 0.1}>
                 <div className={`card-premium p-7 sm:p-8 h-full flex flex-col ${p.popular ? 'ring-2 ring-accent/20 shadow-lg' : ''}`}>
-                  {p.popular && <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-accent text-white text-[10px] font-bold px-4 py-1.5 rounded-full shadow-md uppercase tracking-wider">Populair</span>}
+                  {p.popular && <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-accent text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md uppercase tracking-wider">Populair</span>}
                   <div className={`w-12 h-12 ${p.color} rounded-xl flex items-center justify-center mb-5`}>
                     <Shield size={20} />
                   </div>

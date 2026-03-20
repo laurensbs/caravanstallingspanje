@@ -3,8 +3,12 @@ import { fmt, fmtDate } from "@/lib/format";
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Users, Caravan, MapPin, FileText, Receipt, Truck, ClipboardList, TrendingUp, AlertTriangle, ArrowUpRight, Activity, BarChart3 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Users, Caravan, MapPin, FileText, Receipt, Truck, ClipboardList, TrendingUp, TrendingDown, AlertTriangle, ArrowUpRight, Activity, MessageSquare, Target, Wrench, ShieldAlert, Calendar, X } from 'lucide-react';
+import dynamic from 'next/dynamic';
+const DashboardCharts = dynamic(() => import('./_components/DashboardCharts'), {
+  ssr: false,
+  loading: () => <div className="grid lg:grid-cols-2 gap-6 mb-8"><div className="bg-surface rounded-2xl p-6 border border-sand-dark/20 h-80 animate-pulse" /><div className="bg-surface rounded-2xl p-6 border border-sand-dark/20 h-80 animate-pulse" /></div>,
+});
 
 interface Stats {
   totalCustomers: number; totalCaravans: number; storedCaravans: number; onSiteCaravans: number;
@@ -13,23 +17,35 @@ interface Stats {
   monthlyRevenue: { month: string; revenue: number; count: number }[];
 }
 
+interface Alerts {
+  expiringContracts: { contract_number: string; customer_name: string; end_date: string }[];
+  expiringInsurance: { brand: string; model: string; license_plate: string; insurance_expiry: string; customer_name: string }[];
+  expiringApk: { brand: string; model: string; license_plate: string; apk_expiry: string; customer_name: string }[];
+  unreadMessages: number;
+  newLeads: number;
+  pendingServices: number;
+}
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [activity, setActivity] = useState<{ id: number; action: string; actor: string; entity_label: string; details: string; created_at: string }[]>([]);
+  const [alerts, setAlerts] = useState<Alerts | null>(null);
+  const [trends, setTrends] = useState<{ newCustomers30d: number; newCaravans30d: number; newContracts30d: number; revenueGrowth30d: number } | null>(null);
+  const [alertsDismissed, setAlertsDismissed] = useState(false);
 
   useEffect(() => {
     fetch('/api/admin/dashboard', { credentials: 'include' })
-      .then(r => r.json()).then(d => { setStats(d.stats); setActivity(d.activity || []); }).catch(() => {});
+      .then(r => r.json()).then(d => { setStats(d.stats); setActivity(d.activity || []); setAlerts(d.alerts || null); setTrends(d.trends || null); }).catch(() => {});
   }, []);
 
 
   if (!stats) return <div className="flex items-center justify-center h-64"><div className="w-6 h-6 border-2 border-warning border-t-transparent rounded-full animate-spin" /></div>;
 
   const cards = [
-    { icon: Users, label: 'Klanten', value: stats.totalCustomers, bg: 'bg-ocean/10', text: 'text-ocean', href: '/admin/klanten' },
-    { icon: Caravan, label: 'Caravans', value: stats.totalCaravans, sub: `${stats.storedCaravans} gestald · ${stats.onSiteCaravans} op camping`, bg: 'bg-primary/10', text: 'text-primary', href: '/admin/caravans' },
+    { icon: Users, label: 'Klanten', value: stats.totalCustomers, bg: 'bg-ocean/10', text: 'text-ocean', href: '/admin/klanten', trend: trends?.newCustomers30d },
+    { icon: Caravan, label: 'Caravans', value: stats.totalCaravans, sub: `${stats.storedCaravans} gestald · ${stats.onSiteCaravans} op camping`, bg: 'bg-primary/10', text: 'text-primary', href: '/admin/caravans', trend: trends?.newCaravans30d },
     { icon: MapPin, label: 'Locaties', value: stats.totalLocations, bg: 'bg-accent/10', text: 'text-accent', href: '/admin/locaties' },
-    { icon: FileText, label: 'Actieve contracten', value: stats.activeContracts, bg: 'bg-ocean-dark/10', text: 'text-ocean-dark', href: '/admin/contracten' },
+    { icon: FileText, label: 'Actieve contracten', value: stats.activeContracts, bg: 'bg-ocean-dark/10', text: 'text-ocean-dark', href: '/admin/contracten', trend: trends?.newContracts30d },
     { icon: Receipt, label: 'Open facturen', value: stats.openInvoices, sub: fmt(stats.openInvoiceAmount), bg: 'bg-warning/10', text: 'text-warning', href: '/admin/facturen' },
     { icon: AlertTriangle, label: 'Achterstallig', value: stats.overdueInvoices, sub: fmt(stats.overdueAmount), bg: 'bg-danger/10', text: 'text-danger', href: '/admin/facturen?status=achterstallig' },
     { icon: ClipboardList, label: 'Open taken', value: stats.openTasks, bg: 'bg-ocean-light/10', text: 'text-ocean', href: '/admin/taken' },
@@ -45,8 +61,91 @@ export default function AdminDashboard() {
         </div>
         <div className="flex items-center gap-2.5 bg-gradient-to-r from-accent/10 to-accent/20 text-accent-dark px-5 py-2.5 rounded-xl text-sm font-semibold border border-accent/30">
           <TrendingUp size={16} /> Omzet {new Date().getFullYear()}: <strong>{fmt(stats.yearRevenue)}</strong>
+          {trends && trends.revenueGrowth30d > 0 && <span className="text-xs text-accent ml-1">+{fmt(trends.revenueGrowth30d)} deze maand</span>}
         </div>
       </div>
+
+      {/* Urgency Alerts */}
+      {alerts && !alertsDismissed && (() => {
+        const totalAlerts = (alerts.expiringContracts?.length || 0) + (alerts.expiringInsurance?.length || 0) + (alerts.expiringApk?.length || 0) + (alerts.unreadMessages > 0 ? 1 : 0) + (alerts.newLeads > 0 ? 1 : 0) + (alerts.pendingServices > 0 ? 1 : 0) + (stats.overdueInvoices > 0 ? 1 : 0);
+        if (totalAlerts === 0) return null;
+        return (
+          <div className="bg-gradient-to-r from-danger/[0.06] via-warning/[0.06] to-primary/[0.06] rounded-2xl border border-danger/20 p-5 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <ShieldAlert size={18} className="text-danger" />
+                <h2 className="font-bold text-surface-dark">Aandachtspunten ({totalAlerts})</h2>
+              </div>
+              <button onClick={() => setAlertsDismissed(true)} className="text-warm-gray/50 hover:text-warm-gray transition-colors" aria-label="Meldingen sluiten"><X size={16} /></button>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {stats.overdueInvoices > 0 && (
+                <Link href="/admin/facturen?status=achterstallig" className="flex items-start gap-3 bg-surface rounded-xl p-3.5 border border-danger/20 hover:shadow-md transition-all group">
+                  <div className="w-8 h-8 bg-danger/10 rounded-lg flex items-center justify-center shrink-0"><Receipt size={15} className="text-danger" /></div>
+                  <div>
+                    <p className="text-sm font-bold text-danger">{stats.overdueInvoices} achterstallige facturen</p>
+                    <p className="text-xs text-warm-gray/70">{fmt(stats.overdueAmount)} openstaand</p>
+                  </div>
+                </Link>
+              )}
+              {alerts.expiringContracts?.length > 0 && (
+                <Link href="/admin/contracten" className="flex items-start gap-3 bg-surface rounded-xl p-3.5 border border-warning/20 hover:shadow-md transition-all group">
+                  <div className="w-8 h-8 bg-warning/10 rounded-lg flex items-center justify-center shrink-0"><Calendar size={15} className="text-warning" /></div>
+                  <div>
+                    <p className="text-sm font-bold text-warning">{alerts.expiringContracts.length} contracten verlopen binnenkort</p>
+                    <p className="text-xs text-warm-gray/70">{alerts.expiringContracts[0]?.customer_name} — {fmtDate(alerts.expiringContracts[0]?.end_date)}</p>
+                  </div>
+                </Link>
+              )}
+              {alerts.expiringInsurance?.length > 0 && (
+                <Link href="/admin/caravans" className="flex items-start gap-3 bg-surface rounded-xl p-3.5 border border-warning/20 hover:shadow-md transition-all group">
+                  <div className="w-8 h-8 bg-warning/10 rounded-lg flex items-center justify-center shrink-0"><AlertTriangle size={15} className="text-warning" /></div>
+                  <div>
+                    <p className="text-sm font-bold text-warning">{alerts.expiringInsurance.length} verzekeringen verlopen</p>
+                    <p className="text-xs text-warm-gray/70">{alerts.expiringInsurance[0]?.brand} — {fmtDate(alerts.expiringInsurance[0]?.insurance_expiry)}</p>
+                  </div>
+                </Link>
+              )}
+              {alerts.expiringApk?.length > 0 && (
+                <Link href="/admin/caravans" className="flex items-start gap-3 bg-surface rounded-xl p-3.5 border border-warning/20 hover:shadow-md transition-all group">
+                  <div className="w-8 h-8 bg-warning/10 rounded-lg flex items-center justify-center shrink-0"><AlertTriangle size={15} className="text-warning" /></div>
+                  <div>
+                    <p className="text-sm font-bold text-warning">{alerts.expiringApk.length} APK-keuringen verlopen</p>
+                    <p className="text-xs text-warm-gray/70">{alerts.expiringApk[0]?.brand} — {fmtDate(alerts.expiringApk[0]?.apk_expiry)}</p>
+                  </div>
+                </Link>
+              )}
+              {alerts.unreadMessages > 0 && (
+                <Link href="/admin/berichten" className="flex items-start gap-3 bg-surface rounded-xl p-3.5 border border-ocean/20 hover:shadow-md transition-all group">
+                  <div className="w-8 h-8 bg-ocean/10 rounded-lg flex items-center justify-center shrink-0"><MessageSquare size={15} className="text-ocean" /></div>
+                  <div>
+                    <p className="text-sm font-bold text-ocean">{alerts.unreadMessages} ongelezen berichten</p>
+                    <p className="text-xs text-warm-gray/70">Reageer op klantvragen</p>
+                  </div>
+                </Link>
+              )}
+              {alerts.newLeads > 0 && (
+                <Link href="/admin/leads" className="flex items-start gap-3 bg-surface rounded-xl p-3.5 border border-accent/20 hover:shadow-md transition-all group">
+                  <div className="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center shrink-0"><Target size={15} className="text-accent" /></div>
+                  <div>
+                    <p className="text-sm font-bold text-accent">{alerts.newLeads} nieuwe leads deze week</p>
+                    <p className="text-xs text-warm-gray/70">Neem contact op</p>
+                  </div>
+                </Link>
+              )}
+              {alerts.pendingServices > 0 && (
+                <Link href="/admin/diensten" className="flex items-start gap-3 bg-surface rounded-xl p-3.5 border border-primary/20 hover:shadow-md transition-all group">
+                  <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0"><Wrench size={15} className="text-primary" /></div>
+                  <div>
+                    <p className="text-sm font-bold text-primary">{alerts.pendingServices} dienstaanvragen wachten</p>
+                    <p className="text-xs text-warm-gray/70">Wachten op goedkeuring of uitvoering</p>
+                  </div>
+                </Link>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -56,7 +155,15 @@ export default function AdminDashboard() {
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${c.bg}`}>
                 <c.icon size={18} className={c.text} />
               </div>
-              <ArrowUpRight size={14} className="text-warm-gray/40 group-hover:text-warm-gray/70 transition-colors" />
+              <div className="flex items-center gap-1">
+                {'trend' in c && c.trend != null && c.trend !== 0 && (
+                  <span className={`flex items-center gap-0.5 text-xs font-semibold ${c.trend > 0 ? 'text-accent' : 'text-danger'}`}>
+                    {c.trend > 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                    {c.trend > 0 ? '+' : ''}{c.trend}
+                  </span>
+                )}
+                <ArrowUpRight size={14} className="text-warm-gray/40 group-hover:text-warm-gray/70 transition-colors" />
+              </div>
             </div>
             <p className="text-2xl font-black text-surface-dark">{typeof c.value === 'number' ? c.value.toLocaleString('nl-NL') : c.value}</p>
             <p className="text-sm text-warm-gray/70 mt-0.5">{c.label}</p>
@@ -66,86 +173,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Charts */}
-      <div className="grid lg:grid-cols-2 gap-6 mb-8">
-        {/* Occupancy — Pie Chart */}
-        <div className="bg-surface rounded-2xl p-6 border border-sand-dark/20">
-          <h2 className="font-bold text-surface-dark flex items-center gap-2 mb-5"><BarChart3 size={16} className="text-ocean" /> Bezettingsgraad</h2>
-          {(() => {
-            const stored = stats.storedCaravans || 0;
-            const onSite = stats.onSiteCaravans || 0;
-            const inTransit = Math.max(0, (stats.totalCaravans || 0) - stored - onSite);
-            const total = stats.totalCaravans || 1;
-            const pct = Math.round((stored / total) * 100);
-            const pieData = [
-              { name: 'Gestald', value: stored, color: '#1a6b8a' },
-              { name: 'Op camping', value: onSite, color: '#C4653A' },
-              { name: 'In transit', value: inTransit, color: '#d4c5b0' },
-            ].filter(d => d.value > 0);
-            return (
-              <>
-                <div className="flex items-center justify-between mb-4">
-                  <div><p className="text-3xl font-black text-surface-dark">{pct}%</p><p className="text-xs text-warm-gray/70">{stored} van {total} plekken bezet</p></div>
-                </div>
-                <div className="h-48">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" strokeWidth={2} stroke="#FAF9F7">
-                        {pieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                      </Pie>
-                      <Tooltip formatter={(value) => [String(value), '']} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="flex justify-center gap-4 mt-2">
-                  {pieData.map(d => (
-                    <div key={d.name} className="flex items-center gap-1.5 text-xs text-warm-gray/70">
-                      <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: d.color }} />
-                      {d.name} ({d.value})
-                    </div>
-                  ))}
-                </div>
-              </>
-            );
-          })()}
-        </div>
-
-        {/* Revenue — Bar Chart */}
-        <div className="bg-surface rounded-2xl p-6 border border-sand-dark/20">
-          <h2 className="font-bold text-surface-dark flex items-center gap-2 mb-5"><TrendingUp size={16} className="text-accent" /> Maandomzet</h2>
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div className="bg-accent/[0.06] rounded-xl p-4 border border-accent/20">
-              <p className="text-xs text-warm-gray/70 mb-1">Jaaromzet {new Date().getFullYear()}</p>
-              <p className="text-xl font-black text-surface-dark">{fmt(stats.yearRevenue)}</p>
-            </div>
-            <div className="bg-warning/[0.06] rounded-xl p-4 border border-warning/20">
-              <p className="text-xs text-warm-gray/70 mb-1">Openstaand</p>
-              <p className="text-xl font-black text-surface-dark">{fmt(stats.openInvoiceAmount)}</p>
-            </div>
-          </div>
-          {(stats.monthlyRevenue?.length || 0) > 0 ? (
-            <div className="h-48">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={stats.monthlyRevenue.map(m => ({ ...m, label: m.month.slice(5) }))}>
-                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#8a7f77' }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#8a7f77' }} axisLine={false} tickLine={false} tickFormatter={v => `€${(v / 1000).toFixed(0)}k`} />
-                  <Tooltip formatter={(value) => [fmt(Number(value)), 'Omzet']} labelFormatter={(l) => `Maand ${l}`} />
-                  <Bar dataKey="revenue" fill="#3D5A3E" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className="h-48 flex items-center justify-center text-warm-gray/50 text-sm">
-              Nog geen omzetgegevens beschikbaar
-            </div>
-          )}
-          {stats.activeContracts > 0 && (
-            <div className="bg-sand/40 rounded-xl p-3 text-center mt-2">
-              <p className="text-xs text-warm-gray/70">Gemiddelde maandelijkse omzet per contract</p>
-              <p className="text-lg font-black text-surface-dark">{fmt(stats.yearRevenue / 12 / stats.activeContracts)}</p>
-            </div>
-          )}
-        </div>
-      </div>
+      <DashboardCharts stats={stats} />
 
       {/* Quick Actions + Activity */}
       <div className="grid lg:grid-cols-2 gap-6">

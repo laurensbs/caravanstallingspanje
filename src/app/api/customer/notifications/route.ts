@@ -1,17 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { neon } from '@neondatabase/serverless';
+import { sql } from '@/lib/db';
+import { getCustomerSession } from '@/lib/auth';
 
-function getDb() {
-  return neon(process.env.DATABASE_URL!);
+async function getCustomerId(req: NextRequest): Promise<number | null> {
+  const token = req.cookies.get('customer_token')?.value;
+  if (!token) return null;
+  const session = await getCustomerSession(token);
+  return session?.id || null;
 }
 
 // GET /api/customer/notifications
 export async function GET(req: NextRequest) {
-  const customerId = req.headers.get('x-customer-id');
+  const customerId = await getCustomerId(req);
   if (!customerId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const sql = getDb();
     const notifications = await sql`
       SELECT id, title, message, link, is_read, created_at
       FROM notifications
@@ -28,11 +31,10 @@ export async function GET(req: NextRequest) {
 
 // POST /api/customer/notifications — mark as read
 export async function POST(req: NextRequest) {
-  const customerId = req.headers.get('x-customer-id');
+  const customerId = await getCustomerId(req);
   if (!customerId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const sql = getDb();
     const body = await req.json();
     const { id, action } = body;
 

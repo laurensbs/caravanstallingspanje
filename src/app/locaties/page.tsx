@@ -39,7 +39,7 @@ export default function LocatiesPage() {
                   <div className="w-12 h-12 bg-accent/10 text-primary rounded-xl flex items-center justify-center">
                     <MapPin size={22} />
                   </div>
-                  <span className="text-[10px] font-bold bg-accent/10 text-accent px-3 py-1 rounded-full uppercase tracking-wider">Hoofdvestiging</span>
+                  <span className="text-xs font-bold bg-accent/10 text-accent px-3 py-1 rounded-full uppercase tracking-wider">Hoofdvestiging</span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-black mb-2">Sant Climent de Peralta</h2>
                 <a

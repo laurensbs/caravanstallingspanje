@@ -174,11 +174,11 @@ export default function LeadsPage() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-1">
                   <span className="font-bold text-sm truncate">{lead.name || lead.email}</span>
-                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${STATUS_COLORS[lead.status] || 'bg-gray-100 text-gray-600'}`}>
+                  <span className={`text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${STATUS_COLORS[lead.status] || 'bg-gray-100 text-gray-600'}`}>
                     {lead.status}
                   </span>
                   {lead.source && (
-                    <span className="text-[10px] text-warm-gray/60 bg-sand/50 px-2 py-0.5 rounded-full">
+                    <span className="text-xs text-warm-gray/60 bg-sand/50 px-2 py-0.5 rounded-full">
                       {SOURCE_LABELS[lead.source] || lead.source}
                     </span>
                   )}
@@ -200,25 +200,25 @@ export default function LeadsPage() {
                 <div className="grid sm:grid-cols-3 gap-4 mb-4">
                   {lead.storage_type && (
                     <div>
-                      <p className="text-[10px] font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Type stalling</p>
+                      <p className="text-xs font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Type stalling</p>
                       <p className="text-sm font-medium capitalize">{lead.storage_type}</p>
                     </div>
                   )}
                   {lead.caravan_brand && (
                     <div>
-                      <p className="text-[10px] font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Merk</p>
+                      <p className="text-xs font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Merk</p>
                       <p className="text-sm font-medium">{lead.caravan_brand}</p>
                     </div>
                   )}
                   {lead.caravan_length && (
                     <div>
-                      <p className="text-[10px] font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Lengte</p>
+                      <p className="text-xs font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Lengte</p>
                       <p className="text-sm font-medium">{lead.caravan_length}</p>
                     </div>
                   )}
                   {lead.timeframe && (
                     <div>
-                      <p className="text-[10px] font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Tijdlijn</p>
+                      <p className="text-xs font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Tijdlijn</p>
                       <p className="text-sm font-medium">{lead.timeframe}</p>
                     </div>
                   )}
@@ -227,20 +227,20 @@ export default function LeadsPage() {
                     if (parsed) {
                       return Object.entries(parsed).map(([key, value]) => (
                         <div key={key}>
-                          <p className="text-[10px] font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">{SERVICE_DETAIL_LABELS[key] || key}</p>
+                          <p className="text-xs font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">{SERVICE_DETAIL_LABELS[key] || key}</p>
                           <p className="text-sm font-medium">{Array.isArray(value) ? value.join(', ') : String(value)}</p>
                         </div>
                       ));
                     }
                     return (
                       <div>
-                        <p className="text-[10px] font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Diensten</p>
+                        <p className="text-xs font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Diensten</p>
                         <p className="text-sm font-medium">{lead.services}</p>
                       </div>
                     );
                   })()}
                   <div>
-                    <p className="text-[10px] font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Aangemaakt</p>
+                    <p className="text-xs font-bold text-warm-gray/60 uppercase tracking-wider mb-0.5">Aangemaakt</p>
                     <p className="text-sm font-medium">{new Date(lead.created_at).toLocaleString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                   </div>
                 </div>

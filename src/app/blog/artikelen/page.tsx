@@ -14,7 +14,7 @@ export default function ArtikelenPage() {
         renderBadges: (item) => (
           <>
             {item.tags && Array.isArray(item.tags) && (item.tags as string[]).slice(0, 2).map((tag: string) => (
-              <span key={tag} className="bg-hero/70 backdrop-blur text-white text-[11px] font-semibold px-2 py-0.5 rounded-full">
+              <span key={tag} className="bg-hero/70 backdrop-blur text-white text-xs font-semibold px-2 py-0.5 rounded-full">
                 {tag}
               </span>
             ))}

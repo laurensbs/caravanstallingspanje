@@ -85,7 +85,7 @@ export default function ArtikelDetailPage() {
             </Link>
             <div className="flex flex-wrap items-center gap-3 mb-5">
               {tags.slice(0, 3).map(tag => (
-                <span key={tag} className="bg-white/10 backdrop-blur text-white text-[11px] font-bold px-3 py-1 rounded-full">{tag}</span>
+                <span key={tag} className="bg-white/10 backdrop-blur text-white text-xs font-bold px-3 py-1 rounded-full">{tag}</span>
               ))}
               {publishedAt && (
                 <span className="flex items-center gap-1.5 text-white/60 text-xs">

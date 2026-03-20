@@ -221,7 +221,7 @@ export default function GuideAdminPage({ config }: { config: GuideAdminConfig })
               <thead>
                 <tr className="border-b border-sand-dark/20 bg-sand/30">
                   {config.tableColumns.map(col => (
-                    <th key={col.key} className="text-left text-[11px] font-bold text-warm-gray/50 uppercase tracking-wider px-4 py-3">{col.label}</th>
+                    <th key={col.key} className="text-left text-xs font-bold text-warm-gray/50 uppercase tracking-wider px-4 py-3">{col.label}</th>
                   ))}
                   <th className="w-24 px-4 py-3" />
                 </tr>
@@ -315,7 +315,7 @@ function ItemRow({
             <div className="space-y-5 max-w-4xl">
               <FormFields fields={config.fields} data={formData} onChange={onChange} />
               <div>
-                <label className="block text-[11px] font-bold text-warm-gray/50 uppercase tracking-wider mb-2">Afbeeldingen</label>
+                <label className="block text-xs font-bold text-warm-gray/50 uppercase tracking-wider mb-2">Afbeeldingen</label>
                 <ImageUploadZone entityType={config.imageType} entityId={item.id as number} images={images} onImagesChange={onImagesChange} />
               </div>
               {error && <p className="text-danger text-sm">{error}</p>}
@@ -341,7 +341,7 @@ function FormFields({ fields, data, onChange }: { fields: FieldDef[]; data: Reco
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {fields.map(f => (
         <div key={f.key} className={f.colSpan === 2 ? 'sm:col-span-2' : ''}>
-          <label className="block text-[11px] font-bold text-warm-gray/50 uppercase tracking-wider mb-1.5">{f.label}{f.required && ' *'}</label>
+          <label className="block text-xs font-bold text-warm-gray/50 uppercase tracking-wider mb-1.5">{f.label}{f.required && ' *'}</label>
           {f.type === 'textarea' ? (
             <textarea
               value={(data[f.key] as string) || ''}

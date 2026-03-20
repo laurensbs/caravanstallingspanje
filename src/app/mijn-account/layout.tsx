@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import AccountLayoutClient from './_components/AccountLayoutClient';
 
 export const metadata: Metadata = {
   title: 'Mijn Account - Caravan Storage Spain',
@@ -6,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function MijnAccountLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <AccountLayoutClient>{children}</AccountLayoutClient>;
 }

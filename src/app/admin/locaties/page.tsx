@@ -96,7 +96,7 @@ export default function LocatiesPage() {
                       <span className="text-sm font-medium text-surface-dark">Terreinkaart</span>
                       <div className="flex gap-2 ml-4">
                         {Object.entries(SPOT_COLORS).map(([k, v]) => (
-                          <span key={k} className={`text-[10px] px-2 py-0.5 rounded-full border ${v}`}>{k}</span>
+                          <span key={k} className={`text-xs px-2 py-0.5 rounded-full border ${v}`}>{k}</span>
                         ))}
                       </div>
                     </div>

@@ -29,12 +29,12 @@ export default function RestaurantsPage() {
         renderBadges: (item) => (
           <>
             {item.cuisine_type && (
-              <span className="bg-primary text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow">
+              <span className="bg-primary text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow">
                 {String(item.cuisine_type)}
               </span>
             )}
             {item.michelin_stars && Number(item.michelin_stars) > 0 && (
-              <span className="bg-red-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow">
+              <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow">
                 ★ Michelin {String(item.michelin_stars)}
               </span>
             )}

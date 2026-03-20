@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     const token = await createCustomerToken({ id: customer.id, name, email: customer.email });
 
     const response = NextResponse.json({ name, email: customer.email, phone: customer.phone, customer_number: customer.customer_number });
-    response.cookies.set('customer_token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: 60 * 60 * 24 * 30 });
+    response.cookies.set('customer_token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: 60 * 60 * 24 * 7 });
     return response;
   } catch (error) {
     console.error('Customer register error:', error);

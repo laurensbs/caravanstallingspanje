@@ -110,7 +110,7 @@ export default function ImageUploadZone({
           <div className="flex flex-col items-center gap-2">
             <Upload size={24} className="text-warm-gray/40" />
             <p className="text-sm text-warm-gray/70">Sleep afbeeldingen of klik om te uploaden</p>
-            <p className="text-[11px] text-warm-gray/40">JPEG, PNG, WebP, AVIF — max 5MB</p>
+            <p className="text-xs text-warm-gray/40">JPEG, PNG, WebP, AVIF — max 5MB</p>
           </div>
         )}
       </div>

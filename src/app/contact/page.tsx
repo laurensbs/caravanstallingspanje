@@ -146,7 +146,7 @@ export default function ContactPage() {
                         <c.icon size={16} className="text-primary" />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-warm-gray uppercase tracking-wider mb-0.5">{c.label}</p>
+                        <p className="text-xs font-bold text-warm-gray uppercase tracking-wider mb-0.5">{c.label}</p>
                         {c.href ? (
                           <a href={c.href} className="text-sm font-medium hover:text-primary transition-colors">{c.value}</a>
                         ) : (

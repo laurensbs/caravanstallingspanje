@@ -163,7 +163,7 @@ export default function PlanningPage() {
           {/* Day Headers */}
           <div className="grid grid-cols-7 border-b border-sand-dark/20">
             {DAYS_NL.map(d => (
-              <div key={d} className="text-center text-[11px] font-semibold text-warm-gray/70 py-2">{d}</div>
+              <div key={d} className="text-center text-xs font-semibold text-warm-gray/70 py-2">{d}</div>
             ))}
           </div>
 
@@ -193,11 +193,11 @@ export default function PlanningPage() {
                     {dayEvents.slice(0, 3).map(e => (
                       <div key={e.id} className="flex items-center gap-1">
                         <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${TYPE_COLORS[e.type] || 'bg-warm-gray'}`} />
-                        <span className="text-[10px] text-warm-gray truncate">{e.title}</span>
+                        <span className="text-xs text-warm-gray truncate">{e.title}</span>
                       </div>
                     ))}
                     {dayEvents.length > 3 && (
-                      <span className="text-[10px] text-accent font-semibold">+{dayEvents.length - 3} meer</span>
+                      <span className="text-xs text-accent font-semibold">+{dayEvents.length - 3} meer</span>
                     )}
                   </div>
                 </button>
@@ -235,7 +235,7 @@ export default function PlanningPage() {
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-surface-dark truncate">{e.title}</p>
                         <p className="text-xs text-warm-gray/70">{e.subtitle}</p>
-                        <span className="text-[10px] font-semibold text-warm-gray/50 mt-1 block">{TYPE_LABELS[e.type]}</span>
+                        <span className="text-xs font-semibold text-warm-gray/50 mt-1 block">{TYPE_LABELS[e.type]}</span>
                       </div>
                     </div>
                   ))}
@@ -269,12 +269,12 @@ export default function PlanningPage() {
                     className="w-full flex items-start gap-3 p-2.5 hover:bg-sand/40 rounded-xl transition-colors text-left"
                   >
                     <div className="text-center shrink-0">
-                      <div className="text-[10px] text-warm-gray/70 font-semibold">{new Date(e.date + 'T00:00:00').toLocaleDateString('nl-NL', { month: 'short' })}</div>
+                      <div className="text-xs text-warm-gray/70 font-semibold">{new Date(e.date + 'T00:00:00').toLocaleDateString('nl-NL', { month: 'short' })}</div>
                       <div className="text-lg font-black text-surface-dark">{new Date(e.date + 'T00:00:00').getDate()}</div>
                     </div>
                     <div className="min-w-0 pt-0.5">
                       <p className="text-xs font-semibold text-surface-dark truncate">{e.title}</p>
-                      <p className="text-[10px] text-warm-gray/70 truncate">{e.subtitle}</p>
+                      <p className="text-xs text-warm-gray/70 truncate">{e.subtitle}</p>
                     </div>
                     <span className={`w-2 h-2 rounded-full mt-2 shrink-0 ${TYPE_COLORS[e.type]}`} />
                   </button>

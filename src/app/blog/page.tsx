@@ -112,7 +112,7 @@ export default function HubPage() {
               ].map(s => (
                 <div key={s.l} className="py-4 sm:py-5 text-center">
                   <p className="text-lg sm:text-2xl font-black text-surface-dark">{s.n}</p>
-                  <p className="text-[10px] sm:text-xs text-warm-gray font-medium">{s.l}</p>
+                  <p className="text-xs sm:text-xs text-warm-gray font-medium">{s.l}</p>
                 </div>
               ))}
             </div>
@@ -220,22 +220,22 @@ function GuideCard({ item, type }: { item: Item; type: string }) {
           )}
           <div className="absolute top-3 left-3 flex gap-1.5">
             {type === 'campings' && item.stars && (
-              <span className="bg-white/90 backdrop-blur-sm text-surface-dark text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5">
+              <span className="bg-white/90 backdrop-blur-sm text-surface-dark text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5">
                 <Star size={10} className="text-amber-500 fill-amber-500" /> {item.stars as number}
               </span>
             )}
             {type === 'beaches' && item.beach_type && (
-              <span className="bg-white/90 backdrop-blur-sm text-surface-dark text-[10px] font-bold px-2 py-0.5 rounded-full">
+              <span className="bg-white/90 backdrop-blur-sm text-surface-dark text-xs font-bold px-2 py-0.5 rounded-full">
                 {({ zand: 'Zand', kiezel: 'Kiezel', cala: 'Cala', rots: 'Rots' } as Record<string, string>)[item.beach_type as string] || item.beach_type as string}
               </span>
             )}
             {type === 'attractions' && item.category && (
-              <span className="bg-white/90 backdrop-blur-sm text-surface-dark text-[10px] font-bold px-2 py-0.5 rounded-full">
+              <span className="bg-white/90 backdrop-blur-sm text-surface-dark text-xs font-bold px-2 py-0.5 rounded-full">
                 {({ museum: 'Museum', natuur: 'Natuur', historisch: 'Historisch', activiteit: 'Activiteit', park: 'Park' } as Record<string, string>)[item.category as string] || item.category as string}
               </span>
             )}
             {type === 'restaurants' && item.price_range && (
-              <span className="bg-white/90 backdrop-blur-sm text-surface-dark text-[10px] font-bold px-2 py-0.5 rounded-full">
+              <span className="bg-white/90 backdrop-blur-sm text-surface-dark text-xs font-bold px-2 py-0.5 rounded-full">
                 {item.price_range as string}
               </span>
             )}
@@ -244,10 +244,10 @@ function GuideCard({ item, type }: { item: Item; type: string }) {
         <div className="p-5 flex flex-col flex-1">
           <h3 className="font-bold text-[15px] leading-snug text-surface-dark group-hover:text-primary transition-colors line-clamp-2 mb-1.5">{name}</h3>
           {(type === 'campings' || type === 'beaches' || type === 'restaurants') && (item.town || item.place_name) && (
-            <p className="text-[11px] text-warm-gray flex items-center gap-1 mb-2"><MapPin size={10} /> {(item.town || item.place_name) as string}</p>
+            <p className="text-xs text-warm-gray flex items-center gap-1 mb-2"><MapPin size={10} /> {(item.town || item.place_name) as string}</p>
           )}
           {type === 'restaurants' && item.cuisine_type && (
-            <p className="text-[11px] text-warm-gray mb-2">{item.cuisine_type as string}</p>
+            <p className="text-xs text-warm-gray mb-2">{item.cuisine_type as string}</p>
           )}
           {desc && <p className="text-sm text-warm-gray leading-relaxed flex-1 line-clamp-2 mb-3">{desc}</p>}
           <span className="inline-flex items-center gap-1 text-primary font-semibold text-xs group-hover:gap-2 transition-all mt-auto">

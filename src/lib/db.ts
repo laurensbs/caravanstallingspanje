@@ -78,6 +78,7 @@ export async function initDatabase() {
     country TEXT DEFAULT 'NL',
     company_name TEXT,
     notes TEXT,
+    referral_token TEXT UNIQUE,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
   )`;
@@ -404,6 +405,33 @@ export async function initDatabase() {
     created_at TIMESTAMP DEFAULT NOW()
   )`;
 
+  await sql`CREATE TABLE IF NOT EXISTS reviews (
+    id SERIAL PRIMARY KEY,
+    customer_id INTEGER REFERENCES customers(id),
+    service_request_id INTEGER REFERENCES service_requests(id),
+    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    title TEXT,
+    comment TEXT,
+    is_published BOOLEAN DEFAULT false,
+    admin_reply TEXT,
+    created_at TIMESTAMP DEFAULT NOW()
+  )`;
+
+  await sql`CREATE TABLE IF NOT EXISTS discount_codes (
+    id SERIAL PRIMARY KEY,
+    code TEXT UNIQUE NOT NULL,
+    description TEXT,
+    type TEXT NOT NULL DEFAULT 'percentage',
+    value NUMERIC(10,2) NOT NULL,
+    min_months INTEGER DEFAULT 1,
+    max_uses INTEGER,
+    used_count INTEGER DEFAULT 0,
+    is_active BOOLEAN DEFAULT true,
+    valid_from DATE,
+    valid_until DATE,
+    created_at TIMESTAMP DEFAULT NOW()
+  )`;
+
   // Indexes
   await sql`CREATE INDEX IF NOT EXISTS idx_caravans_customer ON caravans(customer_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_caravans_location ON caravans(location_id)`;
@@ -431,6 +459,9 @@ export async function initDatabase() {
   await sql`CREATE INDEX IF NOT EXISTS idx_service_requests_status ON service_requests(status)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_transport_status ON transport_orders(status)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_reviews_customer ON reviews(customer_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_reviews_published ON reviews(is_published)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_discount_codes_code ON discount_codes(code)`;
 
   return { success: true };
 }
@@ -960,6 +991,71 @@ export async function getGuideStats() {
     sql`SELECT COUNT(*) as total FROM guide_blog_posts WHERE is_published = true`,
   ]);
   return { campings: Number(c[0].total), places: Number(p[0].total), beaches: Number(b[0].total), attractions: Number(a[0].total), restaurants: Number(r[0].total), blogPosts: Number(bp[0].total) };
+}
+
+// ─── Reviews ───
+export async function getAllReviews(page = 1, limit = 50, published?: boolean) {
+  const offset = (page - 1) * limit;
+  if (published !== undefined) {
+    const rows = await sql`SELECT r.*, cu.first_name || ' ' || cu.last_name as customer_name, cu.email as customer_email
+      FROM reviews r LEFT JOIN customers cu ON r.customer_id = cu.id
+      WHERE r.is_published = ${published} ORDER BY r.created_at DESC LIMIT ${limit} OFFSET ${offset}`;
+    const cnt = await sql`SELECT COUNT(*) as total FROM reviews WHERE is_published = ${published}`;
+    return { reviews: rows, total: Number(cnt[0].total) };
+  }
+  const rows = await sql`SELECT r.*, cu.first_name || ' ' || cu.last_name as customer_name, cu.email as customer_email
+    FROM reviews r LEFT JOIN customers cu ON r.customer_id = cu.id
+    ORDER BY r.created_at DESC LIMIT ${limit} OFFSET ${offset}`;
+  const cnt = await sql`SELECT COUNT(*) as total FROM reviews`;
+  return { reviews: rows, total: Number(cnt[0].total) };
+}
+
+export async function getPublishedReviews(limit = 20) {
+  return sql`SELECT r.rating, r.title, r.comment, r.admin_reply, r.created_at, cu.first_name
+    FROM reviews r LEFT JOIN customers cu ON r.customer_id = cu.id
+    WHERE r.is_published = true ORDER BY r.created_at DESC LIMIT ${limit}`;
+}
+
+export async function createReview(data: { customer_id: number; service_request_id?: number; rating: number; title?: string; comment?: string }) {
+  const res = await sql`INSERT INTO reviews (customer_id, service_request_id, rating, title, comment)
+    VALUES (${data.customer_id}, ${data.service_request_id || null}, ${data.rating}, ${data.title || null}, ${data.comment || null}) RETURNING *`;
+  return res[0];
+}
+
+export async function updateReviewStatus(id: number, is_published: boolean, admin_reply?: string) {
+  await sql`UPDATE reviews SET is_published = ${is_published}, admin_reply = ${admin_reply || null} WHERE id = ${id}`;
+}
+
+// ─── Discount Codes ───
+export async function getAllDiscountCodes(page = 1, limit = 50) {
+  const offset = (page - 1) * limit;
+  const rows = await sql`SELECT * FROM discount_codes ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`;
+  const cnt = await sql`SELECT COUNT(*) as total FROM discount_codes`;
+  return { codes: rows, total: Number(cnt[0].total) };
+}
+
+export async function getDiscountCodeByCode(code: string) {
+  const rows = await sql`SELECT * FROM discount_codes WHERE code = ${code} AND is_active = true AND (valid_from IS NULL OR valid_from <= CURRENT_DATE) AND (valid_until IS NULL OR valid_until >= CURRENT_DATE) AND (max_uses IS NULL OR used_count < max_uses) LIMIT 1`;
+  return rows[0] || null;
+}
+
+export async function createDiscountCode(data: { code: string; description?: string; type: string; value: number; min_months?: number; max_uses?: number; valid_from?: string; valid_until?: string }) {
+  const res = await sql`INSERT INTO discount_codes (code, description, type, value, min_months, max_uses, valid_from, valid_until)
+    VALUES (${data.code}, ${data.description || null}, ${data.type}, ${data.value}, ${data.min_months || 1}, ${data.max_uses || null}, ${data.valid_from || null}, ${data.valid_until || null}) RETURNING *`;
+  return res[0];
+}
+
+export async function updateDiscountCode(id: number, data: { is_active?: boolean; description?: string; max_uses?: number; valid_until?: string }) {
+  await sql`UPDATE discount_codes SET
+    is_active = COALESCE(${data.is_active ?? null}, is_active),
+    description = COALESCE(${data.description ?? null}, description),
+    max_uses = COALESCE(${data.max_uses ?? null}, max_uses),
+    valid_until = COALESCE(${data.valid_until ?? null}::date, valid_until)
+    WHERE id = ${id}`;
+}
+
+export async function incrementDiscountCodeUsage(code: string) {
+  await sql`UPDATE discount_codes SET used_count = used_count + 1 WHERE code = ${code}`;
 }
 
 export { sql };

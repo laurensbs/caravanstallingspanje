@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Search, Plus, X, CheckCircle, Camera, AlertTriangle, Trash2, RotateCcw, ChevronRight, SwitchCamera } from 'lucide-react';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { toast } from 'sonner';
 
 interface Inspection {
   id: number; caravan_brand: string; caravan_model: string; caravan_license_plate: string;
@@ -37,6 +39,8 @@ export default function StaffInspectiesPage() {
   const [formStep, setFormStep] = useState(0); // 0=caravan, 1=checklist, 2=photos, 3=notes
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [expandedInspection, setExpandedInspection] = useState<number | null>(null);
+  const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   // Camera refs
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -137,34 +141,42 @@ export default function StaffInspectiesPage() {
   };
 
   const handleSubmit = async () => {
-    // Create inspection
-    const res = await fetch('/api/staff/inspections', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, checklist, status: 'afgerond' }),
-      credentials: 'include',
-    });
-    const result = await res.json();
+    setSubmitting(true);
+    try {
+      // Create inspection
+      const res = await fetch('/api/staff/inspections', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, checklist, status: 'afgerond' }),
+        credentials: 'include',
+      });
+      const result = await res.json();
 
-    // Upload photos if any
-    if (result.inspection?.id && photos.length > 0) {
-      for (const photo of photos) {
-        await fetch('/api/staff/inspections/photos', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            inspection_id: result.inspection.id,
-            photo_data: photo.data,
-            caption: photo.caption,
-          }),
-          credentials: 'include',
-        });
+      // Upload photos if any
+      if (result.inspection?.id && photos.length > 0) {
+        for (const photo of photos) {
+          await fetch('/api/staff/inspections/photos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              inspection_id: result.inspection.id,
+              photo_data: photo.data,
+              caption: photo.caption,
+            }),
+            credentials: 'include',
+          });
+        }
       }
-    }
 
-    setShowForm(false);
-    stopCamera();
-    fetchData();
+      toast.success('Inspectie succesvol opgeslagen!');
+      setShowForm(false);
+      setShowConfirmSubmit(false);
+      stopCamera();
+      fetchData();
+    } catch {
+      toast.error('Er ging iets mis bij het opslaan');
+    }
+    setSubmitting(false);
   };
 
   const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) : '-';
@@ -219,7 +231,7 @@ export default function StaffInspectiesPage() {
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-bold text-surface-dark truncate">{insp.caravan_brand} {insp.caravan_model}</h3>
                   <p className="text-xs text-warm-gray/70 truncate">{insp.caravan_license_plate} · {insp.location_name}</p>
-                  <p className="text-[11px] text-warm-gray/50 mt-0.5">{fmtDate(insp.inspected_at || insp.created_at)}</p>
+                  <p className="text-xs text-warm-gray/50 mt-0.5">{fmtDate(insp.inspected_at || insp.created_at)}</p>
                 </div>
                 <ChevronRight size={16} className={`text-warm-gray/50 transition-transform ${expanded ? 'rotate-90' : ''}`} />
               </button>
@@ -348,7 +360,7 @@ export default function StaffInspectiesPage() {
                             <Trash2 size={12}/>
                           </button>
                           <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1">
-                            <input type="text" placeholder="Notitie..." value={photo.caption} onChange={e => { const newPhotos = [...photos]; newPhotos[i].caption = e.target.value; setPhotos(newPhotos); }} className="w-full text-[10px] text-white bg-transparent outline-none placeholder:text-white/60" />
+                            <input type="text" placeholder="Notitie..." value={photo.caption} onChange={e => { const newPhotos = [...photos]; newPhotos[i].caption = e.target.value; setPhotos(newPhotos); }} className="w-full text-xs text-white bg-transparent outline-none placeholder:text-white/60" />
                           </div>
                         </div>
                       ))}
@@ -411,7 +423,7 @@ export default function StaffInspectiesPage() {
                   Volgende <ChevronRight size={14}/>
                 </button>
               ) : (
-                <button type="button" onClick={handleSubmit} className="flex-1 bg-accent hover:bg-accent-dark text-white font-bold py-3.5 rounded-xl text-sm shadow-lg shadow-accent/20 transition-all flex items-center justify-center gap-2">
+                <button type="button" onClick={() => setShowConfirmSubmit(true)} className="flex-1 bg-accent hover:bg-accent-dark text-white font-bold py-3.5 rounded-xl text-sm shadow-lg shadow-accent/20 transition-all flex items-center justify-center gap-2">
                   <CheckCircle size={14}/> Inspectie afronden
                 </button>
               )}
@@ -419,6 +431,16 @@ export default function StaffInspectiesPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={showConfirmSubmit}
+        onClose={() => setShowConfirmSubmit(false)}
+        onConfirm={handleSubmit}
+        title="Inspectie afronden?"
+        description={`Weet u zeker dat u deze inspectie wilt afronden? ${photos.length} foto('s) worden geüpload.`}
+        confirmLabel="Ja, afronden"
+        loading={submitting}
+      />
 
       {/* Hidden: no-scrollbar style */}
       <style jsx global>{`

@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Bell, X, Check, MessageSquare, FileText, Truck, Wrench, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useVisibleInterval } from '@/hooks/useVisibleInterval';
 
 interface Notification {
   id: number;
@@ -28,7 +29,7 @@ function getIcon(title: string) {
   return Bell;
 }
 
-export default function NotificationCenter({ userType, userId }: { userType: string; userId: number }) {
+export default function NotificationCenter({ userType }: { userType: string; userId?: number }) {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const unreadCount = notifications.filter(n => !n.is_read).length;
@@ -36,7 +37,7 @@ export default function NotificationCenter({ userType, userId }: { userType: str
   const fetchNotifications = useCallback(async () => {
     try {
       const endpoint = userType === 'admin' ? '/api/admin/notifications' : userType === 'staff' ? '/api/staff/notifications' : '/api/customer/notifications';
-      const res = await fetch(endpoint);
+      const res = await fetch(endpoint, { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         setNotifications(data.notifications || []);
@@ -46,13 +47,7 @@ export default function NotificationCenter({ userType, userId }: { userType: str
     }
   }, [userType]);
 
-  useEffect(() => {
-    if (userId) fetchNotifications();
-
-    // Poll every 30 seconds
-    const interval = setInterval(fetchNotifications, 30_000);
-    return () => clearInterval(interval);
-  }, [userId, fetchNotifications]);
+  useVisibleInterval(fetchNotifications, 30_000);
 
   const markAsRead = async (id: number) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
@@ -69,7 +64,7 @@ export default function NotificationCenter({ userType, userId }: { userType: str
           <motion.span
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center"
+            className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-danger text-white text-xs font-bold rounded-full flex items-center justify-center"
           >
             {unreadCount > 9 ? '9+' : unreadCount}
           </motion.span>
@@ -118,7 +113,7 @@ export default function NotificationCenter({ userType, userId }: { userType: str
                             {!n.is_read && <span className="w-2 h-2 bg-primary rounded-full shrink-0" />}
                           </div>
                           {n.message && <p className="text-xs text-warm-gray mt-0.5 line-clamp-2">{n.message}</p>}
-                          <p className="text-[10px] text-warm-gray/60 mt-1">{new Date(n.created_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
+                          <p className="text-xs text-warm-gray/60 mt-1">{new Date(n.created_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
                         </div>
                         {!n.is_read && (
                           <button onClick={(e) => { e.stopPropagation(); markAsRead(n.id); }} className="p-1 hover:bg-sand rounded-lg transition-colors shrink-0">

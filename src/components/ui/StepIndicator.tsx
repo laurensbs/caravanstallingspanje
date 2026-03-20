@@ -24,7 +24,7 @@ export default function StepIndicator({ steps, current }: StepIndicatorProps) {
             `}>
               {i < current ? <Check size={18} /> : i + 1}
             </div>
-            <span className={`text-[11px] font-semibold mt-2 text-center ${i <= current ? 'text-surface-dark' : 'text-warm-gray'}`}>
+            <span className={`text-xs font-semibold mt-2 text-center ${i <= current ? 'text-surface-dark' : 'text-warm-gray'}`}>
               {step.label}
             </span>
           </div>
