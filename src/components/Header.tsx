@@ -12,11 +12,11 @@ import QuizModal from '@/components/QuizModal';
 
 const DIENSTEN_ITEMS = [
   { icon: Shield, label: 'Buiten- & Binnenstalling', desc: 'Beveiligd terrein, Securitas Direct', href: '/stalling' },
-  { icon: Wrench, label: 'Reparatie & Onderhoud', desc: 'Complete werkplaats, alle merken', href: '/diensten' },
-  { icon: Sparkles, label: 'CaravanRepair®', desc: 'Masterdealer schadeherstel', href: '/diensten' },
-  { icon: Truck, label: 'Transport', desc: '7 eenheden, heel Costa Brava', href: '/diensten' },
-  { icon: ShoppingBag, label: 'Verkoop', desc: 'Tweedehands caravans', href: '/diensten' },
-  { icon: Bike, label: 'Verhuur', desc: 'Fietsen, koelkasten & airco', href: '/diensten' },
+  { icon: Wrench, label: 'Reparatie & Onderhoud', desc: 'Complete werkplaats, alle merken', href: '/diensten/reparatie' },
+  { icon: Sparkles, label: 'CaravanRepair®', desc: 'Masterdealer schadeherstel', href: '/diensten/caravanrepair' },
+  { icon: Truck, label: 'Transport', desc: '7 eenheden, heel Costa Brava', href: '/diensten/transport' },
+  { icon: ShoppingBag, label: 'Verkoop', desc: 'Tweedehands caravans', href: '/diensten/verkoop' },
+  { icon: Bike, label: 'Verhuur', desc: 'Fietsen, koelkasten & airco', href: '/diensten/verhuur' },
 ];
 
 export default function Header() {
