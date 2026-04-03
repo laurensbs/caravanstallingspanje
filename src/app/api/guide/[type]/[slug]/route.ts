@@ -8,8 +8,11 @@ import {
 const slugLookup: Record<string, { fn: (slug: string) => Promise<Record<string, unknown> | null>; imageType: string }> = {
   campings: { fn: getGuideCampingBySlug, imageType: 'camping' },
   plaatsen: { fn: getGuidePlaceBySlug, imageType: 'place' },
+  places: { fn: getGuidePlaceBySlug, imageType: 'place' },
   stranden: { fn: getGuideBeachBySlug, imageType: 'beach' },
+  beaches: { fn: getGuideBeachBySlug, imageType: 'beach' },
   bezienswaardigheden: { fn: getGuideAttractionBySlug, imageType: 'attraction' },
+  attractions: { fn: getGuideAttractionBySlug, imageType: 'attraction' },
   restaurants: { fn: getGuideRestaurantBySlug, imageType: 'restaurant' },
   blog: { fn: getGuideBlogPostBySlug, imageType: 'blog' },
 };

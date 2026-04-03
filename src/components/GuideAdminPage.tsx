@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Search, ChevronDown, ChevronUp, Pencil, Trash2, Star, ExternalLink, X } from 'lucide-react';
+import { Plus, Search, ChevronDown, ChevronUp, Pencil, Trash2, Star, ExternalLink, X, Globe } from 'lucide-react';
 import ImageUploadZone from '@/components/ImageUploadZone';
 
 type GuideImage = { id: number; url: string; alt_text: string | null; is_cover: boolean; sort_order: number };
@@ -337,12 +337,62 @@ function ItemRow({
 }
 
 function FormFields({ fields, data, onChange }: { fields: FieldDef[]; data: Record<string, any>; onChange: (key: string, value: unknown) => void }) {
+  const [lang, setLang] = useState<'nl' | 'en' | 'es'>('nl');
+  const TRANSLATABLE = ['name', 'description', 'title', 'excerpt', 'content'];
+  const translatableFields = fields.filter(f => TRANSLATABLE.includes(f.key));
+  const nonTranslatableFields = fields.filter(f => !TRANSLATABLE.includes(f.key));
+  const langLabel = { nl: '🇳🇱 Nederlands', en: '🇬🇧 English', es: '🇪🇸 Español' };
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {fields.map(f => (
-        <div key={f.key} className={f.colSpan === 2 ? 'sm:col-span-2' : ''}>
-          <label className="block text-xs font-bold text-gray-500/50 uppercase tracking-wider mb-1.5">{f.label}{f.required && ' *'}</label>
-          {f.type === 'textarea' ? (
+    <div className="space-y-4">
+      {/* Non-translatable fields always visible */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {nonTranslatableFields.map(f => (
+          <FieldInput key={f.key} field={f} data={data} onChange={onChange} />
+        ))}
+      </div>
+
+      {/* Language tabs for translatable fields */}
+      {translatableFields.length > 0 && (
+        <div className="border border-gray-200 rounded-xl overflow-hidden">
+          <div className="flex items-center gap-0.5 bg-gray-50 px-2 py-1.5 border-b border-gray-200">
+            <Globe size={14} className="text-gray-400 mr-1.5" />
+            {(['nl', 'en', 'es'] as const).map(l => (
+              <button
+                key={l}
+                type="button"
+                onClick={() => setLang(l)}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                  lang === l ? 'bg-primary text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                {langLabel[l]}
+              </button>
+            ))}
+          </div>
+          <div className="p-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {translatableFields.map(f => {
+                const suffix = lang === 'nl' ? '' : `_${lang}`;
+                const fieldKey = f.key + suffix;
+                const label = lang === 'nl' ? f.label : `${f.label} (${lang.toUpperCase()})`;
+                return (
+                  <FieldInput key={fieldKey} field={{ ...f, key: fieldKey, label, required: lang === 'nl' ? f.required : false }} data={data} onChange={onChange} />
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FieldInput({ field: f, data, onChange }: { field: FieldDef; data: Record<string, any>; onChange: (key: string, value: unknown) => void }) {
+  return (
+    <div className={f.colSpan === 2 ? 'sm:col-span-2' : ''}>
+      <label className="block text-xs font-bold text-gray-500/50 uppercase tracking-wider mb-1.5">{f.label}{f.required && ' *'}</label>
+      {f.type === 'textarea' ? (
             <textarea
               value={(data[f.key] as string) || ''}
               onChange={e => onChange(f.key, e.target.value)}
@@ -394,9 +444,7 @@ function FormFields({ fields, data, onChange }: { fields: FieldDef[]; data: Reco
             />
           )}
         </div>
-      ))}
-    </div>
-  );
+      );
 }
 
 function TagInput({ value, onChange, placeholder }: { value: string[]; onChange: (v: string[]) => void; placeholder: string }) {

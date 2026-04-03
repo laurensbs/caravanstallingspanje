@@ -147,10 +147,27 @@ export const staffSchema = z.object({
 // ── Guide Hub ──
 const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+// Shared i18n fields for guide schemas
+const guideI18nFields = {
+  name_en: z.string().max(200).optional(),
+  name_es: z.string().max(200).optional(),
+  description_en: z.string().max(10000).optional(),
+  description_es: z.string().max(10000).optional(),
+};
+const blogI18nFields = {
+  title_en: z.string().max(300).optional(),
+  title_es: z.string().max(300).optional(),
+  excerpt_en: z.string().max(1000).optional(),
+  excerpt_es: z.string().max(1000).optional(),
+  content_en: z.string().max(100000).optional(),
+  content_es: z.string().max(100000).optional(),
+};
+
 export const guideCampingSchema = z.object({
   name: z.string().min(1).max(200),
   slug: z.string().min(1).max(200).regex(slugRegex, 'Alleen kleine letters, cijfers en streepjes'),
   description: z.string().max(10000).optional(),
+  ...guideI18nFields,
   region: z.string().max(100).default('Costa Brava'),
   town: z.string().max(100).optional(),
   address: z.string().max(300).optional(),
@@ -170,6 +187,7 @@ export const guidePlaceSchema = z.object({
   name: z.string().min(1).max(200),
   slug: z.string().min(1).max(200).regex(slugRegex, 'Alleen kleine letters, cijfers en streepjes'),
   description: z.string().max(10000).optional(),
+  ...guideI18nFields,
   region: z.string().max(100).default('Costa Brava'),
   lat: z.number().min(-90).max(90).optional(),
   lng: z.number().min(-180).max(180).optional(),
@@ -184,6 +202,7 @@ export const guideBeachSchema = z.object({
   name: z.string().min(1).max(200),
   slug: z.string().min(1).max(200).regex(slugRegex, 'Alleen kleine letters, cijfers en streepjes'),
   description: z.string().max(10000).optional(),
+  ...guideI18nFields,
   place_id: z.number().positive().optional(),
   region: z.string().max(100).default('Costa Brava'),
   beach_type: z.enum(['zand', 'kiezel', 'cala', 'rots']).default('zand'),
@@ -198,6 +217,7 @@ export const guideAttractionSchema = z.object({
   name: z.string().min(1).max(200),
   slug: z.string().min(1).max(200).regex(slugRegex, 'Alleen kleine letters, cijfers en streepjes'),
   description: z.string().max(10000).optional(),
+  ...guideI18nFields,
   place_id: z.number().positive().optional(),
   region: z.string().max(100).default('Costa Brava'),
   category: z.enum(['museum', 'natuur', 'historisch', 'activiteit', 'park']).default('activiteit'),
@@ -215,6 +235,7 @@ export const guideRestaurantSchema = z.object({
   name: z.string().min(1).max(200),
   slug: z.string().min(1).max(200).regex(slugRegex, 'Alleen kleine letters, cijfers en streepjes'),
   description: z.string().max(10000).optional(),
+  ...guideI18nFields,
   place_id: z.number().positive().optional(),
   region: z.string().max(100).default('Costa Brava'),
   cuisine_type: z.string().max(100).optional(),
@@ -233,6 +254,7 @@ export const guideBlogPostSchema = z.object({
   slug: z.string().min(1).max(300).regex(slugRegex, 'Alleen kleine letters, cijfers en streepjes'),
   excerpt: z.string().max(1000).optional(),
   content: z.string().max(100000).optional(),
+  ...blogI18nFields,
   category: z.string().max(100).default('Algemeen'),
   read_time: z.string().max(20).default('5 min'),
   author: z.string().max(100).default('Caravanstalling Spanje'),

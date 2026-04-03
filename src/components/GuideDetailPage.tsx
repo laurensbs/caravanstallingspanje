@@ -10,9 +10,19 @@ import { ArrowLeft, MapPin, Globe, Phone, ChevronLeft, ChevronRight, ExternalLin
 import { motion } from 'framer-motion';
 import CtaSection from '@/components/CtaSection';
 import A from '@/components/AnimateIn';
+import { useLocale } from '@/lib/i18n';
 
 type Item = Record<string, any>;
 type ImageData = { id: number; url: string; alt_text: string | null; is_cover: boolean };
+
+// Helper to get locale-aware field value
+function localizedField(item: Record<string, any>, field: string, locale: string): string {
+  if (locale !== 'nl') {
+    const localized = item[`${field}_${locale}`];
+    if (localized) return localized;
+  }
+  return item[field] || '';
+}
 
 type GuideDetailConfig = {
   apiType: string;
@@ -73,8 +83,9 @@ export default function GuideDetailPage({ config }: { config: GuideDetailConfig 
     );
   }
 
-  const name = (item.name || item.title) as string;
-  const description = (item.description || item.content) as string | null;
+  const { locale } = useLocale();
+  const name = localizedField(item, item.title ? 'title' : 'name', locale) || (item.name || item.title) as string;
+  const description = localizedField(item, item.content ? 'content' : 'description', locale) || (item.description || item.content) as string | null;
   const coverImg = images.find(img => img.is_cover) || images[0];
   const allImages = images.length > 0 ? images : coverImg ? [coverImg] : [];
   const hasMap = item.latitude && item.longitude;

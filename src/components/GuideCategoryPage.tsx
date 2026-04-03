@@ -9,8 +9,18 @@ import { Search, MapPin, Star, ChevronRight, ChevronLeft, ArrowRight, Loader2 } 
 import A from '@/components/AnimateIn';
 import PageHero from '@/components/PageHero';
 import CtaSection from '@/components/CtaSection';
+import { useLocale } from '@/lib/i18n';
 
 type Item = Record<string, any>;
+
+// Helper to get locale-aware field value
+function localizedField(item: Record<string, any>, field: string, locale: string): string {
+  if (locale !== 'nl') {
+    const localized = item[`${field}_${locale}`];
+    if (localized) return localized;
+  }
+  return item[field] || '';
+}
 
 type FilterDef = {
   key: string;
@@ -178,9 +188,10 @@ function CategoryCard({ item, basePath, renderBadges, renderMeta }: {
   renderBadges?: (item: Item) => React.ReactNode;
   renderMeta?: (item: Item) => React.ReactNode;
 }) {
-  const name = (item.name || item.title) as string;
+  const { locale } = useLocale();
+  const name = localizedField(item, item.title ? 'title' : 'name', locale) || (item.name || item.title) as string;
   const cover = item.cover_image as string | null;
-  const desc = (item.description || item.excerpt) as string | null;
+  const desc = localizedField(item, item.excerpt ? 'excerpt' : 'description', locale) || (item.description || item.excerpt) as string | null;
 
   return (
     <Link href={`${basePath}/${item.slug}`} className="group block h-full">

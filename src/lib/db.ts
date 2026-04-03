@@ -394,6 +394,34 @@ export async function initDatabase() {
   await sql`ALTER TABLE guide_blog_posts ADD COLUMN IF NOT EXISTS tags JSONB DEFAULT '[]'`;
   await sql`ALTER TABLE guide_places ADD COLUMN IF NOT EXISTS town TEXT`;
 
+  // ── i18n: EN + ES translation columns for all guide tables ──
+  await sql`ALTER TABLE guide_campings ADD COLUMN IF NOT EXISTS name_en TEXT`;
+  await sql`ALTER TABLE guide_campings ADD COLUMN IF NOT EXISTS name_es TEXT`;
+  await sql`ALTER TABLE guide_campings ADD COLUMN IF NOT EXISTS description_en TEXT`;
+  await sql`ALTER TABLE guide_campings ADD COLUMN IF NOT EXISTS description_es TEXT`;
+  await sql`ALTER TABLE guide_places ADD COLUMN IF NOT EXISTS name_en TEXT`;
+  await sql`ALTER TABLE guide_places ADD COLUMN IF NOT EXISTS name_es TEXT`;
+  await sql`ALTER TABLE guide_places ADD COLUMN IF NOT EXISTS description_en TEXT`;
+  await sql`ALTER TABLE guide_places ADD COLUMN IF NOT EXISTS description_es TEXT`;
+  await sql`ALTER TABLE guide_beaches ADD COLUMN IF NOT EXISTS name_en TEXT`;
+  await sql`ALTER TABLE guide_beaches ADD COLUMN IF NOT EXISTS name_es TEXT`;
+  await sql`ALTER TABLE guide_beaches ADD COLUMN IF NOT EXISTS description_en TEXT`;
+  await sql`ALTER TABLE guide_beaches ADD COLUMN IF NOT EXISTS description_es TEXT`;
+  await sql`ALTER TABLE guide_attractions ADD COLUMN IF NOT EXISTS name_en TEXT`;
+  await sql`ALTER TABLE guide_attractions ADD COLUMN IF NOT EXISTS name_es TEXT`;
+  await sql`ALTER TABLE guide_attractions ADD COLUMN IF NOT EXISTS description_en TEXT`;
+  await sql`ALTER TABLE guide_attractions ADD COLUMN IF NOT EXISTS description_es TEXT`;
+  await sql`ALTER TABLE guide_restaurants ADD COLUMN IF NOT EXISTS name_en TEXT`;
+  await sql`ALTER TABLE guide_restaurants ADD COLUMN IF NOT EXISTS name_es TEXT`;
+  await sql`ALTER TABLE guide_restaurants ADD COLUMN IF NOT EXISTS description_en TEXT`;
+  await sql`ALTER TABLE guide_restaurants ADD COLUMN IF NOT EXISTS description_es TEXT`;
+  await sql`ALTER TABLE guide_blog_posts ADD COLUMN IF NOT EXISTS title_en TEXT`;
+  await sql`ALTER TABLE guide_blog_posts ADD COLUMN IF NOT EXISTS title_es TEXT`;
+  await sql`ALTER TABLE guide_blog_posts ADD COLUMN IF NOT EXISTS excerpt_en TEXT`;
+  await sql`ALTER TABLE guide_blog_posts ADD COLUMN IF NOT EXISTS excerpt_es TEXT`;
+  await sql`ALTER TABLE guide_blog_posts ADD COLUMN IF NOT EXISTS content_en TEXT`;
+  await sql`ALTER TABLE guide_blog_posts ADD COLUMN IF NOT EXISTS content_es TEXT`;
+
   await sql`CREATE TABLE IF NOT EXISTS notifications (
     id SERIAL PRIMARY KEY,
     user_type TEXT NOT NULL,
@@ -826,11 +854,11 @@ export async function getGuideCampingBySlug(slug: string) {
   return rows[0] || null;
 }
 export async function createGuideCamping(data: Record<string, unknown>) {
-  const res = await sql`INSERT INTO guide_campings (name, slug, description, region, town, address, lat, lng, stars, website, phone, price_range, amenities, highlights, is_featured) VALUES (${data.name as string}, ${data.slug as string}, ${data.description as string || null}, ${data.region as string || 'Costa Brava'}, ${data.town as string || null}, ${data.address as string || null}, ${data.lat as number || null}, ${data.lng as number || null}, ${data.stars as number || 3}, ${data.website as string || null}, ${data.phone as string || null}, ${data.price_range as string || '€€'}, ${JSON.stringify(data.amenities || [])}, ${JSON.stringify(data.highlights || [])}, ${data.is_featured === true}) RETURNING *`;
+  const res = await sql`INSERT INTO guide_campings (name, slug, description, name_en, name_es, description_en, description_es, region, town, address, lat, lng, stars, website, phone, price_range, amenities, highlights, is_featured) VALUES (${data.name as string}, ${data.slug as string}, ${data.description as string || null}, ${data.name_en as string || null}, ${data.name_es as string || null}, ${data.description_en as string || null}, ${data.description_es as string || null}, ${data.region as string || 'Costa Brava'}, ${data.town as string || null}, ${data.address as string || null}, ${data.lat as number || null}, ${data.lng as number || null}, ${data.stars as number || 3}, ${data.website as string || null}, ${data.phone as string || null}, ${data.price_range as string || '€€'}, ${JSON.stringify(data.amenities || [])}, ${JSON.stringify(data.highlights || [])}, ${data.is_featured === true}) RETURNING *`;
   return res[0];
 }
 export async function updateGuideCamping(id: number, data: Record<string, unknown>) {
-  const res = await sql`UPDATE guide_campings SET name=${data.name as string}, slug=${data.slug as string}, description=${data.description as string||null}, region=${data.region as string||'Costa Brava'}, town=${data.town as string||null}, address=${data.address as string||null}, lat=${data.lat as number||null}, lng=${data.lng as number||null}, stars=${data.stars as number||3}, website=${data.website as string||null}, phone=${data.phone as string||null}, price_range=${data.price_range as string||'€€'}, amenities=${JSON.stringify(data.amenities||[])}, highlights=${JSON.stringify(data.highlights||[])}, is_featured=${data.is_featured===true}, is_active=${data.is_active!==false}, updated_at=NOW() WHERE id=${id} RETURNING *`;
+  const res = await sql`UPDATE guide_campings SET name=${data.name as string}, slug=${data.slug as string}, description=${data.description as string||null}, name_en=${data.name_en as string||null}, name_es=${data.name_es as string||null}, description_en=${data.description_en as string||null}, description_es=${data.description_es as string||null}, region=${data.region as string||'Costa Brava'}, town=${data.town as string||null}, address=${data.address as string||null}, lat=${data.lat as number||null}, lng=${data.lng as number||null}, stars=${data.stars as number||3}, website=${data.website as string||null}, phone=${data.phone as string||null}, price_range=${data.price_range as string||'€€'}, amenities=${JSON.stringify(data.amenities||[])}, highlights=${JSON.stringify(data.highlights||[])}, is_featured=${data.is_featured===true}, is_active=${data.is_active!==false}, updated_at=NOW() WHERE id=${id} RETURNING *`;
   return res[0];
 }
 export async function deleteGuideCamping(id: number) {
@@ -850,11 +878,11 @@ export async function getGuidePlaceBySlug(slug: string) {
   return rows[0] || null;
 }
 export async function createGuidePlace(data: Record<string, unknown>) {
-  const res = await sql`INSERT INTO guide_places (name, slug, description, region, town, lat, lng, highlights, best_season, population, is_featured) VALUES (${data.name as string}, ${data.slug as string}, ${data.description as string || null}, ${data.region as string || 'Costa Brava'}, ${data.town as string || null}, ${data.lat as number || null}, ${data.lng as number || null}, ${JSON.stringify(data.highlights || [])}, ${data.best_season as string || null}, ${data.population as string || null}, ${data.is_featured === true}) RETURNING *`;
+  const res = await sql`INSERT INTO guide_places (name, slug, description, name_en, name_es, description_en, description_es, region, town, lat, lng, highlights, best_season, population, is_featured) VALUES (${data.name as string}, ${data.slug as string}, ${data.description as string || null}, ${data.name_en as string || null}, ${data.name_es as string || null}, ${data.description_en as string || null}, ${data.description_es as string || null}, ${data.region as string || 'Costa Brava'}, ${data.town as string || null}, ${data.lat as number || null}, ${data.lng as number || null}, ${JSON.stringify(data.highlights || [])}, ${data.best_season as string || null}, ${data.population as string || null}, ${data.is_featured === true}) RETURNING *`;
   return res[0];
 }
 export async function updateGuidePlace(id: number, data: Record<string, unknown>) {
-  const res = await sql`UPDATE guide_places SET name=${data.name as string}, slug=${data.slug as string}, description=${data.description as string||null}, region=${data.region as string||'Costa Brava'}, town=${data.town as string||null}, lat=${data.lat as number||null}, lng=${data.lng as number||null}, highlights=${JSON.stringify(data.highlights||[])}, best_season=${data.best_season as string||null}, population=${data.population as string||null}, is_featured=${data.is_featured===true}, is_active=${data.is_active!==false}, updated_at=NOW() WHERE id=${id} RETURNING *`;
+  const res = await sql`UPDATE guide_places SET name=${data.name as string}, slug=${data.slug as string}, description=${data.description as string||null}, name_en=${data.name_en as string||null}, name_es=${data.name_es as string||null}, description_en=${data.description_en as string||null}, description_es=${data.description_es as string||null}, region=${data.region as string||'Costa Brava'}, town=${data.town as string||null}, lat=${data.lat as number||null}, lng=${data.lng as number||null}, highlights=${JSON.stringify(data.highlights||[])}, best_season=${data.best_season as string||null}, population=${data.population as string||null}, is_featured=${data.is_featured===true}, is_active=${data.is_active!==false}, updated_at=NOW() WHERE id=${id} RETURNING *`;
   return res[0];
 }
 export async function deleteGuidePlace(id: number) {
@@ -874,11 +902,11 @@ export async function getGuideBeachBySlug(slug: string) {
   return rows[0] || null;
 }
 export async function createGuideBeach(data: Record<string, unknown>) {
-  const res = await sql`INSERT INTO guide_beaches (name, slug, description, place_id, region, town, beach_type, length_meters, blue_flag, lat, lng, facilities, is_featured) VALUES (${data.name as string}, ${data.slug as string}, ${data.description as string || null}, ${data.place_id as number || null}, ${data.region as string || 'Costa Brava'}, ${data.town as string || null}, ${data.beach_type as string || 'zand'}, ${data.length_meters as number || null}, ${data.blue_flag === true}, ${data.lat as number || null}, ${data.lng as number || null}, ${JSON.stringify(data.facilities || [])}, ${data.is_featured === true}) RETURNING *`;
+  const res = await sql`INSERT INTO guide_beaches (name, slug, description, name_en, name_es, description_en, description_es, place_id, region, town, beach_type, length_meters, blue_flag, lat, lng, facilities, is_featured) VALUES (${data.name as string}, ${data.slug as string}, ${data.description as string || null}, ${data.name_en as string || null}, ${data.name_es as string || null}, ${data.description_en as string || null}, ${data.description_es as string || null}, ${data.place_id as number || null}, ${data.region as string || 'Costa Brava'}, ${data.town as string || null}, ${data.beach_type as string || 'zand'}, ${data.length_meters as number || null}, ${data.blue_flag === true}, ${data.lat as number || null}, ${data.lng as number || null}, ${JSON.stringify(data.facilities || [])}, ${data.is_featured === true}) RETURNING *`;
   return res[0];
 }
 export async function updateGuideBeach(id: number, data: Record<string, unknown>) {
-  const res = await sql`UPDATE guide_beaches SET name=${data.name as string}, slug=${data.slug as string}, description=${data.description as string||null}, place_id=${data.place_id as number||null}, region=${data.region as string||'Costa Brava'}, town=${data.town as string||null}, beach_type=${data.beach_type as string||'zand'}, length_meters=${data.length_meters as number||null}, blue_flag=${data.blue_flag===true}, lat=${data.lat as number||null}, lng=${data.lng as number||null}, facilities=${JSON.stringify(data.facilities||[])}, is_featured=${data.is_featured===true}, is_active=${data.is_active!==false}, updated_at=NOW() WHERE id=${id} RETURNING *`;
+  const res = await sql`UPDATE guide_beaches SET name=${data.name as string}, slug=${data.slug as string}, description=${data.description as string||null}, name_en=${data.name_en as string||null}, name_es=${data.name_es as string||null}, description_en=${data.description_en as string||null}, description_es=${data.description_es as string||null}, place_id=${data.place_id as number||null}, region=${data.region as string||'Costa Brava'}, town=${data.town as string||null}, beach_type=${data.beach_type as string||'zand'}, length_meters=${data.length_meters as number||null}, blue_flag=${data.blue_flag===true}, lat=${data.lat as number||null}, lng=${data.lng as number||null}, facilities=${JSON.stringify(data.facilities||[])}, is_featured=${data.is_featured===true}, is_active=${data.is_active!==false}, updated_at=NOW() WHERE id=${id} RETURNING *`;
   return res[0];
 }
 export async function deleteGuideBeach(id: number) {
@@ -898,11 +926,11 @@ export async function getGuideAttractionBySlug(slug: string) {
   return rows[0] || null;
 }
 export async function createGuideAttraction(data: Record<string, unknown>) {
-  const res = await sql`INSERT INTO guide_attractions (name, slug, description, place_id, region, town, category, address, lat, lng, website, price_info, opening_hours, price_range, highlights, is_featured) VALUES (${data.name as string}, ${data.slug as string}, ${data.description as string || null}, ${data.place_id as number || null}, ${data.region as string || 'Costa Brava'}, ${data.town as string || null}, ${data.category as string || 'bezienswaardigheid'}, ${data.address as string || null}, ${data.lat as number || null}, ${data.lng as number || null}, ${data.website as string || null}, ${data.price_info as string || null}, ${data.opening_hours as string || null}, ${data.price_range as string || null}, ${JSON.stringify(data.highlights || [])}, ${data.is_featured === true}) RETURNING *`;
+  const res = await sql`INSERT INTO guide_attractions (name, slug, description, name_en, name_es, description_en, description_es, place_id, region, town, category, address, lat, lng, website, price_info, opening_hours, price_range, highlights, is_featured) VALUES (${data.name as string}, ${data.slug as string}, ${data.description as string || null}, ${data.name_en as string || null}, ${data.name_es as string || null}, ${data.description_en as string || null}, ${data.description_es as string || null}, ${data.place_id as number || null}, ${data.region as string || 'Costa Brava'}, ${data.town as string || null}, ${data.category as string || 'bezienswaardigheid'}, ${data.address as string || null}, ${data.lat as number || null}, ${data.lng as number || null}, ${data.website as string || null}, ${data.price_info as string || null}, ${data.opening_hours as string || null}, ${data.price_range as string || null}, ${JSON.stringify(data.highlights || [])}, ${data.is_featured === true}) RETURNING *`;
   return res[0];
 }
 export async function updateGuideAttraction(id: number, data: Record<string, unknown>) {
-  const res = await sql`UPDATE guide_attractions SET name=${data.name as string}, slug=${data.slug as string}, description=${data.description as string||null}, place_id=${data.place_id as number||null}, region=${data.region as string||'Costa Brava'}, town=${data.town as string||null}, category=${data.category as string||'bezienswaardigheid'}, address=${data.address as string||null}, lat=${data.lat as number||null}, lng=${data.lng as number||null}, website=${data.website as string||null}, price_info=${data.price_info as string||null}, opening_hours=${data.opening_hours as string||null}, price_range=${data.price_range as string||null}, highlights=${JSON.stringify(data.highlights||[])}, is_featured=${data.is_featured===true}, is_active=${data.is_active!==false}, updated_at=NOW() WHERE id=${id} RETURNING *`;
+  const res = await sql`UPDATE guide_attractions SET name=${data.name as string}, slug=${data.slug as string}, description=${data.description as string||null}, name_en=${data.name_en as string||null}, name_es=${data.name_es as string||null}, description_en=${data.description_en as string||null}, description_es=${data.description_es as string||null}, place_id=${data.place_id as number||null}, region=${data.region as string||'Costa Brava'}, town=${data.town as string||null}, category=${data.category as string||'bezienswaardigheid'}, address=${data.address as string||null}, lat=${data.lat as number||null}, lng=${data.lng as number||null}, website=${data.website as string||null}, price_info=${data.price_info as string||null}, opening_hours=${data.opening_hours as string||null}, price_range=${data.price_range as string||null}, highlights=${JSON.stringify(data.highlights||[])}, is_featured=${data.is_featured===true}, is_active=${data.is_active!==false}, updated_at=NOW() WHERE id=${id} RETURNING *`;
   return res[0];
 }
 export async function deleteGuideAttraction(id: number) {
@@ -922,11 +950,11 @@ export async function getGuideRestaurantBySlug(slug: string) {
   return rows[0] || null;
 }
 export async function createGuideRestaurant(data: Record<string, unknown>) {
-  const res = await sql`INSERT INTO guide_restaurants (name, slug, description, place_id, region, town, cuisine_type, price_range, address, lat, lng, website, phone, michelin_stars, specialties, is_featured) VALUES (${data.name as string}, ${data.slug as string}, ${data.description as string || null}, ${data.place_id as number || null}, ${data.region as string || 'Costa Brava'}, ${data.town as string || null}, ${data.cuisine_type as string || null}, ${data.price_range as string || '€€'}, ${data.address as string || null}, ${data.lat as number || null}, ${data.lng as number || null}, ${data.website as string || null}, ${data.phone as string || null}, ${data.michelin_stars as number || 0}, ${JSON.stringify(data.specialties || [])}, ${data.is_featured === true}) RETURNING *`;
+  const res = await sql`INSERT INTO guide_restaurants (name, slug, description, name_en, name_es, description_en, description_es, place_id, region, town, cuisine_type, price_range, address, lat, lng, website, phone, michelin_stars, specialties, is_featured) VALUES (${data.name as string}, ${data.slug as string}, ${data.description as string || null}, ${data.name_en as string || null}, ${data.name_es as string || null}, ${data.description_en as string || null}, ${data.description_es as string || null}, ${data.place_id as number || null}, ${data.region as string || 'Costa Brava'}, ${data.town as string || null}, ${data.cuisine_type as string || null}, ${data.price_range as string || '€€'}, ${data.address as string || null}, ${data.lat as number || null}, ${data.lng as number || null}, ${data.website as string || null}, ${data.phone as string || null}, ${data.michelin_stars as number || 0}, ${JSON.stringify(data.specialties || [])}, ${data.is_featured === true}) RETURNING *`;
   return res[0];
 }
 export async function updateGuideRestaurant(id: number, data: Record<string, unknown>) {
-  const res = await sql`UPDATE guide_restaurants SET name=${data.name as string}, slug=${data.slug as string}, description=${data.description as string||null}, place_id=${data.place_id as number||null}, region=${data.region as string||'Costa Brava'}, town=${data.town as string||null}, cuisine_type=${data.cuisine_type as string||null}, price_range=${data.price_range as string||'€€'}, address=${data.address as string||null}, lat=${data.lat as number||null}, lng=${data.lng as number||null}, website=${data.website as string||null}, phone=${data.phone as string||null}, michelin_stars=${data.michelin_stars as number||0}, specialties=${JSON.stringify(data.specialties||[])}, is_featured=${data.is_featured===true}, is_active=${data.is_active!==false}, updated_at=NOW() WHERE id=${id} RETURNING *`;
+  const res = await sql`UPDATE guide_restaurants SET name=${data.name as string}, slug=${data.slug as string}, description=${data.description as string||null}, name_en=${data.name_en as string||null}, name_es=${data.name_es as string||null}, description_en=${data.description_en as string||null}, description_es=${data.description_es as string||null}, place_id=${data.place_id as number||null}, region=${data.region as string||'Costa Brava'}, town=${data.town as string||null}, cuisine_type=${data.cuisine_type as string||null}, price_range=${data.price_range as string||'€€'}, address=${data.address as string||null}, lat=${data.lat as number||null}, lng=${data.lng as number||null}, website=${data.website as string||null}, phone=${data.phone as string||null}, michelin_stars=${data.michelin_stars as number||0}, specialties=${JSON.stringify(data.specialties||[])}, is_featured=${data.is_featured===true}, is_active=${data.is_active!==false}, updated_at=NOW() WHERE id=${id} RETURNING *`;
   return res[0];
 }
 export async function deleteGuideRestaurant(id: number) {
@@ -946,14 +974,14 @@ export async function getGuideBlogPostBySlug(slug: string) {
   return rows[0] || null;
 }
 export async function createGuideBlogPost(data: Record<string, unknown>) {
-  const res = await sql`INSERT INTO guide_blog_posts (title, slug, excerpt, content, category, read_time, author, tags, is_featured, is_published, published_at) VALUES (${data.title as string}, ${data.slug as string}, ${data.excerpt as string || null}, ${data.content as string || null}, ${data.category as string || 'Algemeen'}, ${data.read_time as string || '5 min'}, ${data.author as string || 'Caravanstalling Spanje'}, ${JSON.stringify(data.tags || [])}, ${data.is_featured === true}, ${data.is_published === true}, ${data.is_published === true ? new Date().toISOString() : null}) RETURNING *`;
+  const res = await sql`INSERT INTO guide_blog_posts (title, slug, excerpt, content, title_en, title_es, excerpt_en, excerpt_es, content_en, content_es, category, read_time, author, tags, is_featured, is_published, published_at) VALUES (${data.title as string}, ${data.slug as string}, ${data.excerpt as string || null}, ${data.content as string || null}, ${data.title_en as string || null}, ${data.title_es as string || null}, ${data.excerpt_en as string || null}, ${data.excerpt_es as string || null}, ${data.content_en as string || null}, ${data.content_es as string || null}, ${data.category as string || 'Algemeen'}, ${data.read_time as string || '5 min'}, ${data.author as string || 'Caravanstalling Spanje'}, ${JSON.stringify(data.tags || [])}, ${data.is_featured === true}, ${data.is_published === true}, ${data.is_published === true ? new Date().toISOString() : null}) RETURNING *`;
   return res[0];
 }
 export async function updateGuideBlogPost(id: number, data: Record<string, unknown>) {
   const wasPublished = data._was_published === true;
   const isNowPublished = data.is_published === true;
   const publishedAt = (!wasPublished && isNowPublished) ? new Date().toISOString() : (data.published_at as string || null);
-  const res = await sql`UPDATE guide_blog_posts SET title=${data.title as string}, slug=${data.slug as string}, excerpt=${data.excerpt as string||null}, content=${data.content as string||null}, category=${data.category as string||'Algemeen'}, read_time=${data.read_time as string||'5 min'}, author=${data.author as string||'Caravanstalling Spanje'}, tags=${JSON.stringify(data.tags||[])}, is_featured=${data.is_featured===true}, is_published=${data.is_published===true}, published_at=${publishedAt}, updated_at=NOW() WHERE id=${id} RETURNING *`;
+  const res = await sql`UPDATE guide_blog_posts SET title=${data.title as string}, slug=${data.slug as string}, excerpt=${data.excerpt as string||null}, content=${data.content as string||null}, title_en=${data.title_en as string||null}, title_es=${data.title_es as string||null}, excerpt_en=${data.excerpt_en as string||null}, excerpt_es=${data.excerpt_es as string||null}, content_en=${data.content_en as string||null}, content_es=${data.content_es as string||null}, category=${data.category as string||'Algemeen'}, read_time=${data.read_time as string||'5 min'}, author=${data.author as string||'Caravanstalling Spanje'}, tags=${JSON.stringify(data.tags||[])}, is_featured=${data.is_featured===true}, is_published=${data.is_published===true}, published_at=${publishedAt}, updated_at=NOW() WHERE id=${id} RETURNING *`;
   return res[0];
 }
 export async function deleteGuideBlogPost(id: number) {

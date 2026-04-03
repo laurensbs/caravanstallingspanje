@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Search, Tent, MapPin, Waves, Mountain, UtensilsCrossed, BookOpen, Star, ChevronRight, Palmtree } from 'lucide-react';
 import A from '@/components/AnimateIn';
 import CtaSection from '@/components/CtaSection';
+import { useLocale } from '@/lib/i18n';
 
 type Item = Record<string, any>;
 type FeaturedData = {
@@ -194,9 +195,12 @@ function HorizontalScroll({ children }: { children: React.ReactNode }) {
 
 function GuideCard({ item, type }: { item: Item; type: string }) {
   const slug = item.slug as string;
-  const name = (item.name || item.title) as string;
+  const { locale } = useLocale();
+  const nameField = item.title ? 'title' : 'name';
+  const descField = item.excerpt ? 'excerpt' : 'description';
+  const name = (locale !== 'nl' && item[`${nameField}_${locale}`]) || (item.name || item.title) as string;
   const cover = item.cover_image as string | null;
-  const desc = (item.description || item.excerpt) as string | null;
+  const desc = (locale !== 'nl' && item[`${descField}_${locale}`]) || (item.description || item.excerpt) as string | null;
 
   const hrefMap: Record<string, string> = {
     campings: `/blog/campings/${slug}`,

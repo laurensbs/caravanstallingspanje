@@ -7,7 +7,12 @@ import {
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ type: string }> }) {
   try {
-    const { type } = await params;
+    const { type: rawType } = await params;
+    // Accept both Dutch and English type names
+    const typeAliases: Record<string, string> = {
+      places: 'plaatsen', beaches: 'stranden', attractions: 'bezienswaardigheden',
+    };
+    const type = typeAliases[rawType] || rawType;
     const url = new URL(req.url);
     const page = parseInt(url.searchParams.get('page') || '1');
     const limit = Math.min(parseInt(url.searchParams.get('limit') || '20'), 50);

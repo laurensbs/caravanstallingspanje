@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Users, Caravan, MapPin, FileText, Receipt, UserCog,
   ClipboardList, Truck, Settings, LogOut, Menu, X, Bell, Search, ChevronDown,
   Wrench, MessageSquare, Shield, Eye, EyeOff, Lock, User, ArrowRight, AlertCircle,
-  BarChart3, CalendarDays, Package, Target, Map as MapIcon, Palmtree, Mountain, UtensilsCrossed, BookOpen, Tent, Star, Tag,
+  BarChart3, CalendarDays, Package, Map as MapIcon, Palmtree, Mountain, UtensilsCrossed, BookOpen, Tent, Star, Tag,
   ChevronRight, GripVertical,
 } from 'lucide-react';
 
@@ -20,7 +20,6 @@ const NAV_SECTIONS: NavSection[] = [
     { href: '/admin', icon: LayoutDashboard, label: 'Dashboard', roles: ['admin', 'staff'] },
   ]},
   { id: 'beheer', label: 'Beheer', items: [
-    { href: '/admin/leads', icon: Target, label: 'Leads', roles: ['admin'] },
     { href: '/admin/klanten', icon: Users, label: 'Klanten', roles: ['admin'] },
     { href: '/admin/caravans', icon: Caravan, label: 'Caravans', roles: ['admin'] },
     { href: '/admin/locaties', icon: MapPin, label: 'Locaties & Plekken', roles: ['admin'] },
@@ -37,7 +36,7 @@ const NAV_SECTIONS: NavSection[] = [
     { href: '/admin/pakketten', icon: Package, label: 'Pakketten & Diensten', roles: ['admin'] },
     { href: '/admin/planning', icon: CalendarDays, label: 'Planning', roles: ['admin', 'staff'] },
   ]},
-  { id: 'gids', label: 'Gids', items: [
+  { id: 'websitebeheer', label: 'Websitebeheer', items: [
     { href: '/admin/gids/campings', icon: Tent, label: 'Campings', roles: ['admin'] },
     { href: '/admin/gids/plaatsen', icon: MapIcon, label: 'Plaatsen', roles: ['admin'] },
     { href: '/admin/gids/stranden', icon: Palmtree, label: 'Stranden', roles: ['admin'] },
