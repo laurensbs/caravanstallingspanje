@@ -53,6 +53,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const [loginError, setLoginError] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
   const [showPw, setShowPw] = useState(false);
+  const [rememberEmail, setRememberEmail] = useState(false);
 
   // Notifications
   const [showNotifications, setShowNotifications] = useState(false);
@@ -75,6 +76,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   useEffect(() => {
     const savedRole = localStorage.getItem('admin_panel_role') as 'admin' | 'staff' | null;
     if (savedRole === 'admin' || savedRole === 'staff') setSelectedRole(savedRole);
+    const savedEmail = localStorage.getItem('admin_saved_email');
+    if (savedEmail) { setLoginEmail(savedEmail); setRememberEmail(true); }
     checkAuth();
   }, [checkAuth]);
 
@@ -146,6 +149,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         setRole(data.role === 'staff' ? 'staff' : 'admin');
         setUserName(data.name);
         localStorage.setItem('admin_panel_role', selectedRole);
+        if (rememberEmail) {
+          localStorage.setItem('admin_saved_email', loginEmail);
+        } else {
+          localStorage.removeItem('admin_saved_email');
+        }
       } else {
         setLoginError(data.error || 'Inloggen mislukt');
       }
@@ -251,6 +259,20 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                   </button>
                 </div>
               </div>
+
+              {/* Remember + Error */}
+              <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={rememberEmail}
+                  onChange={e => {
+                    setRememberEmail(e.target.checked);
+                    if (!e.target.checked) localStorage.removeItem('admin_saved_email');
+                  }}
+                  className="w-4 h-4 rounded border-white/20 bg-surface/[0.04] text-primary focus:ring-primary/30 accent-primary"
+                />
+                <span className="text-white/50 text-xs font-medium">Onthoud mijn e-mailadres</span>
+              </label>
 
               {/* Error */}
               {loginError && (
