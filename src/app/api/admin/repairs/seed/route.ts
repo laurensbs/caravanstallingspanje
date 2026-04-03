@@ -189,7 +189,16 @@ const SEED_DATA: {
   { location_code: 'PAL11', area: 'peratallada', customer_name: 'Boon', client_number: '478', repairs_description: '', observations: '', cost_type: 'none', status: 'geen_schade', parts_needed: '', invoice_reference: '', date_of_completion: '' },
 ];
 
+// Allow seeding via GET for easy browser access
+export async function GET() {
+  return seed();
+}
+
 export async function POST() {
+  return seed();
+}
+
+async function seed() {
   try {
     // Check if data already exists
     const existing = await sql`SELECT COUNT(*) as count FROM repair_inspections WHERE year = 2025`;

@@ -102,7 +102,7 @@ function rowColor(status: string) {
 
 export default function ReparatiesPage() {
   const currentYear = new Date().getFullYear();
-  const [year, setYear] = useState(currentYear);
+  const [year, setYear] = useState(2025);
   const [statusFilter, setStatusFilter] = useState('');
   const [areaFilter, setAreaFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
