@@ -1124,37 +1124,37 @@ export async function incrementDiscountCodeUsage(code: string) {
 // ─── Repair Inspections ───
 export async function getAllRepairInspections(page = 1, limit = 100, year?: number, status?: string, area?: string, search?: string) {
   const offset = (page - 1) * limit;
-  const y = year || new Date().getFullYear();
+  const y = year ?? 0;
   let rows, cnt;
   // Build dynamic query
   if (status && area && search) {
     const s = `%${search}%`;
-    rows = await sql`SELECT * FROM repair_inspections WHERE year = ${y} AND status = ${status} AND area = ${area} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s}) ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
-    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE year = ${y} AND status = ${status} AND area = ${area} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s})`;
+    rows = await sql`SELECT * FROM repair_inspections WHERE (${y} = 0 OR year = ${y}) AND status = ${status} AND area = ${area} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s}) ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
+    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE (${y} = 0 OR year = ${y}) AND status = ${status} AND area = ${area} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s})`;
   } else if (status && area) {
-    rows = await sql`SELECT * FROM repair_inspections WHERE year = ${y} AND status = ${status} AND area = ${area} ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
-    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE year = ${y} AND status = ${status} AND area = ${area}`;
+    rows = await sql`SELECT * FROM repair_inspections WHERE (${y} = 0 OR year = ${y}) AND status = ${status} AND area = ${area} ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
+    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE (${y} = 0 OR year = ${y}) AND status = ${status} AND area = ${area}`;
   } else if (status && search) {
     const s = `%${search}%`;
-    rows = await sql`SELECT * FROM repair_inspections WHERE year = ${y} AND status = ${status} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s}) ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
-    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE year = ${y} AND status = ${status} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s})`;
+    rows = await sql`SELECT * FROM repair_inspections WHERE (${y} = 0 OR year = ${y}) AND status = ${status} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s}) ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
+    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE (${y} = 0 OR year = ${y}) AND status = ${status} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s})`;
   } else if (area && search) {
     const s = `%${search}%`;
-    rows = await sql`SELECT * FROM repair_inspections WHERE year = ${y} AND area = ${area} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s}) ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
-    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE year = ${y} AND area = ${area} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s})`;
+    rows = await sql`SELECT * FROM repair_inspections WHERE (${y} = 0 OR year = ${y}) AND area = ${area} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s}) ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
+    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE (${y} = 0 OR year = ${y}) AND area = ${area} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s})`;
   } else if (status) {
-    rows = await sql`SELECT * FROM repair_inspections WHERE year = ${y} AND status = ${status} ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
-    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE year = ${y} AND status = ${status}`;
+    rows = await sql`SELECT * FROM repair_inspections WHERE (${y} = 0 OR year = ${y}) AND status = ${status} ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
+    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE (${y} = 0 OR year = ${y}) AND status = ${status}`;
   } else if (area) {
-    rows = await sql`SELECT * FROM repair_inspections WHERE year = ${y} AND area = ${area} ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
-    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE year = ${y} AND area = ${area}`;
+    rows = await sql`SELECT * FROM repair_inspections WHERE (${y} = 0 OR year = ${y}) AND area = ${area} ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
+    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE (${y} = 0 OR year = ${y}) AND area = ${area}`;
   } else if (search) {
     const s = `%${search}%`;
-    rows = await sql`SELECT * FROM repair_inspections WHERE year = ${y} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s}) ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
-    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE year = ${y} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s})`;
+    rows = await sql`SELECT * FROM repair_inspections WHERE (${y} = 0 OR year = ${y}) AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s}) ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
+    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE (${y} = 0 OR year = ${y}) AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s})`;
   } else {
-    rows = await sql`SELECT * FROM repair_inspections WHERE year = ${y} ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
-    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE year = ${y}`;
+    rows = await sql`SELECT * FROM repair_inspections WHERE (${y} = 0 OR year = ${y}) ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
+    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE (${y} = 0 OR year = ${y})`;
   }
   return { inspections: rows, total: Number(cnt[0].total) };
 }
@@ -1202,9 +1202,9 @@ export async function deleteRepairInspection(id: number) {
 }
 
 export async function getRepairStats(year?: number) {
-  const y = year || new Date().getFullYear();
-  const rows = await sql`SELECT status, COUNT(*) as count FROM repair_inspections WHERE year = ${y} GROUP BY status`;
-  const total = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE year = ${y}`;
+  const y = year ?? 0;
+  const rows = await sql`SELECT status, COUNT(*) as count FROM repair_inspections WHERE (${y} = 0 OR year = ${y}) GROUP BY status`;
+  const total = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE (${y} = 0 OR year = ${y})`;
   return { byStatus: rows, total: Number(total[0].total) };
 }
 

@@ -1,6 +1,6 @@
 'use client';
 import { fmt, fmtDate } from "@/lib/format";
-
+import { useAdminI18n } from '@/lib/admin-i18n';
 import { useState, useEffect, useCallback } from 'react';
 import { Package, Plus, Pencil, Trash2, Check, X, Euro, Tag, ToggleLeft, ToggleRight } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
@@ -28,6 +28,7 @@ const PRICE_TYPES = [
 ];
 
 export default function DienstenPakkettenPage() {
+  const { t } = useAdminI18n();
   const [packages, setPackages] = useState<ServicePackage[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<ServicePackage | null>(null);
@@ -73,7 +74,7 @@ export default function DienstenPakkettenPage() {
   };
 
   const deletePackage = async (id: number) => {
-    if (!confirm('Weet je zeker dat je dit pakket wilt verwijderen?')) return;
+    if (!confirm(t('Weet je zeker dat je dit pakket wilt verwijderen?'))) return;
     await fetch(`/api/admin/packages/${id}`, { method: 'DELETE', credentials: 'include' });
     fetchPackages();
   };
@@ -110,71 +111,71 @@ export default function DienstenPakkettenPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Diensten & Pakketten</h1>
-          <p className="text-sm text-gray-500/70 mt-1">{packages.length} pakketten • {packages.filter(p => p.is_active).length} actief</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('Diensten & Pakketten')}</h1>
+          <p className="text-sm text-gray-500/70 mt-1">{packages.length} {t('pakketten')} • {packages.filter(p => p.is_active).length} {t('actief')}</p>
         </div>
         <button onClick={() => { resetForm(); setEditing(null); setShowForm(true); }} className="bg-primary hover:bg-primary-light text-white font-semibold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all">
-          <Plus size={16} /> Nieuw pakket
+          <Plus size={16} /> {t('Nieuw pakket')}
         </button>
       </div>
 
       {/* Category filter */}
       <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-        <button onClick={() => setFilterCat('all')} className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${filterCat === 'all' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>Alle</button>
+        <button onClick={() => setFilterCat('all')} className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${filterCat === 'all' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>{t('Alle')}</button>
         {CATEGORIES.map(c => (
-          <button key={c.value} onClick={() => setFilterCat(c.value)} className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${filterCat === c.value ? 'bg-primary text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>{c.label}</button>
+          <button key={c.value} onClick={() => setFilterCat(c.value)} className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${filterCat === c.value ? 'bg-primary text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>{t(c.label)}</button>
         ))}
       </div>
 
       {/* Form modal */}
-      <Modal open={showForm} onClose={() => { setShowForm(false); setEditing(null); }} title={editing ? 'Pakket bewerken' : 'Nieuw pakket'}>
+      <Modal open={showForm} onClose={() => { setShowForm(false); setEditing(null); }} title={editing ? t('Pakket bewerken') : t('Nieuw pakket')}>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 block mb-1">Naam *</label>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">{t('Naam')} *</label>
                   <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value, slug: editing ? form.slug : e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-') })} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary" />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 block mb-1">Slug *</label>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">{t('Slug')} *</label>
                   <input value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 block mb-1">Categorie</label>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">{t('Categorie')}</label>
                   <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary">
-                    {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                    {CATEGORIES.map(c => <option key={c.value} value={c.value}>{t(c.label)}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 block mb-1">Prijstype</label>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">{t('Prijstype')}</label>
                   <select value={form.price_type} onChange={e => setForm({ ...form, price_type: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary">
-                    {PRICE_TYPES.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
+                    {PRICE_TYPES.map(p => <option key={p.value} value={p.value}>{t(p.label)}</option>)}
                   </select>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 block mb-1">Prijs (€) *</label>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">{t('Prijs (€)')} *</label>
                   <input type="number" step="0.01" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary" />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 block mb-1">Sortering</label>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1">{t('Sortering')}</label>
                   <input type="number" value={form.sort_order} onChange={e => setForm({ ...form, sort_order: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary" />
                 </div>
               </div>
               <div>
-                <label className="text-xs font-semibold text-gray-500 block mb-1">Omschrijving</label>
+                <label className="text-xs font-semibold text-gray-500 block mb-1">{t('Omschrijving')}</label>
                 <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={2} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary resize-none" />
               </div>
               <div>
-                <label className="text-xs font-semibold text-gray-500 block mb-1">Features (1 per regel)</label>
-                <textarea value={form.features} onChange={e => setForm({ ...form, features: e.target.value })} rows={4} placeholder="Tweewekelijkse inspectie&#10;Bandenspanning controle&#10;Acculader dienst" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary resize-none" />
+                <label className="text-xs font-semibold text-gray-500 block mb-1">{t('Features (1 per regel)')}</label>
+                <textarea value={form.features} onChange={e => setForm({ ...form, features: e.target.value })} rows={4} placeholder={`${t('Tweewekelijkse inspectie')}\n${t('Bandenspanning controle')}\n${t('Acculader dienst')}`} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-primary resize-none" />
               </div>
               <div className="flex justify-end gap-3 pt-2">
-                <button onClick={() => { setShowForm(false); setEditing(null); }} className="px-5 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50">Annuleren</button>
+                <button onClick={() => { setShowForm(false); setEditing(null); }} className="px-5 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50">{t('Annuleren')}</button>
                 <button onClick={savePackage} disabled={!form.name || !form.slug || !form.price} className="bg-primary text-white font-semibold px-6 py-2.5 rounded-xl text-sm disabled:opacity-50 flex items-center gap-2">
-                  <Check size={14} /> Opslaan
+                  <Check size={14} /> {t('Opslaan')}
                 </button>
               </div>
             </div>
@@ -186,7 +187,7 @@ export default function DienstenPakkettenPage() {
       ) : filtered.length === 0 ? (
         <div className="bg-surface rounded-2xl border border-gray-200 p-12 text-center">
           <Package size={48} className="text-gray-500/40 mx-auto mb-4" />
-          <p className="text-gray-500/70">Geen pakketten gevonden</p>
+          <p className="text-gray-500/70">{t('Geen pakketten gevonden')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -194,8 +195,8 @@ export default function DienstenPakkettenPage() {
             <div key={pkg.id} className={`bg-surface rounded-2xl border p-6 transition-all hover:shadow-lg ${pkg.is_active ? 'border-gray-200' : 'border-red-100 bg-danger/10/30'}`}>
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${pkg.is_active ? 'bg-accent/15 text-accent-dark' : 'bg-danger/15 text-danger'}`}>{pkg.is_active ? 'Actief' : 'Inactief'}</span>
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 ml-1">{CATEGORIES.find(c => c.value === pkg.category)?.label || pkg.category}</span>
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${pkg.is_active ? 'bg-accent/15 text-accent-dark' : 'bg-danger/15 text-danger'}`}>{pkg.is_active ? t('Actief') : t('Inactief')}</span>
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 ml-1">{t(CATEGORIES.find(c => c.value === pkg.category)?.label || pkg.category)}</span>
                 </div>
                 <div className="flex gap-1">
                   <button onClick={() => toggleActive(pkg)} className="p-1.5 rounded-lg hover:bg-gray-300/20 text-gray-500/70 hover:text-gray-500 transition-colors">

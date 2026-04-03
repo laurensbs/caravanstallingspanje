@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Calendar, ChevronLeft, ChevronRight, MapPin, AlertCircle, Truck, CheckCircle, Clock, Filter } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAdminI18n } from '@/lib/admin-i18n';
 
 interface ContractEvent {
   id: number;
@@ -63,6 +64,7 @@ interface CalendarEvent {
 }
 
 export default function PlanningPage() {
+  const { t } = useAdminI18n();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -87,12 +89,12 @@ export default function PlanningPage() {
 
         (contractsData.contracts || []).forEach((c: ContractEvent) => {
           if (c.startDate) calEvents.push({ id: `cs-${c.id}`, date: c.startDate.slice(0, 10), type: 'contract_start', title: `${c.customerName}`, subtitle: `${c.caravanBrand} · ${c.spotLabel}` });
-          if (c.endDate) calEvents.push({ id: `ce-${c.id}`, date: c.endDate.slice(0, 10), type: 'contract_end', title: `${c.customerName}`, subtitle: `Contract ${c.contractNumber} eindigt` });
+          if (c.endDate) calEvents.push({ id: `ce-${c.id}`, date: c.endDate.slice(0, 10), type: 'contract_end', title: `${c.customerName}`, subtitle: `${t('Contract')} ${c.contractNumber} ${t('eindigt')}` });
         });
 
-        (transportData.orders || []).forEach((t: TransportEvent) => {
-          if (t.pickupDate) calEvents.push({ id: `tp-${t.id}`, date: t.pickupDate.slice(0, 10), type: 'transport_pickup', title: `${t.customerName}`, subtitle: `${t.caravanBrand} ophalen` });
-          if (t.deliveryDate) calEvents.push({ id: `td-${t.id}`, date: t.deliveryDate.slice(0, 10), type: 'transport_delivery', title: `${t.customerName}`, subtitle: `${t.caravanBrand} afleveren` });
+        (transportData.orders || []).forEach((tr: TransportEvent) => {
+          if (tr.pickupDate) calEvents.push({ id: `tp-${tr.id}`, date: tr.pickupDate.slice(0, 10), type: 'transport_pickup', title: `${tr.customerName}`, subtitle: `${tr.caravanBrand} ${t('ophalen')}` });
+          if (tr.deliveryDate) calEvents.push({ id: `td-${tr.id}`, date: tr.deliveryDate.slice(0, 10), type: 'transport_delivery', title: `${tr.customerName}`, subtitle: `${tr.caravanBrand} ${t('afleveren')}` });
         });
 
         setEvents(calEvents);
@@ -125,8 +127,8 @@ export default function PlanningPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Planning</h1>
-          <p className="text-sm text-gray-500/70 mt-1">Overzicht van contracten, transport en taken</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('Planning')}</h1>
+          <p className="text-sm text-gray-500/70 mt-1">{t('Overzicht van contracten, transport en taken')}</p>
         </div>
         <div className="flex items-center gap-2">
           {/* Filter */}
@@ -136,11 +138,11 @@ export default function PlanningPage() {
               onChange={e => setFilter(e.target.value)}
               className="appearance-none bg-surface border border-gray-200 rounded-xl pl-9 pr-8 py-2 text-sm font-medium text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/20"
             >
-              <option value="all">Alles</option>
-              <option value="contract_start">Contract start</option>
-              <option value="contract_end">Contract einde</option>
-              <option value="transport_pickup">Ophalen</option>
-              <option value="transport_delivery">Afleveren</option>
+              <option value="all">{t('Alles')}</option>
+              <option value="contract_start">{t('Contract start')}</option>
+              <option value="contract_end">{t('Contract einde')}</option>
+              <option value="transport_pickup">{t('Ophalen')}</option>
+              <option value="transport_delivery">{t('Afleveren')}</option>
             </select>
             <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500/70" />
           </div>
@@ -154,8 +156,8 @@ export default function PlanningPage() {
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <button onClick={prevMonth} className="p-2 hover:bg-gray-50 rounded-xl transition-colors"><ChevronLeft size={18} /></button>
             <div className="text-center">
-              <h2 className="text-lg font-bold text-gray-900">{MONTHS_NL[month]} {year}</h2>
-              <button onClick={goToday} className="text-xs text-accent font-semibold hover:underline">Vandaag</button>
+              <h2 className="text-lg font-bold text-gray-900">{t(MONTHS_NL[month])} {year}</h2>
+              <button onClick={goToday} className="text-xs text-accent font-semibold hover:underline">{t('Vandaag')}</button>
             </div>
             <button onClick={nextMonth} className="p-2 hover:bg-gray-50 rounded-xl transition-colors"><ChevronRight size={18} /></button>
           </div>
@@ -163,7 +165,7 @@ export default function PlanningPage() {
           {/* Day Headers */}
           <div className="grid grid-cols-7 border-b border-gray-200">
             {DAYS_NL.map(d => (
-              <div key={d} className="text-center text-xs font-semibold text-gray-500/70 py-2">{d}</div>
+              <div key={d} className="text-center text-xs font-semibold text-gray-500/70 py-2">{t(d)}</div>
             ))}
           </div>
 
@@ -197,7 +199,7 @@ export default function PlanningPage() {
                       </div>
                     ))}
                     {dayEvents.length > 3 && (
-                      <span className="text-xs text-accent font-semibold">+{dayEvents.length - 3} meer</span>
+                      <span className="text-xs text-accent font-semibold">+{dayEvents.length - 3} {t('meer')}</span>
                     )}
                   </div>
                 </button>
@@ -210,12 +212,12 @@ export default function PlanningPage() {
         <div className="space-y-4">
           {/* Legend */}
           <div className="bg-surface rounded-2xl border border-gray-200 p-4">
-            <h3 className="text-xs font-bold text-gray-500/70 uppercase tracking-wider mb-3">Legenda</h3>
+            <h3 className="text-xs font-bold text-gray-500/70 uppercase tracking-wider mb-3">{t('Legenda')}</h3>
             <div className="space-y-2">
               {Object.entries(TYPE_LABELS).map(([key, label]) => (
                 <div key={key} className="flex items-center gap-2">
                   <span className={`w-3 h-3 rounded-full ${TYPE_COLORS[key]}`} />
-                  <span className="text-xs text-gray-500">{label}</span>
+                  <span className="text-xs text-gray-500">{t(label)}</span>
                 </div>
               ))}
             </div>
@@ -224,7 +226,7 @@ export default function PlanningPage() {
           {/* Selected Events */}
           <div className="bg-surface rounded-2xl border border-gray-200 p-4">
             <h3 className="text-xs font-bold text-gray-500/70 uppercase tracking-wider mb-3">
-              {selectedDate ? new Date(selectedDate + 'T00:00:00').toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' }) : 'Selecteer een datum'}
+              {selectedDate ? new Date(selectedDate + 'T00:00:00').toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' }) : t('Selecteer een datum')}
             </h3>
             {selectedDate ? (
               selectedEvents.length > 0 ? (
@@ -235,7 +237,7 @@ export default function PlanningPage() {
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-gray-900 truncate">{e.title}</p>
                         <p className="text-xs text-gray-500/70">{e.subtitle}</p>
-                        <span className="text-xs font-semibold text-gray-500/50 mt-1 block">{TYPE_LABELS[e.type]}</span>
+                        <span className="text-xs font-semibold text-gray-500/50 mt-1 block">{t(TYPE_LABELS[e.type])}</span>
                       </div>
                     </div>
                   ))}
@@ -243,20 +245,20 @@ export default function PlanningPage() {
               ) : (
                 <div className="text-center py-6">
                   <Calendar size={24} className="text-gray-500/40 mx-auto mb-2" />
-                  <p className="text-xs text-gray-500/70">Geen items op deze datum</p>
+                  <p className="text-xs text-gray-500/70">{t('Geen items op deze datum')}</p>
                 </div>
               )
             ) : (
               <div className="text-center py-6">
                 <Calendar size={24} className="text-gray-500/40 mx-auto mb-2" />
-                <p className="text-xs text-gray-500/70">Klik op een datum voor details</p>
+                <p className="text-xs text-gray-500/70">{t('Klik op een datum voor details')}</p>
               </div>
             )}
           </div>
 
           {/* Upcoming Events */}
           <div className="bg-surface rounded-2xl border border-gray-200 p-4">
-            <h3 className="text-xs font-bold text-gray-500/70 uppercase tracking-wider mb-3">Komende items</h3>
+            <h3 className="text-xs font-bold text-gray-500/70 uppercase tracking-wider mb-3">{t('Komende items')}</h3>
             <div className="space-y-2">
               {filteredEvents
                 .filter(e => e.date >= today)
@@ -280,7 +282,7 @@ export default function PlanningPage() {
                   </button>
                 ))}
               {filteredEvents.filter(e => e.date >= today).length === 0 && (
-                <p className="text-xs text-gray-500/70 text-center py-4">Geen komende items</p>
+                <p className="text-xs text-gray-500/70 text-center py-4">{t('Geen komende items')}</p>
               )}
             </div>
           </div>

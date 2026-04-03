@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { BarChart3, TrendingUp, Users, MapPin, FileText, Receipt, Euro, Percent, ArrowUp, ArrowDown, Calendar, Download } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAdminI18n } from '@/lib/admin-i18n';
 
 interface Stats {
   totalCustomers: number;
@@ -76,6 +77,7 @@ function OccupancyBar({ location, occupied, total }: { location: string; occupie
 }
 
 export default function RapportagesPage() {
+  const { t } = useAdminI18n();
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState("jaar");
@@ -114,7 +116,7 @@ export default function RapportagesPage() {
   if (!stats) return (
     <div className="text-center py-32">
       <BarChart3 size={48} className="text-gray-500/40 mx-auto mb-4" />
-      <p className="text-gray-500/70">Kon rapportages niet laden</p>
+      <p className="text-gray-500/70">{t('Kon rapportages niet laden')}</p>
     </div>
   );
 
@@ -123,30 +125,30 @@ export default function RapportagesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Rapportages & Analytics</h1>
-          <p className="text-sm text-gray-500/70 mt-1">Overzicht van bezetting, omzet en klantstatistieken</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('Rapportages & Analytics')}</h1>
+          <p className="text-sm text-gray-500/70 mt-1">{t('Overzicht van bezetting, omzet en klantstatistieken')}</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex bg-gray-100 rounded-lg p-0.5">
             {["maand", "kwartaal", "jaar"].map(p => (
               <button key={p} onClick={() => setPeriod(p)} className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${period === p ? 'bg-surface text-gray-900 shadow-sm' : 'text-gray-500/70 hover:text-gray-500'}`}>
-                {p.charAt(0).toUpperCase() + p.slice(1)}
+                {t(p.charAt(0).toUpperCase() + p.slice(1))}
               </button>
             ))}
           </div>
           <div className="relative">
             <button onClick={() => setShowExport(!showExport)} className="flex items-center gap-2 text-sm font-semibold text-gray-500 bg-surface border border-gray-200 px-4 py-2 rounded-xl hover:bg-gray-50 transition-all">
-              <Download size={14} /> Exporteren
+              <Download size={14} /> {t('Exporteren')}
             </button>
             {showExport && (
               <div className="absolute right-0 top-full mt-2 bg-surface rounded-xl border border-gray-200 shadow-xl py-2 w-56 z-50">
                 {[
-                  { label: 'Klanten (CSV)', type: 'customers' },
-                  { label: 'Contracten (CSV)', type: 'contracts' },
-                  { label: 'Facturen (CSV)', type: 'invoices' },
-                  { label: 'Caravans (CSV)', type: 'caravans' },
-                  { label: 'Transport (CSV)', type: 'transport' },
-                  { label: 'Omzet rapport (CSV)', type: 'revenue' },
+                  { label: t('Klanten (CSV)'), type: 'customers' },
+                  { label: t('Contracten (CSV)'), type: 'contracts' },
+                  { label: t('Facturen (CSV)'), type: 'invoices' },
+                  { label: t('Caravans (CSV)'), type: 'caravans' },
+                  { label: t('Transport (CSV)'), type: 'transport' },
+                  { label: t('Omzet rapport (CSV)'), type: 'revenue' },
                 ].map(item => (
                   <a key={item.type} href={`/api/admin/export?type=${item.type}`} className="block px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-colors" onClick={() => setShowExport(false)}>
                     {item.label}
@@ -160,10 +162,10 @@ export default function RapportagesPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={Users} label="Totaal klanten" value={String(stats.totalCustomers)} trend={stats.newCustomersThisMonth > 0 ? stats.newCustomersThisMonth : undefined} color="bg-sky-50 text-sky-600" sub={`${stats.newCustomersThisMonth} nieuw deze maand`} />
-        <StatCard icon={FileText} label="Actieve contracten" value={String(stats.activeContracts)} color="bg-accent/10 text-accent" />
-        <StatCard icon={Euro} label="Maandomzet" value={fmt(stats.monthlyRevenue)} trend={stats.revenueGrowth} color="bg-warning/10 text-warning" />
-        <StatCard icon={Percent} label="Bezettingsgraad" value={`${stats.occupancyRate}%`} color={`${stats.occupancyRate > 85 ? 'bg-danger/10 text-danger' : 'bg-accent/10 text-accent'}`} sub={`${stats.totalCaravans} caravans gestald`} />
+        <StatCard icon={Users} label={t('Totaal klanten')} value={String(stats.totalCustomers)} trend={stats.newCustomersThisMonth > 0 ? stats.newCustomersThisMonth : undefined} color="bg-sky-50 text-sky-600" sub={`${stats.newCustomersThisMonth} ${t('nieuw deze maand')}`} />
+        <StatCard icon={FileText} label={t('Actieve contracten')} value={String(stats.activeContracts)} color="bg-accent/10 text-accent" />
+        <StatCard icon={Euro} label={t('Maandomzet')} value={fmt(stats.monthlyRevenue)} trend={stats.revenueGrowth} color="bg-warning/10 text-warning" />
+        <StatCard icon={Percent} label={t('Bezettingsgraad')} value={`${stats.occupancyRate}%`} color={`${stats.occupancyRate > 85 ? 'bg-danger/10 text-danger' : 'bg-accent/10 text-accent'}`} sub={`${stats.totalCaravans} ${t('caravans gestald')}`} />
       </div>
 
       {/* Charts Row */}
@@ -172,8 +174,8 @@ export default function RapportagesPage() {
         <div className="lg:col-span-2 bg-surface rounded-2xl border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="font-bold text-gray-900">Omzet overzicht</h3>
-              <p className="text-xs text-gray-500/70 mt-0.5">Maandelijkse omzet in €</p>
+              <h3 className="font-bold text-gray-900">{t('Omzet overzicht')}</h3>
+              <p className="text-xs text-gray-500/70 mt-0.5">{t('Maandelijkse omzet in €')}</p>
             </div>
             <TrendingUp size={18} className="text-gray-500/50" />
           </div>
@@ -187,8 +189,8 @@ export default function RapportagesPage() {
         <div className="bg-surface rounded-2xl border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="font-bold text-gray-900">Bezetting per locatie</h3>
-              <p className="text-xs text-gray-500/70 mt-0.5">Plekken bezet / totaal</p>
+              <h3 className="font-bold text-gray-900">{t('Bezetting per locatie')}</h3>
+              <p className="text-xs text-gray-500/70 mt-0.5">{t('Plekken bezet / totaal')}</p>
             </div>
             <MapPin size={18} className="text-gray-500/50" />
           </div>
@@ -200,7 +202,7 @@ export default function RapportagesPage() {
             ) : (
               <div className="text-center py-8">
                 <MapPin size={32} className="text-gray-500/40 mx-auto mb-2" />
-                <p className="text-xs text-gray-500/70">Geen locatiedata beschikbaar</p>
+                <p className="text-xs text-gray-500/70">{t('Geen locatiedata beschikbaar')}</p>
               </div>
             )}
           </div>
@@ -210,12 +212,12 @@ export default function RapportagesPage() {
       {/* Contracts by Type */}
       <div className="grid lg:grid-cols-2 gap-6">
         <div className="bg-surface rounded-2xl border border-gray-200 p-6">
-          <h3 className="font-bold text-gray-900 mb-6">Contracten per type</h3>
+          <h3 className="font-bold text-gray-900 mb-6">{t('Contracten per type')}</h3>
           <div className="space-y-3">
             {(stats.contractsByType.length > 0 ? stats.contractsByType : [
-              { type: 'Buitenstalling', count: 0 },
-              { type: 'Binnenstalling', count: 0 },
-              { type: 'Seizoensstalling', count: 0 },
+              { type: t('Buitenstalling'), count: 0 },
+              { type: t('Binnenstalling'), count: 0 },
+              { type: t('Seizoensstalling'), count: 0 },
             ]).map(ct => {
               const total = stats.activeContracts || 1;
               const pct = Math.round((ct.count / total) * 100);
@@ -234,15 +236,15 @@ export default function RapportagesPage() {
 
         <div className="bg-surface rounded-2xl border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="font-bold text-gray-900">Openstaande facturen</h3>
+            <h3 className="font-bold text-gray-900">{t('Openstaande facturen')}</h3>
             <Receipt size={18} className="text-gray-500/50" />
           </div>
           <div className="text-center py-6">
             <p className="text-4xl font-bold text-warning">{stats.outstandingInvoices}</p>
-            <p className="text-sm text-gray-500/70 mt-2">openstaande facturen</p>
+            <p className="text-sm text-gray-500/70 mt-2">{t('openstaande facturen')}</p>
           </div>
           <a href="/admin/facturen" className="block text-center text-sm font-semibold text-accent hover:text-primary-light transition-colors mt-4">
-            Bekijk facturen →
+            {t('Bekijk facturen →')}
           </a>
         </div>
       </div>

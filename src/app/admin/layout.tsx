@@ -4,12 +4,13 @@ import { useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useVisibleInterval } from '@/hooks/useVisibleInterval';
+import { AdminI18nProvider, useAdminI18n } from '@/lib/admin-i18n';
 import {
   LayoutDashboard, Users, Caravan, MapPin, FileText, Receipt, UserCog,
   ClipboardList, Truck, Settings, LogOut, Menu, X, Bell, Search, ChevronDown,
   Wrench, MessageSquare, Shield, Eye, EyeOff, Lock, User, ArrowRight, AlertCircle,
   BarChart3, CalendarDays, Package, Map as MapIcon, Palmtree, Mountain, UtensilsCrossed, BookOpen, Tent, Star, Tag,
-  ChevronRight, GripVertical, Hammer,
+  ChevronRight, GripVertical, Hammer, ChevronsLeft, ChevronsRight, Globe,
 } from 'lucide-react';
 
 type NavItem = { href: string; icon: typeof LayoutDashboard; label: string; roles: string[] };
@@ -55,8 +56,18 @@ const NAV_SECTIONS: NavSection[] = [
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
+  return (
+    <AdminI18nProvider>
+      <AdminLayoutContent>{children}</AdminLayoutContent>
+    </AdminI18nProvider>
+  );
+}
+
+function AdminLayoutContent({ children }: { children: ReactNode }) {
+  const { t, locale, setLocale } = useAdminI18n();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarHidden, setSidebarHidden] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
   const [role, setRole] = useState<'admin' | 'staff'>('admin');
   const [userName, setUserName] = useState('');
@@ -111,14 +122,15 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         const prefs = JSON.parse(raw);
         if (prefs.collapsed) setCollapsedSections(prefs.collapsed);
         if (prefs.order) setSectionOrder(prefs.order);
+        if (prefs.hidden !== undefined) setSidebarHidden(prefs.hidden);
       }
     } catch { /* ignore corrupt data */ }
   }, [userName]);
 
-  const saveSidebarPrefs = useCallback((collapsed: Record<string, boolean>, order: string[]) => {
+  const saveSidebarPrefs = useCallback((collapsed: Record<string, boolean>, order: string[], hidden?: boolean) => {
     if (!userName) return;
-    localStorage.setItem(`sidebar_prefs_${userName}`, JSON.stringify({ collapsed, order }));
-  }, [userName]);
+    localStorage.setItem(`sidebar_prefs_${userName}`, JSON.stringify({ collapsed, order, hidden: hidden ?? sidebarHidden }));
+  }, [userName, sidebarHidden]);
 
   const toggleSection = useCallback((sectionId: string) => {
     setCollapsedSections(prev => {
@@ -127,6 +139,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       return next;
     });
   }, [saveSidebarPrefs, sectionOrder]);
+
+  const toggleSidebarHidden = useCallback(() => {
+    setSidebarHidden(prev => {
+      const next = !prev;
+      saveSidebarPrefs(collapsedSections, sectionOrder, next);
+      return next;
+    });
+  }, [saveSidebarPrefs, collapsedSections, sectionOrder]);
 
   const orderedSections = useMemo(() => {
     const filtered = NAV_SECTIONS
@@ -236,10 +256,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           localStorage.removeItem('admin_saved_pw');
         }
       } else {
-        setLoginError(data.error || 'Inloggen mislukt');
+        setLoginError(data.error || t('Inloggen mislukt'));
       }
     } catch {
-      setLoginError('Er is een fout opgetreden');
+      setLoginError(t('Er is een fout opgetreden'));
     } finally {
       setLoginLoading(false);
     }
@@ -257,7 +277,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     <div className="h-screen flex items-center justify-center bg-surface-dark">
       <div className="flex flex-col items-center gap-4">
         <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-        <p className="text-white/70 text-sm">Laden...</p>
+        <p className="text-white/70 text-sm">{t('Laden...')}</p>
       </div>
     </div>
   );
@@ -274,14 +294,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-primary-light rounded-2xl mb-6 shadow-lg shadow-primary/20">
               <Shield className="text-white" size={28} />
             </div>
-            <h1 className="text-white font-bold text-3xl tracking-tight">Beheerportaal</h1>
-            <p className="text-white/70 text-sm mt-3">Caravanstalling Spanje</p>
+            <h1 className="text-white font-bold text-3xl tracking-tight">{t('Beheerportaal')}</h1>
+            <p className="text-white/70 text-sm mt-3">{t('Caravanstalling Spanje')}</p>
           </div>
 
           <div className="bg-surface/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-3xl p-8 space-y-5 shadow-2xl">
             {/* Role selector tabs */}
             <div>
-              <label className="text-white/70 text-xs font-bold uppercase tracking-widest block mb-2.5">Inloggen als</label>
+              <label className="text-white/70 text-xs font-bold uppercase tracking-widest block mb-2.5">{t('Inloggen als')}</label>
               <div className="flex bg-surface/[0.04] rounded-xl p-1 border border-white/[0.06]">
                 {(['admin', 'staff'] as const).map(r => (
                   <button
@@ -304,7 +324,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <form onSubmit={handleLogin} className="space-y-4">
               {/* Email field */}
               <div>
-                <label className="text-white/70 text-xs font-bold uppercase tracking-widest block mb-2.5">E-mailadres</label>
+                <label className="text-white/70 text-xs font-bold uppercase tracking-widest block mb-2.5">{t('E-mailadres')}</label>
                 <div className="relative">
                   <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/20" />
                   <input
@@ -322,7 +342,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
               {/* Password field */}
               <div>
-                <label className="text-white/70 text-xs font-bold uppercase tracking-widest block mb-2.5">Wachtwoord</label>
+                <label className="text-white/70 text-xs font-bold uppercase tracking-widest block mb-2.5">{t('Wachtwoord')}</label>
                 <div className="relative">
                   <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/20" />
                   <input
@@ -335,7 +355,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                     autoFocus
                     autoComplete="current-password"
                   />
-                  <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/60 transition-colors" aria-label={showPw ? "Wachtwoord verbergen" : "Wachtwoord tonen"}>
+                  <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/60 transition-colors" aria-label={showPw ? t('Wachtwoord verbergen') : t('Wachtwoord tonen')}>
                     {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
@@ -352,7 +372,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                   }}
                   className="w-4 h-4 rounded border-white/20 bg-surface/[0.04] text-primary focus:ring-primary/30 accent-primary"
                 />
-                <span className="text-white/50 text-xs font-medium">Onthoud mijn gegevens</span>
+                <span className="text-white/50 text-xs font-medium">{t('Onthoud mijn gegevens')}</span>
               </label>
 
               {/* Error */}
@@ -369,7 +389,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 disabled={loginLoading}
                 className="w-full bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-white font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 disabled:opacity-60"
               >
-                {loginLoading ? 'Bezig...' : 'Inloggen'}
+                {loginLoading ? t('Bezig...') : t('Inloggen')}
                 {!loginLoading && <ArrowRight size={16} />}
               </button>
             </form>
@@ -378,10 +398,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           {/* Trust badges */}
           <div className="flex items-center justify-center gap-5 mt-6">
             <span className="flex items-center gap-1.5 text-xs text-white/20 font-medium">
-              <Shield size={12} /> Beveiligde verbinding
+              <Shield size={12} /> {t('Beveiligde verbinding')}
             </span>
             <span className="flex items-center gap-1.5 text-xs text-white/20 font-medium">
-              <Lock size={12} /> Versleuteld
+              <Lock size={12} /> {t('Versleuteld')}
             </span>
           </div>
         </div>
@@ -392,16 +412,19 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-40 w-[270px] bg-white border-r border-gray-200 flex flex-col transform transition-transform md:relative md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside className={`fixed inset-y-0 left-0 z-40 w-[270px] bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ${sidebarHidden ? 'md:w-0 md:min-w-0 md:overflow-hidden md:border-0' : 'md:relative md:translate-x-0'} ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center justify-between h-16 px-5 border-b border-gray-200 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-lg flex items-center justify-center text-white text-xs font-bold">CS</div>
             <div>
               <span className="text-gray-900 font-bold text-sm block leading-tight">Caravanstalling</span>
-              <span className="text-gray-500 text-xs">{role === 'admin' ? 'Admin Panel' : 'Staff Portal'}</span>
+              <span className="text-gray-500 text-xs">{role === 'admin' ? t('Admin Panel') : t('Staff Portal')}</span>
             </div>
           </div>
-          <button className="md:hidden text-gray-500" onClick={() => setSidebarOpen(false)} aria-label="Zijmenu sluiten"><X size={20} /></button>
+          <div className="flex items-center gap-1">
+            <button className="hidden md:block text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors" onClick={toggleSidebarHidden} aria-label={t('Zijmenu inklappen')}><ChevronsLeft size={18} /></button>
+            <button className="md:hidden text-gray-500" onClick={() => setSidebarOpen(false)} aria-label={t('Zijmenu sluiten')}><X size={20} /></button>
+          </div>
         </div>
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto custom-scrollbar">
           {orderedSections.map(section => {
@@ -411,7 +434,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 return (
                   <Link key={n.href} href={n.href} onClick={() => setSidebarOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${active ? 'bg-primary/10 text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`}>
-                    <n.icon size={17} className={active ? 'text-primary' : ''} /> {n.label}
+                    <n.icon size={17} className={active ? 'text-primary' : ''} /> {t(n.label)}
                     {active && <div className="w-1.5 h-1.5 rounded-full bg-primary ml-auto" />}
                   </Link>
                 );
@@ -433,7 +456,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                   className="flex items-center gap-1 w-full text-left px-3 pt-5 pb-1.5 group cursor-pointer"
                 >
                   <GripVertical size={12} className="text-gray-300 group-hover:text-gray-400 shrink-0 cursor-grab active:cursor-grabbing" />
-                  <span className="text-xs font-bold text-gray-400 uppercase tracking-widest flex-1 select-none">{section.label}</span>
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-widest flex-1 select-none">{t(section.label)}</span>
                   <ChevronRight size={12} className={`text-gray-400 group-hover:text-gray-500 transition-transform duration-200 ${isCollapsed ? '' : 'rotate-90'}`} />
                 </button>
                 <div className={`overflow-hidden transition-all duration-200 ${isCollapsed ? 'max-h-0' : 'max-h-[500px]'}`}>
@@ -442,7 +465,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                     return (
                       <Link key={n.href} href={n.href} onClick={() => setSidebarOpen(false)}
                         className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${active ? 'bg-primary/10 text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`}>
-                        <n.icon size={17} className={active ? 'text-primary' : ''} /> {n.label}
+                        <n.icon size={17} className={active ? 'text-primary' : ''} /> {t(n.label)}
                         {active && <div className="w-1.5 h-1.5 rounded-full bg-primary ml-auto" />}
                       </Link>
                     );
@@ -461,7 +484,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             </div>
           </div>
           <button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:text-danger hover:bg-red-50 w-full transition-all">
-            <LogOut size={17} /> Uitloggen
+            <LogOut size={17} /> {t('Uitloggen')}
           </button>
         </div>
       </aside>
@@ -471,11 +494,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         {/* Top bar */}
         <header className="h-16 bg-surface border-b border-gray-200 flex items-center justify-between px-6 shrink-0">
           <div className="flex items-center gap-3">
-            <button className="md:hidden text-gray-500/70 hover:text-gray-500" onClick={() => setSidebarOpen(true)} aria-label="Menu openen"><Menu size={20} /></button>
+            <button className="md:hidden text-gray-500/70 hover:text-gray-500" onClick={() => setSidebarOpen(true)} aria-label={t('Menu openen')}><Menu size={20} /></button>
+            {sidebarHidden && <button className="hidden md:flex items-center justify-center text-gray-400 hover:text-gray-600 p-1.5 rounded-lg hover:bg-gray-100 transition-colors" onClick={toggleSidebarHidden} aria-label={t('Zijmenu uitklappen')}><ChevronsRight size={18} /></button>}
             <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3.5 py-2.5 w-full md:w-80 border border-gray-200 relative">
               <Search size={15} className="text-gray-500/50" />
               <input
-                placeholder="Zoek klanten, caravans, contracten..."
+                placeholder={t('Zoek klanten, caravans, contracten...')}
                 className="bg-transparent text-sm outline-none flex-1 text-gray-500 placeholder:text-gray-500/50"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
@@ -485,9 +509,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               {showSearch && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-surface rounded-xl border border-gray-200 shadow-xl z-50 max-h-80 overflow-y-auto">
                   {searching ? (
-                    <div className="p-4 text-center text-sm text-gray-500/70">Zoeken...</div>
+                    <div className="p-4 text-center text-sm text-gray-500/70">{t('Zoeken...')}</div>
                   ) : searchResults.length === 0 ? (
-                    <div className="p-4 text-center text-sm text-gray-500/70">Geen resultaten</div>
+                    <div className="p-4 text-center text-sm text-gray-500/70">{t('Geen resultaten')}</div>
                   ) : searchResults.map((r, i) => (
                     <Link key={i} href={r.href} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0">
                       <span className="text-xs font-bold text-gray-500/50 uppercase w-16 shrink-0">{r.type}</span>
@@ -500,18 +524,18 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </div>
           <div className="flex items-center gap-4">
             <div className="relative">
-              <button onClick={() => setShowNotifications(!showNotifications)} className="relative text-gray-500/50 hover:text-gray-500 transition-colors" aria-label="Notificaties">
+              <button onClick={() => setShowNotifications(!showNotifications)} className="relative text-gray-500/50 hover:text-gray-500 transition-colors" aria-label={t('Notificaties')}>
                 <Bell size={19} />
                 {unreadCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[9px] font-bold rounded-full flex items-center justify-center">{unreadCount}</span>}
               </button>
               {showNotifications && (
                 <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-surface rounded-xl border border-gray-200 shadow-xl z-50 max-h-96 overflow-y-auto">
                   <div className="p-3 border-b border-gray-200 flex items-center justify-between">
-                    <span className="text-sm font-bold text-gray-900">Notificaties</span>
-                    {unreadCount > 0 && <span className="text-xs font-bold text-primary">{unreadCount} nieuw</span>}
+                    <span className="text-sm font-bold text-gray-900">{t('Notificaties')}</span>
+                    {unreadCount > 0 && <span className="text-xs font-bold text-primary">{unreadCount} {t('nieuw')}</span>}
                   </div>
                   {notifications.length === 0 ? (
-                    <div className="p-6 text-center text-sm text-gray-500/70">Geen notificaties</div>
+                    <div className="p-6 text-center text-sm text-gray-500/70">{t('Geen notificaties')}</div>
                   ) : notifications.map(n => (
                     <div key={n.id} className={`px-4 py-3 border-b border-gray-100 last:border-0 ${!n.read ? 'bg-primary/[0.03]' : ''}`}>
                       <div className="flex items-start gap-2">
@@ -526,6 +550,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 </div>
               )}
             </div>
+            <div className="h-6 w-px bg-gray-100" />
+            <button onClick={() => setLocale(locale === 'nl' ? 'en' : 'nl')} className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors" title={locale === 'nl' ? 'Switch to English' : 'Naar Nederlands'}>
+              <Globe size={14} />
+              {locale === 'nl' ? '🇳🇱 NL' : '🇬🇧 EN'}
+            </button>
             <div className="h-6 w-px bg-gray-100" />
             <div className="flex items-center gap-2.5 text-sm">
               <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-sm shadow-primary/20">{userName.charAt(0)}</div>

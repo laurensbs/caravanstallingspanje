@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Star, Eye, EyeOff, MessageSquare } from 'lucide-react';
 import { fmtDate } from '@/lib/format';
 import { toast } from 'sonner';
+import { useAdminI18n } from '@/lib/admin-i18n';
 
 interface Review {
   id: number; customer_name: string; customer_email: string; rating: number;
@@ -10,6 +11,7 @@ interface Review {
 }
 
 export default function ReviewsPage() {
+  const { t } = useAdminI18n();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [total, setTotal] = useState(0);
   const [filter, setFilter] = useState<string>('');
@@ -33,7 +35,7 @@ export default function ReviewsPage() {
       body: JSON.stringify({ is_published: publish }), credentials: 'include',
     });
     fetchReviews();
-    toast.success(publish ? 'Review gepubliceerd' : 'Review verborgen');
+    toast.success(publish ? t('Review gepubliceerd') : t('Review verborgen'));
   };
 
   const submitReply = async (id: number) => {
@@ -43,7 +45,7 @@ export default function ReviewsPage() {
     });
     setReplyId(null); setReplyText('');
     fetchReviews();
-    toast.success('Reactie geplaatst');
+    toast.success(t('Reactie geplaatst'));
   };
 
   const avg = reviews.length > 0 ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1) : '–';
@@ -51,18 +53,18 @@ export default function ReviewsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <div><h1 className="text-2xl font-bold text-gray-900">Reviews</h1><p className="text-sm text-gray-500/70 mt-1">{total} reviews · Gemiddeld: {avg} ★</p></div>
+        <div><h1 className="text-2xl font-bold text-gray-900">{t('Reviews')}</h1><p className="text-sm text-gray-500/70 mt-1">{total} {t('reviews')} · {t('Gemiddeld')}: {avg} ★</p></div>
       </div>
 
       <div className="flex gap-2 mb-6">
-        {[{ v: '', l: 'Alle' }, { v: 'true', l: 'Gepubliceerd' }, { v: 'false', l: 'Ongepubliceerd' }].map(s => (
+        {[{ v: '', l: t('Alle') }, { v: 'true', l: t('Gepubliceerd') }, { v: 'false', l: t('Ongepubliceerd') }].map(s => (
           <button key={s.v} onClick={() => setFilter(s.v)} className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all ${filter === s.v ? 'bg-primary text-white shadow-md shadow-primary/20' : 'bg-gray-50 hover:bg-gray-300/20 text-gray-500'}`}>{s.l}</button>
         ))}
       </div>
 
       <div className="space-y-4">
         {reviews.length === 0 ? (
-          <div className="bg-surface rounded-2xl border border-gray-200 p-8 text-center text-gray-500/70">Geen reviews gevonden</div>
+          <div className="bg-surface rounded-2xl border border-gray-200 p-8 text-center text-gray-500/70">{t('Geen reviews gevonden')}</div>
         ) : reviews.map(r => (
           <div key={r.id} className={`bg-surface rounded-2xl border p-5 transition-all ${r.is_published ? 'border-gray-200' : 'border-warning/30 bg-warning/[0.02]'}`}>
             <div className="flex items-start justify-between mb-3">
@@ -75,26 +77,26 @@ export default function ReviewsPage() {
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={() => togglePublish(r.id, !r.is_published)} className={`flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${r.is_published ? 'bg-accent/10 text-accent hover:bg-accent/20' : 'bg-gray-50 text-gray-500 hover:bg-gray-300/20'}`}>
-                  {r.is_published ? <><Eye size={12} /> Gepubliceerd</> : <><EyeOff size={12} /> Verborgen</>}
+                  {r.is_published ? <><Eye size={12} /> {t('Gepubliceerd')}</> : <><EyeOff size={12} /> {t('Verborgen')}</>}
                 </button>
               </div>
             </div>
             {r.comment && <p className="text-sm text-gray-500 leading-relaxed mb-3">{r.comment}</p>}
             {r.admin_reply && (
               <div className="bg-primary/[0.04] border border-primary/20 rounded-xl p-3 mb-3">
-                <p className="text-xs font-semibold text-primary mb-1">Uw reactie:</p>
+                <p className="text-xs font-semibold text-primary mb-1">{t('Uw reactie')}:</p>
                 <p className="text-sm text-gray-500">{r.admin_reply}</p>
               </div>
             )}
             {replyId === r.id ? (
               <div className="flex gap-2">
-                <input value={replyText} onChange={e => setReplyText(e.target.value)} placeholder="Schrijf een reactie..." className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:ring-2 focus:ring-primary/20 outline-none" />
-                <button onClick={() => submitReply(r.id)} disabled={!replyText.trim()} className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50">Plaatsen</button>
-                <button onClick={() => setReplyId(null)} className="text-sm text-gray-500/70 px-3">Annuleren</button>
+                <input value={replyText} onChange={e => setReplyText(e.target.value)} placeholder={t('Schrijf een reactie...')} className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 focus:ring-2 focus:ring-primary/20 outline-none" />
+                <button onClick={() => submitReply(r.id)} disabled={!replyText.trim()} className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50">{t('Reactie plaatsen')}</button>
+                <button onClick={() => setReplyId(null)} className="text-sm text-gray-500/70 px-3">{t('Annuleren')}</button>
               </div>
             ) : (
               <button onClick={() => { setReplyId(r.id); setReplyText(r.admin_reply || ''); }} className="text-xs text-ocean font-medium flex items-center gap-1 hover:text-ocean-dark transition-colors">
-                <MessageSquare size={12} /> {r.admin_reply ? 'Reactie bewerken' : 'Reageren'}
+                <MessageSquare size={12} /> {r.admin_reply ? t('Reactie bewerken') : t('Reageren')}
               </button>
             )}
           </div>

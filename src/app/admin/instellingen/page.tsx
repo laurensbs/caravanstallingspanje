@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { Settings, Save, Shield, Bell, Euro, Building } from 'lucide-react';
+import { useAdminI18n } from '@/lib/admin-i18n';
 
 export default function InstellingenPage() {
+  const { t } = useAdminI18n();
   const [activeTab, setActiveTab] = useState('bedrijf');
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
@@ -42,11 +44,11 @@ export default function InstellingenPage() {
   };
 
   const tabs = [
-    { id: 'bedrijf', label: 'Bedrijfsgegevens', icon: Building },
-    { id: 'facturatie', label: 'Facturatie', icon: Euro },
-    { id: 'operatie', label: 'Operatie', icon: Settings },
-    { id: 'notificaties', label: 'Notificaties', icon: Bell },
-    { id: 'beveiliging', label: 'Beveiliging', icon: Shield },
+    { id: 'bedrijf', label: t('Bedrijfsgegevens'), icon: Building },
+    { id: 'facturatie', label: t('Facturatie'), icon: Euro },
+    { id: 'operatie', label: t('Operatie'), icon: Settings },
+    { id: 'notificaties', label: t('Notificaties'), icon: Bell },
+    { id: 'beveiliging', label: t('Beveiliging'), icon: Shield },
   ];
 
   const Input = ({ label, field, type = 'text' }: { label: string; field: string; type?: string }) => (
@@ -68,15 +70,15 @@ export default function InstellingenPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Instellingen</h1>
-        <button onClick={save} disabled={saving} className="bg-primary hover:bg-primary-light text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all disabled:opacity-50"><Save size={16} />{saving ? 'Opslaan...' : 'Opslaan'}</button>
+        <h1 className="text-2xl font-bold text-gray-900">{t('Instellingen')}</h1>
+        <button onClick={save} disabled={saving} className="bg-primary hover:bg-primary-light text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all disabled:opacity-50"><Save size={16} />{saving ? t('Opslaan...') : t('Opslaan')}</button>
       </div>
 
       <div className="flex gap-6">
         <div className="w-56 flex-shrink-0">
           <div className="bg-surface rounded-2xl border border-gray-200 p-2 space-y-1">
-            {tabs.map(t => (
-              <button key={t.id} onClick={() => setActiveTab(t.id)} className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-left transition-all ${activeTab === t.id ? 'bg-gradient-to-r from-primary/10 to-primary/5 text-primary font-semibold border border-primary/20' : 'hover:bg-gray-50 text-gray-500/70 hover:text-gray-500'}`}><t.icon size={16} />{t.label}</button>
+            {tabs.map(tab => (
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-left transition-all ${activeTab === tab.id ? 'bg-gradient-to-r from-primary/10 to-primary/5 text-primary font-semibold border border-primary/20' : 'hover:bg-gray-50 text-gray-500/70 hover:text-gray-500'}`}><tab.icon size={16} />{tab.label}</button>
             ))}
           </div>
         </div>
@@ -84,74 +86,74 @@ export default function InstellingenPage() {
         <div className="flex-1 bg-surface rounded-2xl border border-gray-200 p-6">
           {activeTab === 'bedrijf' && (
             <div className="space-y-4">
-              <h2 className="font-bold mb-4">Bedrijfsgegevens</h2>
-              <Input label="Bedrijfsnaam" field="company_name" />
+              <h2 className="font-bold mb-4">{t('Bedrijfsgegevens')}</h2>
+              <Input label={t('Bedrijfsnaam')} field="company_name" />
               <div className="grid grid-cols-2 gap-4">
-                <Input label="E-mail" field="company_email" type="email" />
-                <Input label="Telefoon" field="company_phone" />
+                <Input label={t('E-mail')} field="company_email" type="email" />
+                <Input label={t('Telefoon')} field="company_phone" />
               </div>
-              <Input label="Adres" field="company_address" />
+              <Input label={t('Adres')} field="company_address" />
               <div className="grid grid-cols-3 gap-4">
-                <Input label="Stad" field="company_city" />
-                <Input label="Postcode" field="company_postal" />
-                <Input label="Land" field="company_country" />
+                <Input label={t('Stad')} field="company_city" />
+                <Input label={t('Postcode')} field="company_postal" />
+                <Input label={t('Land')} field="company_country" />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <Input label="KVK / CIF" field="company_kvk" />
-                <Input label="BTW-nummer" field="company_btw" />
+                <Input label={t('KVK / CIF')} field="company_kvk" />
+                <Input label={t('BTW-nummer')} field="company_btw" />
               </div>
             </div>
           )}
 
           {activeTab === 'facturatie' && (
             <div className="space-y-4">
-              <h2 className="font-bold mb-4">Facturatie-instellingen</h2>
+              <h2 className="font-bold mb-4">{t('Facturatie-instellingen')}</h2>
               <div className="grid grid-cols-3 gap-4">
-                <Input label="Standaard BTW %" field="default_tax_rate" type="number" />
-                <Input label="Factuur prefix" field="invoice_prefix" />
-                <Input label="Contract prefix" field="contract_prefix" />
+                <Input label={t('Standaard BTW %')} field="default_tax_rate" type="number" />
+                <Input label={t('Factuur prefix')} field="invoice_prefix" />
+                <Input label={t('Contract prefix')} field="contract_prefix" />
               </div>
-              <Toggle label="Automatische verlenging" desc="Standaard automatisch verlengen voor nieuwe contracten" field="auto_renewal_default" />
+              <Toggle label={t('Automatische verlenging')} desc={t('Standaard automatisch verlengen voor nieuwe contracten')} field="auto_renewal_default" />
             </div>
           )}
 
           {activeTab === 'operatie' && (
             <div className="space-y-4">
-              <h2 className="font-bold mb-4">Operationele instellingen</h2>
+              <h2 className="font-bold mb-4">{t('Operationele instellingen')}</h2>
               <div className="grid grid-cols-3 gap-4">
-                <Input label="Inspectie-interval (dagen)" field="inspection_interval_days" type="number" />
-                <Input label="Verzekering herinnering (dagen voor vervaldatum)" field="insurance_reminder_days" type="number" />
-                <Input label="APK herinnering (dagen voor vervaldatum)" field="apk_reminder_days" type="number" />
+                <Input label={t('Inspectie-interval (dagen)')} field="inspection_interval_days" type="number" />
+                <Input label={t('Verzekering herinnering (dagen voor vervaldatum)')} field="insurance_reminder_days" type="number" />
+                <Input label={t('APK herinnering (dagen voor vervaldatum)')} field="apk_reminder_days" type="number" />
               </div>
             </div>
           )}
 
           {activeTab === 'notificaties' && (
             <div className="space-y-2">
-              <h2 className="font-bold mb-4">E-mail notificaties</h2>
-              <Toggle label="Nieuwe boeking" desc="E-mail bij nieuwe contractaanvraag" field="email_new_booking" />
-              <Toggle label="Factuur verstuurd" desc="Bevestiging bij versturen factuur" field="email_invoice" />
-              <Toggle label="Inspectie rapport" desc="E-mail na afronding inspectie" field="email_inspection" />
+              <h2 className="font-bold mb-4">{t('E-mail notificaties')}</h2>
+              <Toggle label={t('Nieuwe boeking')} desc={t('E-mail bij nieuwe contractaanvraag')} field="email_new_booking" />
+              <Toggle label={t('Factuur verstuurd')} desc={t('Bevestiging bij versturen factuur')} field="email_invoice" />
+              <Toggle label={t('Inspectie rapport')} desc={t('E-mail na afronding inspectie')} field="email_inspection" />
             </div>
           )}
 
           {activeTab === 'beveiliging' && (
             <div className="space-y-6">
-              <h2 className="font-bold mb-4">Beveiliging</h2>
+              <h2 className="font-bold mb-4">{t('Beveiliging')}</h2>
               <div className="p-4 bg-gray-50 rounded-xl">
-                <h3 className="font-medium text-sm text-gray-900 mb-2">Wachtwoord wijzigen</h3>
+                <h3 className="font-medium text-sm text-gray-900 mb-2">{t('Wachtwoord wijzigen')}</h3>
                 <div className="space-y-3">
-                  <input type="password" placeholder="Huidig wachtwoord" className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-surface focus:ring-2 focus:ring-primary/20 outline-none" />
-                  <input type="password" placeholder="Nieuw wachtwoord" className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-surface focus:ring-2 focus:ring-primary/20 outline-none" />
-                  <input type="password" placeholder="Bevestig nieuw wachtwoord" className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-surface focus:ring-2 focus:ring-primary/20 outline-none" />
-                  <button className="bg-primary text-white font-semibold px-4 py-2 rounded-xl text-sm shadow-md shadow-primary/20">Wijzigen</button>
+                  <input type="password" placeholder={t('Huidig wachtwoord')} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-surface focus:ring-2 focus:ring-primary/20 outline-none" />
+                  <input type="password" placeholder={t('Nieuw wachtwoord')} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-surface focus:ring-2 focus:ring-primary/20 outline-none" />
+                  <input type="password" placeholder={t('Bevestig nieuw wachtwoord')} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-surface focus:ring-2 focus:ring-primary/20 outline-none" />
+                  <button className="bg-primary text-white font-semibold px-4 py-2 rounded-xl text-sm shadow-md shadow-primary/20">{t('Wijzigen')}</button>
                 </div>
               </div>
               <div className="p-4 bg-gray-50 rounded-xl">
-                <h3 className="font-medium text-sm text-gray-900 mb-2">Database</h3>
-                <p className="text-xs text-gray-500/70 mb-3">Initialiseer de database of reset alle tabellen.</p>
+                <h3 className="font-medium text-sm text-gray-900 mb-2">{t('Database')}</h3>
+                <p className="text-xs text-gray-500/70 mb-3">{t('Initialiseer de database of reset alle tabellen.')}</p>
                 <div className="flex gap-2">
-                  <button onClick={async () => { await fetch('/api/setup', { method: 'POST' }); alert('Database geïnitialiseerd'); }} className="bg-accent text-white font-semibold px-4 py-2 rounded-xl text-sm">Database initialiseren</button>
+                  <button onClick={async () => { await fetch('/api/setup', { method: 'POST' }); alert(t('Database geïnitialiseerd')); }} className="bg-accent text-white font-semibold px-4 py-2 rounded-xl text-sm">{t('Database initialiseren')}</button>
                 </div>
               </div>
             </div>

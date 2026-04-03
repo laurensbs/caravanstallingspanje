@@ -3,13 +3,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Users, Plus, X, Shield, MapPin, Eye, EyeOff } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
+import { useAdminI18n } from '@/lib/admin-i18n';
 
 interface StaffMember { id: number; first_name: string; last_name: string; email: string; phone: string; role: string; location_id: number; location_name: string; is_active: boolean; created_at: string; }
 
-const ROLE_LABELS: Record<string,string> = { beheerder: 'Beheerder', medewerker: 'Medewerker', chauffeur: 'Chauffeur', technicus: 'Technicus' };
+const ROLE_KEYS: Record<string,string> = { beheerder: 'Beheerder', medewerker: 'Medewerker', chauffeur: 'Chauffeur', technicus: 'Technicus' };
 const ROLE_COLORS: Record<string,string> = { beheerder: 'bg-primary/15 text-primary', medewerker: 'bg-ocean/15 text-ocean-dark', chauffeur: 'bg-warning/15 text-warning', technicus: 'bg-accent/15 text-primary-dark' };
 
 export default function MedewerkersPage() {
+  const { t } = useAdminI18n();
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -50,13 +52,13 @@ export default function MedewerkersPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <div><h1 className="text-2xl font-bold text-gray-900">Medewerkers</h1><p className="text-sm text-gray-500/70 mt-1">{activeStaff.length} actief · {inactiveStaff.length} inactief</p></div>
-        <button onClick={openForm} className="bg-primary hover:bg-primary-light text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all"><Plus size={16} /> Medewerker toevoegen</button>
+        <div><h1 className="text-2xl font-bold text-gray-900">{t('Medewerkers')}</h1><p className="text-sm text-gray-500/70 mt-1">{activeStaff.length} {t('actief')} · {inactiveStaff.length} {t('inactief')}</p></div>
+        <button onClick={openForm} className="bg-primary hover:bg-primary-light text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all"><Plus size={16} /> {t('Medewerker toevoegen')}</button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {loading ? <div className="col-span-full bg-surface rounded-2xl border border-gray-200 p-8 text-center text-gray-500/70">Laden...</div> :
-        staff.length === 0 ? <div className="col-span-full bg-surface rounded-2xl border border-gray-200 p-8 text-center text-gray-500/70">Geen medewerkers</div> :
+        {loading ? <div className="col-span-full bg-surface rounded-2xl border border-gray-200 p-8 text-center text-gray-500/70">{t('Laden...')}</div> :
+        staff.length === 0 ? <div className="col-span-full bg-surface rounded-2xl border border-gray-200 p-8 text-center text-gray-500/70">{t('Geen medewerkers')}</div> :
         staff.map(s => (
           <div key={s.id} className={`bg-surface rounded-2xl border border-gray-200 p-5 hover:shadow-lg hover:shadow-gray-200/30 transition-all ${!s.is_active ? 'opacity-50' : ''}`}>
             <div className="flex items-start justify-between">
@@ -64,10 +66,10 @@ export default function MedewerkersPage() {
                 <div className="w-10 h-10 bg-warning/15 rounded-xl flex items-center justify-center text-warning font-bold text-sm">{s.first_name[0]}{s.last_name[0]}</div>
                 <div>
                   <h3 className="font-semibold">{s.first_name} {s.last_name}</h3>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${ROLE_COLORS[s.role] || 'bg-gray-100'}`}>{ROLE_LABELS[s.role] || s.role}</span>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${ROLE_COLORS[s.role] || 'bg-gray-100'}`}>{t(ROLE_KEYS[s.role] || s.role)}</span>
                 </div>
               </div>
-              <button onClick={() => toggleActive(s.id, s.is_active)} className={`text-xs px-2 py-1 rounded-lg ${s.is_active ? 'text-danger hover:bg-danger/10' : 'text-accent hover:bg-accent/10'}`}>{s.is_active ? 'Deactiveren' : 'Activeren'}</button>
+              <button onClick={() => toggleActive(s.id, s.is_active)} className={`text-xs px-2 py-1 rounded-lg ${s.is_active ? 'text-danger hover:bg-danger/10' : 'text-accent hover:bg-accent/10'}`}>{s.is_active ? t('Deactiveren') : t('Activeren')}</button>
             </div>
             <div className="mt-4 space-y-1.5 text-sm text-gray-500/70">
               <div className="flex items-center gap-2"><Shield size={14}/> {s.email}</div>
@@ -78,28 +80,28 @@ export default function MedewerkersPage() {
         ))}
       </div>
 
-      <Modal open={showForm} onClose={() => setShowForm(false)} title="Medewerker toevoegen" size="sm">
+      <Modal open={showForm} onClose={() => setShowForm(false)} title={t('Medewerker toevoegen')} size="sm">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-xs font-semibold text-gray-500 block mb-1">Voornaam *</label><input required value={form.first_name} onChange={e=>setForm({...form,first_name:e.target.value})} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"/></div>
-                <div><label className="text-xs font-semibold text-gray-500 block mb-1">Achternaam *</label><input required value={form.last_name} onChange={e=>setForm({...form,last_name:e.target.value})} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"/></div>
+                <div><label className="text-xs font-semibold text-gray-500 block mb-1">{t('Voornaam')} *</label><input required value={form.first_name} onChange={e=>setForm({...form,first_name:e.target.value})} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"/></div>
+                <div><label className="text-xs font-semibold text-gray-500 block mb-1">{t('Achternaam')} *</label><input required value={form.last_name} onChange={e=>setForm({...form,last_name:e.target.value})} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"/></div>
               </div>
-              <div><label className="text-xs font-semibold text-gray-500 block mb-1">E-mail *</label><input type="email" required value={form.email} onChange={e=>setForm({...form,email:e.target.value})} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"/></div>
-              <div><label className="text-xs font-semibold text-gray-500 block mb-1">Telefoon</label><input value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"/></div>
+              <div><label className="text-xs font-semibold text-gray-500 block mb-1">{t('E-mail')} *</label><input type="email" required value={form.email} onChange={e=>setForm({...form,email:e.target.value})} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"/></div>
+              <div><label className="text-xs font-semibold text-gray-500 block mb-1">{t('Telefoon')}</label><input value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"/></div>
               <div>
-                <label className="text-xs font-semibold text-gray-500 block mb-1">Wachtwoord *</label>
+                <label className="text-xs font-semibold text-gray-500 block mb-1">{t('Wachtwoord')} *</label>
                 <div className="relative">
                   <input type={showPassword ? 'text' : 'password'} required minLength={8} value={form.password} onChange={e=>setForm({...form,password:e.target.value})} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all pr-10"/>
-                  <button type="button" onClick={()=>setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500/70" aria-label={showPassword ? "Wachtwoord verbergen" : "Wachtwoord tonen"}>{showPassword ? <EyeOff size={16}/> : <Eye size={16}/>}</button>
+                  <button type="button" onClick={()=>setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500/70" aria-label={showPassword ? t('Wachtwoord verbergen') : t('Wachtwoord tonen')}>{showPassword ? <EyeOff size={16}/> : <Eye size={16}/>}</button>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-xs font-semibold text-gray-500 block mb-1">Rol *</label><select required value={form.role} onChange={e=>setForm({...form,role:e.target.value})} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-primary/20 outline-none"><option value="medewerker">Medewerker</option><option value="beheerder">Beheerder</option><option value="chauffeur">Chauffeur</option><option value="technicus">Technicus</option></select></div>
-                <div><label className="text-xs font-semibold text-gray-500 block mb-1">Locatie</label><select value={form.location_id} onChange={e=>setForm({...form,location_id:e.target.value})} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-primary/20 outline-none"><option value="">Alle locaties</option>{locations.map(l=><option key={l.id} value={l.id}>{l.name}</option>)}</select></div>
+                <div><label className="text-xs font-semibold text-gray-500 block mb-1">{t('Rol')} *</label><select required value={form.role} onChange={e=>setForm({...form,role:e.target.value})} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-primary/20 outline-none"><option value="medewerker">{t('Medewerker')}</option><option value="beheerder">{t('Beheerder')}</option><option value="chauffeur">{t('Chauffeur')}</option><option value="technicus">{t('Technicus')}</option></select></div>
+                <div><label className="text-xs font-semibold text-gray-500 block mb-1">{t('Locatie')}</label><select value={form.location_id} onChange={e=>setForm({...form,location_id:e.target.value})} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:ring-2 focus:ring-primary/20 outline-none"><option value="">{t('Alle locaties')}</option>{locations.map(l=><option key={l.id} value={l.id}>{l.name}</option>)}</select></div>
               </div>
               <div className="flex gap-3 justify-end pt-2">
-                <button type="button" onClick={()=>setShowForm(false)} className="px-4 py-2.5 text-sm text-gray-500/70 hover:bg-gray-300/20 rounded-xl transition-colors">Annuleren</button>
-                <button type="submit" className="bg-primary hover:bg-primary-light text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-primary/20 transition-all">Toevoegen</button>
+                <button type="button" onClick={()=>setShowForm(false)} className="px-4 py-2.5 text-sm text-gray-500/70 hover:bg-gray-300/20 rounded-xl transition-colors">{t('Annuleren')}</button>
+                <button type="submit" className="bg-primary hover:bg-primary-light text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-primary/20 transition-all">{t('Toevoegen')}</button>
               </div>
             </form>
       </Modal>
