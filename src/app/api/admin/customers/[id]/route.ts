@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sql, getCaravansByCustomer, getContractsByCustomer, getInvoicesByCustomer } from '@/lib/db';
+import { sql, getCaravansByCustomer, getContractsByCustomer, getInvoicesByCustomer, logActivity, getAdminInfo } from '@/lib/db';
 import { validateBody, customerSchema } from '@/lib/validations';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -36,6 +36,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!validated.success) return NextResponse.json({ error: validated.error }, { status: 400 });
     const data = validated.data;
     await sql`UPDATE customers SET first_name = ${data.first_name}, last_name = ${data.last_name}, email = ${data.email}, phone = ${data.phone || null}, address = ${data.address || null}, city = ${data.city || null}, postal_code = ${data.postal_code || null}, country = ${data.country || 'NL'}, company_name = ${data.company_name || null}, notes = ${data.notes || null}, updated_at = NOW() WHERE id = ${id}`;
+    const admin = getAdminInfo(req);
+    await logActivity({ actor: admin.name, role: admin.role, action: 'Klant bijgewerkt', entityType: 'customer', entityId: id, entityLabel: `${data.first_name} ${data.last_name}` });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Customer PUT error:', error);
@@ -43,10 +45,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
+    const existing = await sql`SELECT first_name, last_name FROM customers WHERE id = ${id}`;
     await sql`DELETE FROM customers WHERE id = ${id}`;
+    const admin = getAdminInfo(req);
+    await logActivity({ actor: admin.name, role: admin.role, action: 'Klant verwijderd', entityType: 'customer', entityId: id, entityLabel: existing[0] ? `${existing[0].first_name} ${existing[0].last_name}` : id });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Customer DELETE error:', error);

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sql } from '@/lib/db';
+import { sql, logActivity, getAdminInfo } from '@/lib/db';
 
 export async function GET(
   request: NextRequest,
@@ -39,6 +39,8 @@ export async function PUT(
       WHERE id = ${Number(id)}
     `;
 
+    const admin = getAdminInfo(request);
+    await logActivity({ actor: admin.name, role: admin.role, action: 'Pakket bijgewerkt', entityType: 'package', entityId: id, entityLabel: name || `Pakket #${id}` });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Package PUT error:', error);
@@ -52,7 +54,10 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
+    const existing = await sql`SELECT name FROM service_packages WHERE id = ${Number(id)}`;
     await sql`DELETE FROM service_packages WHERE id = ${Number(id)}`;
+    const admin = getAdminInfo(request);
+    await logActivity({ actor: admin.name, role: admin.role, action: 'Pakket verwijderd', entityType: 'package', entityId: id, entityLabel: existing[0]?.name || `#${id}` });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Package DELETE error:', error);

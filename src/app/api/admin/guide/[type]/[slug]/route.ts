@@ -6,7 +6,7 @@ import {
   getGuideAttractionBySlug, updateGuideAttraction, deleteGuideAttraction,
   getGuideRestaurantBySlug, updateGuideRestaurant, deleteGuideRestaurant,
   getGuideBlogPostBySlug, updateGuideBlogPost, deleteGuideBlogPost,
-  getGuideImages,
+  getGuideImages, logActivity, getAdminInfo,
 } from '@/lib/db';
 import { validateBody, guideCampingSchema, guidePlaceSchema, guideBeachSchema, guideAttractionSchema, guideRestaurantSchema, guideBlogPostSchema } from '@/lib/validations';
 
@@ -48,6 +48,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ type
     const validated = validateBody(config.schema as Parameters<typeof validateBody>[0], body);
     if (!validated.success) return NextResponse.json({ error: validated.error }, { status: 400 });
     const updated = await config.update(existing.id, { ...(validated.data as Record<string, unknown>), published_at: existing.published_at });
+    const admin = getAdminInfo(req);
+    await logActivity({ actor: admin.name, role: admin.role, action: `Gids ${type} bijgewerkt`, entityType: `guide_${type}`, entityId: String(existing.id), entityLabel: existing.name || existing.title || slug });
     return NextResponse.json({ item: updated });
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : '';
@@ -59,7 +61,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ type
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ type: string; slug: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ type: string; slug: string }> }) {
   try {
     const { type, slug } = await params;
     if (!(type in typeConfig)) return NextResponse.json({ error: 'Ongeldig type' }, { status: 400 });
@@ -67,6 +69,8 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     const existing = await config.getBySlug(slug);
     if (!existing) return NextResponse.json({ error: 'Niet gevonden' }, { status: 404 });
     await config.delete(existing.id);
+    const admin = getAdminInfo(req);
+    await logActivity({ actor: admin.name, role: admin.role, action: `Gids ${type} verwijderd`, entityType: `guide_${type}`, entityId: String(existing.id), entityLabel: existing.name || existing.title || slug });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Guide DELETE error:', error);

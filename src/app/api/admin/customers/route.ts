@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllCustomers, createCustomer, sql } from '@/lib/db';
+import { getAllCustomers, createCustomer, sql, logActivity, getAdminInfo } from '@/lib/db';
 import { validateBody, customerSchema } from '@/lib/validations';
 
 export async function GET(req: NextRequest) {
@@ -22,6 +22,8 @@ export async function POST(req: NextRequest) {
     const validated = validateBody(customerSchema, body);
     if (!validated.success) return NextResponse.json({ error: validated.error }, { status: 400 });
     const customer = await createCustomer(validated.data);
+    const admin = getAdminInfo(req);
+    await logActivity({ actor: admin.name, role: admin.role, action: 'Klant aangemaakt', entityType: 'customer', entityId: String(customer.id), entityLabel: `${validated.data.first_name} ${validated.data.last_name}` });
     return NextResponse.json({ customer }, { status: 201 });
   } catch (error) {
     console.error('Customer POST error:', error);

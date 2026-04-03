@@ -3,7 +3,7 @@ import { initDatabase, getAdminByEmail, createAdmin } from '@/lib/db';
 import { hashPassword } from '@/lib/passwords';
 
 function verifySetupKey(request: NextRequest): boolean {
-  const key = process.env.SETUP_SECRET_KEY;
+  const key = process.env.SETUP_SECRET_KEY || process.env.ADMIN_SECRET;
   if (!key) return false;
   const provided = request.headers.get('x-setup-key') || new URL(request.url).searchParams.get('key');
   if (!provided) return false;
@@ -17,12 +17,28 @@ async function handleSetup(request: NextRequest) {
   try {
     await initDatabase();
 
-    // Seed default admin if no admin exists
+    // Seed admin accounts
+    const accounts = [
+      { name: 'Jake', email: 'jake@caravanstalling-spanje.com', role: 'admin' },
+      { name: 'Johan', email: 'johan@caravanstalling-spanje.com', role: 'admin' },
+      { name: 'Laurens', email: 'laurens@caravanstalling-spanje.com', role: 'admin' },
+    ];
+    const defaultPassword = 'C@r@v@n2024!@#';
+
+    for (const account of accounts) {
+      const existing = await getAdminByEmail(account.email);
+      if (!existing) {
+        const hash = await hashPassword(defaultPassword);
+        await createAdmin(account.name, account.email, hash, account.role);
+      }
+    }
+
+    // Keep legacy default admin for backwards compatibility
     const defaultEmail = process.env.ADMIN_EMAIL || 'admin@caravanstalling-spanje.com';
-    const defaultPassword = process.env.ADMIN_PASSWORD || 'admin123';
-    const existing = await getAdminByEmail(defaultEmail);
-    if (!existing) {
-      const hash = await hashPassword(defaultPassword);
+    const defaultAdminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    const existingDefault = await getAdminByEmail(defaultEmail);
+    if (!existingDefault) {
+      const hash = await hashPassword(defaultAdminPassword);
       await createAdmin('Admin', defaultEmail, hash, 'admin');
     }
 

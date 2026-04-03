@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sql } from '@/lib/db';
+import { sql, logActivity, getAdminInfo } from '@/lib/db';
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -10,6 +10,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     } else {
       await sql`UPDATE invoices SET status = ${status}, updated_at = NOW() WHERE id = ${id}`;
     }
+    const admin = getAdminInfo(req);
+    const inv = await sql`SELECT invoice_number FROM invoices WHERE id = ${id}`;
+    await logActivity({ actor: admin.name, role: admin.role, action: `Factuurstatus → ${status}`, entityType: 'invoice', entityId: id, entityLabel: inv[0]?.invoice_number || `#${id}` });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Invoice status error:', error);

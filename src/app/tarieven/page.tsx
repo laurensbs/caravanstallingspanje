@@ -19,7 +19,7 @@ const plans = [
     period: '/maand',
     desc: 'Onze populairste optie. Veilige buitenstalling op ons beveiligde terrein met Securitas Direct alarm. Ideaal voor de meeste caravans en campers — het milde Spaanse klimaat beschermt tegen vorst en strooizout.',
     features: ['Eigen vaste plek met pleknummer', '24/7 camerabewaking', 'Securitas Direct alarm', 'Standaard verzekerd tegen schade & diefstal', 'Tweewekelijkse controle op weerschade', 'Jaarlijkse technische keuring'],
-    popular: false,
+    popular: true,
     color: 'bg-accent/10 text-accent',
     cta: 'Stalling aanvragen',
   },

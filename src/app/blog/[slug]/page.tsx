@@ -94,7 +94,7 @@ export default function BlogPostPage() {
               <span className="flex items-center gap-1.5 text-white/60 text-xs"><Calendar size={11} /> {new Date(post.date).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
               <span className="flex items-center gap-1.5 text-white/60 text-xs"><Clock size={11} /> {post.readTime} leestijd</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.1] mb-4 text-white">{post.title}</h1>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.1] mb-4">{post.title}</h1>
             <p className="text-white/70 text-base sm:text-lg leading-relaxed max-w-3xl">{post.excerpt}</p>
           </motion.div>
         </div>

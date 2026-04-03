@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sql } from '@/lib/db';
+import { sql, logActivity, getAdminInfo } from '@/lib/db';
 
 export async function GET() {
   try {
@@ -26,6 +26,8 @@ export async function PUT(req: NextRequest) {
     for (const [key, value] of Object.entries(settings)) {
       await sql`INSERT INTO app_settings (key, value, updated_at) VALUES (${key}, ${JSON.stringify(value)}, NOW()) ON CONFLICT (key) DO UPDATE SET value = ${JSON.stringify(value)}, updated_at = NOW()`;
     }
+    const admin = getAdminInfo(req);
+    await logActivity({ actor: admin.name, role: admin.role, action: 'Instellingen bijgewerkt', entityType: 'settings', entityLabel: Object.keys(settings).join(', ') });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Settings PUT error:', error);

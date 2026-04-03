@@ -7,7 +7,7 @@ import {
 } from '@/lib/db';
 
 function verifySetupKey(request: NextRequest): boolean {
-  const key = process.env.SETUP_SECRET_KEY;
+  const key = process.env.SETUP_SECRET_KEY || process.env.ADMIN_SECRET;
   if (!key) return false;
   const provided = request.headers.get('x-setup-key') || new URL(request.url).searchParams.get('key');
   if (!provided) return false;

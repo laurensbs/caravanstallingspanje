@@ -1,14 +1,14 @@
 import { SignJWT, jwtVerify } from 'jose';
 
-function requireEnv(name: string): Uint8Array {
-  const val = process.env[name];
+function requireEnv(name: string, ...fallbacks: string[]): Uint8Array {
+  const val = process.env[name] || fallbacks.map(f => process.env[f]).find(Boolean);
   if (!val) throw new Error(`Missing required environment variable: ${name}`);
   return new TextEncoder().encode(val);
 }
 
-const ADMIN_SECRET = requireEnv('ADMIN_JWT_SECRET');
-const STAFF_SECRET = requireEnv('STAFF_JWT_SECRET');
-const CUSTOMER_SECRET = requireEnv('CUSTOMER_JWT_SECRET');
+const ADMIN_SECRET = requireEnv('ADMIN_JWT_SECRET', 'ADMIN_SECRET');
+const STAFF_SECRET = requireEnv('STAFF_JWT_SECRET', 'ADMIN_SECRET');
+const CUSTOMER_SECRET = requireEnv('CUSTOMER_JWT_SECRET', 'ADMIN_SECRET');
 
 // ── Admin auth ──
 

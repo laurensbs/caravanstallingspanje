@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminToken } from '@/lib/auth';
 import { verifyPassword } from '@/lib/passwords';
-import { getAdminByEmail, recordLoginSuccess, recordLoginFailure, isAccountLocked } from '@/lib/db';
+import { getAdminByEmail, recordLoginSuccess, recordLoginFailure, isAccountLocked, logActivity } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
     }
 
     await recordLoginSuccess('admin_users', admin.id);
+    await logActivity({ actor: admin.name, role: admin.role, action: 'Ingelogd', entityType: 'auth', entityLabel: admin.email });
 
     const token = await createAdminToken({ id: admin.id, name: admin.name, email: admin.email, role: admin.role });
 

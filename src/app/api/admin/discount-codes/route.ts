@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAllDiscountCodes, createDiscountCode } from '@/lib/db';
+import { getAllDiscountCodes, createDiscountCode, logActivity, getAdminInfo } from '@/lib/db';
 
 export async function GET(request: Request) {
   try {
@@ -21,6 +21,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Code, type en waarde zijn verplicht' }, { status: 400 });
     }
     const code = await createDiscountCode(body);
+    const admin = getAdminInfo(request);
+    await logActivity({ actor: admin.name, role: admin.role, action: 'Kortingscode aangemaakt', entityType: 'discount_code', entityId: String(code.id), entityLabel: body.code });
     return NextResponse.json({ code }, { status: 201 });
   } catch (error) {
     console.error('Create discount code error:', error);

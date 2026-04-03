@@ -793,12 +793,24 @@ export async function getContactMessages() {
 }
 
 // Activity Log
+export function getAdminInfo(req: { headers: { get(name: string): string | null } }) {
+  return {
+    id: Number(req.headers.get('x-admin-id')) || 0,
+    name: req.headers.get('x-admin-name') || 'Onbekend',
+    role: req.headers.get('x-admin-role') || 'admin',
+  };
+}
+
 export async function logActivity(data: { actor?: string; role?: string; action: string; entityType?: string; entityId?: string; entityLabel?: string; details?: string }) {
   await sql`INSERT INTO activity_log (actor, role, action, entity_type, entity_id, entity_label, details) VALUES (${data.actor || null}, ${data.role || null}, ${data.action}, ${data.entityType || null}, ${data.entityId || null}, ${data.entityLabel || null}, ${data.details || null})`.catch(() => {});
 }
 
 export async function getRecentActivity(limit = 30) {
   return sql`SELECT * FROM activity_log ORDER BY created_at DESC LIMIT ${limit}`;
+}
+
+export async function getEntityActivity(entityType: string, entityId: string, limit = 50) {
+  return sql`SELECT * FROM activity_log WHERE entity_type = ${entityType} AND entity_id = ${entityId} ORDER BY created_at DESC LIMIT ${limit}`;
 }
 
 // ─── Guide Hub: Campings ───

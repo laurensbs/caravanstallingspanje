@@ -37,7 +37,7 @@ export default function BrandSlider() {
                 <img
                   src={brand.logo}
                   alt={brand.name}
-                  className={`${brand.h} w-auto object-contain opacity-70 transition-opacity`}
+                  className={`${brand.h} w-auto object-contain opacity-70 hover:opacity-100 transition-opacity`}
                   loading="lazy"
                 />
               </div>

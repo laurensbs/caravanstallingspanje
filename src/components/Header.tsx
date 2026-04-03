@@ -297,7 +297,7 @@ export default function Header() {
           </motion.div>
         )}
       </AnimatePresence>
-      <QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} source="header" />
+      <QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} source="header" initialInterest="stalling" />
     </>
   );
 }

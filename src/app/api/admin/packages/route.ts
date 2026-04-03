@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sql } from '@/lib/db';
+import { sql, logActivity, getAdminInfo } from '@/lib/db';
 
 // Service packages — admin configurable, customer-visible
 
@@ -63,6 +63,8 @@ export async function POST(request: NextRequest) {
       RETURNING *
     `;
 
+    const admin = getAdminInfo(request);
+    await logActivity({ actor: admin.name, role: admin.role, action: 'Pakket aangemaakt', entityType: 'package', entityId: String(pkg[0].id), entityLabel: name });
     return NextResponse.json({ package: pkg[0] }, { status: 201 });
   } catch (error) {
     console.error('Packages POST error:', error);

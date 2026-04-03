@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { neon } from '@neondatabase/serverless';
-import { createInvoice } from '@/lib/db';
+import { createInvoice, logActivity, getAdminInfo } from '@/lib/db';
 import { validateBody, invoiceSchema } from '@/lib/validations';
 
 export async function GET(req: NextRequest) {
@@ -51,6 +51,8 @@ export async function POST(req: NextRequest) {
     const validated = validateBody(invoiceSchema, body);
     if (!validated.success) return NextResponse.json({ error: validated.error }, { status: 400 });
     const invoice = await createInvoice(validated.data);
+    const admin = getAdminInfo(req);
+    await logActivity({ actor: admin.name, role: admin.role, action: 'Factuur aangemaakt', entityType: 'invoice', entityId: String(invoice.id || invoice.invoice_number), entityLabel: invoice.invoice_number });
     return NextResponse.json({ invoice }, { status: 201 });
   } catch (error) {
     console.error('Invoice POST error:', error);

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { neon } from '@neondatabase/serverless';
-import { createContract } from '@/lib/db';
+import { createContract, logActivity, getAdminInfo } from '@/lib/db';
 import { validateBody, contractSchema } from '@/lib/validations';
 
 export async function GET(req: NextRequest) {
@@ -47,6 +47,8 @@ export async function POST(req: NextRequest) {
     const validated = validateBody(contractSchema, body);
     if (!validated.success) return NextResponse.json({ error: validated.error }, { status: 400 });
     const contract = await createContract(validated.data);
+    const admin = getAdminInfo(req);
+    await logActivity({ actor: admin.name, role: admin.role, action: 'Contract aangemaakt', entityType: 'contract', entityId: String(contract.id || contract.contract_number), entityLabel: contract.contract_number });
     return NextResponse.json({ contract }, { status: 201 });
   } catch (error) {
     console.error('Contract POST error:', error);

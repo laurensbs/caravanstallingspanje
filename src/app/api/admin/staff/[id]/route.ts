@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sql } from '@/lib/db';
+import { sql, logActivity, getAdminInfo } from '@/lib/db';
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -8,6 +8,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (data.is_active !== undefined) {
       await sql`UPDATE staff SET is_active = ${data.is_active}, updated_at = NOW() WHERE id = ${id}`;
     }
+    const admin = getAdminInfo(req);
+    const staff = await sql`SELECT first_name, last_name FROM staff WHERE id = ${id}`;
+    await logActivity({ actor: admin.name, role: admin.role, action: data.is_active ? 'Medewerker geactiveerd' : 'Medewerker gedeactiveerd', entityType: 'staff', entityId: id, entityLabel: staff[0] ? `${staff[0].first_name} ${staff[0].last_name}` : `#${id}` });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Staff PATCH error:', error);

@@ -8,7 +8,7 @@
   --color-accent: #1B4D3E;
   --color-accent-light: #2A7D62;
   --color-accent-dark: #143D30;
-  --color-surface: #FFFFFF;
+  --color-surface: #FAFAF8;
   --color-surface-dark: #1A1A1A;
   --color-sand: #F5F3EF;
   --color-sand-dark: #E5E5E5;
@@ -217,7 +217,7 @@
   }
 
   .gradient-text {
-    color: white;
+    color: var(--color-primary);
   }
 
   /* ── Section divider — simple line ── */
@@ -319,7 +319,7 @@
   .input-modern {
     width: 100%;
     padding: 0.75rem 1rem;
-    background: #FFFFFF;
+    background: #FAFAF8;
     border: 1.5px solid #E5E5E5;
     border-radius: var(--radius-md);
     font-size: 0.875rem;

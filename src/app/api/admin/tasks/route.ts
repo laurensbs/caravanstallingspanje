@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sql } from '@/lib/db';
+import { sql, logActivity, getAdminInfo } from '@/lib/db';
 import { validateBody, taskSchema } from '@/lib/validations';
 
 export async function GET(req: NextRequest) {
@@ -31,6 +31,8 @@ export async function POST(req: NextRequest) {
     if (!validated.success) return NextResponse.json({ error: validated.error }, { status: 400 });
     const data = validated.data;
     const result = await sql`INSERT INTO tasks (title, description, priority, assigned_to, location_id, due_date) VALUES (${data.title}, ${data.description || null}, ${data.priority || 'normaal'}, ${data.assigned_to || null}, ${data.location_id || null}, ${data.due_date || null}) RETURNING *`;
+    const admin = getAdminInfo(req);
+    await logActivity({ actor: admin.name, role: admin.role, action: 'Taak aangemaakt', entityType: 'task', entityId: String(result[0].id), entityLabel: data.title });
     return NextResponse.json({ task: result[0] }, { status: 201 });
   } catch (error) {
     console.error('Task POST error:', error);

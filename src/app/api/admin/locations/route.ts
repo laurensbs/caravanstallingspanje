@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllLocations, sql } from '@/lib/db';
+import { getAllLocations, sql, logActivity, getAdminInfo } from '@/lib/db';
 
 export async function GET() {
   try {
@@ -15,6 +15,8 @@ export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
     const result = await sql`INSERT INTO locations (name, address, city, postal_code, country, phone, email, capacity_inside, capacity_outside, is_active) VALUES (${data.name}, ${data.address || null}, ${data.city || null}, ${data.postal_code || null}, ${data.country || 'ES'}, ${data.phone || null}, ${data.email || null}, ${data.capacity_inside || 0}, ${data.capacity_outside || 0}, ${data.is_active !== false}) RETURNING *`;
+    const admin = getAdminInfo(req);
+    await logActivity({ actor: admin.name, role: admin.role, action: 'Locatie aangemaakt', entityType: 'location', entityId: String(result[0].id), entityLabel: data.name });
     return NextResponse.json({ location: result[0] }, { status: 201 });
   } catch (error) {
     console.error('Location POST error:', error);

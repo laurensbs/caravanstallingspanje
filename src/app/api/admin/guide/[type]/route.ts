@@ -3,6 +3,7 @@ import {
   getGuideCampings, createGuideCamping, getGuidePlaces, createGuidePlace,
   getGuideBeaches, createGuideBeach, getGuideAttractions, createGuideAttraction,
   getGuideRestaurants, createGuideRestaurant, getGuideBlogPosts, createGuideBlogPost,
+  logActivity, getAdminInfo,
 } from '@/lib/db';
 import { validateBody, guideCampingSchema, guidePlaceSchema, guideBeachSchema, guideAttractionSchema, guideRestaurantSchema, guideBlogPostSchema } from '@/lib/validations';
 
@@ -64,6 +65,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ typ
     const validated = validateBody(config.schema as Parameters<typeof validateBody>[0], body);
     if (!validated.success) return NextResponse.json({ error: validated.error }, { status: 400 });
     const item = await config.create(validated.data as Record<string, unknown>);
+    const admin = getAdminInfo(req);
+    await logActivity({ actor: admin.name, role: admin.role, action: `Gids ${type} aangemaakt`, entityType: `guide_${type}`, entityId: String(item.id || item.slug), entityLabel: item.name || item.title || item.slug });
     return NextResponse.json({ item }, { status: 201 });
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : '';

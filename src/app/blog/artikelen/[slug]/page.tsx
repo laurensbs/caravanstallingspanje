@@ -108,7 +108,7 @@ export default function ArtikelDetailPage() {
                 </span>
               )}
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.1] mb-4 text-white">{title}</h1>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.1] mb-4">{title}</h1>
             {excerpt && <p className="text-white/70 text-base sm:text-lg leading-relaxed max-w-3xl">{excerpt}</p>}
           </motion.div>
         </div>
