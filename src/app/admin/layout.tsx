@@ -13,7 +13,7 @@ import {
   ChevronRight, GripVertical, Hammer, ChevronsLeft, ChevronsRight, Globe,
 } from 'lucide-react';
 
-type NavItem = { href: string; icon: typeof LayoutDashboard; label: string; roles: string[] };
+type NavItem = { href: string; icon: typeof LayoutDashboard; label: string; roles: string[]; users?: string[] };
 type NavSection = { id: string; label: string; items: NavItem[] };
 
 const NAV_SECTIONS: NavSection[] = [
@@ -39,12 +39,12 @@ const NAV_SECTIONS: NavSection[] = [
     { href: '/admin/planning', icon: CalendarDays, label: 'Planning', roles: ['admin', 'staff'] },
   ]},
   { id: 'websitebeheer', label: 'Websitebeheer', items: [
-    { href: '/admin/gids/campings', icon: Tent, label: 'Campings', roles: ['admin'] },
-    { href: '/admin/gids/plaatsen', icon: MapIcon, label: 'Plaatsen', roles: ['admin'] },
-    { href: '/admin/gids/stranden', icon: Palmtree, label: 'Stranden', roles: ['admin'] },
-    { href: '/admin/gids/bezienswaardigheden', icon: Mountain, label: 'Bezienswaardigheden', roles: ['admin'] },
-    { href: '/admin/gids/restaurants', icon: UtensilsCrossed, label: 'Restaurants', roles: ['admin'] },
-    { href: '/admin/gids/blog', icon: BookOpen, label: 'Blog Artikelen', roles: ['admin'] },
+    { href: '/admin/gids/campings', icon: Tent, label: 'Campings', roles: ['admin'], users: ['Laurens'] },
+    { href: '/admin/gids/plaatsen', icon: MapIcon, label: 'Plaatsen', roles: ['admin'], users: ['Laurens'] },
+    { href: '/admin/gids/stranden', icon: Palmtree, label: 'Stranden', roles: ['admin'], users: ['Laurens'] },
+    { href: '/admin/gids/bezienswaardigheden', icon: Mountain, label: 'Bezienswaardigheden', roles: ['admin'], users: ['Laurens'] },
+    { href: '/admin/gids/restaurants', icon: UtensilsCrossed, label: 'Restaurants', roles: ['admin'], users: ['Laurens'] },
+    { href: '/admin/gids/blog', icon: BookOpen, label: 'Blog Artikelen', roles: ['admin'], users: ['Laurens'] },
   ]},
   { id: 'overig', label: 'Overig', items: [
     { href: '/admin/berichten', icon: MessageSquare, label: 'Berichten', roles: ['admin', 'staff'] },
@@ -150,12 +150,12 @@ function AdminLayoutContent({ children }: { children: ReactNode }) {
 
   const orderedSections = useMemo(() => {
     const filtered = NAV_SECTIONS
-      .map(s => ({ ...s, items: s.items.filter(i => i.roles.includes(role)) }))
+      .map(s => ({ ...s, items: s.items.filter(i => i.roles.includes(role) && (!i.users || i.users.includes(userName))) }))
       .filter(s => s.items.length > 0);
     if (sectionOrder.length === 0) return filtered;
     const orderMap = new Map(sectionOrder.map((id, i) => [id, i]));
     return [...filtered].sort((a, b) => (orderMap.get(a.id) ?? 999) - (orderMap.get(b.id) ?? 999));
-  }, [role, sectionOrder]);
+  }, [role, userName, sectionOrder]);
 
   const handleSectionDragStart = useCallback((e: React.DragEvent, sectionId: string) => {
     setDragSection(sectionId);
