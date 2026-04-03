@@ -95,7 +95,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     const savedRole = localStorage.getItem('admin_panel_role') as 'admin' | 'staff' | null;
     if (savedRole === 'admin' || savedRole === 'staff') setSelectedRole(savedRole);
     const savedEmail = localStorage.getItem('admin_saved_email');
+    const savedPw = localStorage.getItem('admin_saved_pw');
     if (savedEmail) { setLoginEmail(savedEmail); setRememberEmail(true); }
+    if (savedPw) setPassword(savedPw);
     checkAuth();
   }, [checkAuth]);
 
@@ -227,8 +229,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         localStorage.setItem('admin_panel_role', selectedRole);
         if (rememberEmail) {
           localStorage.setItem('admin_saved_email', loginEmail);
+          localStorage.setItem('admin_saved_pw', password);
         } else {
           localStorage.removeItem('admin_saved_email');
+          localStorage.removeItem('admin_saved_pw');
         }
       } else {
         setLoginError(data.error || 'Inloggen mislukt');
@@ -343,11 +347,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                   checked={rememberEmail}
                   onChange={e => {
                     setRememberEmail(e.target.checked);
-                    if (!e.target.checked) localStorage.removeItem('admin_saved_email');
+                    if (!e.target.checked) { localStorage.removeItem('admin_saved_email'); localStorage.removeItem('admin_saved_pw'); }
                   }}
                   className="w-4 h-4 rounded border-white/20 bg-surface/[0.04] text-primary focus:ring-primary/30 accent-primary"
                 />
-                <span className="text-white/50 text-xs font-medium">Onthoud mijn e-mailadres</span>
+                <span className="text-white/50 text-xs font-medium">Onthoud mijn gegevens</span>
               </label>
 
               {/* Error */}
