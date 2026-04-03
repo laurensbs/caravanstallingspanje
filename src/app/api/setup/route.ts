@@ -11,7 +11,9 @@ function verifySetupKey(request: NextRequest): boolean {
 }
 
 async function handleSetup(request: NextRequest) {
-  if (!verifySetupKey(request)) {
+  // Allow setup without key if no key is configured (first-time setup)
+  const hasKey = !!(process.env.SETUP_SECRET_KEY || process.env.ADMIN_SECRET);
+  if (hasKey && !verifySetupKey(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   try {
