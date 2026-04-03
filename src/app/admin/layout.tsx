@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, ReactNode } from 'react';
+import { useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useVisibleInterval } from '@/hooks/useVisibleInterval';
@@ -8,36 +8,50 @@ import {
   LayoutDashboard, Users, Caravan, MapPin, FileText, Receipt, UserCog,
   ClipboardList, Truck, Settings, LogOut, Menu, X, Bell, Search, ChevronDown,
   Wrench, MessageSquare, Shield, Eye, EyeOff, Lock, User, ArrowRight, AlertCircle,
-  BarChart3, CalendarDays, Package, Target, Map, Palmtree, Mountain, UtensilsCrossed, BookOpen, Tent, Star, Tag,
+  BarChart3, CalendarDays, Package, Target, Map as MapIcon, Palmtree, Mountain, UtensilsCrossed, BookOpen, Tent, Star, Tag,
+  ChevronRight, GripVertical,
 } from 'lucide-react';
 
-type NavItem = { href: string; icon: typeof LayoutDashboard; label: string; section: string; roles: string[] };
+type NavItem = { href: string; icon: typeof LayoutDashboard; label: string; roles: string[] };
+type NavSection = { id: string; label: string; items: NavItem[] };
 
-const NAV: NavItem[] = [
-  { href: '/admin', icon: LayoutDashboard, label: 'Dashboard', section: '', roles: ['admin', 'staff'] },
-  { href: '/admin/leads', icon: Target, label: 'Leads', section: 'Beheer', roles: ['admin'] },
-  { href: '/admin/klanten', icon: Users, label: 'Klanten', section: '', roles: ['admin'] },
-  { href: '/admin/caravans', icon: Caravan, label: 'Caravans', section: '', roles: ['admin'] },
-  { href: '/admin/locaties', icon: MapPin, label: 'Locaties & Plekken', section: '', roles: ['admin'] },
-  { href: '/admin/contracten', icon: FileText, label: 'Contracten', section: 'Financieel', roles: ['admin'] },
-  { href: '/admin/facturen', icon: Receipt, label: 'Facturen', section: '', roles: ['admin'] },
-  { href: '/admin/rapportages', icon: BarChart3, label: 'Rapportages', section: '', roles: ['admin'] },
-  { href: '/admin/transport', icon: Truck, label: 'Transport', section: 'Operationeel', roles: ['admin', 'staff'] },
-  { href: '/admin/taken', icon: ClipboardList, label: 'Taken', section: '', roles: ['admin', 'staff'] },
-  { href: '/admin/diensten', icon: Wrench, label: 'Service aanvragen', section: '', roles: ['admin', 'staff'] },
-  { href: '/admin/pakketten', icon: Package, label: 'Pakketten & Diensten', section: '', roles: ['admin'] },
-  { href: '/admin/planning', icon: CalendarDays, label: 'Planning', section: '', roles: ['admin', 'staff'] },
-  { href: '/admin/gids/campings', icon: Tent, label: 'Campings', section: 'Gids', roles: ['admin'] },
-  { href: '/admin/gids/plaatsen', icon: Map, label: 'Plaatsen', section: '', roles: ['admin'] },
-  { href: '/admin/gids/stranden', icon: Palmtree, label: 'Stranden', section: '', roles: ['admin'] },
-  { href: '/admin/gids/bezienswaardigheden', icon: Mountain, label: 'Bezienswaardigheden', section: '', roles: ['admin'] },
-  { href: '/admin/gids/restaurants', icon: UtensilsCrossed, label: 'Restaurants', section: '', roles: ['admin'] },
-  { href: '/admin/gids/blog', icon: BookOpen, label: 'Blog Artikelen', section: '', roles: ['admin'] },
-  { href: '/admin/berichten', icon: MessageSquare, label: 'Berichten', section: 'Overig', roles: ['admin', 'staff'] },
-  { href: '/admin/reviews', icon: Star, label: 'Reviews', section: '', roles: ['admin'] },
-  { href: '/admin/kortingscodes', icon: Tag, label: 'Kortingscodes', section: '', roles: ['admin'] },
-  { href: '/admin/medewerkers', icon: UserCog, label: 'Medewerkers', section: '', roles: ['admin'] },
-  { href: '/admin/instellingen', icon: Settings, label: 'Instellingen', section: '', roles: ['admin'] },
+const NAV_SECTIONS: NavSection[] = [
+  { id: 'dashboard', label: '', items: [
+    { href: '/admin', icon: LayoutDashboard, label: 'Dashboard', roles: ['admin', 'staff'] },
+  ]},
+  { id: 'beheer', label: 'Beheer', items: [
+    { href: '/admin/leads', icon: Target, label: 'Leads', roles: ['admin'] },
+    { href: '/admin/klanten', icon: Users, label: 'Klanten', roles: ['admin'] },
+    { href: '/admin/caravans', icon: Caravan, label: 'Caravans', roles: ['admin'] },
+    { href: '/admin/locaties', icon: MapPin, label: 'Locaties & Plekken', roles: ['admin'] },
+  ]},
+  { id: 'financieel', label: 'Financieel', items: [
+    { href: '/admin/contracten', icon: FileText, label: 'Contracten', roles: ['admin'] },
+    { href: '/admin/facturen', icon: Receipt, label: 'Facturen', roles: ['admin'] },
+    { href: '/admin/rapportages', icon: BarChart3, label: 'Rapportages', roles: ['admin'] },
+  ]},
+  { id: 'operationeel', label: 'Operationeel', items: [
+    { href: '/admin/transport', icon: Truck, label: 'Transport', roles: ['admin', 'staff'] },
+    { href: '/admin/taken', icon: ClipboardList, label: 'Taken', roles: ['admin', 'staff'] },
+    { href: '/admin/diensten', icon: Wrench, label: 'Service aanvragen', roles: ['admin', 'staff'] },
+    { href: '/admin/pakketten', icon: Package, label: 'Pakketten & Diensten', roles: ['admin'] },
+    { href: '/admin/planning', icon: CalendarDays, label: 'Planning', roles: ['admin', 'staff'] },
+  ]},
+  { id: 'gids', label: 'Gids', items: [
+    { href: '/admin/gids/campings', icon: Tent, label: 'Campings', roles: ['admin'] },
+    { href: '/admin/gids/plaatsen', icon: MapIcon, label: 'Plaatsen', roles: ['admin'] },
+    { href: '/admin/gids/stranden', icon: Palmtree, label: 'Stranden', roles: ['admin'] },
+    { href: '/admin/gids/bezienswaardigheden', icon: Mountain, label: 'Bezienswaardigheden', roles: ['admin'] },
+    { href: '/admin/gids/restaurants', icon: UtensilsCrossed, label: 'Restaurants', roles: ['admin'] },
+    { href: '/admin/gids/blog', icon: BookOpen, label: 'Blog Artikelen', roles: ['admin'] },
+  ]},
+  { id: 'overig', label: 'Overig', items: [
+    { href: '/admin/berichten', icon: MessageSquare, label: 'Berichten', roles: ['admin', 'staff'] },
+    { href: '/admin/reviews', icon: Star, label: 'Reviews', roles: ['admin'] },
+    { href: '/admin/kortingscodes', icon: Tag, label: 'Kortingscodes', roles: ['admin'] },
+    { href: '/admin/medewerkers', icon: UserCog, label: 'Medewerkers', roles: ['admin'] },
+    { href: '/admin/instellingen', icon: Settings, label: 'Instellingen', roles: ['admin'] },
+  ]},
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
@@ -66,6 +80,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const [showSearch, setShowSearch] = useState(false);
   const [searching, setSearching] = useState(false);
 
+  // Sidebar preferences per account
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+  const [sectionOrder, setSectionOrder] = useState<string[]>([]);
+  const [dragSection, setDragSection] = useState<string | null>(null);
+
   const checkAuth = useCallback(() => {
     fetch('/api/admin/auth/me', { credentials: 'include' })
       .then(r => r.ok ? r.json() : Promise.reject())
@@ -80,6 +99,64 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     if (savedEmail) { setLoginEmail(savedEmail); setRememberEmail(true); }
     checkAuth();
   }, [checkAuth]);
+
+  // Load sidebar prefs when user is authenticated
+  useEffect(() => {
+    if (!userName) return;
+    try {
+      const raw = localStorage.getItem(`sidebar_prefs_${userName}`);
+      if (raw) {
+        const prefs = JSON.parse(raw);
+        if (prefs.collapsed) setCollapsedSections(prefs.collapsed);
+        if (prefs.order) setSectionOrder(prefs.order);
+      }
+    } catch { /* ignore corrupt data */ }
+  }, [userName]);
+
+  const saveSidebarPrefs = useCallback((collapsed: Record<string, boolean>, order: string[]) => {
+    if (!userName) return;
+    localStorage.setItem(`sidebar_prefs_${userName}`, JSON.stringify({ collapsed, order }));
+  }, [userName]);
+
+  const toggleSection = useCallback((sectionId: string) => {
+    setCollapsedSections(prev => {
+      const next = { ...prev, [sectionId]: !prev[sectionId] };
+      saveSidebarPrefs(next, sectionOrder);
+      return next;
+    });
+  }, [saveSidebarPrefs, sectionOrder]);
+
+  const orderedSections = useMemo(() => {
+    const filtered = NAV_SECTIONS
+      .map(s => ({ ...s, items: s.items.filter(i => i.roles.includes(role)) }))
+      .filter(s => s.items.length > 0);
+    if (sectionOrder.length === 0) return filtered;
+    const orderMap = new Map(sectionOrder.map((id, i) => [id, i]));
+    return [...filtered].sort((a, b) => (orderMap.get(a.id) ?? 999) - (orderMap.get(b.id) ?? 999));
+  }, [role, sectionOrder]);
+
+  const handleSectionDragStart = useCallback((e: React.DragEvent, sectionId: string) => {
+    setDragSection(sectionId);
+    e.dataTransfer.effectAllowed = 'move';
+  }, []);
+
+  const handleSectionDragEnd = useCallback(() => {
+    setDragSection(null);
+  }, []);
+
+  const handleSectionDrop = useCallback((targetSectionId: string) => {
+    if (!dragSection || dragSection === targetSectionId) { setDragSection(null); return; }
+    const currentOrder = orderedSections.map(s => s.id);
+    const fromIdx = currentOrder.indexOf(dragSection);
+    const toIdx = currentOrder.indexOf(targetSectionId);
+    if (fromIdx === -1 || toIdx === -1) { setDragSection(null); return; }
+    const newOrder = [...currentOrder];
+    newOrder.splice(fromIdx, 1);
+    newOrder.splice(toIdx, 0, dragSection);
+    setSectionOrder(newOrder);
+    saveSidebarPrefs(collapsedSections, newOrder);
+    setDragSection(null);
+  }, [dragSection, orderedSections, saveSidebarPrefs, collapsedSections]);
 
   // Load notifications
   const loadNotifs = useCallback(() => {
@@ -308,14 +385,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  const filteredNav = NAV.filter(n => n.roles.includes(role));
-  let lastSection = '';
-
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-40 w-[270px] bg-surface-dark transform transition-transform md:relative md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex items-center justify-between h-16 px-5 border-b border-white/[0.06]">
+      <aside className={`fixed inset-y-0 left-0 z-40 w-[270px] bg-surface-dark flex flex-col transform transition-transform md:relative md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex items-center justify-between h-16 px-5 border-b border-white/[0.06] shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-lg flex items-center justify-center text-white text-xs font-bold">CS</div>
             <div>
@@ -325,26 +399,56 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </div>
           <button className="md:hidden text-white/70" onClick={() => setSidebarOpen(false)} aria-label="Zijmenu sluiten"><X size={20} /></button>
         </div>
-        <nav className="p-3 space-y-0.5 overflow-y-auto h-[calc(100vh-8rem)] custom-scrollbar">
-          {filteredNav.map(n => {
-            const active = pathname === n.href || (n.href !== '/admin' && pathname.startsWith(n.href));
-            let sectionHeader = null;
-            if (n.section && n.section !== lastSection) {
-              lastSection = n.section;
-              sectionHeader = <p className="text-xs font-bold text-white/20 uppercase tracking-widest px-3 pt-5 pb-1.5">{n.section}</p>;
+        <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto custom-scrollbar">
+          {orderedSections.map(section => {
+            if (!section.label) {
+              return section.items.map(n => {
+                const active = pathname === n.href;
+                return (
+                  <Link key={n.href} href={n.href} onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${active ? 'bg-surface/[0.08] text-white shadow-sm' : 'text-white/60 hover:text-white/80 hover:bg-surface/[0.03]'}`}>
+                    <n.icon size={17} className={active ? 'text-primary' : ''} /> {n.label}
+                    {active && <div className="w-1.5 h-1.5 rounded-full bg-primary ml-auto" />}
+                  </Link>
+                );
+              });
             }
+            const isCollapsed = collapsedSections[section.id] ?? false;
+            const isDragging = dragSection === section.id;
             return (
-              <div key={n.href}>
-                {sectionHeader}
-                <Link href={n.href} onClick={() => setSidebarOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${active ? 'bg-surface/[0.08] text-white shadow-sm' : 'text-white/60 hover:text-white/80 hover:bg-surface/[0.03]'}`}>
-                  <n.icon size={17} className={active ? 'text-primary' : ''} /> {n.label}
-                  {active && <div className="w-1.5 h-1.5 rounded-full bg-primary ml-auto" />}
-                </Link>
+              <div key={section.id}
+                onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }}
+                onDrop={() => handleSectionDrop(section.id)}
+                className={`transition-opacity ${isDragging ? 'opacity-40' : ''}`}
+              >
+                <button
+                  draggable
+                  onDragStart={e => handleSectionDragStart(e, section.id)}
+                  onDragEnd={handleSectionDragEnd}
+                  onClick={() => toggleSection(section.id)}
+                  className="flex items-center gap-1 w-full text-left px-3 pt-5 pb-1.5 group cursor-pointer"
+                >
+                  <GripVertical size={12} className="text-white/10 group-hover:text-white/30 shrink-0 cursor-grab active:cursor-grabbing" />
+                  <span className="text-xs font-bold text-white/20 uppercase tracking-widest flex-1 select-none">{section.label}</span>
+                  <ChevronRight size={12} className={`text-white/20 group-hover:text-white/40 transition-transform duration-200 ${isCollapsed ? '' : 'rotate-90'}`} />
+                </button>
+                <div className={`overflow-hidden transition-all duration-200 ${isCollapsed ? 'max-h-0' : 'max-h-[500px]'}`}>
+                  {section.items.map(n => {
+                    const active = pathname === n.href || (n.href !== '/admin' && pathname.startsWith(n.href));
+                    return (
+                      <Link key={n.href} href={n.href} onClick={() => setSidebarOpen(false)}
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${active ? 'bg-surface/[0.08] text-white shadow-sm' : 'text-white/60 hover:text-white/80 hover:bg-surface/[0.03]'}`}>
+                        <n.icon size={17} className={active ? 'text-primary' : ''} /> {n.label}
+                        {active && <div className="w-1.5 h-1.5 rounded-full bg-primary ml-auto" />}
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
             );
           })}
         </nav>
-        <div className="absolute bottom-0 w-full p-3 border-t border-white/[0.06]">
+        <div className="shrink-0 p-3 border-t border-white/[0.06]">
           <div className="flex items-center gap-3 px-3 mb-3">
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-lg flex items-center justify-center text-white text-xs font-bold">{userName.charAt(0)}</div>
             <div className="flex-1 min-w-0">
