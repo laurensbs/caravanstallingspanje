@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
-import { Wrench, Plus, X, Search, ChevronDown, ChevronUp, Edit2, Trash2, Package, Calendar, FileText, AlertCircle, CheckCircle, Clock, Ban, Receipt, Eye } from 'lucide-react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { Wrench, Plus, X, Search, ChevronDown, ChevronUp, Edit2, Trash2, Package, Calendar, FileText, AlertCircle, CheckCircle, Clock, Ban, Receipt, Eye, Check } from 'lucide-react';
 import { useAdminData } from '@/hooks/useAdminData';
 import Modal from '@/components/ui/Modal';
 import { useAdminI18n } from '@/lib/admin-i18n';
@@ -113,6 +113,8 @@ export default function ReparatiesPage() {
   const [form, setForm] = useState(emptyForm);
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [stats, setStats] = useState<Record<string, number>>({});
+  const [yearOpen, setYearOpen] = useState(false);
+  const yearRef = React.useRef<HTMLDivElement>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
 
   const { items: repairs, total, loading, refetch } = useAdminData<Repair>({
@@ -198,12 +200,31 @@ export default function ReparatiesPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <select value={year} onChange={e => setYear(parseInt(e.target.value))} className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:ring-2 focus:ring-primary/20 outline-none">
-            <option value={0}>{t('Alle jaren')}</option>
-            {[currentYear, currentYear - 1, currentYear - 2].map(y => (
-              <option key={y} value={y}>{y}</option>
-            ))}
-          </select>
+          <div className="relative" ref={yearRef}>
+            <button onClick={() => setYearOpen(!yearOpen)} className="flex items-center gap-2 border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white hover:border-gray-300 transition-colors min-w-[130px] justify-between">
+              <span className="flex items-center gap-2">
+                <Calendar size={14} className="text-gray-400" />
+                <span className="font-medium text-gray-700">{year === 0 ? t('Alle jaren') : year}</span>
+              </span>
+              <ChevronDown size={14} className={`text-gray-400 transition-transform ${yearOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {yearOpen && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setYearOpen(false)} />
+                <div className="absolute right-0 top-full mt-1 bg-white rounded-xl border border-gray-200 shadow-lg shadow-black/8 py-1 z-20 min-w-[150px] overflow-hidden">
+                  {[{ value: 0, label: t('Alle jaren') }, ...([currentYear, currentYear - 1, currentYear - 2].map(y => ({ value: y, label: String(y) })))].map(opt => (
+                    <button key={opt.value} onClick={() => { setYear(opt.value); setYearOpen(false); }}
+                      className={`w-full text-left px-4 py-2 text-sm flex items-center justify-between transition-colors ${
+                        year === opt.value ? 'bg-primary/5 text-primary font-semibold' : 'text-gray-700 hover:bg-gray-50'
+                      }`}>
+                      {opt.label}
+                      {year === opt.value && <Check size={14} className="text-primary" />}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
           <button onClick={() => { setForm(emptyForm); setEditingId(null); setShowForm(true); }} className="bg-primary hover:bg-primary-light text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all">
             <Plus size={16} /> {t('Nieuwe inspectie')}
           </button>
