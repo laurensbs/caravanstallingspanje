@@ -9,7 +9,7 @@ import {
   ClipboardList, Truck, Settings, LogOut, Menu, X, Bell, Search, ChevronDown,
   Wrench, MessageSquare, Shield, Eye, EyeOff, Lock, User, ArrowRight, AlertCircle,
   BarChart3, CalendarDays, Package, Map as MapIcon, Palmtree, Mountain, UtensilsCrossed, BookOpen, Tent, Star, Tag,
-  ChevronRight, GripVertical,
+  ChevronRight, GripVertical, Hammer,
 } from 'lucide-react';
 
 type NavItem = { href: string; icon: typeof LayoutDashboard; label: string; roles: string[] };
@@ -33,6 +33,7 @@ const NAV_SECTIONS: NavSection[] = [
     { href: '/admin/transport', icon: Truck, label: 'Transport', roles: ['admin', 'staff'] },
     { href: '/admin/taken', icon: ClipboardList, label: 'Taken', roles: ['admin', 'staff'] },
     { href: '/admin/diensten', icon: Wrench, label: 'Service aanvragen', roles: ['admin', 'staff'] },
+    { href: '/admin/reparaties', icon: Hammer, label: 'Reparaties', roles: ['admin', 'staff'] },
     { href: '/admin/pakketten', icon: Package, label: 'Pakketten & Diensten', roles: ['admin'] },
     { href: '/admin/planning', icon: CalendarDays, label: 'Planning', roles: ['admin', 'staff'] },
   ]},

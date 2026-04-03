@@ -460,6 +460,26 @@ export async function initDatabase() {
     created_at TIMESTAMP DEFAULT NOW()
   )`;
 
+  await sql`CREATE TABLE IF NOT EXISTS repair_inspections (
+    id SERIAL PRIMARY KEY,
+    year INTEGER NOT NULL DEFAULT 2025,
+    location_code TEXT NOT NULL,
+    area TEXT NOT NULL DEFAULT 'cruillas',
+    customer_name TEXT NOT NULL,
+    client_number TEXT,
+    repairs_description TEXT,
+    observations TEXT,
+    cost_type TEXT DEFAULT 'client',
+    status TEXT DEFAULT 'geen_schade',
+    parts_needed TEXT,
+    date_of_completion DATE,
+    invoice_reference TEXT,
+    notes TEXT,
+    assigned_to TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  )`;
+
   // Indexes
   await sql`CREATE INDEX IF NOT EXISTS idx_caravans_customer ON caravans(customer_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_caravans_location ON caravans(location_id)`;
@@ -490,6 +510,9 @@ export async function initDatabase() {
   await sql`CREATE INDEX IF NOT EXISTS idx_reviews_customer ON reviews(customer_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_reviews_published ON reviews(is_published)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_discount_codes_code ON discount_codes(code)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_repair_inspections_year ON repair_inspections(year)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_repair_inspections_status ON repair_inspections(status)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_repair_inspections_area ON repair_inspections(area)`;
 
   return { success: true };
 }
@@ -1096,6 +1119,93 @@ export async function updateDiscountCode(id: number, data: { is_active?: boolean
 
 export async function incrementDiscountCodeUsage(code: string) {
   await sql`UPDATE discount_codes SET used_count = used_count + 1 WHERE code = ${code}`;
+}
+
+// ─── Repair Inspections ───
+export async function getAllRepairInspections(page = 1, limit = 100, year?: number, status?: string, area?: string, search?: string) {
+  const offset = (page - 1) * limit;
+  const y = year || new Date().getFullYear();
+  let rows, cnt;
+  // Build dynamic query
+  if (status && area && search) {
+    const s = `%${search}%`;
+    rows = await sql`SELECT * FROM repair_inspections WHERE year = ${y} AND status = ${status} AND area = ${area} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s}) ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
+    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE year = ${y} AND status = ${status} AND area = ${area} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s})`;
+  } else if (status && area) {
+    rows = await sql`SELECT * FROM repair_inspections WHERE year = ${y} AND status = ${status} AND area = ${area} ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
+    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE year = ${y} AND status = ${status} AND area = ${area}`;
+  } else if (status && search) {
+    const s = `%${search}%`;
+    rows = await sql`SELECT * FROM repair_inspections WHERE year = ${y} AND status = ${status} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s}) ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
+    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE year = ${y} AND status = ${status} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s})`;
+  } else if (area && search) {
+    const s = `%${search}%`;
+    rows = await sql`SELECT * FROM repair_inspections WHERE year = ${y} AND area = ${area} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s}) ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
+    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE year = ${y} AND area = ${area} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s})`;
+  } else if (status) {
+    rows = await sql`SELECT * FROM repair_inspections WHERE year = ${y} AND status = ${status} ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
+    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE year = ${y} AND status = ${status}`;
+  } else if (area) {
+    rows = await sql`SELECT * FROM repair_inspections WHERE year = ${y} AND area = ${area} ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
+    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE year = ${y} AND area = ${area}`;
+  } else if (search) {
+    const s = `%${search}%`;
+    rows = await sql`SELECT * FROM repair_inspections WHERE year = ${y} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s}) ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
+    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE year = ${y} AND (customer_name ILIKE ${s} OR location_code ILIKE ${s} OR client_number ILIKE ${s} OR repairs_description ILIKE ${s})`;
+  } else {
+    rows = await sql`SELECT * FROM repair_inspections WHERE year = ${y} ORDER BY location_code LIMIT ${limit} OFFSET ${offset}`;
+    cnt = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE year = ${y}`;
+  }
+  return { inspections: rows, total: Number(cnt[0].total) };
+}
+
+export async function getRepairInspectionById(id: number) {
+  const rows = await sql`SELECT * FROM repair_inspections WHERE id = ${id} LIMIT 1`;
+  return rows[0] || null;
+}
+
+export async function createRepairInspection(data: Record<string, unknown>) {
+  const res = await sql`INSERT INTO repair_inspections (year, location_code, area, customer_name, client_number, repairs_description, observations, cost_type, status, parts_needed, date_of_completion, invoice_reference, notes, assigned_to)
+    VALUES (${data.year as number || new Date().getFullYear()}, ${data.location_code as string}, ${data.area as string || 'cruillas'}, ${data.customer_name as string}, ${data.client_number as string || null}, ${data.repairs_description as string || null}, ${data.observations as string || null}, ${data.cost_type as string || 'client'}, ${data.status as string || 'geen_schade'}, ${data.parts_needed as string || null}, ${data.date_of_completion as string || null}::date, ${data.invoice_reference as string || null}, ${data.notes as string || null}, ${data.assigned_to as string || null}) RETURNING *`;
+  return res[0];
+}
+
+export async function updateRepairInspection(id: number, data: Record<string, unknown>) {
+  await sql`UPDATE repair_inspections SET
+    location_code = COALESCE(${data.location_code as string ?? null}, location_code),
+    area = COALESCE(${data.area as string ?? null}, area),
+    customer_name = COALESCE(${data.customer_name as string ?? null}, customer_name),
+    client_number = COALESCE(${data.client_number as string ?? null}, client_number),
+    repairs_description = COALESCE(${data.repairs_description as string ?? null}, repairs_description),
+    observations = COALESCE(${data.observations as string ?? null}, observations),
+    cost_type = COALESCE(${data.cost_type as string ?? null}, cost_type),
+    status = COALESCE(${data.status as string ?? null}, status),
+    parts_needed = COALESCE(${data.parts_needed as string ?? null}, parts_needed),
+    date_of_completion = COALESCE(${data.date_of_completion as string ?? null}::date, date_of_completion),
+    invoice_reference = COALESCE(${data.invoice_reference as string ?? null}, invoice_reference),
+    notes = COALESCE(${data.notes as string ?? null}, notes),
+    assigned_to = COALESCE(${data.assigned_to as string ?? null}, assigned_to),
+    updated_at = NOW()
+    WHERE id = ${id}`;
+}
+
+export async function updateRepairStatus(id: number, status: string) {
+  if (status === 'afgerond') {
+    await sql`UPDATE repair_inspections SET status = ${status}, date_of_completion = NOW(), updated_at = NOW() WHERE id = ${id}`;
+  } else {
+    await sql`UPDATE repair_inspections SET status = ${status}, updated_at = NOW() WHERE id = ${id}`;
+  }
+}
+
+export async function deleteRepairInspection(id: number) {
+  await sql`DELETE FROM repair_inspections WHERE id = ${id}`;
+}
+
+export async function getRepairStats(year?: number) {
+  const y = year || new Date().getFullYear();
+  const rows = await sql`SELECT status, COUNT(*) as count FROM repair_inspections WHERE year = ${y} GROUP BY status`;
+  const total = await sql`SELECT COUNT(*) as total FROM repair_inspections WHERE year = ${y}`;
+  return { byStatus: rows, total: Number(total[0].total) };
 }
 
 export { sql };
