@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { Wrench, Plus, X, Search, Filter, ChevronDown, ChevronUp, Edit2, Trash2, Package, Calendar, FileText, AlertCircle, CheckCircle, Clock, Ban, Receipt, Eye } from 'lucide-react';
+import { Wrench, Plus, X, Search, ChevronDown, ChevronUp, Edit2, Trash2, Package, Calendar, FileText, AlertCircle, CheckCircle, Clock, Ban, Receipt, Eye } from 'lucide-react';
 import { useAdminData } from '@/hooks/useAdminData';
 import Modal from '@/components/ui/Modal';
 import { useAdminI18n } from '@/lib/admin-i18n';
@@ -108,7 +108,6 @@ export default function ReparatiesPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [areaFilter, setAreaFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -120,13 +119,13 @@ export default function ReparatiesPage() {
     endpoint: '/api/admin/repairs',
     dataKey: 'inspections',
     limit: 200,
-    params: { year: year ? String(year) : '', status: statusFilter, area: areaFilter, search: searchQuery },
+    params: { year: year > 0 ? String(year) : '', status: statusFilter, area: areaFilter, search: searchQuery },
   });
 
   // Load stats
   const loadStats = useCallback(async () => {
     try {
-      const res = await fetch(`/api/admin/repairs?stats=true${year ? `&year=${year}` : ''}`, { credentials: 'include' });
+      const res = await fetch(`/api/admin/repairs?stats=true${year > 0 ? `&year=${year}` : ''}`, { credentials: 'include' });
       const data = await res.json();
       const map: Record<string, number> = {};
       (data.byStatus || []).forEach((r: { status: string; count: string }) => { map[r.status] = parseInt(r.count); });
@@ -201,7 +200,7 @@ export default function ReparatiesPage() {
         <div className="flex items-center gap-3">
           <select value={year} onChange={e => setYear(parseInt(e.target.value))} className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:ring-2 focus:ring-primary/20 outline-none">
             <option value={0}>{t('Alle jaren')}</option>
-            {[currentYear + 1, currentYear, currentYear - 1, currentYear - 2].map(y => (
+            {[currentYear, currentYear - 1, currentYear - 2].map(y => (
               <option key={y} value={y}>{y}</option>
             ))}
           </select>
@@ -211,59 +210,43 @@ export default function ReparatiesPage() {
         </div>
       </div>
 
-      {/* Stats cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 mb-6">
+      {/* Compact stats bar */}
+      <div className="flex flex-wrap gap-2 mb-5">
         {STATUSES.filter(s => s.value).map(s => {
           const cfg = STATUS_CONFIG[s.value];
           const count = stats[s.value] || 0;
           const isActive = statusFilter === s.value;
           return (
             <button key={s.value} onClick={() => setStatusFilter(statusFilter === s.value ? '' : s.value)}
-              className={`p-3 rounded-xl border text-left transition-all ${isActive ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
-              <div className="flex items-center gap-1.5 mb-1">
-                <cfg.icon size={14} className={cfg.color} />
-                <span className="text-xs font-medium text-gray-500 truncate">{t(cfg.label)}</span>
-              </div>
-              <span className="text-lg font-bold text-gray-900">{count}</span>
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all border ${isActive ? 'border-primary bg-primary/10 text-primary' : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'}`}>
+              <cfg.icon size={12} className={isActive ? 'text-primary' : cfg.color} />
+              {t(cfg.label)} <span className="font-bold">{count}</span>
             </button>
           );
         })}
       </div>
 
       {/* Search + Filters */}
-      <div className="bg-white rounded-2xl border border-gray-200 mb-6 p-4">
+      <div className="bg-white rounded-2xl border border-gray-200 mb-4 p-3">
         <div className="flex flex-wrap gap-3 items-center">
-          <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2.5 flex-1 min-w-[200px] border border-gray-200">
+          <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2 flex-1 min-w-[200px] border border-gray-200">
             <Search size={15} className="text-gray-400" />
             <input placeholder={t('Zoek op naam, locatie, klantnr...')} className="bg-transparent text-sm outline-none flex-1 text-gray-700 placeholder:text-gray-400"
               value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
           </div>
           <select value={areaFilter} onChange={e => setAreaFilter(e.target.value)}
-            className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:ring-2 focus:ring-primary/20 outline-none">
+            className="border border-gray-200 rounded-xl px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-primary/20 outline-none">
             {AREAS.map(a => <option key={a.value} value={a.value}>{t(a.label)}</option>)}
           </select>
-          <button onClick={() => setShowFilters(!showFilters)} className="flex items-center gap-2 px-3 py-2.5 text-sm text-gray-500 hover:text-gray-700 border border-gray-200 rounded-xl bg-white">
-            <Filter size={15} /> {t('Filters')} {showFilters ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-          </button>
         </div>
-        {showFilters && (
-          <div className="mt-3 pt-3 border-t border-gray-100 flex flex-wrap gap-2">
-            {STATUSES.map(s => (
-              <button key={s.value} onClick={() => setStatusFilter(statusFilter === s.value ? '' : s.value)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${statusFilter === s.value ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
-                {t(s.label)}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap items-center gap-4 mb-4 text-xs">
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-amber-200 border border-amber-300" /> {t('Geel = wordt gedaan / gedaan')}</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-emerald-200 border border-emerald-300" /> {t('Groen = gefactureerd / geregeld')}</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-red-200 border border-red-300" /> {t('Rood = afgekeurd')}</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-orange-200 border border-orange-300" /> {t('Oranje = onze kosten')}</span>
+      <div className="flex flex-wrap items-center gap-3 mb-3 text-[11px] text-gray-400">
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-300" /> {t('Geel = wordt gedaan / gedaan')}</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-300" /> {t('Groen = gefactureerd / geregeld')}</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-300" /> {t('Rood = afgekeurd')}</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-300" /> {t('Oranje = onze kosten')}</span>
       </div>
 
       {/* Table */}

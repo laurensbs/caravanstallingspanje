@@ -7,7 +7,8 @@ export async function GET(req: NextRequest) {
     const url = new URL(req.url);
     const page = Math.max(1, parseInt(url.searchParams.get('page') || '1'));
     const limit = Math.min(500, Math.max(1, parseInt(url.searchParams.get('limit') || '200')));
-    const year = url.searchParams.get('year') ? parseInt(url.searchParams.get('year')!) : undefined;
+    const yearParam = url.searchParams.get('year');
+    const year = yearParam && yearParam !== '' ? parseInt(yearParam) : undefined;
     const status = url.searchParams.get('status') || undefined;
     const area = url.searchParams.get('area') || undefined;
     const search = url.searchParams.get('search') || undefined;
