@@ -1,198 +1,0 @@
-Script started on Tue Mar 17 22:32:52 2026
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h[?2004l
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  bash /tmp/fix-colors.sh [K[K[?2004l
-Done: src/app/stalling/page.tsx
-Done: src/app/diensten/page.tsx
-Done: src/app/tarieven/page.tsx
-Done: src/app/contact/page.tsx
-Done: src/app/locaties/page.tsx
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h[?2004l
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  sed -i '' 's/focus:bord [Keer-accent/focus:border-primary/g; s/focus:ring-accent/focus:ring-primary/g; s/bg [K--white/bg-surface/g' src/app/contact/page.tsx[?2004l
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h[?2004l
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  bash /tmp/fix-portals.s [Kh[?2004l
-Done: src/app/admin/layout.tsx
-Done: src/app/admin/page.tsx
-Done: src/app/staff/layout.tsx
-Done: src/app/staff/page.tsx
-All portal layouts and dashboards updated!
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h[?2004l
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  bash /tmp/fix-customer. [Kssh[?2004l
-Done: src/app/mijn-account/page.tsx
-Customer portal updated!
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h[?2004l
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  bash /tmp/fix-admin-pag [Kees.sh[?2004l
-Done: src/app/admin/berichten/page.tsx
-Done: src/app/admin/caravans/page.tsx
-Done: src/app/admin/contracten/page.tsx
-Done: src/app/admin/diensten/page.tsx
-Done: src/app/admin/facturen/page.tsx
-Done: src/app/admin/instellingen/page.tsx
-Done: src/app/admin/klanten/page.tsx
-Done: src/app/admin/locaties/page.tsx
-Done: src/app/admin/medewerkers/page.tsx
-Done: src/app/admin/taken/page.tsx
-Done: src/app/admin/transport/page.tsx
-All 11 admin pages updated!
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h[?2004l
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  bash /tmp/fix-staff-pag [Kees.sh[?2004l
-Done: src/app/staff/inspecties/page.tsx
-Done: src/app/staff/taken/page.tsx
-Done: src/app/staff/terrein/page.tsx
-All 3 staff pages updated!
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h[?2004l
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  grep -rn --include="*.t [Kssx" 'bg-slate-\|text-slate-\|border-slate-\|bg-\[#0a0e1a\]\|bg-slate-950\|text-e [Kmmerald-\|bg-emerald-\|border-emerald-' src/app/ src/components/ | grep -v node_m [Koodules | head -40[?2004l
-src/app/contract/ondertekenen/page.tsx:150:        <div className="animate-pulse text-slate-400">Contract laden...</div>
-src/app/contract/ondertekenen/page.tsx:160:          <h1 className="text-xl font-bold text-slate-900 mb-2">Ondertekening niet mogelijk</h1>
-src/app/contract/ondertekenen/page.tsx:161:          <p className="text-slate-500 text-sm">{error}</p>
-src/app/contract/ondertekenen/page.tsx:172:          <h1 className="text-2xl font-bold text-slate-900 mb-2">Contract ondertekend!</h1>
-src/app/contract/ondertekenen/page.tsx:173:          <p className="text-slate-500 text-sm mb-6">Uw contract is succesvol digitaal ondertekend. U ontvangt een bevestiging per e-mail.</p>
-src/app/contract/ondertekenen/page.tsx:191:          <h1 className="text-2xl font-black text-slate-900">Stallingscontract</h1>
-src/app/contract/ondertekenen/page.tsx:192:          <p className="text-slate-400 text-sm mt-1">Contract {c.contract_number}</p>
-src/app/contract/ondertekenen/page.tsx:196:        <div className="bg-white rounded-2xl border border-slate-100 p-6 mb-6">
-src/app/contract/ondertekenen/page.tsx:197:          <h2 className="text-lg font-bold text-slate-900 mb-4">Contractgegevens</h2>
-src/app/contract/ondertekenen/page.tsx:199:            <div><span className="text-slate-400 block">Klant</span><span className="font-medium text-slate-800">{cust.name}</span></div>
-src/app/contract/ondertekenen/page.tsx:200:            <div><span className="text-slate-400 block">E-mail</span><span className="font-medium text-slate-800">{cust.email}</span></div>
-src/app/contract/ondertekenen/page.tsx:201:            <div><span className="text-slate-400 block">Locatie</span><span className="font-medium text-slate-800">{c.location_name}</span></div>
-src/app/contract/ondertekenen/page.tsx:202:            <div><span className="text-slate-400 block">Caravan</span><span className="font-medium text-slate-800">{c.caravan}</span></div>
-src/app/contract/ondertekenen/page.tsx:203:            <div><span className="text-slate-400 block">Kenteken</span><span className="font-medium text-slate-800">{c.license_plate}</span></div>
-src/app/contract/ondertekenen/page.tsx:204:            <div><span className="text-slate-400 block">Periode</span><span className="font-medium text-slate-800">{new Date(c.start_date).toLocaleDateString('nl-NL')} - {new Date(c.end_date).toLocaleDateString('nl-NL')}</span></div>
-src/app/contract/ondertekenen/page.tsx:205:            <div><span className="text-slate-400 block">Maandbedrag</span><span className="font-bold text-amber-600">€{Number(c.monthly_rate).toFixed(2)}</span></div>
-src/app/contract/ondertekenen/page.tsx:206:            <div><span className="text-slate-400 block">Borg</span><span className="font-medium text-slate-800">€{Number(c.deposit).toFixed(2)}</span></div>
-src/app/contract/ondertekenen/page.tsx:211:        <div className="bg-white rounded-2xl border border-slate-100 p-6 mb-6">
-src/app/contract/ondertekenen/page.tsx:212:          <h2 className="text-lg font-bold text-slate-900 mb-4">Voorwaarden</h2>
-src/app/contract/ondertekenen/page.tsx:213:          <div className="text-sm text-slate-600 space-y-2 mb-4 max-h-48 overflow-y-auto">
-src/app/contract/ondertekenen/page.tsx:226:            <input type="checkbox" checked={agreedTerms} onChange={e => setAgreedTerms(e.target.checked)} className="mt-1 w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-500" />
-src/app/contract/ondertekenen/page.tsx:227:            <span className="text-sm text-slate-700">Ik heb de voorwaarden gelezen en ga hiermee akkoord</span>
-src/app/contract/ondertekenen/page.tsx:232:        <div className="bg-white rounded-2xl border border-slate-100 p-6 mb-6">
-src/app/contract/ondertekenen/page.tsx:234:            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2"><PenTool size={18} /> Uw handtekening</h2>
-src/app/contract/ondertekenen/page.tsx:235:            <button onClick={clearSignature} className="text-xs text-slate-400 hover:text-slate-600 underline">Wissen</button>
-src/app/contract/ondertekenen/page.tsx:239:            className="w-full h-40 border-2 border-dashed border-slate-200 rounded-xl cursor-crosshair bg-slate-50 touch-none"
-src/app/contract/ondertekenen/page.tsx:241:          <p className="text-xs text-slate-400 mt-2">Teken uw handtekening in het vak hierboven</p>
-src/app/contract/ondertekenen/page.tsx:253:        <p className="text-xs text-center text-slate-400 mt-4">
-src/app/contract/ondertekenen/page.tsx:263:    <Suspense fallback={<div className="min-h-screen bg-[#FAF9F7] flex items-center justify-center"><div className="animate-pulse text-slate-400">Laden...</div></div>}>
-src/app/contact/page.tsx:72:                    <CheckCircle className="text-emerald-600" size={32} />
-src/app/mijn-account/page.tsx:335:                        {i < Math.min(timeline.length, 8) - 1 && <div className="w-px h-8 bg-slate-200" />}
-src/app/stalling/page.tsx:139:                    const c = i < 8 ? (i % 3 === 0 ? 'bg-accent/15 text-emerald-700' : i % 3 === 1 ? 'bg-ocean/15 text-blue-700' : 'bg-warning/15 text-amber-700') : i < 12 ? 'bg-accent/15 text-emerald-700' : 'bg-ocean/15 text-blue-700';
-src/app/admin/instellingen/page.tsx:62:      <button type="button" onClick={() => setSettings(s => ({...s, [field]: !(s as Record<string,string|number|boolean>)[field]}))} className={`w-10 h-6 rounded-full transition ${(settings as Record<string,string|number|boolean>)[field] ? 'bg-warning/100' : 'bg-slate-300'} relative`}>
-src/app/admin/locaties/page.tsx:80:                    <div className="w-24 h-2 bg-slate-200 rounded-full mt-1">
-src/app/admin/planning/page.tsx:42:  contract_start: 'bg-emerald-500',
-src/app/admin/planning/page.tsx:128:          <h1 className="text-2xl font-black text-slate-900">Planning</h1>
-src/app/admin/planning/page.tsx:129:          <p className="text-sm text-slate-400 mt-1">Overzicht van contracten, transport en taken</p>
-src/app/admin/planning/page.tsx:137:              className="appearance-none bg-white border border-slate-200 rounded-xl pl-9 pr-8 py-2 text-sm font-medium text-slate-600 focus:outline-none focus:ring-2 focus:ring-accent/20"
-src/app/admin/planning/page.tsx:145:            <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-src/app/admin/planning/page.tsx:152:        <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h[?2004l
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  grep -rn --include="*.t [Kssx" 'bg-slate-\|text-slate-\|border-slate-\|text-emerald-\|bg-emerald-\|text-amb [Keer-\|bg-amber-\|text-blue-[0-9]\|bg-blue-\|text-green-\|bg-green-\|text-purple-\ [K||bg-purple-\|text-gray-\|bg-gray-\|border-gray-\|divide-slate' src/app/ src/comp [Koonents/ | grep -v node_modules | wc -l[?2004l
-     196
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h[?2004l
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  grep -rl --include="*.t [Kssx" 'bg-slate-\|text-slate-\|border-slate-\|text-emerald-\|bg-emerald-\|text-amb [Keer-\|bg-amber-\|text-blue-[0-9]\|bg-blue-\|text-green-\|bg-green-\|text-purple-\ [K||bg-purple-\|text-gray-\|bg-gray-\|border-gray-\|divide-slate' src/app/ src/comp [Koonents/ | sort[?2004l
-src/app/admin/berichten/page.tsx
-src/app/admin/diensten/page.tsx
-src/app/admin/instellingen/page.tsx
-src/app/admin/layout.tsx
-src/app/admin/locaties/page.tsx
-src/app/admin/medewerkers/page.tsx
-src/app/admin/pakketten/page.tsx
-src/app/admin/planning/page.tsx
-src/app/admin/rapportages/page.tsx
-src/app/admin/taken/page.tsx
-src/app/admin/transport/page.tsx
-src/app/contact/page.tsx
-src/app/contract/ondertekenen/page.tsx
-src/app/locaties/page.tsx
-src/app/mijn-account/page.tsx
-src/app/offline/page.tsx
-src/app/reserveren/page.tsx
-src/app/staff/inspecties/page.tsx
-src/app/staff/scan/page.tsx
-src/app/staff/taken/page.tsx
-src/app/stalling/page.tsx
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h[?2004l
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  bash /tmp/fix-all-remai [Knning.sh[?2004l
-Done: src/app/admin/berichten/page.tsx
-Done: src/app/admin/diensten/page.tsx
-Done: src/app/admin/instellingen/page.tsx
-Done: src/app/admin/layout.tsx
-Done: src/app/admin/locaties/page.tsx
-Done: src/app/admin/medewerkers/page.tsx
-Done: src/app/admin/pakketten/page.tsx
-Done: src/app/admin/planning/page.tsx
-Done: src/app/admin/rapportages/page.tsx
-Done: src/app/admin/taken/page.tsx
-Done: src/app/admin/transport/page.tsx
-Done: src/app/contact/page.tsx
-Done: src/app/contract/ondertekenen/page.tsx
-Done: src/app/locaties/page.tsx
-Done: src/app/mijn-account/page.tsx
-Done: src/app/offline/page.tsx
-Done: src/app/reserveren/page.tsx
-Done: src/app/staff/inspecties/page.tsx
-Done: src/app/staff/scan/page.tsx
-Done: src/app/staff/taken/page.tsx
-Done: src/app/stalling/page.tsx
-All files cleaned!
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h[?2004l
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  grep -rn --include="*.t [Kssx" 'bg-slate-\|text-slate-\|border-slate-\|text-emerald-\|bg-emerald-\|text-amb [Keer-\|bg-amber-\|text-blue-[0-9]\|bg-blue-\|text-green-\|bg-green-\|text-purple-\ [K||bg-purple-\|text-gray-\|bg-gray-\|border-gray-\|divide-slate' src/app/ src/comp [Koonents/ | grep -v node_modules | head -20[?2004l
-src/app/admin/transport/page.tsx:10:const STATUS_COLORS: Record<string,string> = { aangevraagd: 'bg-ocean/15 text-ocean-dark', gepland: 'bg-warning/15 text-warning', onderweg: 'bg-primary/15 text-purple-700', afgeleverd: 'bg-accent/15 text-primary-dark', geannuleerd: 'bg-sand text-warm-gray' };
-src/app/admin/planning/page.tsx:195:                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${TYPE_COLORS[e.type] || 'bg-slate-400'}`} />
-src/app/admin/medewerkers/page.tsx:9:const ROLE_COLORS: Record<string,string> = { beheerder: 'bg-primary/15 text-purple-700', medewerker: 'bg-ocean/15 text-ocean-dark', chauffeur: 'bg-warning/15 text-warning', technicus: 'bg-accent/15 text-primary-dark' };
-src/app/admin/diensten/page.tsx:8:const STATUS_COLORS: Record<string,string> = { aangevraagd: 'bg-ocean/15 text-ocean-dark', goedgekeurd: 'bg-warning/15 text-warning', in_uitvoering: 'bg-primary/15 text-purple-700', afgerond: 'bg-accent/15 text-primary-dark', geannuleerd: 'bg-sand text-warm-gray' };
-src/app/staff/taken/page.tsx:9:const PRIORITY_DOT: Record<string,string> = { laag: 'bg-ocean', normaal: 'bg-gray-400', hoog: 'bg-warning', urgent: 'bg-danger/100' };
-src/app/staff/taken/page.tsx:70:            <CheckCircle size={28} className="text-emerald-200 mx-auto mb-3" />
-src/app/staff/taken/page.tsx:83:                  <div className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 ${PRIORITY_DOT[t.priority] || 'bg-gray-400'}`} />
-src/app/staff/scan/page.tsx:236:                      <button onClick={() => registerCheckIn("in")} disabled={loading} className="bg-accent hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h[?2004l
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  cd /Users/laurens/Deskt [Koop/caravanstallingspanje && \[?2004l
-[0m[27m[24m[Jcmdand> [K[?2004hssed -i '' 's/text-purple-700/text-primary/g' src/app/admin/transport/pag [Kee.tsx src/app/admin/medewerkers/page.tsx src/app/admin/diensten/page.tsx && \[?2004l
-[0m[27m[24m[Jcmdand cmdand> [K[?2004hssed -i '' "s/bg-slate-400/bg-warm-gray/g" src/app/admin/planning/ [Kppage.tsx && \[?2004l
-[0m[27m[24m[Jcmdand cmdand cmdand> [K[?2004hssed -i '' 's/bg-gray-400/bg-warm-gray/g; s/text-emerald-20 [K00/text-accent\/40/g' src/app/staff/taken/page.tsx && \[?2004l
-[0m[27m[24m[Jcmdand cmdand cmdand cmdand> [K[?2004hssed -i '' 's/hover:bg-emerald-700/hover:bg-accent-d [Kaark/g' src/app/staff/scan/page.tsx && \[?2004l
-[0m[27m[24m[Jcmdand cmdand cmdand cmdand cmdand> [K[?2004heecho "Fixed all stragglers"[?2004l
-Fixed all stragglers
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h[?2004l
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  grep -rn --include="*.t [Kssx" 'bg-slate-\|text-slate-\|border-slate-\|text-emerald-\|bg-emerald-\|text-amb [Keer-\|bg-amber-\|text-blue-[0-9]\|bg-blue-\|text-green-\|bg-green-\|text-purple-\ [K||bg-purple-\|text-gray-\|bg-gray-\|border-gray-\|divide-slate' src/app/ src/comp [Koonents/ | grep -v node_modules | wc -l[?2004l
-       0
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h[?2004l
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  npx next build 2>&1 | t [Kaail -60[?2004l
-^C
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  npx next build 2>&1 | t [Kaail -80[?2004l
-^C
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  npx next build[?2004l
-   [1m[38;2;173;127;168m▲ Next.js 15.5.13[39m[22m
-   - Environments: .env.local
-
- [37m[1m [22m[39m Creating an optimized production build ...
- [32m[1m✓[22m[39m Compiled successfully in 3.7s
-[?25l [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[?25h⠙[1G[0K[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  npx next build 2>&1[?2004l
-   [1m[38;2;173;127;168m▲ Next.js 15.5.13[39m[22m
-   - Environments: .env.local
-
- [37m[1m [22m[39m Creating an optimized production build ...
- [32m[1m✓[22m[39m Compiled successfully in 3.2s
-[?25l [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[?25h⠙[1G[0K[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  npx next build 2>&1; ec [Khho "EXIT_CODE=$?"[?2004l
-   [1m[38;2;173;127;168m▲ Next.js 15.5.13[39m[22m
-   - Environments: .env.local
-
- [37m[1m [22m[39m Creating an optimized production build ...
- [32m[1m✓[22m[39m Compiled successfully in 3.3s
-[?25l [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[?25h⠙[1G[0KEXIT_CODE=130
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  npx next build > /tmp/b [Kuuild-output.txt 2>&1; echo "BUILD_EXIT=$?" >> /tmp/build-output.txt[?2004l
-^C[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  cat /tmp/build-output.t [Kxxt[?2004l
-   ▲ Next.js 15.5.13
-   - Environments: .env.local
-
-   Creating an optimized production build ...
- ✓ Compiled successfully in 2.9s
-   Linting and checking validity of types ...
-BUILD_EXIT=130
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h[?2004l
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  npx next build > /tmp/b [Kuuild2.txt 2>&1; echo "EXIT=$?" >> /tmp/build2.txt[?2004l
-^C[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h  cat /tmp/build2.txt[?2004l
-   ▲ Next.js 15.5.13
-   - Environments: .env.local
-
-   Creating an optimized production build ...
- ✓ Compiled successfully in 3.1s
-   Linting and checking validity of types ...
-EXIT=130
-[1m[7m%[27m[1m[0m                                                                                [0m[27m[24m[Jlaurens@MacBook-Pro-van-Laurens caravanstallingspanje % [K[?2004h

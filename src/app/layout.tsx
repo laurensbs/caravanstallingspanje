@@ -1,115 +1,37 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
+import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
+import { Toaster } from 'sonner';
 import './globals.css';
-import { LocaleProvider } from '@/components/LocaleProvider';
-import FloatingActions from '@/components/FloatingActions';
-import MobileNav from '@/components/MobileNav';
-import ToastProvider from '@/components/ui/Toast';
-import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
-import ExitIntentPopup from '@/components/ExitIntentPopup';
-import CookieConsent from '@/components/CookieConsent';
-import Breadcrumbs from '@/components/Breadcrumbs';
-import Analytics from '@/components/Analytics';
-import LiveChat from '@/components/LiveChat';
 
 export const metadata: Metadata = {
-  title: { default: 'Caravanstalling Spanje | Veilige Stalling Costa Brava', template: '%s | Caravanstalling Spanje' },
-  description: 'Dé specialist in het veilig stallen, onderhouden, repareren en transporteren van uw caravan aan de Costa Brava. 2000+ caravans, 3 locaties.',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://caravanstalling-spanje.com'),
-  manifest: '/manifest.json',
-  themeColor: '#1B4D3E',
-  appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Caravanstalling' },
-  openGraph: {
-    type: 'website',
-    locale: 'nl_NL',
-    siteName: 'Caravanstalling Spanje',
-    title: 'Caravanstalling Spanje | Veilige Stalling Costa Brava',
-    description: 'Dé specialist in het veilig stallen, onderhouden, repareren en transporteren van uw caravan aan de Costa Brava.',
-    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: 'Caravanstalling Spanje — Costa Brava' }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Caravanstalling Spanje',
-    description: 'Veilige caravanstalling aan de Costa Brava. Stalling, onderhoud, reparatie en transport.',
-  },
-  alternates: {
-    canonical: 'https://caravanstalling-spanje.com',
-    languages: {
-      'nl': 'https://caravanstalling-spanje.com',
-      'x-default': 'https://caravanstalling-spanje.com',
-    },
-  },
+  title: 'Caravanstalling — Beheerportaal',
+  description: 'Intern beheerportaal',
+  robots: { index: false, follow: false },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#FAFAFA',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="nl">
-      <head>
-
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <link rel="apple-touch-icon" href="/images/icon-192.svg" />
-      </head>
-      <body className="bg-surface text-gray-900 antialiased pb-16 md:pb-0">
-        <a href="#main-content" className="skip-link">Ga naar inhoud</a>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'LocalBusiness',
-              name: 'Caravanstalling Spanje',
-              description: 'Specialist in veilige caravanstalling, onderhoud, reparatie en transport aan de Costa Brava.',
-              url: 'https://caravanstalling-spanje.com',
-              telephone: '+34650036755',
-              email: 'info@caravanstalling-spanje.com',
-              address: {
-                '@type': 'PostalAddress',
-                streetAddress: 'Ctra de Palamos 91',
-                addressLocality: 'Sant Climent de Peralta',
-                addressRegion: 'Girona',
-                postalCode: '17110',
-                addressCountry: 'ES',
-              },
-              openingHoursSpecification: {
-                '@type': 'OpeningHoursSpecification',
-                dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-                opens: '09:30',
-                closes: '16:30',
-              },
-              aggregateRating: {
-                '@type': 'AggregateRating',
-                ratingValue: '4.9',
-                reviewCount: '25',
-                bestRating: '5',
-              },
-              priceRange: '€45 - €95 per maand',
-              hasOfferCatalog: {
-                '@type': 'OfferCatalog',
-                name: 'Stallingsdiensten',
-                itemListElement: [
-                  { '@type': 'Offer', name: 'Buitenstalling', price: '65', priceCurrency: 'EUR', description: 'Veilige buitenstalling met 24/7 bewaking' },
-                  { '@type': 'Offer', name: 'Binnenstalling', price: '95', priceCurrency: 'EUR', description: 'Overdekte stalling in geïsoleerde hal' },
-                  { '@type': 'Offer', name: 'Seizoensstalling', price: '45', priceCurrency: 'EUR', description: 'Voordelig tarief buiten het kampeerseizoen' },
-                ],
-              },
-            }),
+    <html lang="nl" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+      <body>
+        {children}
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: {
+              background: 'var(--color-surface)',
+              color: 'var(--color-text)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-md)',
+              boxShadow: 'var(--shadow-md)',
+              fontFamily: 'var(--font-sans)',
+            },
           }}
         />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'WebSite',
-              name: 'Caravanstalling Spanje',
-              url: 'https://caravanstalling-spanje.com',
-              inLanguage: 'nl',
-            }),
-          }}
-        />
-        <LocaleProvider><Analytics /><LiveChat /><Breadcrumbs />{children}<FloatingActions /><MobileNav /><ExitIntentPopup /><CookieConsent /><ToastProvider /><ServiceWorkerRegistration /></LocaleProvider>
       </body>
     </html>
   );

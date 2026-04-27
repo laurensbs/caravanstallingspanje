@@ -1,9 +1,16 @@
 'use client';
 
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { Refrigerator, Plus, Search, ChevronDown, ChevronUp, Edit2, Trash2, Calendar, AlertCircle, CheckCircle, MapPin, Mail, Tag } from 'lucide-react';
-import Modal from '@/components/ui/Modal';
-import { useAdminI18n } from '@/lib/admin-i18n';
+import { useEffect, useState, useCallback, useMemo, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
+import {
+  Plus, Search, Trash2, Pencil, Calendar, MapPin, Tag, Receipt, Link as LinkIcon,
+  AlertCircle, CheckCircle2, ChevronRight,
+} from 'lucide-react';
+import { Button, Input, Select, Textarea, Badge, Skeleton, Spinner } from '@/components/ui';
+import Drawer from '@/components/Drawer';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 type Booking = {
   id: number;
@@ -13,6 +20,8 @@ type Booking = {
   spot_number: string | null;
   status: 'compleet' | 'controleren';
   notes: string | null;
+  holded_invoice_id: string | null;
+  holded_invoice_number: string | null;
 };
 
 type Fridge = {
@@ -22,53 +31,75 @@ type Fridge = {
   extra_email: string | null;
   device_type: string;
   notes: string | null;
-  created_at: string;
-  updated_at: string;
+  holded_contact_id: string | null;
   bookings: Booking[];
 };
 
-const STATUS_BADGE: Record<string, string> = {
-  compleet: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  controleren: 'bg-amber-50 text-amber-700 border-amber-200',
+const emptyFridge = { name: '', email: '', extra_email: '', device_type: 'Grote koelkast', notes: '' };
+const emptyBooking: { camping: string; start_date: string; end_date: string; spot_number: string; status: 'compleet' | 'controleren'; notes: string } = {
+  camping: '', start_date: '', end_date: '', spot_number: '', status: 'compleet', notes: '',
 };
 
-const emptyFridge = { name: '', email: '', extra_email: '', device_type: 'Grote koelkast', notes: '' };
-const emptyBooking: { camping: string; start_date: string; end_date: string; spot_number: string; status: 'compleet' | 'controleren'; notes: string } = { camping: '', start_date: '', end_date: '', spot_number: '', status: 'compleet', notes: '' };
-
-function formatDate(s: string | null) {
+function fmtDate(s: string | null): string {
   if (!s) return '';
-  const d = new Date(s);
-  return d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
+  return new Date(s).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
 }
 
-function formatPeriod(b: Booking) {
-  const start = formatDate(b.start_date);
-  const end = formatDate(b.end_date);
+function fmtPeriod(b: Booking): string {
+  const start = fmtDate(b.start_date);
+  const end = fmtDate(b.end_date);
   if (!start && !end) return '—';
   if (!end) return start;
   return `${start} – ${end}`;
 }
 
+function bookingDescription(b: Booking, fridgeName: string): string {
+  const camping = b.camping || 'Stalling';
+  const period = fmtPeriod(b);
+  return `Koelkast huur — ${camping} — ${period} (${fridgeName})`;
+}
+
 export default function KoelkastenPage() {
-  const { t } = useAdminI18n();
+  return (
+    <Suspense fallback={<div className="text-text-muted text-sm"><Spinner size={16} /></div>}>
+      <KoelkastenContent />
+    </Suspense>
+  );
+}
+
+function KoelkastenContent() {
+  const searchParams = useSearchParams();
+
   const [year, setYear] = useState(0);
-  const [statusFilter, setStatusFilter] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '');
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
   const [fridges, setFridges] = useState<Fridge[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [stats, setStats] = useState<{ totalFridges: number; totalBookings: number; byStatus: { status: string; count: string }[] }>({ totalFridges: 0, totalBookings: 0, byStatus: [] });
-  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const [showFridgeForm, setShowFridgeForm] = useState(false);
-  const [editingFridge, setEditingFridge] = useState<Fridge | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerMode, setDrawerMode] = useState<'create' | 'edit'>('create');
+  const [drawerFridge, setDrawerFridge] = useState<Fridge | null>(null);
   const [fridgeForm, setFridgeForm] = useState(emptyFridge);
+  const [savingFridge, setSavingFridge] = useState(false);
+  const [holdedSyncing, setHoldedSyncing] = useState(false);
 
-  const [showBookingForm, setShowBookingForm] = useState(false);
-  const [bookingFridgeId, setBookingFridgeId] = useState<number | null>(null);
-  const [editingBookingId, setEditingBookingId] = useState<number | null>(null);
+  const [bookingDialog, setBookingDialog] = useState<{ open: boolean; mode: 'create' | 'edit'; bookingId?: number }>({ open: false, mode: 'create' });
   const [bookingForm, setBookingForm] = useState(emptyBooking);
+  const [savingBooking, setSavingBooking] = useState(false);
 
-  const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'fridge' | 'booking'; id: number } | null>(null);
+  const [invoiceDialog, setInvoiceDialog] = useState<{ open: boolean; booking: Booking | null }>({ open: false, booking: null });
+  const [invoiceForm, setInvoiceForm] = useState({ description: '', units: '1', subtotal: '', tax: '21', notes: '' });
+  const [creatingInvoice, setCreatingInvoice] = useState(false);
+
+  const [confirmDelete, setConfirmDelete] = useState<{ type: 'fridge' | 'booking'; id: number } | null>(null);
+
+  // ─── Debounced search ───
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 250);
+    return () => clearTimeout(t);
+  }, [search]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -76,38 +107,47 @@ export default function KoelkastenPage() {
       const params = new URLSearchParams();
       if (year > 0) params.set('year', String(year));
       if (statusFilter) params.set('status', statusFilter);
-      if (searchQuery) params.set('search', searchQuery);
+      if (debouncedSearch) params.set('search', debouncedSearch);
       const res = await fetch(`/api/admin/fridges?${params}`, { credentials: 'include' });
       const data = await res.json();
       setFridges(data.fridges || []);
-    } catch { setFridges([]); }
-    setLoading(false);
-  }, [year, statusFilter, searchQuery]);
-
-  const loadStats = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/admin/fridges?stats=true${year > 0 ? `&year=${year}` : ''}`, { credentials: 'include' });
-      setStats(await res.json());
-    } catch { /* ignore */ }
-  }, [year]);
+    } catch {
+      setFridges([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [year, statusFilter, debouncedSearch]);
 
   useEffect(() => { load(); }, [load]);
-  useEffect(() => { loadStats(); }, [loadStats]);
 
-  const submitFridge = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const url = editingFridge ? `/api/admin/fridges/${editingFridge.id}` : '/api/admin/fridges';
-    const method = editingFridge ? 'PUT' : 'POST';
-    const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(fridgeForm), credentials: 'include' });
-    if (res.ok) {
-      setShowFridgeForm(false);
-      setEditingFridge(null);
-      setFridgeForm(emptyFridge);
-      load(); loadStats();
+  const refresh = useCallback(async () => {
+    if (drawerFridge) {
+      const res = await fetch(`/api/admin/fridges/${drawerFridge.id}`, { credentials: 'include' });
+      if (res.ok) {
+        const d = await res.json();
+        setDrawerFridge(d.fridge);
+      }
     }
+    load();
+  }, [drawerFridge, load]);
+
+  const years = useMemo(() => {
+    const set = new Set<number>();
+    fridges.forEach(f => f.bookings.forEach(b => { if (b.start_date) set.add(new Date(b.start_date).getFullYear()); }));
+    return Array.from(set).sort((a, b) => b - a);
+  }, [fridges]);
+
+  // ─── Fridge actions ───
+  const openCreate = () => {
+    setDrawerMode('create');
+    setDrawerFridge(null);
+    setFridgeForm(emptyFridge);
+    setDrawerOpen(true);
   };
 
-  const openEditFridge = (f: Fridge) => {
+  const openEdit = (f: Fridge) => {
+    setDrawerMode('edit');
+    setDrawerFridge(f);
     setFridgeForm({
       name: f.name,
       email: f.email || '',
@@ -115,35 +155,65 @@ export default function KoelkastenPage() {
       device_type: f.device_type,
       notes: f.notes || '',
     });
-    setEditingFridge(f);
-    setShowFridgeForm(true);
+    setDrawerOpen(true);
   };
 
-  const submitBooking = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!bookingFridgeId) return;
-    const url = editingBookingId ? `/api/admin/fridges/bookings/${editingBookingId}` : `/api/admin/fridges/${bookingFridgeId}/bookings`;
-    const method = editingBookingId ? 'PUT' : 'POST';
-    const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(bookingForm), credentials: 'include' });
-    if (res.ok) {
-      setShowBookingForm(false);
-      setBookingFridgeId(null);
-      setEditingBookingId(null);
-      setBookingForm(emptyBooking);
-      load(); loadStats();
+  const saveFridge = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setSavingFridge(true);
+    try {
+      const url = drawerMode === 'edit' && drawerFridge ? `/api/admin/fridges/${drawerFridge.id}` : '/api/admin/fridges';
+      const method = drawerMode === 'edit' ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(fridgeForm),
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        toast.error(d.error || 'Opslaan mislukt');
+        return;
+      }
+      const data = await res.json().catch(() => ({}));
+      toast.success(drawerMode === 'edit' ? 'Klant bijgewerkt' : 'Klant toegevoegd');
+      if (drawerMode === 'create' && data.fridge) {
+        setDrawerMode('edit');
+        setDrawerFridge(data.fridge);
+      }
+      await refresh();
+    } finally {
+      setSavingFridge(false);
     }
   };
 
-  const openNewBooking = (fridgeId: number) => {
-    setBookingFridgeId(fridgeId);
-    setEditingBookingId(null);
-    setBookingForm(emptyBooking);
-    setShowBookingForm(true);
+  const syncHolded = async () => {
+    if (!drawerFridge) return;
+    setHoldedSyncing(true);
+    try {
+      const res = await fetch(`/api/admin/fridges/${drawerFridge.id}/holded-contact`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || 'Synchronisatie mislukt');
+        return;
+      }
+      toast.success('Gekoppeld aan Holded');
+      await refresh();
+    } finally {
+      setHoldedSyncing(false);
+    }
   };
 
-  const openEditBooking = (fridgeId: number, b: Booking) => {
-    setBookingFridgeId(fridgeId);
-    setEditingBookingId(b.id);
+  // ─── Booking actions ───
+  const openNewBooking = () => {
+    setBookingForm(emptyBooking);
+    setBookingDialog({ open: true, mode: 'create' });
+  };
+
+  const openEditBooking = (b: Booking) => {
     setBookingForm({
       camping: b.camping || '',
       start_date: b.start_date ? b.start_date.split('T')[0] : '',
@@ -152,168 +222,240 @@ export default function KoelkastenPage() {
       status: b.status,
       notes: b.notes || '',
     });
-    setShowBookingForm(true);
+    setBookingDialog({ open: true, mode: 'edit', bookingId: b.id });
   };
 
-  const handleDelete = async () => {
-    if (!deleteConfirm) return;
-    const url = deleteConfirm.type === 'fridge'
-      ? `/api/admin/fridges/${deleteConfirm.id}`
-      : `/api/admin/fridges/bookings/${deleteConfirm.id}`;
-    await fetch(url, { method: 'DELETE', credentials: 'include' });
-    setDeleteConfirm(null);
-    load(); loadStats();
+  const saveBooking = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!drawerFridge) return;
+    setSavingBooking(true);
+    try {
+      const url = bookingDialog.mode === 'edit' && bookingDialog.bookingId
+        ? `/api/admin/fridges/bookings/${bookingDialog.bookingId}`
+        : `/api/admin/fridges/${drawerFridge.id}/bookings`;
+      const method = bookingDialog.mode === 'edit' ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bookingForm),
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        toast.error(d.error || 'Opslaan mislukt');
+        return;
+      }
+      toast.success(bookingDialog.mode === 'edit' ? 'Periode bijgewerkt' : 'Periode toegevoegd');
+      setBookingDialog({ open: false, mode: 'create' });
+      await refresh();
+    } finally {
+      setSavingBooking(false);
+    }
   };
 
-  const years = useMemo(() => {
-    const set = new Set<number>();
-    fridges.forEach(f => f.bookings.forEach(b => { if (b.start_date) set.add(new Date(b.start_date).getFullYear()); }));
-    return Array.from(set).sort((a, b) => b - a);
-  }, [fridges]);
+  // ─── Invoice ───
+  const openInvoice = (b: Booking) => {
+    if (!drawerFridge) return;
+    setInvoiceForm({
+      description: bookingDescription(b, drawerFridge.name),
+      units: '1',
+      subtotal: '',
+      tax: '21',
+      notes: '',
+    });
+    setInvoiceDialog({ open: true, booking: b });
+  };
 
-  const completeCount = parseInt(stats.byStatus.find(s => s.status === 'compleet')?.count || '0');
-  const checkCount = parseInt(stats.byStatus.find(s => s.status === 'controleren')?.count || '0');
+  const submitInvoice = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!invoiceDialog.booking) return;
+    const subtotal = parseFloat(invoiceForm.subtotal.replace(',', '.'));
+    if (isNaN(subtotal) || subtotal < 0) {
+      toast.error('Vul een geldig bedrag in');
+      return;
+    }
+    setCreatingInvoice(true);
+    try {
+      const res = await fetch(`/api/admin/fridges/bookings/${invoiceDialog.booking.id}/invoice`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          description: invoiceForm.description,
+          units: parseFloat(invoiceForm.units) || 1,
+          subtotal,
+          tax: parseFloat(invoiceForm.tax) || 0,
+          notes: invoiceForm.notes,
+        }),
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || 'Factuur mislukt');
+        return;
+      }
+      toast.success(`Factuur ${data.holdedInvoiceNumber || 'aangemaakt'}`);
+      setInvoiceDialog({ open: false, booking: null });
+      await refresh();
+    } finally {
+      setCreatingInvoice(false);
+    }
+  };
+
+  // ─── Delete ───
+  const confirmDeleteAction = async () => {
+    if (!confirmDelete) return;
+    const url = confirmDelete.type === 'fridge'
+      ? `/api/admin/fridges/${confirmDelete.id}`
+      : `/api/admin/fridges/bookings/${confirmDelete.id}`;
+    const res = await fetch(url, { method: 'DELETE', credentials: 'include' });
+    if (!res.ok) {
+      toast.error('Verwijderen mislukt');
+      return;
+    }
+    toast.success('Verwijderd');
+    if (confirmDelete.type === 'fridge') {
+      setDrawerOpen(false);
+      setDrawerFridge(null);
+    }
+    setConfirmDelete(null);
+    await refresh();
+  };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
+    <div className="max-w-6xl">
+      <header className="flex items-end justify-between mb-8 gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-            <Refrigerator className="text-primary" size={24} /> {t('Koelkasten')}
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            {stats.totalFridges} {t('klanten')} · {stats.totalBookings} {t('periodes')} · {completeCount} {t('compleet')} · {checkCount} {t('controleren')}
-          </p>
+          <h1 className="text-2xl font-medium text-text tracking-tight">Koelkasten</h1>
+          <p className="text-sm text-text-muted mt-1">{fridges.length} klanten</p>
         </div>
-        <button onClick={() => { setEditingFridge(null); setFridgeForm(emptyFridge); setShowFridgeForm(true); }} className="bg-primary hover:bg-primary-dark text-white px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 shadow-sm transition-colors">
-          <Plus size={16} /> {t('Nieuwe koelkast')}
-        </button>
-      </div>
+        <Button onClick={openCreate}><Plus size={14} /> Nieuwe klant</Button>
+      </header>
 
-      {/* Filters */}
-      <div className="bg-white border border-gray-200 rounded-xl p-4 mb-6 flex flex-wrap gap-3">
-        <div className="relative flex-1 min-w-[220px]">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+      <div className="flex flex-wrap gap-2 mb-6">
+        <div className="relative flex-1 min-w-[220px] max-w-md">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle" />
           <input
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            placeholder={t('Zoek naam, e-mail of camping...')}
-            className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-primary"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Zoek naam, e-mail of camping..."
+            className="w-full h-10 pl-9 pr-3 text-sm bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors placeholder:text-text-subtle"
           />
         </div>
-        <select value={year} onChange={e => setYear(parseInt(e.target.value))} className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary">
-          <option value={0}>{t('Alle jaren')}</option>
+        <select
+          value={year}
+          onChange={e => setYear(parseInt(e.target.value))}
+          className="h-10 px-3 text-sm bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors"
+        >
+          <option value={0}>Alle jaren</option>
           {years.map(y => <option key={y} value={y}>{y}</option>)}
         </select>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary">
-          <option value="">{t('Alle statussen')}</option>
-          <option value="compleet">{t('Compleet')}</option>
-          <option value="controleren">{t('Controleren')}</option>
+        <select
+          value={statusFilter}
+          onChange={e => setStatusFilter(e.target.value)}
+          className="h-10 px-3 text-sm bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors"
+        >
+          <option value="">Alle statussen</option>
+          <option value="compleet">Compleet</option>
+          <option value="controleren">Controleren</option>
         </select>
       </div>
 
-      {/* Table */}
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="bg-surface border border-border rounded-[var(--radius-xl)] overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-gray-500 text-sm">{t('Laden...')}</div>
+          <div className="divide-y divide-border">
+            {[0, 1, 2, 3, 4].map(i => (
+              <div key={i} className="px-5 py-4 flex items-center gap-4">
+                <Skeleton className="w-9 h-9 rounded-full" />
+                <Skeleton className="h-4 flex-1 max-w-xs" />
+                <Skeleton className="h-4 w-20" />
+              </div>
+            ))}
+          </div>
         ) : fridges.length === 0 ? (
-          <div className="p-12 text-center">
-            <Refrigerator className="mx-auto text-gray-300 mb-3" size={36} />
-            <p className="text-gray-500 text-sm">{t('Geen koelkasten gevonden')}</p>
-          </div>
+          <div className="py-16 text-center text-sm text-text-muted">Geen klanten gevonden</div>
         ) : (
-          <div className="divide-y divide-gray-100">
-            {fridges.map(f => {
-              const expanded = expandedId === f.id;
-              const hasCheck = f.bookings.some(b => b.status === 'controleren');
-              return (
-                <div key={f.id} className={hasCheck ? 'bg-amber-50/30' : ''}>
-                  <div className="px-4 py-3 flex items-center gap-4 hover:bg-gray-50 transition-colors">
-                    <button onClick={() => setExpandedId(expanded ? null : f.id)} className="text-gray-400 hover:text-gray-600">
-                      {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-                    </button>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold text-gray-900 text-sm">{f.name}</span>
-                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{f.device_type}</span>
-                        {hasCheck && <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full flex items-center gap-1"><AlertCircle size={11} />{t('Controleren')}</span>}
+          <ul className="divide-y divide-border">
+            <AnimatePresence initial={false}>
+              {fridges.map(f => {
+                const hasCheck = f.bookings.some(b => b.status === 'controleren');
+                const hasInvoice = f.bookings.some(b => b.holded_invoice_number);
+                return (
+                  <motion.li
+                    key={f.id}
+                    layout
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <button
+                      onClick={() => openEdit(f)}
+                      className="w-full flex items-center gap-4 px-5 py-3.5 hover:bg-surface-2 transition-colors text-left group"
+                    >
+                      <div className="w-9 h-9 rounded-full bg-surface-2 text-text flex items-center justify-center text-xs font-medium shrink-0 border border-border">
+                        {f.name.split(/\s+/).slice(0, 2).map(p => p[0]?.toUpperCase()).join('')}
                       </div>
-                      <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
-                        {f.email && <span className="flex items-center gap-1"><Mail size={11} />{f.email}</span>}
-                        <span>{f.bookings.length} {t('periode(s)')}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-medium text-text">{f.name}</span>
+                          {f.holded_contact_id && (
+                            <span title="Gekoppeld aan Holded">
+                              <LinkIcon size={11} className="text-text-subtle" />
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs text-text-muted mt-0.5 truncate">
+                          {f.device_type} · {f.bookings.length} periode{f.bookings.length === 1 ? '' : 's'}{f.email ? ` · ${f.email}` : ''}
+                        </div>
                       </div>
-                    </div>
-                    <button onClick={() => openNewBooking(f.id)} className="text-xs px-2.5 py-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 font-medium flex items-center gap-1">
-                      <Plus size={12} /> {t('Periode')}
+                      <div className="flex items-center gap-2 shrink-0">
+                        {hasInvoice && <Badge tone="success"><Receipt size={10} /> Factuur</Badge>}
+                        {hasCheck && <Badge tone="warning"><AlertCircle size={10} /> Controleren</Badge>}
+                        <ChevronRight size={14} className="text-text-subtle group-hover:text-text transition-colors" />
+                      </div>
                     </button>
-                    <button onClick={() => openEditFridge(f)} className="text-gray-400 hover:text-primary p-1.5 rounded-lg hover:bg-gray-100" title={t('Bewerken')}>
-                      <Edit2 size={15} />
-                    </button>
-                    <button onClick={() => setDeleteConfirm({ type: 'fridge', id: f.id })} className="text-gray-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50" title={t('Verwijderen')}>
-                      <Trash2 size={15} />
-                    </button>
-                  </div>
-                  {expanded && (
-                    <div className="px-4 pb-4 pl-12 space-y-2">
-                      {f.notes && (
-                        <div className="bg-blue-50/50 border border-blue-100 rounded-lg px-3 py-2 text-xs text-blue-800">
-                          <strong>{t('Notitie klant')}:</strong> {f.notes}
-                        </div>
-                      )}
-                      {f.extra_email && (
-                        <div className="text-xs text-gray-500 flex items-center gap-1.5"><Mail size={11} /> {t('Extra')}: {f.extra_email}</div>
-                      )}
-                      {f.bookings.length === 0 ? (
-                        <p className="text-xs text-gray-400 italic">{t('Geen periodes')}</p>
-                      ) : (
-                        <div className="space-y-1.5">
-                          {f.bookings.map(b => (
-                            <div key={b.id} className="bg-white border border-gray-200 rounded-lg px-3 py-2.5 flex items-center gap-3">
-                              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full border ${STATUS_BADGE[b.status]}`}>
-                                {b.status === 'compleet' ? <CheckCircle size={10} className="inline mr-1" /> : <AlertCircle size={10} className="inline mr-1" />}
-                                {b.status}
-                              </span>
-                              <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-2 text-xs">
-                                <span className="flex items-center gap-1 text-gray-700"><MapPin size={11} className="text-gray-400" />{b.camping || '—'}</span>
-                                <span className="flex items-center gap-1 text-gray-700"><Calendar size={11} className="text-gray-400" />{formatPeriod(b)}</span>
-                                {b.spot_number && <span className="flex items-center gap-1 text-gray-700"><Tag size={11} className="text-gray-400" />{b.spot_number}</span>}
-                                {b.notes && <span className="text-gray-500 italic truncate" title={b.notes}>{b.notes}</span>}
-                              </div>
-                              <button onClick={() => openEditBooking(f.id, b)} className="text-gray-400 hover:text-primary p-1 rounded hover:bg-gray-100"><Edit2 size={13} /></button>
-                              <button onClick={() => setDeleteConfirm({ type: 'booking', id: b.id })} className="text-gray-400 hover:text-red-600 p-1 rounded hover:bg-red-50"><Trash2 size={13} /></button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                  </motion.li>
+                );
+              })}
+            </AnimatePresence>
+          </ul>
         )}
       </div>
 
-      {/* Fridge form */}
-      <Modal open={showFridgeForm} onClose={() => setShowFridgeForm(false)} title={editingFridge ? t('Koelkast bewerken') : t('Nieuwe koelkast')} size="lg">
-        <form onSubmit={submitFridge} className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">{t('Naam')}</label>
-            <input required value={fridgeForm.name} onChange={e => setFridgeForm({ ...fridgeForm, name: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary" />
-          </div>
+      {/* ─── Fridge drawer ─── */}
+      <Drawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        title={drawerMode === 'edit' && drawerFridge ? drawerFridge.name : 'Nieuwe klant'}
+        subtitle={drawerMode === 'edit' && drawerFridge ? drawerFridge.device_type : undefined}
+        footer={drawerMode === 'edit' && drawerFridge ? (
+          <>
+            <Button variant="ghost" onClick={() => setConfirmDelete({ type: 'fridge', id: drawerFridge.id })}>
+              <Trash2 size={14} /> Verwijderen
+            </Button>
+            <Button onClick={() => saveFridge()} loading={savingFridge}>Opslaan</Button>
+          </>
+        ) : (
+          <>
+            <Button variant="ghost" onClick={() => setDrawerOpen(false)}>Annuleren</Button>
+            <Button onClick={() => saveFridge()} loading={savingFridge}>Toevoegen</Button>
+          </>
+        )}
+      >
+        <form onSubmit={saveFridge} className="space-y-4">
+          <Input label="Naam" required value={fridgeForm.name} onChange={e => setFridgeForm({ ...fridgeForm, name: e.target.value })} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">{t('E-mail')}</label>
-              <input type="email" value={fridgeForm.email} onChange={e => setFridgeForm({ ...fridgeForm, email: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary" />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">{t('Extra e-mail')}</label>
-              <input type="email" value={fridgeForm.extra_email} onChange={e => setFridgeForm({ ...fridgeForm, extra_email: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary" />
-            </div>
+            <Input label="E-mail" type="email" value={fridgeForm.email} onChange={e => setFridgeForm({ ...fridgeForm, email: e.target.value })} />
+            <Input label="Extra e-mail" type="email" value={fridgeForm.extra_email} onChange={e => setFridgeForm({ ...fridgeForm, extra_email: e.target.value })} />
           </div>
           <div>
-            <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">{t('Soort apparaat')}</label>
-            <input value={fridgeForm.device_type} onChange={e => setFridgeForm({ ...fridgeForm, device_type: e.target.value })} list="device-types" className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary" />
+            <label className="block text-xs font-medium text-text mb-1.5">Soort apparaat</label>
+            <input
+              list="device-types"
+              value={fridgeForm.device_type}
+              onChange={e => setFridgeForm({ ...fridgeForm, device_type: e.target.value })}
+              className="w-full h-10 px-3 text-sm bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors"
+            />
             <datalist id="device-types">
               <option value="Grote koelkast" />
               <option value="Tafelmodel koelkast" />
@@ -322,70 +464,187 @@ export default function KoelkastenPage() {
               <option value="Grote koelkast + airco unit" />
             </datalist>
           </div>
-          <div>
-            <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">{t('Notities')}</label>
-            <textarea rows={2} value={fridgeForm.notes} onChange={e => setFridgeForm({ ...fridgeForm, notes: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary" />
-          </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <button type="button" onClick={() => setShowFridgeForm(false)} className="px-4 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">{t('Annuleren')}</button>
-            <button type="submit" className="bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-lg text-sm font-semibold">{editingFridge ? t('Opslaan') : t('Toevoegen')}</button>
-          </div>
+          <Textarea label="Notities" value={fridgeForm.notes} onChange={e => setFridgeForm({ ...fridgeForm, notes: e.target.value })} />
         </form>
-      </Modal>
 
-      {/* Booking form */}
-      <Modal open={showBookingForm} onClose={() => setShowBookingForm(false)} title={editingBookingId ? t('Periode bewerken') : t('Nieuwe periode')} size="lg">
-        <form onSubmit={submitBooking} className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">{t('Camping')}</label>
-            <input value={bookingForm.camping} onChange={e => setBookingForm({ ...bookingForm, camping: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary" />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">{t('Startdatum')}</label>
-              <input type="date" value={bookingForm.start_date} onChange={e => setBookingForm({ ...bookingForm, start_date: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary" />
+        {drawerMode === 'edit' && drawerFridge && (
+          <>
+            {/* Holded sync */}
+            <div className="mt-8 p-4 bg-surface-2 rounded-[var(--radius-lg)] border border-border">
+              <div className="flex items-start gap-3">
+                <div className="flex-1">
+                  <div className="text-xs font-medium text-text mb-1">Holded</div>
+                  <p className="text-xs text-text-muted">
+                    {drawerFridge.holded_contact_id
+                      ? `Gekoppeld (id ${drawerFridge.holded_contact_id.slice(0, 8)}…)`
+                      : 'Nog niet gekoppeld'}
+                  </p>
+                </div>
+                {!drawerFridge.holded_contact_id && (
+                  <Button size="sm" variant="secondary" onClick={syncHolded} loading={holdedSyncing}>
+                    Koppelen
+                  </Button>
+                )}
+              </div>
             </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">{t('Einddatum')}</label>
-              <input type="date" value={bookingForm.end_date} onChange={e => setBookingForm({ ...bookingForm, end_date: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary" />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">{t('Pleknummer')}</label>
-              <input value={bookingForm.spot_number} onChange={e => setBookingForm({ ...bookingForm, spot_number: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary" />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">{t('Status')}</label>
-              <select value={bookingForm.status} onChange={e => setBookingForm({ ...bookingForm, status: e.target.value as 'compleet' | 'controleren' })} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary">
-                <option value="compleet">{t('Compleet')}</option>
-                <option value="controleren">{t('Controleren')}</option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">{t('Opmerking')}</label>
-            <textarea rows={2} value={bookingForm.notes} onChange={e => setBookingForm({ ...bookingForm, notes: e.target.value })} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-primary" />
-          </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <button type="button" onClick={() => setShowBookingForm(false)} className="px-4 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">{t('Annuleren')}</button>
-            <button type="submit" className="bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-lg text-sm font-semibold">{editingBookingId ? t('Opslaan') : t('Toevoegen')}</button>
-          </div>
-        </form>
-      </Modal>
 
-      {/* Delete confirm */}
-      <Modal open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title={t('Verwijderen?')} size="sm">
-        <p className="text-sm text-gray-600 mb-5">
-          {deleteConfirm?.type === 'fridge'
-            ? t('Weet je zeker dat je deze koelkast en alle bijbehorende periodes wilt verwijderen?')
-            : t('Weet je zeker dat je deze periode wilt verwijderen?')}
-        </p>
-        <div className="flex justify-end gap-2">
-          <button onClick={() => setDeleteConfirm(null)} className="px-4 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">{t('Annuleren')}</button>
-          <button onClick={handleDelete} className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold">{t('Verwijderen')}</button>
-        </div>
-      </Modal>
+            {/* Bookings */}
+            <div className="mt-8">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs font-medium uppercase tracking-wider text-text-muted">Periodes</h3>
+                <Button size="sm" variant="secondary" onClick={openNewBooking}><Plus size={12} /> Toevoegen</Button>
+              </div>
+              {drawerFridge.bookings.length === 0 ? (
+                <p className="text-xs text-text-muted italic">Nog geen periodes</p>
+              ) : (
+                <ul className="space-y-2">
+                  {drawerFridge.bookings.map(b => (
+                    <li key={b.id} className="bg-surface border border-border rounded-[var(--radius-md)] p-3 space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0 space-y-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <Badge tone={b.status === 'compleet' ? 'success' : 'warning'}>
+                              {b.status === 'compleet' ? <CheckCircle2 size={10} /> : <AlertCircle size={10} />}
+                              {b.status}
+                            </Badge>
+                            {b.holded_invoice_number && (
+                              <Badge tone="accent"><Receipt size={10} /> {b.holded_invoice_number}</Badge>
+                            )}
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-xs text-text">
+                            <span className="flex items-center gap-1.5"><MapPin size={11} className="text-text-subtle" />{b.camping || '—'}</span>
+                            <span className="flex items-center gap-1.5"><Calendar size={11} className="text-text-subtle" />{fmtPeriod(b)}</span>
+                            {b.spot_number && <span className="flex items-center gap-1.5"><Tag size={11} className="text-text-subtle" />{b.spot_number}</span>}
+                          </div>
+                          {b.notes && <p className="text-xs text-text-muted italic">{b.notes}</p>}
+                        </div>
+                        <div className="flex items-center gap-0.5 shrink-0">
+                          <button
+                            onClick={() => openEditBooking(b)}
+                            className="w-7 h-7 inline-flex items-center justify-center rounded-[var(--radius-sm)] text-text-muted hover:text-text hover:bg-surface-2 transition-colors"
+                            aria-label="Bewerken"
+                          >
+                            <Pencil size={12} />
+                          </button>
+                          <button
+                            onClick={() => setConfirmDelete({ type: 'booking', id: b.id })}
+                            className="w-7 h-7 inline-flex items-center justify-center rounded-[var(--radius-sm)] text-text-muted hover:text-danger hover:bg-danger-soft transition-colors"
+                            aria-label="Verwijderen"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      </div>
+                      {!b.holded_invoice_number && (
+                        <div className="pt-2 border-t border-border">
+                          <Button size="sm" variant="secondary" onClick={() => openInvoice(b)}>
+                            <Receipt size={12} /> Factuur in Holded
+                          </Button>
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </>
+        )}
+      </Drawer>
+
+      {/* ─── Booking dialog (modal) ─── */}
+      <AnimatePresence>
+        {bookingDialog.open && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setBookingDialog({ open: false, mode: 'create' })}
+              className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 8 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+              className="relative bg-bg border border-border rounded-[var(--radius-xl)] shadow-lg max-w-md w-full p-6"
+            >
+              <h2 className="text-base font-medium text-text mb-4">
+                {bookingDialog.mode === 'edit' ? 'Periode bewerken' : 'Nieuwe periode'}
+              </h2>
+              <form onSubmit={saveBooking} className="space-y-4">
+                <Input label="Camping" value={bookingForm.camping} onChange={e => setBookingForm({ ...bookingForm, camping: e.target.value })} />
+                <div className="grid grid-cols-2 gap-3">
+                  <Input label="Startdatum" type="date" value={bookingForm.start_date} onChange={e => setBookingForm({ ...bookingForm, start_date: e.target.value })} />
+                  <Input label="Einddatum" type="date" value={bookingForm.end_date} onChange={e => setBookingForm({ ...bookingForm, end_date: e.target.value })} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <Input label="Pleknummer" value={bookingForm.spot_number} onChange={e => setBookingForm({ ...bookingForm, spot_number: e.target.value })} />
+                  <Select label="Status" value={bookingForm.status} onChange={e => setBookingForm({ ...bookingForm, status: e.target.value as 'compleet' | 'controleren' })}>
+                    <option value="compleet">Compleet</option>
+                    <option value="controleren">Controleren</option>
+                  </Select>
+                </div>
+                <Textarea label="Opmerking" value={bookingForm.notes} onChange={e => setBookingForm({ ...bookingForm, notes: e.target.value })} />
+                <div className="flex justify-end gap-2 pt-2">
+                  <Button type="button" variant="ghost" onClick={() => setBookingDialog({ open: false, mode: 'create' })}>Annuleren</Button>
+                  <Button type="submit" loading={savingBooking}>
+                    {bookingDialog.mode === 'edit' ? 'Opslaan' : 'Toevoegen'}
+                  </Button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ─── Invoice dialog ─── */}
+      <AnimatePresence>
+        {invoiceDialog.open && invoiceDialog.booking && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setInvoiceDialog({ open: false, booking: null })}
+              className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 8 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+              className="relative bg-bg border border-border rounded-[var(--radius-xl)] shadow-lg max-w-md w-full p-6"
+            >
+              <h2 className="text-base font-medium text-text mb-1">Factuur in Holded</h2>
+              <p className="text-xs text-text-muted mb-4">Controleer en pas aan voor verzenden.</p>
+              <form onSubmit={submitInvoice} className="space-y-4">
+                <Input label="Omschrijving" required value={invoiceForm.description} onChange={e => setInvoiceForm({ ...invoiceForm, description: e.target.value })} />
+                <div className="grid grid-cols-3 gap-3">
+                  <Input label="Aantal" type="number" min="1" step="1" value={invoiceForm.units} onChange={e => setInvoiceForm({ ...invoiceForm, units: e.target.value })} />
+                  <Input label="Bedrag (€)" required inputMode="decimal" placeholder="0,00" value={invoiceForm.subtotal} onChange={e => setInvoiceForm({ ...invoiceForm, subtotal: e.target.value })} />
+                  <Input label="Btw (%)" type="number" min="0" max="100" step="1" value={invoiceForm.tax} onChange={e => setInvoiceForm({ ...invoiceForm, tax: e.target.value })} />
+                </div>
+                <Textarea label="Notities" value={invoiceForm.notes} onChange={e => setInvoiceForm({ ...invoiceForm, notes: e.target.value })} />
+                <div className="flex justify-end gap-2 pt-2">
+                  <Button type="button" variant="ghost" onClick={() => setInvoiceDialog({ open: false, booking: null })}>Annuleren</Button>
+                  <Button type="submit" loading={creatingInvoice}><Receipt size={14} /> Verstuur naar Holded</Button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <ConfirmDialog
+        open={!!confirmDelete}
+        title={confirmDelete?.type === 'fridge' ? 'Klant verwijderen?' : 'Periode verwijderen?'}
+        description={confirmDelete?.type === 'fridge' ? 'De klant en alle bijbehorende periodes worden permanent verwijderd.' : 'Deze periode wordt permanent verwijderd.'}
+        confirmLabel="Verwijderen"
+        destructive
+        onConfirm={confirmDeleteAction}
+        onCancel={() => setConfirmDelete(null)}
+      />
     </div>
   );
 }

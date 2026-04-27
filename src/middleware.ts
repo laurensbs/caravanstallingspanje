@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminToken, verifyStaffToken, verifyCustomerToken } from '@/lib/auth';
+import { verifyAdminToken } from '@/lib/auth';
 
-// ── Simple in-memory rate limiter ──
 const rateMap = new Map<string, { count: number; reset: number }>();
-const RATE_LIMIT = 60; // requests per window
-const RATE_WINDOW = 60_000; // 1 minute
+const RATE_LIMIT = 60;
+const RATE_WINDOW = 60_000;
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
@@ -17,24 +16,19 @@ function checkRateLimit(ip: string): boolean {
   return entry.count <= RATE_LIMIT;
 }
 
-// ── Security headers ──
 function addSecurityHeaders(response: NextResponse): NextResponse {
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  response.headers.set('X-XSS-Protection', '1; mode=block');
   response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
-  response.headers.set('Permissions-Policy', 'camera=(self), microphone=(), geolocation=(self)');
-  // CSP — strict domains. unsafe-inline required for Next.js inline scripts + Tailwind.
-  // TODO: migrate to nonce-based CSP when Next.js has stable support (currently experimental)
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://www.googletagmanager.com https://www.google-analytics.com https://embed.tawk.to",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "font-src 'self' https://fonts.gstatic.com",
-    "img-src 'self' data: https://images.unsplash.com https://u.cubeupload.com https://*.googleapis.com https://*.gstatic.com https://www.google-analytics.com https://www.googletagmanager.com blob:",
-    "frame-src https://www.google.com https://maps.google.com https://js.stripe.com https://tawk.to",
-    "connect-src 'self' https://api.stripe.com https://*.neon.tech https://www.google-analytics.com https://analytics.google.com https://*.sentry.io https://*.tawk.to wss://*.tawk.to",
+    "script-src 'self' 'unsafe-inline'",
+    "style-src 'self' 'unsafe-inline'",
+    "font-src 'self' data:",
+    "img-src 'self' data: blob:",
+    "connect-src 'self' https://*.neon.tech https://api.holded.com",
     "worker-src 'self' blob:",
     "object-src 'none'",
     "base-uri 'self'",
@@ -47,9 +41,7 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const hostname = request.headers.get('host') || '';
 
-  // ── Rate limiting on API routes ──
   if (pathname.startsWith('/api/')) {
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
     if (!checkRateLimit(ip)) {
@@ -57,25 +49,6 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // ── Admin subdomain ──
-  if (hostname.startsWith('admin.')) {
-    if (pathname.startsWith('/api/')) return addSecurityHeaders(NextResponse.next());
-    if (pathname === '/login') return addSecurityHeaders(NextResponse.next());
-    const url = request.nextUrl.clone();
-    url.pathname = `/admin${pathname}`;
-    return addSecurityHeaders(NextResponse.rewrite(url));
-  }
-
-  // ── Staff subdomain ──
-  if (hostname.startsWith('staff.')) {
-    if (pathname.startsWith('/api/')) return addSecurityHeaders(NextResponse.next());
-    if (pathname === '/login') return addSecurityHeaders(NextResponse.next());
-    const url = request.nextUrl.clone();
-    url.pathname = `/staff${pathname}`;
-    return addSecurityHeaders(NextResponse.rewrite(url));
-  }
-
-  // ── Protect /api/admin/* (except auth) ──
   if (pathname.startsWith('/api/admin') && !pathname.startsWith('/api/admin/auth')) {
     const cookie = request.cookies.get('admin_token')?.value;
     const authHeader = request.headers.get('authorization');
@@ -90,40 +63,9 @@ export async function middleware(request: NextRequest) {
     return addSecurityHeaders(response);
   }
 
-  // ── Protect /api/staff/* (except auth) ──
-  if (pathname.startsWith('/api/staff') && !pathname.startsWith('/api/staff/auth')) {
-    const cookie = request.cookies.get('staff_token')?.value;
-    const authHeader = request.headers.get('authorization');
-    const token = cookie || (authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null);
-    if (!token) return NextResponse.json({ error: 'Niet geautoriseerd' }, { status: 401 });
-    const session = await verifyStaffToken(token);
-    if (!session) return NextResponse.json({ error: 'Sessie verlopen' }, { status: 401 });
-    const response = NextResponse.next();
-    response.headers.set('x-staff-id', String(session.id));
-    response.headers.set('x-staff-name', session.name);
-    response.headers.set('x-staff-role', session.role);
-    if (session.locationId) response.headers.set('x-staff-location', String(session.locationId));
-    return addSecurityHeaders(response);
-  }
-
-  // ── Protect /api/customer/* (except auth) ──
-  if (pathname.startsWith('/api/customer') && !pathname.startsWith('/api/customer/auth')) {
-    const cookie = request.cookies.get('customer_token')?.value;
-    const authHeader = request.headers.get('authorization');
-    const token = cookie || (authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null);
-    if (!token) return NextResponse.json({ error: 'Niet geautoriseerd' }, { status: 401 });
-    const session = await verifyCustomerToken(token);
-    if (!session) return NextResponse.json({ error: 'Sessie verlopen' }, { status: 401 });
-    const response = NextResponse.next();
-    response.headers.set('x-customer-id', String(session.id));
-    response.headers.set('x-customer-email', session.email);
-    response.headers.set('x-customer-name', session.name);
-    return addSecurityHeaders(response);
-  }
-
   return addSecurityHeaders(NextResponse.next());
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|images|manifest\\.json|sw\\.js).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };
