@@ -18,6 +18,7 @@ export async function initDatabase() {
   )`;
   await sql`ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS failed_attempts INTEGER DEFAULT 0`;
   await sql`ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP`;
+  await sql`ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN DEFAULT false`;
 
   await sql`CREATE TABLE IF NOT EXISTS activity_log (
     id SERIAL PRIMARY KEY,
@@ -103,6 +104,14 @@ export async function isAccountLocked(id: number): Promise<boolean> {
   const rows = await sql`SELECT locked_until FROM admin_users WHERE id = ${id} LIMIT 1`;
   if (!rows[0]?.locked_until) return false;
   return new Date(rows[0].locked_until) > new Date();
+}
+
+export async function setAdminPassword(id: number, hash: string) {
+  await sql`UPDATE admin_users SET password_hash = ${hash}, must_change_password = false, failed_attempts = 0, locked_until = NULL WHERE id = ${id}`;
+}
+
+export async function markAllAdminsForPasswordChange() {
+  await sql`UPDATE admin_users SET must_change_password = true`;
 }
 
 // ─── Activity log ───

@@ -31,6 +31,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Ongeldige inloggegevens' }, { status: 401 });
     }
 
+    if (admin.must_change_password) {
+      // Reset failed attempts (correct password) but don't issue a session yet.
+      await recordLoginSuccess(admin.id);
+      return NextResponse.json({
+        success: true,
+        mustChangePassword: true,
+        adminId: admin.id,
+        name: admin.name,
+      });
+    }
+
     await recordLoginSuccess(admin.id);
     await logActivity({ actor: admin.name, role: admin.role, action: 'Ingelogd', entityType: 'auth', entityLabel: admin.email });
 

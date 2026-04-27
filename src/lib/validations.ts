@@ -5,6 +5,12 @@ export const loginSchema = z.object({
   password: z.string().min(1).max(200),
 });
 
+export const setPasswordSchema = z.object({
+  adminId: z.number().int().positive(),
+  currentPassword: z.string().min(1).max(200),
+  newPassword: z.string().min(10, 'Minimaal 10 tekens').max(200),
+});
+
 export const fridgeSchema = z.object({
   name: z.string().min(1).max(200),
   email: z.string().email().optional().or(z.literal('')),
