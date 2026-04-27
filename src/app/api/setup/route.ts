@@ -25,7 +25,7 @@ async function handleSetup(request: NextRequest) {
       { name: 'Johan', email: 'johan@caravanstalling-spanje.com', role: 'admin' },
       { name: 'Laurens', email: 'laurens@caravanstalling-spanje.com', role: 'admin' },
     ];
-    const defaultPassword = 'C@r@v@n2024!@#';
+    const defaultPassword = 'admin1234';
 
     for (const account of accounts) {
       const existing = await getAdminByEmail(account.email);
