@@ -263,21 +263,21 @@ export const guideBlogPostSchema = z.object({
 });
 
 // ── Repair Inspections ──
-export const repairInspectionSchema = z.object({
-  year: z.number().int().min(2020).max(2040).default(new Date().getFullYear()),
-  location_code: z.string().min(1).max(20),
-  area: z.enum(['cruillas', 'peratallada']).default('cruillas'),
-  customer_name: z.string().min(1).max(200),
-  client_number: z.string().max(20).optional(),
-  repairs_description: z.string().max(5000).optional(),
-  observations: z.string().max(5000).optional(),
-  cost_type: z.enum(['client', 'company', 'none']).default('client'),
-  status: z.enum(['geen_schade', 'inspectie', 'werkbon', 'goedgekeurd', 'afgekeurd', 'in_behandeling', 'afgerond', 'gefactureerd']).default('geen_schade'),
-  parts_needed: z.string().max(2000).optional(),
-  date_of_completion: z.string().optional(),
-  invoice_reference: z.string().max(200).optional(),
-  notes: z.string().max(5000).optional(),
-  assigned_to: z.string().max(100).optional(),
+export const fridgeSchema = z.object({
+  name: z.string().min(1).max(200),
+  email: z.string().email().optional().or(z.literal('')),
+  extra_email: z.string().email().optional().or(z.literal('')),
+  device_type: z.string().max(100).default('Grote koelkast'),
+  notes: z.string().max(2000).optional(),
+});
+
+export const fridgeBookingSchema = z.object({
+  camping: z.string().max(200).optional(),
+  start_date: z.string().optional(),
+  end_date: z.string().optional(),
+  spot_number: z.string().max(50).optional(),
+  status: z.enum(['compleet', 'controleren']).default('compleet'),
+  notes: z.string().max(2000).optional(),
 });
 
 // ── Helpers ──
