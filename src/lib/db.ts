@@ -142,6 +142,8 @@ export async function initDatabase() {
   await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS return_date DATE`;
   await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS camping TEXT`;
   await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS created_via TEXT NOT NULL DEFAULT 'public'`;
+  await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS outbound_time TEXT`;
+  await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS return_time TEXT`;
   await sql`CREATE INDEX IF NOT EXISTS idx_transport_requests_status ON transport_requests(status)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_transport_requests_created ON transport_requests(created_at DESC)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_transport_requests_date ON transport_requests(preferred_date)`;
@@ -612,7 +614,9 @@ export async function createTransportRequest(data: {
    *  terug-rit van camping → stalling. */
   camping: string;
   outbound_date: string;
+  outbound_time?: string | null;
   return_date: string;
+  return_time?: string | null;
   registration?: string | null;
   brand?: string | null;
   model?: string | null;
@@ -622,11 +626,12 @@ export async function createTransportRequest(data: {
 }) {
   const res = await sql`INSERT INTO transport_requests
     (name, email, phone, from_location, to_location,
-     camping, preferred_date, return_date,
+     camping, preferred_date, return_date, outbound_time, return_time,
      registration, brand, model, notes, created_via, status)
     VALUES (${data.name}, ${data.email}, ${data.phone || null},
       'Stalling Cruïlles', ${data.camping},
       ${data.camping}, ${data.outbound_date}::date, ${data.return_date}::date,
+      ${data.outbound_time || null}, ${data.return_time || null},
       ${data.registration || null}, ${data.brand || null}, ${data.model || null},
       ${data.notes || null}, ${data.created_via || 'public'}, ${data.status || 'controleren'})
     RETURNING *`;

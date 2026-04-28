@@ -102,9 +102,11 @@ export const transportOrderSchema = z.object({
   outboundDate: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Heen-datum is verplicht'),
+  outboundTime: z.string().regex(/^\d{2}:\d{2}$/).optional().or(z.literal('')),
   returnDate: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Terug-datum is verplicht'),
+  returnTime: z.string().regex(/^\d{2}:\d{2}$/).optional().or(z.literal('')),
   description: z.string().max(2000).optional().or(z.literal('')),
 }).refine((d) => new Date(d.returnDate) >= new Date(d.outboundDate), {
   message: 'Terug-datum moet op of na heen-datum liggen',

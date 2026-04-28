@@ -21,26 +21,31 @@ export async function POST(req: NextRequest) {
       phone: d.phone,
       camping: d.camping,
       outbound_date: d.outboundDate,
+      outbound_time: d.outboundTime || null,
       return_date: d.returnDate,
+      return_time: d.returnTime || null,
       registration: d.registration || null,
       brand: d.brand || null,
       model: d.model || null,
       notes: d.description || null,
     });
 
+    const heen = `${d.outboundDate}${d.outboundTime ? ` ${d.outboundTime}` : ''}`;
+    const terug = `${d.returnDate}${d.returnTime ? ` ${d.returnTime}` : ''}`;
+
     await logActivity({
       action: 'Transport-aanvraag ontvangen',
       entityType: 'transport_request',
       entityId: String(entry.id),
       entityLabel: `${d.name} — ${d.camping}`,
-      details: `Heen ${d.outboundDate} · Terug ${d.returnDate}`,
+      details: `Heen ${heen} · Terug ${terug}`,
     });
 
     const reference = `TR-${entry.id}`;
     const mail = requestReceivedHtml({
       name: d.name,
       type: 'service',
-      description: `Transport heen-en-terug — ${d.camping}\nHeen: ${d.outboundDate}\nTerug: ${d.returnDate}`,
+      description: `Transport heen-en-terug — ${d.camping}\nHeen: ${heen}\nTerug: ${terug}`,
       reference,
     });
     await sendMail({ to: d.email, subject: mail.subject, html: mail.html, text: mail.text })

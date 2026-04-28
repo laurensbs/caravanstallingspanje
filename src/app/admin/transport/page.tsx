@@ -20,7 +20,9 @@ type Entry = {
   from_location: string;
   to_location: string;
   preferred_date: string | null;
+  outbound_time: string | null;
   return_date: string | null;
+  return_time: string | null;
   camping: string | null;
   registration: string | null;
   brand: string | null;
@@ -82,7 +84,8 @@ function statusTone(status: string): 'warning' | 'success' | 'accent' | 'danger'
 
 const emptyForm = {
   name: '', email: '', phone: '', camping: '',
-  outbound_date: '', return_date: '',
+  outbound_date: '', outbound_time: '',
+  return_date: '', return_time: '',
   registration: '', brand: '', model: '', notes: '',
 };
 
@@ -258,7 +261,8 @@ export default function TransportPage() {
                     </span>
                     <span className="flex items-center gap-1.5 text-text">
                       <Calendar size={12} className="text-text-subtle shrink-0" />
-                      Heen: {fmtDate(e.preferred_date)}{e.return_date ? ` · Terug: ${fmtDate(e.return_date)}` : ''}
+                      Heen: {fmtDate(e.preferred_date)}{e.outbound_time ? ` ${e.outbound_time}` : ''}
+                      {e.return_date ? ` · Terug: ${fmtDate(e.return_date)}${e.return_time ? ` ${e.return_time}` : ''}` : ''}
                     </span>
                     <a href={`mailto:${e.email}`} className="flex items-center gap-1.5 text-text hover:text-text">
                       <Mail size={12} className="text-text-subtle shrink-0" />
@@ -328,8 +332,12 @@ export default function TransportPage() {
             </div>
             <Input label="Heen-datum" type="date" required value={form.outbound_date}
               onChange={(e) => setForm({ ...form, outbound_date: e.target.value })} />
+            <Input label="Heen-tijd" type="time" value={form.outbound_time}
+              onChange={(e) => setForm({ ...form, outbound_time: e.target.value })} />
             <Input label="Terug-datum" type="date" required value={form.return_date}
               onChange={(e) => setForm({ ...form, return_date: e.target.value })} />
+            <Input label="Terug-tijd" type="time" value={form.return_time}
+              onChange={(e) => setForm({ ...form, return_time: e.target.value })} />
             <Input label="Kenteken" value={form.registration}
               onChange={(e) => setForm({ ...form, registration: e.target.value })} />
             <Input label="Merk" value={form.brand}

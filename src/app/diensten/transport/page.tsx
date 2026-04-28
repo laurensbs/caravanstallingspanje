@@ -15,7 +15,9 @@ export default function TransportPage() {
   const [contact, setContact] = useState(emptyContact);
   const [camping, setCamping] = useState('');
   const [outboundDate, setOutboundDate] = useState('');
+  const [outboundTime, setOutboundTime] = useState('');
   const [returnDate, setReturnDate] = useState('');
+  const [returnTime, setReturnTime] = useState('');
   const [description, setDescription] = useState('');
 
   const { submit, submitting, error, done, publicCode } = useServiceSubmit('/api/order/transport');
@@ -48,28 +50,46 @@ export default function TransportPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Field label={t('transport.outbound-date')} required>
-          <input
-            type="date"
-            required
-            value={outboundDate}
-            min={new Date().toISOString().slice(0, 10)}
-            onChange={(e) => {
-              const v = e.target.value;
-              setOutboundDate(v);
-              if (!returnDate || returnDate < v) setReturnDate(v);
-            }}
-            className={fieldCls}
-          />
+          <div className="grid grid-cols-[1fr_110px] gap-2">
+            <input
+              type="date"
+              required
+              value={outboundDate}
+              min={new Date().toISOString().slice(0, 10)}
+              onChange={(e) => {
+                const v = e.target.value;
+                setOutboundDate(v);
+                if (!returnDate || returnDate < v) setReturnDate(v);
+              }}
+              className={fieldCls}
+            />
+            <input
+              type="time"
+              value={outboundTime}
+              onChange={(e) => setOutboundTime(e.target.value)}
+              className={fieldCls}
+              aria-label="Tijd heen"
+            />
+          </div>
         </Field>
         <Field label={t('transport.return-date')} required>
-          <input
-            type="date"
-            required
-            value={returnDate}
-            min={outboundDate || new Date().toISOString().slice(0, 10)}
-            onChange={(e) => setReturnDate(e.target.value)}
-            className={fieldCls}
-          />
+          <div className="grid grid-cols-[1fr_110px] gap-2">
+            <input
+              type="date"
+              required
+              value={returnDate}
+              min={outboundDate || new Date().toISOString().slice(0, 10)}
+              onChange={(e) => setReturnDate(e.target.value)}
+              className={fieldCls}
+            />
+            <input
+              type="time"
+              value={returnTime}
+              onChange={(e) => setReturnTime(e.target.value)}
+              className={fieldCls}
+              aria-label="Tijd terug"
+            />
+          </div>
         </Field>
       </div>
 
@@ -93,8 +113,8 @@ export default function TransportPage() {
 
       <Section title={t('common.summary')}>
         <SummaryRow label={t('transport.camping-label')} value={camping} />
-        <SummaryRow label={t('transport.outbound-date')} value={outboundDate} />
-        <SummaryRow label={t('transport.return-date')} value={returnDate} />
+        <SummaryRow label={t('transport.outbound-date')} value={`${outboundDate}${outboundTime ? ` · ${outboundTime}` : ''}`} />
+        <SummaryRow label={t('transport.return-date')} value={`${returnDate}${returnTime ? ` · ${returnTime}` : ''}`} />
       </Section>
 
       <div className="rounded-[var(--radius-xl)] bg-surface-2 border border-border p-4">
@@ -119,7 +139,9 @@ export default function TransportPage() {
           ...contact,
           camping,
           outboundDate,
+          outboundTime,
           returnDate,
+          returnTime,
           description,
         });
       }}
