@@ -38,6 +38,8 @@ export type HoldedContact = {
   id: string;
   name?: string;
   email?: string;
+  phone?: string;
+  mobile?: string;
 };
 
 export async function findContactByEmail(email: string): Promise<HoldedContact | null> {
@@ -46,10 +48,35 @@ export async function findContactByEmail(email: string): Promise<HoldedContact |
   return Array.isArray(data) && data.length > 0 ? data[0] : null;
 }
 
-export async function createContact(input: { name: string; email?: string | null }): Promise<HoldedContact> {
+// Holded has no ?phone= query, so we scan the first page of contacts and
+// match locally. Good enough for our scale (<100 contacts); we'd swap to
+// pagination if we ever cross a few thousand.
+function normalizePhone(s: string): string {
+  return s.replace(/[^\d]/g, '').replace(/^00/, ''); // strip + space - and leading 00
+}
+
+export async function findContactByPhone(phone: string): Promise<HoldedContact | null> {
+  const target = normalizePhone(phone);
+  if (target.length < 5) return null;
+  // First page (Holded default ~50 per page). For larger lists we'd loop
+  // ?page=2 etc., but our schaal verandert dit nog niet.
+  const data = await holdedFetch<HoldedContact[]>(`/invoicing/v1/contacts`);
+  if (!Array.isArray(data)) return null;
+  for (const c of data) {
+    const candidates = [c.phone, c.mobile].filter(Boolean) as string[];
+    if (candidates.some((p) => normalizePhone(p) === target)) {
+      return c;
+    }
+  }
+  return null;
+}
+
+export async function createContact(input: { name: string; email?: string | null; phone?: string | null }): Promise<HoldedContact> {
   const body = {
     name: input.name,
     email: input.email || undefined,
+    phone: input.phone || undefined,
+    mobile: input.phone || undefined,
     type: 'client',
     isperson: 1,
   };
@@ -57,14 +84,30 @@ export async function createContact(input: { name: string; email?: string | null
     '/invoicing/v1/contacts',
     { method: 'POST', body: JSON.stringify(body) }
   );
-  return { id: data.id, name: input.name, email: input.email || undefined };
+  return {
+    id: data.id,
+    name: input.name,
+    email: input.email || undefined,
+    phone: input.phone || undefined,
+  };
 }
 
-export async function ensureContact(input: { name: string; email?: string | null }): Promise<HoldedContact> {
+export async function ensureContact(input: { name: string; email?: string | null; phone?: string | null }): Promise<HoldedContact> {
+  // 1. Try exact email match first (fast — Holded supports ?email=).
   if (input.email) {
-    const existing = await findContactByEmail(input.email);
-    if (existing) return existing;
+    try {
+      const byEmail = await findContactByEmail(input.email);
+      if (byEmail) return byEmail;
+    } catch { /* ignore + fall through to phone */ }
   }
+  // 2. Fall back to phone match (scans first page, normalises +/space/dashes).
+  if (input.phone) {
+    try {
+      const byPhone = await findContactByPhone(input.phone);
+      if (byPhone) return byPhone;
+    } catch { /* ignore + fall through to create */ }
+  }
+  // 3. No match — create a fresh contact.
   return createContact(input);
 }
 
@@ -127,7 +170,7 @@ export async function getInvoice(id: string): Promise<HoldedInvoiceSummary | nul
 // One-shot: find-or-create a contact by email, then create an invoice.
 // Used by the Stripe webhook after a successful payment.
 export async function invoiceForCustomer(input: {
-  customer: { name: string; email: string };
+  customer: { name: string; email: string; phone?: string | null };
   description: string;
   amountEur: number;
   taxPercent?: number;

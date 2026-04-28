@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, ArrowRight, Loader2, AlertTriangle } from 'lucide-react';
 import { calculatePrice, formatEur, PRICES, MIN_DAYS, type DeviceType } from '@/lib/pricing';
+import InfoBanner from '@/components/InfoBanner';
 
 type FormState = {
   device_type: DeviceType;
@@ -243,7 +244,13 @@ export default function KoelkastBestelPagina() {
           />
         </motion.div>
 
-        <form onSubmit={submit} className="mt-10 space-y-8">
+        <div className="mt-8 sm:mt-10">
+          <InfoBanner>
+            <strong>Belangrijk:</strong> gebruik het e-mailadres en telefoonnummer dat bij ons bekend is. Zo koppelen we je aanvraag automatisch aan je klantgegevens.
+          </InfoBanner>
+        </div>
+
+        <form onSubmit={submit} className="mt-6 space-y-8">
           {/* Device choice */}
           <section>
             <h2 className="text-sm font-medium text-text-muted uppercase tracking-wider mb-3">

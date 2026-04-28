@@ -4,6 +4,7 @@ import { ReactNode, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import InfoBanner from './InfoBanner';
 
 export type ContactState = {
   name: string;
@@ -171,7 +172,13 @@ export function ServicePageShell({
           <p className="text-text-muted mt-2 leading-relaxed">{intro}</p>
         </motion.div>
 
-        <form onSubmit={onSubmit} className="mt-8 space-y-7">
+        <div className="mt-6">
+          <InfoBanner>
+            <strong>Belangrijk:</strong> gebruik het e-mailadres en telefoonnummer dat bij ons bekend is. Zo koppelen we je aanvraag automatisch aan je klantgegevens.
+          </InfoBanner>
+        </div>
+
+        <form onSubmit={onSubmit} className="mt-6 space-y-7">
           {children}
 
           {error && (

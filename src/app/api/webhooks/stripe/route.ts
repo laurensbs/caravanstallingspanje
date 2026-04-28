@@ -114,6 +114,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
   // Holded + e-mail vars die we hieronder vullen per kind.
   let customerName = session.customer_details?.name || '';
   let customerEmail = session.customer_details?.email || session.customer_email || '';
+  let customerPhone = session.customer_details?.phone || '';
   let invoiceDescription = (typeof md.description === 'string' ? md.description : '') || kind;
   const amountEur = (session.amount_total ?? 0) / 100;
 
@@ -125,13 +126,16 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
       if (fridge) {
         customerName = customerName || fridge.name;
         customerEmail = customerEmail || fridge.email || '';
+        // Notes-veld bevat "Telefoon: 06…" — eruit halen voor Holded match.
+        const phoneMatch = String(fridge.notes || '').match(/Telefoon:\s*([+\d\s().-]{5,})/i);
+        if (phoneMatch && !customerPhone) customerPhone = phoneMatch[1].trim();
       }
       // Holded factuur (idempotent: bestaande invoice respecteren).
       const booking = fridge?.bookings?.find((b: { id: number }) => b.id === id);
       if (customerEmail && !booking?.holded_invoice_id) {
         try {
           const inv = await invoiceForCustomer({
-            customer: { name: customerName || customerEmail, email: customerEmail },
+            customer: { name: customerName || customerEmail, email: customerEmail, phone: customerPhone || null },
             description: invoiceDescription,
             amountEur,
           });
@@ -145,15 +149,16 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
     const id = Number(refId);
     if (Number.isFinite(id) && id > 0) {
       await markStallingRequestPaid(id);
-      const r = await getStallingRequestById(id).catch(() => null) as { name: string; email: string; type: string; holded_invoice_id?: string | null } | null;
+      const r = await getStallingRequestById(id).catch(() => null) as { name: string; email: string; phone?: string | null; type: string; holded_invoice_id?: string | null } | null;
       if (r) {
         customerName = customerName || r.name;
         customerEmail = customerEmail || r.email;
+        customerPhone = customerPhone || r.phone || '';
         invoiceDescription = invoiceDescription || `Stalling ${r.type} — jaarprijs`;
         if (customerEmail && !r.holded_invoice_id) {
           try {
             const inv = await invoiceForCustomer({
-              customer: { name: customerName, email: customerEmail },
+              customer: { name: customerName, email: customerEmail, phone: customerPhone || null },
               description: invoiceDescription,
               amountEur,
             });
@@ -168,15 +173,16 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
     const id = Number(refId);
     if (Number.isFinite(id) && id > 0) {
       await markTransportRequestPaid(id);
-      const r = await getTransportRequestById(id).catch(() => null) as { name: string; email: string; from_location: string; to_location: string; holded_invoice_id?: string | null } | null;
+      const r = await getTransportRequestById(id).catch(() => null) as { name: string; email: string; phone?: string | null; from_location: string; to_location: string; holded_invoice_id?: string | null } | null;
       if (r) {
         customerName = customerName || r.name;
         customerEmail = customerEmail || r.email;
+        customerPhone = customerPhone || r.phone || '';
         invoiceDescription = invoiceDescription || `Transport — ${r.from_location} → ${r.to_location}`;
         if (customerEmail && !r.holded_invoice_id) {
           try {
             const inv = await invoiceForCustomer({
-              customer: { name: customerName, email: customerEmail },
+              customer: { name: customerName, email: customerEmail, phone: customerPhone || null },
               description: invoiceDescription,
               amountEur,
             });
@@ -204,6 +210,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
         // Customer info uit de pending payload (zelfde formaat als IntakePayload).
         customerName = customerName || payload.customer?.name || '';
         customerEmail = customerEmail || payload.customer?.email || '';
+        customerPhone = customerPhone || payload.customer?.phone || '';
         invoiceDescription = invoiceDescription || payload.title || 'Service';
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'forward failed';
@@ -215,7 +222,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
     if (customerEmail) {
       try {
         await invoiceForCustomer({
-          customer: { name: customerName || customerEmail, email: customerEmail },
+          customer: { name: customerName || customerEmail, email: customerEmail, phone: customerPhone || null },
           description: invoiceDescription,
           amountEur,
         });
