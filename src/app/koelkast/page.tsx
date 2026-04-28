@@ -73,6 +73,12 @@ export default function KoelkastBestelPagina() {
         setError(data.error || 'Er ging iets mis');
         return;
       }
+      // Als Stripe Checkout beschikbaar is, redirect direct.
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+        return;
+      }
+      // Fallback: betaling later geregeld door admin.
       setDone({ total: data.total, days: data.days });
     } catch {
       setError('Verbindingsfout');

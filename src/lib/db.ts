@@ -63,6 +63,31 @@ export async function initDatabase() {
   await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_id TEXT`;
   await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_number TEXT`;
 
+  await sql`CREATE TABLE IF NOT EXISTS payments (
+    id SERIAL PRIMARY KEY,
+    stripe_session_id TEXT UNIQUE,
+    stripe_payment_intent_id TEXT,
+    stripe_event_id TEXT,
+    kind TEXT NOT NULL,
+    ref_id TEXT,
+    amount_cents INTEGER NOT NULL,
+    currency TEXT NOT NULL DEFAULT 'eur',
+    customer_email TEXT,
+    description TEXT,
+    status TEXT NOT NULL,
+    raw JSONB,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  )`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_payments_kind_ref ON payments(kind, ref_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_payments_status ON payments(status)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_payments_created ON payments(created_at DESC)`;
+  await sql`CREATE TABLE IF NOT EXISTS stripe_events (
+    id TEXT PRIMARY KEY,
+    type TEXT NOT NULL,
+    received_at TIMESTAMP DEFAULT NOW()
+  )`;
+
   await sql`CREATE TABLE IF NOT EXISTS transport_requests (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
@@ -370,6 +395,55 @@ export async function countOverlappingBookings(
       AND b.start_date <= ${endDate}::date
       AND b.end_date >= ${startDate}::date`;
   return Number((rows as { count: string | number }[])[0]?.count || 0);
+}
+
+// ─── Payments / Stripe ───
+export async function recordStripeEventOnce(eventId: string, type: string): Promise<boolean> {
+  // Returns true if this is the first time we see this event id (so caller
+  // should process), false if we've already handled it (idempotency guard).
+  const res = await sql`
+    INSERT INTO stripe_events (id, type) VALUES (${eventId}, ${type})
+    ON CONFLICT (id) DO NOTHING
+    RETURNING id`;
+  return res.length > 0;
+}
+
+export async function upsertPayment(data: {
+  stripe_session_id?: string | null;
+  stripe_payment_intent_id?: string | null;
+  stripe_event_id?: string | null;
+  kind: string;
+  ref_id?: string | null;
+  amount_cents: number;
+  currency?: string;
+  customer_email?: string | null;
+  description?: string | null;
+  status: string;
+  raw?: unknown;
+}) {
+  const rawJson = data.raw ? JSON.stringify(data.raw) : null;
+  await sql`INSERT INTO payments
+    (stripe_session_id, stripe_payment_intent_id, stripe_event_id, kind, ref_id,
+     amount_cents, currency, customer_email, description, status, raw)
+    VALUES (${data.stripe_session_id || null}, ${data.stripe_payment_intent_id || null},
+      ${data.stripe_event_id || null}, ${data.kind}, ${data.ref_id || null},
+      ${data.amount_cents}, ${data.currency || 'eur'}, ${data.customer_email || null},
+      ${data.description || null}, ${data.status}, ${rawJson}::jsonb)
+    ON CONFLICT (stripe_session_id) DO UPDATE SET
+      status = EXCLUDED.status,
+      stripe_payment_intent_id = COALESCE(EXCLUDED.stripe_payment_intent_id, payments.stripe_payment_intent_id),
+      stripe_event_id = EXCLUDED.stripe_event_id,
+      raw = EXCLUDED.raw,
+      updated_at = NOW()`;
+}
+
+export async function markBookingPaid(bookingId: number, sessionId: string) {
+  await sql`UPDATE fridge_bookings
+    SET status = 'compleet', updated_at = NOW()
+    WHERE id = ${bookingId}`;
+  // Status 'compleet' is our existing "this booking is set". We rely on the
+  // payments table for the actual payment audit trail.
+  void sessionId; // referenced via payments.ref_id
 }
 
 // ─── Transport requests (lokaal — eigen operatie, niet reparatie) ───

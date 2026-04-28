@@ -8,6 +8,7 @@ import {
 } from '@/lib/db';
 import { validateBody, fridgeOrderSchema } from '@/lib/validations';
 import { calculatePrice, formatEur, STOCK, type DeviceType } from '@/lib/pricing';
+import { createCheckoutSession } from '@/lib/stripe';
 
 export async function POST(req: NextRequest) {
   try {
@@ -64,10 +65,38 @@ export async function POST(req: NextRequest) {
       details: `${data.device_type} · ${formatEur(price.total)}`,
     });
 
+    // Stripe Checkout — booking is reserved on 'controleren' until the
+    // webhook flips it to 'compleet' on payment.
+    const origin = req.nextUrl.origin;
+    const description = `${data.device_type} — ${data.camping} — ${data.start_date} t/m ${data.end_date}`;
+    let checkoutUrl: string | null = null;
+    try {
+      const session = await createCheckoutSession({
+        description,
+        amountEur: price.total,
+        successUrl: `${origin}/koelkast/bedankt?session_id={CHECKOUT_SESSION_ID}`,
+        cancelUrl: `${origin}/koelkast?cancelled=1`,
+        customerEmail: data.email,
+        metadata: {
+          kind: 'fridge_booking',
+          refId: String(booking.id),
+          description,
+        },
+      });
+      checkoutUrl = session.url;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Checkout-fout';
+      console.error('Stripe checkout error:', msg);
+      // Booking blijft staan op 'controleren'; we geven success terug zonder
+      // checkout-URL zodat de klant via de "bedankt"-pagina te zien krijgt
+      // dat we hen handmatig benaderen.
+    }
+
     return NextResponse.json({
       success: true,
       total: price.total,
       days: price.days,
+      checkoutUrl,
     });
   } catch (error) {
     console.error('Fridge order error:', error);
