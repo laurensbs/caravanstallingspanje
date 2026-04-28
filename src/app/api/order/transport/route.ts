@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sendIntake } from '@/lib/work-order-hub';
+import { createTransportRequest, logActivity } from '@/lib/db';
 import { validateBody, transportOrderSchema } from '@/lib/validations';
-import { logActivity } from '@/lib/db';
 
+// Transport blijft LOKAAL in het stallings-portaal — het is onze eigen
+// operatie (caravan ophalen/brengen), geen reparatieklus.
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -12,30 +13,29 @@ export async function POST(req: NextRequest) {
     }
     const d = validated.data;
 
-    const result = await sendIntake({
-      type: 'transport',
-      customer: { name: d.name, email: d.email, phone: d.phone },
-      unit: d.registration ? { registration: d.registration, brand: d.brand || undefined, model: d.model || undefined } : undefined,
-      title: `Transport: ${d.fromLocation} → ${d.toLocation}`,
-      description: d.description || 'Transport-aanvraag',
-      transport: {
-        from: d.fromLocation,
-        to: d.toLocation,
-        preferredDate: d.preferredDate || undefined,
-      },
+    const entry = await createTransportRequest({
+      name: d.name,
+      email: d.email,
+      phone: d.phone,
+      from_location: d.fromLocation,
+      to_location: d.toLocation,
+      preferred_date: d.preferredDate || null,
+      registration: d.registration || null,
+      brand: d.brand || null,
+      model: d.model || null,
+      notes: d.description || null,
     });
 
     await logActivity({
-      action: 'Transport-aanvraag doorgestuurd',
-      entityType: 'public_intake',
-      entityId: result.publicCode,
+      action: 'Transport-aanvraag ontvangen',
+      entityType: 'transport_request',
+      entityId: String(entry.id),
       entityLabel: `${d.name} — ${d.fromLocation} → ${d.toLocation}`,
     });
 
-    return NextResponse.json({ success: true, publicCode: result.publicCode });
+    return NextResponse.json({ success: true });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Aanvraag mislukt';
-    console.error('transport order error:', msg);
-    return NextResponse.json({ error: msg }, { status: 502 });
+    console.error('transport order error:', error);
+    return NextResponse.json({ error: 'Aanvraag mislukt' }, { status: 500 });
   }
 }

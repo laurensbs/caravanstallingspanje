@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ArrowRight, Refrigerator, LayoutGrid } from 'lucide-react';
+import { ArrowRight, LayoutGrid, Refrigerator } from 'lucide-react';
 
 export default function LandingPage() {
   return (
@@ -14,13 +15,15 @@ export default function LandingPage() {
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-10"
         >
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-            <span className="text-[10px] font-medium tracking-[0.25em] uppercase text-text-muted">
-              Caravanstalling Spanje
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-medium tracking-tight">
+          <Image
+            src="/images/logo.png"
+            alt="Caravanstalling Spanje"
+            width={300}
+            height={68}
+            priority
+            className="mx-auto h-12 w-auto mb-8"
+          />
+          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">
             Stalling, service en transport aan de Costa Brava
           </h1>
           <p className="text-text-muted mt-4 leading-relaxed max-w-lg mx-auto">
@@ -47,7 +50,10 @@ export default function LandingPage() {
 
         <p className="text-xs text-text-muted text-center mt-12">
           Vragen?{' '}
-          <a href="mailto:info@caravanstalling-spanje.com" className="text-text underline-offset-4 hover:underline">
+          <a
+            href="mailto:info@caravanstalling-spanje.com"
+            className="text-text underline-offset-4 hover:underline"
+          >
             info@caravanstalling-spanje.com
           </a>
         </p>
@@ -73,16 +79,19 @@ function CtaCard({
     >
       <Link
         href={href}
-        className="group block p-6 bg-surface border border-border rounded-[var(--radius-xl)] hover:border-border-strong hover:shadow-md transition-all"
+        className="card-surface group hover-lift block p-6"
       >
         <div className="flex items-start justify-between mb-8">
-          <div className="w-10 h-10 rounded-full bg-surface-2 text-text flex items-center justify-center border border-border">
+          <div className="w-10 h-10 rounded-[var(--radius-md)] bg-surface-2 text-text flex items-center justify-center border border-border">
             <Icon size={18} />
           </div>
-          <ArrowRight size={14} className="text-text-subtle group-hover:text-text transition-colors" />
+          <ArrowRight
+            size={14}
+            className="text-text-subtle group-hover:text-text transition-transform group-hover:translate-x-0.5"
+          />
         </div>
-        <h2 className="text-base font-medium">{title}</h2>
-        <p className="text-sm text-text-muted mt-1 leading-relaxed">{description}</p>
+        <h2 className="text-base font-semibold">{title}</h2>
+        <p className="text-[13px] text-text-muted mt-1 leading-relaxed">{description}</p>
       </Link>
     </motion.div>
   );

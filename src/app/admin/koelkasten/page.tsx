@@ -11,6 +11,7 @@ import {
 import { Button, Input, Select, Textarea, Badge, Skeleton, Spinner } from '@/components/ui';
 import Drawer from '@/components/Drawer';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import PageHeader from '@/components/admin/PageHeader';
 
 type Booking = {
   id: number;
@@ -331,14 +332,17 @@ function KoelkastenContent() {
   };
 
   return (
-    <div className="max-w-6xl">
-      <header className="flex items-end justify-between mb-8 gap-4">
-        <div>
-          <h1 className="text-2xl font-medium text-text tracking-tight">Koelkasten</h1>
-          <p className="text-sm text-text-muted mt-1">{fridges.length} klanten</p>
-        </div>
-        <Button onClick={openCreate}><Plus size={14} /> Nieuwe klant</Button>
-      </header>
+    <>
+      <PageHeader
+        eyebrow="Operatie"
+        title="Koelkasten"
+        description={`${fridges.length} klanten in beheer.`}
+        actions={
+          <Button onClick={openCreate}>
+            <Plus size={14} /> Nieuwe klant
+          </Button>
+        }
+      />
 
       <div className="flex flex-wrap gap-2 mb-6">
         <div className="relative flex-1 min-w-[220px] max-w-md">
@@ -674,6 +678,6 @@ function KoelkastenContent() {
         onConfirm={confirmDeleteAction}
         onCancel={() => setConfirmDelete(null)}
       />
-    </div>
+    </>
   );
 }

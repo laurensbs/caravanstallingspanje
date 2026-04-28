@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Lock, KeyRound } from 'lucide-react';
 import { Button, Input, Spinner } from './ui';
@@ -146,11 +147,17 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-10"
         >
-          <div className="inline-flex items-center gap-2 mb-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-            <span className="text-[10px] font-medium tracking-[0.25em] uppercase text-text-muted">Beheerportaal</span>
-          </div>
-          <h1 className="text-2xl font-medium text-text tracking-tight">Caravanstalling</h1>
+          <Image
+            src="/images/logo.png"
+            alt="Caravanstalling"
+            width={220}
+            height={50}
+            priority
+            className="mx-auto h-9 w-auto opacity-90 mb-5"
+          />
+          <p className="text-[10px] font-medium tracking-[0.25em] uppercase text-text-muted">
+            Beheerportaal
+          </p>
         </motion.div>
 
         <AnimatePresence mode="wait">

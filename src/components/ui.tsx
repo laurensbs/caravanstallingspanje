@@ -180,11 +180,14 @@ export function Spinner({ size = 14 }: { size?: number }) {
 }
 
 // ─── Skeleton ───
-export function Skeleton({ className = '' }: { className?: string }) {
+export function Skeleton({ className = '', delayMs }: { className?: string; delayMs?: number }) {
   return (
     <div
-      className={`animate-pulse bg-surface-2 rounded-[var(--radius-md)] ${className}`}
-      style={{ animationDuration: '1.4s' }}
+      className={`bg-surface-2 rounded-[var(--radius-md)] ${className}`}
+      style={{
+        animation: 'shimmer 1.6s ease-in-out infinite',
+        animationDelay: delayMs ? `${delayMs}ms` : undefined,
+      }}
     />
   );
 }

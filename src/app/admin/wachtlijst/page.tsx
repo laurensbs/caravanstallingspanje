@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { Mail, Phone, MapPin, Calendar, Trash2, Bell, Clock } from 'lucide-react';
 import { Button, Badge, Skeleton } from '@/components/ui';
+import PageHeader from '@/components/admin/PageHeader';
 
 type Entry = {
   id: number;
@@ -57,27 +58,37 @@ export default function WachtlijstPage() {
   };
 
   return (
-    <div className="max-w-5xl">
-      <header className="mb-8">
-        <h1 className="text-2xl font-medium text-text tracking-tight">Wachtlijst</h1>
-        <p className="text-sm text-text-muted mt-1">
-          {entries === null ? 'Laden...' : `${entries.length} aanmelding${entries.length === 1 ? '' : 'en'}`}
-        </p>
-      </header>
+    <>
+      <PageHeader
+        eyebrow="Operatie"
+        title="Wachtlijst"
+        description={
+          entries === null
+            ? 'Laden…'
+            : `${entries.length} aanmelding${entries.length === 1 ? '' : 'en'} voor periodes waarvoor de voorraad vol was.`
+        }
+      />
 
       {entries === null ? (
         <div className="space-y-2">
-          {[0, 1, 2].map(i => <Skeleton key={i} className="h-24" />)}
+          {[0, 1, 2].map((i) => (
+            <Skeleton key={i} className="h-24" delayMs={i * 40} />
+          ))}
         </div>
       ) : entries.length === 0 ? (
-        <div className="bg-surface border border-border rounded-[var(--radius-xl)] p-12 text-center">
-          <Bell size={20} className="text-text-subtle mx-auto mb-3" />
-          <p className="text-sm text-text-muted">Nog geen wachtlijst-aanmeldingen.</p>
+        <div className="card-surface p-12 text-center">
+          <div className="w-12 h-12 rounded-[var(--radius-2xl)] bg-surface-2 border border-border flex items-center justify-center mx-auto mb-4">
+            <Bell size={18} className="text-text-subtle" />
+          </div>
+          <p className="text-sm text-text">Nog geen wachtlijst-aanmeldingen</p>
+          <p className="text-xs text-text-muted mt-1">
+            Wanneer iemand zich op de wachtlijst zet, verschijnt het hier.
+          </p>
         </div>
       ) : (
         <ul className="space-y-3">
           <AnimatePresence initial={false}>
-            {entries.map(e => {
+            {entries.map((e) => {
               const notified = e.status === 'genotificeerd';
               return (
                 <motion.li
@@ -86,7 +97,7 @@ export default function WachtlijstPage() {
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, x: -8 }}
-                  className="bg-surface border border-border rounded-[var(--radius-xl)] p-5"
+                  className="card-surface p-5"
                 >
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="min-w-0">
@@ -145,6 +156,6 @@ export default function WachtlijstPage() {
           </AnimatePresence>
         </ul>
       )}
-    </div>
+    </>
   );
 }

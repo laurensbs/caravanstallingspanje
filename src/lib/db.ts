@@ -63,6 +63,26 @@ export async function initDatabase() {
   await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_id TEXT`;
   await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_number TEXT`;
 
+  await sql`CREATE TABLE IF NOT EXISTS transport_requests (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone TEXT,
+    from_location TEXT NOT NULL,
+    to_location TEXT NOT NULL,
+    preferred_date DATE,
+    registration TEXT,
+    brand TEXT,
+    model TEXT,
+    notes TEXT,
+    status TEXT NOT NULL DEFAULT 'controleren',
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  )`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_transport_requests_status ON transport_requests(status)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_transport_requests_created ON transport_requests(created_at DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_transport_requests_date ON transport_requests(preferred_date)`;
+
   await sql`CREATE TABLE IF NOT EXISTS stalling_requests (
     id SERIAL PRIMARY KEY,
     type TEXT NOT NULL,
@@ -350,6 +370,48 @@ export async function countOverlappingBookings(
       AND b.start_date <= ${endDate}::date
       AND b.end_date >= ${startDate}::date`;
   return Number((rows as { count: string | number }[])[0]?.count || 0);
+}
+
+// ─── Transport requests (lokaal — eigen operatie, niet reparatie) ───
+export async function createTransportRequest(data: {
+  name: string;
+  email: string;
+  phone?: string | null;
+  from_location: string;
+  to_location: string;
+  preferred_date?: string | null;
+  registration?: string | null;
+  brand?: string | null;
+  model?: string | null;
+  notes?: string | null;
+}) {
+  const res = await sql`INSERT INTO transport_requests
+    (name, email, phone, from_location, to_location, preferred_date,
+     registration, brand, model, notes)
+    VALUES (${data.name}, ${data.email}, ${data.phone || null},
+      ${data.from_location}, ${data.to_location},
+      ${data.preferred_date || null}::date,
+      ${data.registration || null}, ${data.brand || null}, ${data.model || null},
+      ${data.notes || null})
+    RETURNING *`;
+  return res[0];
+}
+
+export async function getAllTransportRequests(status?: string) {
+  if (status) {
+    return sql`SELECT * FROM transport_requests WHERE status = ${status} ORDER BY
+      preferred_date NULLS LAST, created_at DESC`;
+  }
+  return sql`SELECT * FROM transport_requests ORDER BY
+    preferred_date NULLS LAST, created_at DESC`;
+}
+
+export async function updateTransportRequestStatus(id: number, status: string) {
+  await sql`UPDATE transport_requests SET status = ${status}, updated_at = NOW() WHERE id = ${id}`;
+}
+
+export async function deleteTransportRequest(id: number) {
+  await sql`DELETE FROM transport_requests WHERE id = ${id}`;
 }
 
 // ─── Stalling requests (lokaal, niet doorgestuurd) ───

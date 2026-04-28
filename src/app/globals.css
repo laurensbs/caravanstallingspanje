@@ -1,46 +1,53 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Surfaces ── */
-  --color-bg: #FAFAFA;
-  --color-surface: #FFFFFF;
-  --color-surface-2: #F5F5F5;
+  /* Warm monochrome stone palette + quiet amber accent.
+     Hue 75 = warm/neutral; cards read like paper, not painted. */
+  --color-bg: oklch(0.985 0.002 75);
+  --color-surface: oklch(1 0 0);
+  --color-surface-2: oklch(0.955 0.004 75);
 
-  /* ── Borders ── */
-  --color-border: #EAEAEA;
-  --color-border-strong: #D4D4D4;
+  --color-border: oklch(0.91 0.004 75);
+  --color-border-strong: oklch(0.84 0.005 75);
 
-  /* ── Text ── */
-  --color-text: #0A0A0A;
-  --color-text-muted: #6B7280;
-  --color-text-subtle: #9CA3AF;
+  --color-text: oklch(0.18 0.005 75);
+  --color-text-muted: oklch(0.50 0.008 75);
+  --color-text-subtle: oklch(0.65 0.006 75);
 
-  /* ── Accent (ink) ── */
-  --color-accent: #0A0A0A;
-  --color-accent-hover: #1F1F1F;
-  --color-accent-fg: #FFFFFF;
+  /* Near-black primary CTA, Stripe-style */
+  --color-accent: oklch(0.22 0.005 75);
+  --color-accent-hover: oklch(0.30 0.005 75);
+  --color-accent-fg: oklch(0.985 0.002 75);
 
-  /* ── Signals ── */
-  --color-success: #16A34A;
-  --color-success-soft: #DCFCE7;
-  --color-warning: #F59E0B;
-  --color-warning-soft: #FEF3C7;
-  --color-danger: #DC2626;
-  --color-danger-soft: #FEE2E2;
+  /* Quiet amber: focus rings, link emphasis, occasional badge */
+  --color-ring: oklch(0.72 0.13 60);
 
-  /* ── Radii ── */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
+  /* Dark sidebar */
+  --color-sidebar: oklch(0.16 0.005 75);
+  --color-sidebar-fg: oklch(0.86 0.005 75);
+  --color-sidebar-accent: oklch(0.23 0.006 75);
+  --color-sidebar-active: oklch(0.32 0.008 75);
+  --color-sidebar-border: oklch(0.24 0.005 75);
+
+  --color-success: oklch(0.62 0.14 145);
+  --color-success-soft: oklch(0.94 0.05 145);
+  --color-warning: oklch(0.72 0.13 60);
+  --color-warning-soft: oklch(0.96 0.06 80);
+  --color-danger: oklch(0.52 0.21 25);
+  --color-danger-soft: oklch(0.95 0.04 25);
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
   --radius-full: 9999px;
 
-  /* ── Shadows ── */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 1px 2px 0 rgba(20, 14, 5, 0.04);
+  --shadow-md: 0 4px 12px 0 rgba(20, 14, 5, 0.06);
+  --shadow-lg: 0 12px 32px 0 rgba(20, 14, 5, 0.08);
+  --shadow-card: 0 1px 2px 0 rgba(0, 0, 0, 0.03), inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
 
-  /* ── Fonts (loaded via next/font in layout.tsx) ── */
   --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
@@ -53,8 +60,23 @@ html, body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.5;
+  letter-spacing: -0.011em;
+  font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1, "ss03" 1, "cv11" 1;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px;
+  }
 }
 
 ::selection {
@@ -62,29 +84,90 @@ html, body {
   color: var(--color-accent-fg);
 }
 
-/* Subtle scrollbar */
+/* Warm scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border-strong);
-  border-radius: var(--radius-full);
-  border: 2px solid var(--color-bg);
+  background: oklch(0.85 0.005 75 / 0.6);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-subtle);
+  background: oklch(0.65 0.008 75 / 0.8);
+  background-clip: padding-box;
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(0.85 0.005 75 / 0.6) transparent;
 }
 
 /* Focus ring */
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-ring);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
-button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-  outline-offset: 2px;
+
+/* ─── Animations ─────────────────────────────────────────── */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.9; }
+}
+
+.animate-fade-in {
+  animation: fade-in 300ms ease-out forwards;
+}
+.animate-page-in {
+  animation: page-in 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.animate-slide-up {
+  animation: slide-up 350ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Press / hover micro-interactions */
+.press-spring {
+  transition: transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.press-spring:active {
+  transform: scale(0.97);
+}
+.hover-lift {
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms;
+}
+.hover-lift:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Surface utility — paper-like white card */
+.card-surface {
+  background: var(--color-surface);
+  border-radius: var(--radius-2xl);
+  border: 1px solid color-mix(in oklch, var(--color-border), transparent 40%);
+  box-shadow: var(--shadow-card);
 }

@@ -1,9 +1,11 @@
 'use client';
 
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ArrowRight, Refrigerator, Wrench, ExternalLink } from 'lucide-react';
 
-const REPAIR_URL = process.env.NEXT_PUBLIC_REPAIR_URL || 'https://caravanreparatiespanje.vercel.app';
+const REPAIR_URL =
+  process.env.NEXT_PUBLIC_REPAIR_URL || 'https://caravanreparatiespanje.vercel.app';
 
 export default function PortalPicker() {
   return (
@@ -15,14 +17,20 @@ export default function PortalPicker() {
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center gap-2 mb-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-            <span className="text-[10px] font-medium tracking-[0.25em] uppercase text-text-muted">
-              Beheerportaal
-            </span>
-          </div>
-          <h1 className="text-2xl font-medium text-text tracking-tight">Caravanstalling</h1>
-          <p className="text-sm text-text-muted mt-2">Welk portaal wil je openen?</p>
+          <Image
+            src="/images/logo.png"
+            alt="Caravanstalling"
+            width={220}
+            height={50}
+            priority
+            className="mx-auto h-9 w-auto opacity-90 mb-6"
+          />
+          <p className="text-[10px] font-medium tracking-[0.25em] uppercase text-text-muted">
+            Beheerportaal
+          </p>
+          <h1 className="text-2xl font-semibold tracking-tight mt-2">
+            Welk portaal wil je openen?
+          </h1>
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -30,8 +38,8 @@ export default function PortalPicker() {
             href="/admin/dashboard"
             external={false}
             icon={Refrigerator}
-            title="Stalling beheer"
-            description="Koelkasten, periodes, wachtlijst en stallingaanvragen."
+            title="Stalling"
+            description="Koelkasten, transport, wachtlijst en stallingaanvragen."
             delay={0.05}
           />
           <PortalCard
@@ -39,7 +47,7 @@ export default function PortalPicker() {
             external
             icon={Wrench}
             title="Reparatie & Work Orders"
-            description="Werkbonnen, services, transporten en onderdelen."
+            description="Werkbonnen, services, onderdelen en planning."
             delay={0.1}
           />
         </div>
@@ -58,16 +66,28 @@ interface PortalCardProps {
 }
 
 function PortalCard({ href, external, icon: Icon, title, description, delay }: PortalCardProps) {
-  const Wrapper = ({ children, className }: { children: React.ReactNode; className?: string }) =>
-    external ? (
-      <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
-        {children}
-      </a>
-    ) : (
-      <a href={href} className={className}>
-        {children}
-      </a>
-    );
+  const inner = (
+    <div className="card-surface group hover-lift block p-6 cursor-pointer">
+      <div className="flex items-start justify-between mb-8">
+        <div className="w-10 h-10 rounded-[var(--radius-md)] bg-surface-2 text-text flex items-center justify-center border border-border">
+          <Icon size={18} />
+        </div>
+        {external ? (
+          <ExternalLink
+            size={14}
+            className="text-text-subtle group-hover:text-text transition-colors"
+          />
+        ) : (
+          <ArrowRight
+            size={14}
+            className="text-text-subtle group-hover:text-text transition-transform group-hover:translate-x-0.5"
+          />
+        )}
+      </div>
+      <h2 className="text-base font-semibold text-text">{title}</h2>
+      <p className="text-[13px] text-text-muted mt-1 leading-relaxed">{description}</p>
+    </div>
+  );
 
   return (
     <motion.div
@@ -75,20 +95,15 @@ function PortalCard({ href, external, icon: Icon, title, description, delay }: P
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
     >
-      <Wrapper className="block group p-6 bg-surface border border-border rounded-[var(--radius-xl)] hover:border-border-strong hover:shadow-md transition-all">
-        <div className="flex items-start justify-between mb-8">
-          <div className="w-10 h-10 rounded-full bg-surface-2 text-text flex items-center justify-center border border-border">
-            <Icon size={18} />
-          </div>
-          {external ? (
-            <ExternalLink size={14} className="text-text-subtle group-hover:text-text transition-colors" />
-          ) : (
-            <ArrowRight size={14} className="text-text-subtle group-hover:text-text transition-colors" />
-          )}
-        </div>
-        <h2 className="text-base font-medium text-text">{title}</h2>
-        <p className="text-sm text-text-muted mt-1 leading-relaxed">{description}</p>
-      </Wrapper>
+      {external ? (
+        <a href={href} target="_blank" rel="noopener noreferrer" className="block">
+          {inner}
+        </a>
+      ) : (
+        <a href={href} className="block">
+          {inner}
+        </a>
+      )}
     </motion.div>
   );
 }

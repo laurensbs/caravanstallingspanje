@@ -14,7 +14,7 @@ function apiKey(): string {
   return key;
 }
 
-export type IntakeType = "repair" | "service" | "inspection" | "transport";
+export type IntakeType = "repair" | "service" | "inspection";
 
 export interface IntakePayload {
   type: IntakeType;
@@ -38,11 +38,6 @@ export interface IntakePayload {
   description: string;
   locationHint?: string;
   serviceCategory?: string;
-  transport?: {
-    from: string;
-    to: string;
-    preferredDate?: string;
-  };
   metadata?: Record<string, string>;
 }
 
