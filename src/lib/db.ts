@@ -63,6 +63,26 @@ export async function initDatabase() {
   await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_id TEXT`;
   await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_number TEXT`;
 
+  await sql`CREATE TABLE IF NOT EXISTS stalling_requests (
+    id SERIAL PRIMARY KEY,
+    type TEXT NOT NULL,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone TEXT,
+    start_date DATE NOT NULL,
+    end_date DATE,
+    registration TEXT,
+    brand TEXT,
+    model TEXT,
+    length TEXT,
+    notes TEXT,
+    status TEXT NOT NULL DEFAULT 'controleren',
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  )`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_stalling_requests_status ON stalling_requests(status)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_stalling_requests_created ON stalling_requests(created_at DESC)`;
+
   await sql`CREATE TABLE IF NOT EXISTS fridge_waitlist (
     id SERIAL PRIMARY KEY,
     device_type TEXT NOT NULL,
@@ -330,6 +350,30 @@ export async function countOverlappingBookings(
       AND b.start_date <= ${endDate}::date
       AND b.end_date >= ${startDate}::date`;
   return Number((rows as { count: string | number }[])[0]?.count || 0);
+}
+
+// ─── Stalling requests (lokaal, niet doorgestuurd) ───
+export async function createStallingRequest(data: {
+  type: 'binnen' | 'buiten';
+  name: string;
+  email: string;
+  phone?: string | null;
+  start_date: string;
+  end_date?: string | null;
+  registration?: string | null;
+  brand?: string | null;
+  model?: string | null;
+  length?: string | null;
+  notes?: string | null;
+}) {
+  const res = await sql`INSERT INTO stalling_requests
+    (type, name, email, phone, start_date, end_date, registration, brand, model, length, notes)
+    VALUES (${data.type}, ${data.name}, ${data.email}, ${data.phone || null},
+      ${data.start_date}::date, ${data.end_date || null}::date,
+      ${data.registration || null}, ${data.brand || null}, ${data.model || null},
+      ${data.length || null}, ${data.notes || null})
+    RETURNING *`;
+  return res[0];
 }
 
 // ─── Waitlist ───

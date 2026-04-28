@@ -1,12 +1,16 @@
 'use client';
 
 import { useEffect, useState, useCallback, ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import LoginScreen from '@/components/LoginScreen';
 import AppShell from '@/components/AppShell';
 import { Spinner } from '@/components/ui';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  const [loading, setLoading] = useState(true);
+  const pathname = usePathname();
+  const isPicker = pathname === '/admin';
+
+  const [loading, setLoading] = useState(!isPicker);
   const [authed, setAuthed] = useState(false);
   const [name, setName] = useState('');
 
@@ -18,7 +22,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => { check(); }, [check]);
+  useEffect(() => {
+    if (isPicker) return;
+    check();
+  }, [check, isPicker]);
+
+  // Portaal-keuzepagina is publiek; geen login-flow
+  if (isPicker) return <>{children}</>;
 
   if (loading) {
     return (

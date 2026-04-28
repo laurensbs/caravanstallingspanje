@@ -7,7 +7,7 @@ import { LayoutDashboard, Refrigerator, Bell, LogOut } from 'lucide-react';
 import { ReactNode } from 'react';
 
 const NAV_ITEMS = [
-  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
+  { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { href: '/admin/koelkasten', label: 'Koelkasten', icon: Refrigerator, exact: false },
   { href: '/admin/wachtlijst', label: 'Wachtlijst', icon: Bell, exact: false },
 ];

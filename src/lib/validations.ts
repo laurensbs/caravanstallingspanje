@@ -61,6 +61,57 @@ export const fridgeOrderSchema = z.object({
   path: ['end_date'],
 });
 
+// ─── Public service requests (forwarded to reparatiepanel) ───
+const contactBase = {
+  name: z.string().min(2).max(200),
+  email: z.string().email(),
+  phone: z.string().min(5).max(40),
+  registration: z.string().max(40).optional().or(z.literal('')),
+  brand: z.string().max(80).optional().or(z.literal('')),
+  model: z.string().max(80).optional().or(z.literal('')),
+  locationHint: z.string().max(300).optional().or(z.literal('')),
+};
+
+export const repairOrderSchema = z.object({
+  ...contactBase,
+  description: z.string().min(5).max(3000),
+});
+
+export const serviceOrderSchema = z.object({
+  ...contactBase,
+  serviceCategory: z.string().min(1).max(150),
+  description: z.string().max(2000).optional().or(z.literal('')),
+});
+
+export const inspectionOrderSchema = z.object({
+  ...contactBase,
+  preferredDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().or(z.literal('')),
+  description: z.string().max(2000).optional().or(z.literal('')),
+});
+
+export const transportOrderSchema = z.object({
+  ...contactBase,
+  fromLocation: z.string().min(2).max(300),
+  toLocation: z.string().min(2).max(300),
+  preferredDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().or(z.literal('')),
+  description: z.string().max(2000).optional().or(z.literal('')),
+});
+
+// Stalling stays local; not forwarded to reparatiepanel.
+export const stallingOrderSchema = z.object({
+  type: z.enum(['binnen', 'buiten']),
+  name: z.string().min(2).max(200),
+  email: z.string().email(),
+  phone: z.string().min(5).max(40),
+  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Datum is verplicht'),
+  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().or(z.literal('')),
+  registration: z.string().max(40).optional().or(z.literal('')),
+  brand: z.string().max(80).optional().or(z.literal('')),
+  model: z.string().max(80).optional().or(z.literal('')),
+  length: z.string().max(20).optional().or(z.literal('')),
+  notes: z.string().max(2000).optional().or(z.literal('')),
+});
+
 export const holdedInvoiceSchema = z.object({
   description: z.string().min(1).max(500),
   units: z.number().positive().default(1),
