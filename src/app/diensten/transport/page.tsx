@@ -5,6 +5,7 @@ import {
   ContactFields, ServicePageShell, Section, Field, fieldCls,
   emptyContact, useServiceSubmit,
 } from '@/components/ServiceForm';
+import CampingPicker from '@/components/CampingPicker';
 import { useLocale } from '@/components/LocaleProvider';
 
 export default function TransportPage() {
@@ -48,21 +49,23 @@ export default function TransportPage() {
       <Section title={t('transport.section-route')}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Field label={t('transport.from')} required>
-            <input
-              required
+            <CampingPicker
               value={fromLocation}
-              onChange={(e) => setFromLocation(e.target.value)}
+              onChange={setFromLocation}
               placeholder={t('transport.from-placeholder')}
-              className={fieldCls}
+              required
+              ariaLabel={t('transport.from')}
+              filter={(c) => c.name !== toLocation}
             />
           </Field>
           <Field label={t('transport.to')} required>
-            <input
-              required
+            <CampingPicker
               value={toLocation}
-              onChange={(e) => setToLocation(e.target.value)}
+              onChange={setToLocation}
               placeholder={t('transport.to-placeholder')}
-              className={fieldCls}
+              required
+              ariaLabel={t('transport.to')}
+              filter={(c) => c.name !== fromLocation}
             />
           </Field>
         </div>

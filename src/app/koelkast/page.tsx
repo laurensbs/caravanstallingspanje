@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, ArrowRight, Loader2, AlertTriangle, Lock } from 'lucide-react';
 import { calculatePrice, PRICES, MIN_DAYS, type DeviceType } from '@/lib/pricing';
 import InfoBanner from '@/components/InfoBanner';
+import CampingPicker from '@/components/CampingPicker';
 import { useLocale } from '@/components/LocaleProvider';
 import LocaleSwitch from '@/components/LocaleSwitch';
 import type { StringKey } from '@/lib/i18n';
@@ -56,19 +57,11 @@ export default function KoelkastBestelPagina() {
       currency: 'EUR',
     }).format(eur);
   const [form, setForm] = useState<FormState>(empty);
-  const [campings, setCampings] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [done, setDone] = useState<{ total: number; days: number } | null>(null);
   const [soldOut, setSoldOut] = useState(false);
   const [waitlistDone, setWaitlistDone] = useState(false);
-
-  useEffect(() => {
-    fetch('/api/order/campings')
-      .then(r => r.json())
-      .then(d => setCampings(d.campings || []))
-      .catch(() => setCampings([]));
-  }, []);
 
   const price = useMemo(() => {
     if (!form.start_date || !form.end_date) return null;
@@ -351,17 +344,13 @@ export default function KoelkastBestelPagina() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-[1fr_140px] gap-3">
               <Field label={t('fridge.camping')} required>
-                <input
-                  list="campings-list"
-                  required
+                <CampingPicker
                   value={form.camping}
-                  onChange={e => setForm({ ...form, camping: e.target.value })}
+                  onChange={(name) => setForm({ ...form, camping: name })}
                   placeholder={t('fridge.camping-placeholder')}
-                  className={inputCls}
+                  required
+                  ariaLabel={t('fridge.camping')}
                 />
-                <datalist id="campings-list">
-                  {campings.map(c => <option key={c} value={c} />)}
-                </datalist>
               </Field>
               <Field label={t('fridge.spot-number')}>
                 <input

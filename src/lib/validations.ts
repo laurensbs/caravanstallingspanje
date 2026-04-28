@@ -1,4 +1,9 @@
 import { z } from 'zod';
+import { CAMPING_NAMES } from './campings';
+
+const knownCamping = z
+  .string()
+  .refine((v) => CAMPING_NAMES.includes(v.trim()), 'Kies een camping uit de lijst');
 
 export const loginSchema = z.object({
   adminId: z.number().int().positive(),
@@ -45,7 +50,7 @@ export const fridgeOrderSchema = z.object({
   name: z.string().min(2).max(200),
   email: z.string().email(),
   phone: z.string().min(5).max(40),
-  camping: z.string().min(2).max(200),
+  camping: knownCamping,
   spot_number: z.string().max(50).optional().or(z.literal('')),
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Datum is verplicht'),
   end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Datum is verplicht'),
@@ -91,10 +96,13 @@ export const inspectionOrderSchema = z.object({
 
 export const transportOrderSchema = z.object({
   ...contactBase,
-  fromLocation: z.string().min(2).max(300),
-  toLocation: z.string().min(2).max(300),
+  fromLocation: knownCamping,
+  toLocation: knownCamping,
   preferredDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().or(z.literal('')),
   description: z.string().max(2000).optional().or(z.literal('')),
+}).refine((d) => d.fromLocation !== d.toLocation, {
+  message: 'Van en naar moeten verschillen',
+  path: ['toLocation'],
 });
 
 // Stalling stays local; not forwarded to reparatiepanel.

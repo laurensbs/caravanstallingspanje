@@ -324,13 +324,6 @@ export async function findFridgeByEmail(email: string) {
   return rows[0] || null;
 }
 
-export async function getCampingSuggestions(): Promise<string[]> {
-  const rows = await sql`
-    SELECT DISTINCT camping FROM fridge_bookings
-    WHERE camping IS NOT NULL AND camping <> ''
-    ORDER BY camping`;
-  return (rows as { camping: string }[]).map(r => r.camping);
-}
 
 export async function updateFridge(id: number, data: { name?: string; email?: string | null; extra_email?: string | null; device_type?: string; notes?: string | null }) {
   await sql`UPDATE fridges SET

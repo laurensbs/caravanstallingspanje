@@ -11,14 +11,30 @@ import LocaleSwitch from '@/components/LocaleSwitch';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
+// Mollie-meets-Stripe deep navy. Used only on landing.
+const NAVY_GRAD =
+  'radial-gradient(120% 80% at 50% 0%, #142F4D 0%, #0A1929 60%, #050D18 100%)';
+
 export default function LandingPage() {
   const { t } = useLocale();
   return (
-    <main className="min-h-screen flex items-center justify-center px-6 py-12 sm:py-20 bg-bg relative">
-      <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+    <main
+      className="min-h-screen flex items-center justify-center px-6 py-12 sm:py-20 relative overflow-hidden"
+      style={{ background: NAVY_GRAD, color: '#F1F5F9' }}
+    >
+      {/* Subtle ambient glow behind the logo so it pops out of the navy */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[480px] opacity-60 blur-3xl"
+        style={{
+          background: `radial-gradient(50% 60% at 50% 30%, rgba(255,255,255,0.10) 0%, transparent 70%)`,
+        }}
+      />
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
         <LocaleSwitch />
       </div>
-      <div className="w-full max-w-3xl">
+
+      <div className="w-full max-w-3xl relative">
         {/* Hero */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -33,11 +49,19 @@ export default function LandingPage() {
             height={68}
             priority
             className="mx-auto h-12 sm:h-14 w-auto mb-7 sm:mb-9"
+            // Inverteert het donker logo naar wit zodat het 'pop't tegen het navy
+            style={{ filter: 'brightness(0) invert(1)' }}
           />
-          <h1 className="text-[28px] sm:text-[40px] leading-[1.15] font-semibold tracking-tight">
+          <h1
+            className="text-[28px] sm:text-[40px] leading-[1.15] font-semibold tracking-tight"
+            style={{ color: '#FFFFFF' }}
+          >
             {t('landing.tagline')}
           </h1>
-          <p className="text-text-muted mt-4 leading-relaxed max-w-lg mx-auto text-[14px] sm:text-base">
+          <p
+            className="mt-4 leading-relaxed max-w-lg mx-auto text-[14px] sm:text-base"
+            style={{ color: 'rgba(241,245,249,0.72)' }}
+          >
             {t('landing.intro')}
           </p>
 
@@ -49,7 +73,12 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.4, ease: EASE }}
-            className="press-spring inline-flex items-center gap-2 mt-5 px-3 py-1.5 rounded-full border border-border bg-surface hover:border-border-strong transition-colors"
+            className="press-spring inline-flex items-center gap-2 mt-5 px-3 py-1.5 rounded-full transition-colors"
+            style={{
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.10)',
+              color: '#F1F5F9',
+            }}
           >
             <span className="flex items-center gap-0.5">
               {[0, 1, 2, 3, 4].map((i) => (
@@ -57,12 +86,14 @@ export default function LandingPage() {
                   key={i}
                   size={11}
                   fill="currentColor"
-                  style={{ color: 'var(--color-ring)' }}
+                  style={{ color: '#F4B942' }}
                 />
               ))}
             </span>
             <span className="text-[11px] font-medium tabular-nums">4.9</span>
-            <span className="text-[11px] text-text-muted">{t('landing.reviews-count')}</span>
+            <span className="text-[11px]" style={{ color: 'rgba(241,245,249,0.6)' }}>
+              {t('landing.reviews-count')}
+            </span>
           </motion.a>
         </motion.div>
 
@@ -103,23 +134,29 @@ export default function LandingPage() {
         </motion.div>
 
         {/* Footer */}
-        <p className="text-xs text-text-muted text-center mt-12 sm:mt-16">
+        <p
+          className="text-xs text-center mt-12 sm:mt-16"
+          style={{ color: 'rgba(241,245,249,0.55)' }}
+        >
           {t('common.questions')}{' '}
           <a
             href="mailto:info@caravanstalling-spanje.com"
-            className="text-text underline-offset-4 hover:underline"
+            className="underline-offset-4 hover:underline"
+            style={{ color: '#F1F5F9' }}
           >
             info@caravanstalling-spanje.com
           </a>
           {' · '}
           <a
             href="tel:+34633778699"
-            className="text-text underline-offset-4 hover:underline"
+            className="underline-offset-4 hover:underline"
+            style={{ color: '#F1F5F9' }}
           >
             +34 633 778 699
           </a>
         </p>
       </div>
+
     </main>
   );
 }
@@ -141,19 +178,34 @@ function CtaCard({
     >
       <Link
         href={href}
-        className="card-surface group hover-lift press-spring block p-6"
+        className="press-spring block p-6 rounded-[var(--radius-2xl)] transition-all hover:-translate-y-px"
+        style={{
+          background: 'rgba(255,255,255,0.04)',
+          border: '1px solid rgba(255,255,255,0.10)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+        }}
       >
         <div className="flex items-start justify-between mb-8">
-          <div className="w-10 h-10 rounded-[var(--radius-md)] bg-surface-2 text-text flex items-center justify-center border border-border transition-transform group-hover:scale-105">
+          <div
+            className="w-10 h-10 rounded-[var(--radius-md)] flex items-center justify-center transition-transform group-hover:scale-105"
+            style={{
+              background: 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,255,255,0.10)',
+              color: '#F1F5F9',
+            }}
+          >
             <Icon size={18} />
           </div>
-          <ArrowRight
-            size={14}
-            className="text-text-subtle group-hover:text-text transition-transform group-hover:translate-x-0.5"
-          />
+          <ArrowRight size={14} style={{ color: 'rgba(241,245,249,0.5)' }} />
         </div>
-        <h2 className="text-base font-semibold">{title}</h2>
-        <p className="text-[13px] text-text-muted mt-1 leading-relaxed">{description}</p>
+        <h2 className="text-base font-semibold" style={{ color: '#FFFFFF' }}>{title}</h2>
+        <p
+          className="text-[13px] mt-1 leading-relaxed"
+          style={{ color: 'rgba(241,245,249,0.7)' }}
+        >
+          {description}
+        </p>
       </Link>
     </motion.div>
   );
@@ -168,12 +220,24 @@ function Usp({
 }) {
   return (
     <div className="flex sm:flex-col items-start gap-3 sm:gap-2 px-4 py-3 sm:py-0 sm:px-0">
-      <div className="w-9 h-9 rounded-full bg-surface-2 flex items-center justify-center border border-border shrink-0">
-        <Icon size={15} className="text-text" />
+      <div
+        className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+        style={{
+          background: 'rgba(255,255,255,0.06)',
+          border: '1px solid rgba(255,255,255,0.10)',
+          color: '#F1F5F9',
+        }}
+      >
+        <Icon size={15} />
       </div>
       <div className="min-w-0">
-        <div className="text-[13px] font-semibold text-text">{title}</div>
-        <div className="text-[12px] text-text-muted leading-relaxed mt-0.5">{children}</div>
+        <div className="text-[13px] font-semibold" style={{ color: '#FFFFFF' }}>{title}</div>
+        <div
+          className="text-[12px] leading-relaxed mt-0.5"
+          style={{ color: 'rgba(241,245,249,0.65)' }}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, Check, Loader2, Lock } from 'lucide-react';
 import Link from 'next/link';
 import InfoBanner from './InfoBanner';
 import LocaleSwitch from './LocaleSwitch';
+import CampingPicker from './CampingPicker';
 import { useLocale } from './LocaleProvider';
 
 export type ContactState = {
@@ -96,7 +97,12 @@ export function ContactFields({
       )}
       {showLocation && (
         <Field label={t('contact.location-hint-label')} hint={t('contact.location-hint-help')}>
-          <input value={state.locationHint} onChange={e => set('locationHint', e.target.value)} className={inputCls} />
+          <CampingPicker
+            value={state.locationHint}
+            onChange={(name) => set('locationHint', name)}
+            placeholder={t('fridge.camping-placeholder')}
+            ariaLabel={t('contact.location-hint-label')}
+          />
         </Field>
       )}
     </div>
