@@ -6,10 +6,7 @@ import { Check, Warehouse, Sun } from 'lucide-react';
 import {
   ServicePageShell, Section, Field, fieldCls, useServiceSubmit,
 } from '@/components/ServiceForm';
-
-function formatEur(eur: number): string {
-  return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(eur);
-}
+import { useLocale } from '@/components/LocaleProvider';
 
 type FormState = {
   type: 'binnen' | 'buiten';
@@ -40,6 +37,13 @@ const empty: FormState = {
 };
 
 export default function StallingPage() {
+  const { t, locale } = useLocale();
+  const formatEur = (eur: number) =>
+    new Intl.NumberFormat(locale === 'nl' ? 'nl-NL' : 'en-IE', {
+      style: 'currency',
+      currency: 'EUR',
+    }).format(eur);
+
   const [form, setForm] = useState<FormState>(empty);
   const [prices, setPrices] = useState<{ binnen: number; buiten: number } | null>(null);
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm({ ...form, [key]: value });
@@ -58,9 +62,9 @@ export default function StallingPage() {
   return (
     <ServicePageShell
       paid
-      title="Stalling aanvragen"
-      intro="Caravan stallen op ons terrein aan de Costa Brava — heel jaar vooraf, overdekt of buiten."
-      doneTitle="Doorsturen naar betaling…"
+      title={t('storage.heading')}
+      intro={t('storage.intro')}
+      doneTitle={t('service.done-title')}
       onSubmit={(e) => {
         e.preventDefault();
         submit(form);
@@ -69,12 +73,12 @@ export default function StallingPage() {
       error={error}
       done={done}
     >
-      <Section title="Soort stalling">
+      <Section title={t('storage.section-type')}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {([
-            { value: 'binnen', label: 'Binnen', icon: Warehouse, description: 'Overdekt — beschermd tegen weer en zon.' },
-            { value: 'buiten', label: 'Buiten', icon: Sun, description: 'Vaste plek op afgesloten terrein.' },
-          ] as const).map((opt) => {
+            { value: 'binnen' as const, label: t('storage.indoor'),  icon: Warehouse, description: t('storage.indoor-desc') },
+            { value: 'buiten' as const, label: t('storage.outdoor'), icon: Sun,        description: t('storage.outdoor-desc') },
+          ]).map((opt) => {
             const selected = form.type === opt.value;
             const Icon = opt.icon;
             const optPrice = prices ? prices[opt.value] : null;
@@ -104,7 +108,7 @@ export default function StallingPage() {
                 {optPrice !== null && optPrice > 0 && (
                   <div className="text-sm font-semibold tabular-nums mt-2">
                     {formatEur(optPrice)}
-                    <span className="text-[11px] font-normal text-text-muted"> / jaar</span>
+                    <span className="text-[11px] font-normal text-text-muted"> {t('storage.per-year')}</span>
                   </div>
                 )}
               </motion.button>
@@ -113,8 +117,8 @@ export default function StallingPage() {
         </div>
       </Section>
 
-      <Section title="Startdatum">
-        <Field label="Vanaf" required hint="De stalling loopt voor één heel jaar vanaf deze datum.">
+      <Section title={t('storage.start-section')}>
+        <Field label={t('storage.start-from')} required hint={t('storage.start-help')}>
           <input
             type="date"
             required
@@ -126,36 +130,36 @@ export default function StallingPage() {
         </Field>
       </Section>
 
-      <Section title="Caravan">
+      <Section title={t('storage.caravan-section')}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Field label="Kenteken">
+          <Field label={t('contact.registration')}>
             <input value={form.registration} onChange={(e) => set('registration', e.target.value)} className={fieldCls} />
           </Field>
-          <Field label="Lengte (meter)">
+          <Field label={t('storage.length-meters')}>
             <input value={form.length} onChange={(e) => set('length', e.target.value)} placeholder="6.5" className={fieldCls} />
           </Field>
-          <Field label="Merk">
+          <Field label={t('contact.brand')}>
             <input value={form.brand} onChange={(e) => set('brand', e.target.value)} className={fieldCls} />
           </Field>
-          <Field label="Model">
+          <Field label={t('contact.model')}>
             <input value={form.model} onChange={(e) => set('model', e.target.value)} className={fieldCls} />
           </Field>
         </div>
       </Section>
 
-      <Section title="Contactgegevens">
-        <Field label="Naam" required>
+      <Section title={t('contact.section-heading')}>
+        <Field label={t('contact.name')} required>
           <input required value={form.name} onChange={(e) => set('name', e.target.value)} autoComplete="name" className={fieldCls} />
         </Field>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Field label="E-mail" required>
+          <Field label={t('contact.email')} required>
             <input required type="email" value={form.email} onChange={(e) => set('email', e.target.value)} autoComplete="email" className={fieldCls} />
           </Field>
-          <Field label="Telefoon" required>
+          <Field label={t('contact.phone')} required>
             <input required type="tel" value={form.phone} onChange={(e) => set('phone', e.target.value)} autoComplete="tel" className={fieldCls} />
           </Field>
         </div>
-        <Field label="Opmerking (optioneel)">
+        <Field label={`${t('contact.note')} ${t('common.optional')}`}>
           <textarea
             rows={3}
             value={form.notes}
@@ -169,15 +173,13 @@ export default function StallingPage() {
         <div className="rounded-[var(--radius-xl)] bg-surface-2 border border-border p-4">
           <div className="flex items-center justify-between">
             <span className="text-sm text-text-muted">
-              Stalling {form.type} · 1 jaar vooraf
+              {form.type === 'binnen' ? t('storage.summary-indoor') : t('storage.summary-outdoor')}
             </span>
             <span className="text-lg font-semibold tabular-nums">
               {formatEur(currentPrice)}
             </span>
           </div>
-          <p className="text-[11px] text-text-muted mt-2">
-            Je gaat na verzenden naar onze beveiligde Stripe-betaalpagina.
-          </p>
+          <p className="text-[11px] text-text-muted mt-2">{t('service.checkout-hint')}</p>
         </div>
       )}
     </ServicePageShell>

@@ -5,8 +5,10 @@ import {
   ContactFields, ServicePageShell, Section, Field, fieldCls,
   emptyContact, useServiceSubmit,
 } from '@/components/ServiceForm';
+import { useLocale } from '@/components/LocaleProvider';
 
 export default function ReparatiePage() {
+  const { t } = useLocale();
   const [contact, setContact] = useState(emptyContact);
   const [description, setDescription] = useState('');
 
@@ -14,8 +16,8 @@ export default function ReparatiePage() {
 
   return (
     <ServicePageShell
-      title="Reparatie aanvragen"
-      intro="Beschrijf wat er moet gebeuren. We koppelen het aan een werkbon in het werkplaats-systeem en nemen contact op."
+      title={t('repair.heading')}
+      intro={t('repair.intro')}
       onSubmit={(e) => {
         e.preventDefault();
         submit({ ...contact, description });
@@ -24,23 +26,23 @@ export default function ReparatiePage() {
       error={error}
       done={done}
       publicCode={publicCode}
-      doneBody="Bedankt! Onze werkplaats heeft je aanvraag ontvangen en bekijkt 'm zo snel mogelijk."
+      doneBody={t('repair.done-body')}
     >
-      <Section title="Wat is er aan de hand?">
-        <Field label="Omschrijving" required hint="Wees zo specifiek mogelijk: locatie van de schade, wanneer ontstaan, etc.">
+      <Section title={t('repair.section-issue')}>
+        <Field label={t('contact.description')} required hint={t('repair.description-help')}>
           <textarea
             required
             rows={5}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Bv. lekkage bij het frontraam links, ontdekt na regen vorige week."
+            placeholder={t('repair.description-placeholder')}
             className={`${fieldCls} min-h-[120px] py-2 resize-none`}
           />
         </Field>
         {/* TODO: foto-upload (Vercel Blob of S3) */}
       </Section>
 
-      <Section title="Contactgegevens">
+      <Section title={t('contact.section-heading')}>
         <ContactFields state={contact} onChange={setContact} />
       </Section>
     </ServicePageShell>

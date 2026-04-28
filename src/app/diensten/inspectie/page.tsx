@@ -5,8 +5,10 @@ import {
   ContactFields, ServicePageShell, Section, Field, fieldCls,
   emptyContact, useServiceSubmit,
 } from '@/components/ServiceForm';
+import { useLocale } from '@/components/LocaleProvider';
 
 export default function InspectiePage() {
+  const { t } = useLocale();
   const [contact, setContact] = useState(emptyContact);
   const [preferredDate, setPreferredDate] = useState('');
   const [description, setDescription] = useState('');
@@ -15,8 +17,8 @@ export default function InspectiePage() {
 
   return (
     <ServicePageShell
-      title="Inspectie aanvragen"
-      intro="Technische keuring met rapport — geschikt voor vóór het seizoen, na schade of voor verkoop."
+      title={t('inspection.heading')}
+      intro={t('inspection.intro')}
       onSubmit={(e) => {
         e.preventDefault();
         submit({ ...contact, preferredDate, description });
@@ -26,8 +28,8 @@ export default function InspectiePage() {
       done={done}
       publicCode={publicCode}
     >
-      <Section title="Wanneer?">
-        <Field label="Voorkeursdatum (optioneel)">
+      <Section title={t('inspection.when')}>
+        <Field label={`${t('inspection.preferred-date')} ${t('common.optional')}`}>
           <input
             type="date"
             value={preferredDate}
@@ -36,18 +38,18 @@ export default function InspectiePage() {
             className={fieldCls}
           />
         </Field>
-        <Field label="Toelichting (optioneel)">
+        <Field label={`${t('contact.note')} ${t('common.optional')}`}>
           <textarea
             rows={3}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Specifieke aandachtspunten, gebruiksdoel, etc."
+            placeholder={t('inspection.note-placeholder')}
             className={`${fieldCls} min-h-[80px] py-2 resize-none`}
           />
         </Field>
       </Section>
 
-      <Section title="Contactgegevens">
+      <Section title={t('contact.section-heading')}>
         <ContactFields state={contact} onChange={setContact} />
       </Section>
     </ServicePageShell>

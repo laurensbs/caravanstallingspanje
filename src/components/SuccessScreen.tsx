@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Check, Mail, Phone } from 'lucide-react';
+import { useLocale } from './LocaleProvider';
 
 interface SuccessScreenProps {
   title: string;
@@ -13,6 +14,7 @@ interface SuccessScreenProps {
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 export default function SuccessScreen({ title, body, reference }: SuccessScreenProps) {
+  const { t } = useLocale();
   return (
     <main className="min-h-screen flex items-center justify-center bg-bg px-6 py-12">
       <div className="max-w-md text-center">
@@ -52,7 +54,7 @@ export default function SuccessScreen({ title, body, reference }: SuccessScreenP
           <p className="text-text-muted leading-relaxed">{body}</p>
           {reference && (
             <p className="text-[11px] text-text-subtle mt-6 font-mono break-all">
-              Referentie: {reference}
+              {t('common.reference')} {reference}
             </p>
           )}
         </motion.div>
@@ -83,7 +85,7 @@ export default function SuccessScreen({ title, body, reference }: SuccessScreenP
               href="/"
               className="inline-block text-sm text-text-muted hover:text-text underline-offset-4 hover:underline transition-colors"
             >
-              Terug naar de website
+              {t('common.back-to-website')}
             </Link>
           </div>
         </motion.div>

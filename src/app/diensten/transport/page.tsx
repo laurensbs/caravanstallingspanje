@@ -5,12 +5,16 @@ import {
   ContactFields, ServicePageShell, Section, Field, fieldCls,
   emptyContact, useServiceSubmit,
 } from '@/components/ServiceForm';
-
-function formatEur(eur: number): string {
-  return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(eur);
-}
+import { useLocale } from '@/components/LocaleProvider';
 
 export default function TransportPage() {
+  const { t, locale } = useLocale();
+  const formatEur = (eur: number) =>
+    new Intl.NumberFormat(locale === 'nl' ? 'nl-NL' : 'en-IE', {
+      style: 'currency',
+      currency: 'EUR',
+    }).format(eur);
+
   const [contact, setContact] = useState(emptyContact);
   const [fromLocation, setFromLocation] = useState('');
   const [toLocation, setToLocation] = useState('');
@@ -30,9 +34,9 @@ export default function TransportPage() {
   return (
     <ServicePageShell
       paid
-      title="Transport aanvragen"
-      intro="Ophalen of brengen tussen camping en stalling, of NL ↔ Spanje."
-      doneTitle="Doorsturen naar betaling…"
+      title={t('transport.heading')}
+      intro={t('transport.intro')}
+      doneTitle={t('service.done-title')}
       onSubmit={(e) => {
         e.preventDefault();
         submit({ ...contact, fromLocation, toLocation, preferredDate, description });
@@ -41,28 +45,28 @@ export default function TransportPage() {
       error={error}
       done={done}
     >
-      <Section title="Route">
+      <Section title={t('transport.section-route')}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Field label="Van" required>
+          <Field label={t('transport.from')} required>
             <input
               required
               value={fromLocation}
               onChange={(e) => setFromLocation(e.target.value)}
-              placeholder="Camping Eurocamping plek 12"
+              placeholder={t('transport.from-placeholder')}
               className={fieldCls}
             />
           </Field>
-          <Field label="Naar" required>
+          <Field label={t('transport.to')} required>
             <input
               required
               value={toLocation}
               onChange={(e) => setToLocation(e.target.value)}
-              placeholder="Stalling Cruïlles"
+              placeholder={t('transport.to-placeholder')}
               className={fieldCls}
             />
           </Field>
         </div>
-        <Field label="Voorkeursdatum (optioneel)">
+        <Field label={`${t('inspection.preferred-date')} ${t('common.optional')}`}>
           <input
             type="date"
             value={preferredDate}
@@ -71,30 +75,28 @@ export default function TransportPage() {
             className={fieldCls}
           />
         </Field>
-        <Field label="Toelichting (optioneel)">
+        <Field label={`${t('contact.note')} ${t('common.optional')}`}>
           <textarea
             rows={3}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Bv. afmetingen, contactpersoon ter plaatse, etc."
+            placeholder={t('transport.note-placeholder')}
             className={`${fieldCls} min-h-[80px] py-2 resize-none`}
           />
         </Field>
       </Section>
 
-      <Section title="Contactgegevens">
+      <Section title={t('contact.section-heading')}>
         <ContactFields state={contact} onChange={setContact} />
       </Section>
 
       {price !== null && price > 0 && (
         <div className="rounded-[var(--radius-xl)] bg-surface-2 border border-border p-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-text-muted">Transport (vast bedrag)</span>
+            <span className="text-sm text-text-muted">{t('transport.amount-label')}</span>
             <span className="text-lg font-semibold tabular-nums">{formatEur(price)}</span>
           </div>
-          <p className="text-[11px] text-text-muted mt-2">
-            Je gaat na verzenden naar onze beveiligde Stripe-betaalpagina.
-          </p>
+          <p className="text-[11px] text-text-muted mt-2">{t('service.checkout-hint')}</p>
         </div>
       )}
     </ServicePageShell>

@@ -8,6 +8,7 @@ import {
   emptyContact, useServiceSubmit,
 } from '@/components/ServiceForm';
 import { Skeleton } from '@/components/ui';
+import { useLocale } from '@/components/LocaleProvider';
 
 type CatalogService = {
   id: number;
@@ -17,11 +18,13 @@ type CatalogService = {
   price_eur: number;
 };
 
-function formatEur(eur: number): string {
-  return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(eur);
-}
-
 export default function ServicePage() {
+  const { t, locale } = useLocale();
+  const formatEur = (eur: number) =>
+    new Intl.NumberFormat(locale === 'nl' ? 'nl-NL' : 'en-IE', {
+      style: 'currency',
+      currency: 'EUR',
+    }).format(eur);
   const [catalog, setCatalog] = useState<CatalogService[] | null>(null);
   const [contact, setContact] = useState(emptyContact);
   const [serviceSlug, setServiceSlug] = useState<string>('');
@@ -41,8 +44,8 @@ export default function ServicePage() {
   return (
     <ServicePageShell
       paid
-      title="Service aanvragen"
-      intro="Kies een service en betaal direct online."
+      title={t('service.heading')}
+      intro={t('service.intro')}
       onSubmit={(e) => {
         e.preventDefault();
         if (!serviceSlug) return;
@@ -51,9 +54,9 @@ export default function ServicePage() {
       submitting={submitting}
       error={error}
       done={done}
-      doneTitle="Doorsturen naar betaling…"
+      doneTitle={t('service.done-title')}
     >
-      <Section title="Welke service?">
+      <Section title={t('service.which')}>
         {catalog === null ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {[0, 1, 2, 3].map((i) => (
@@ -63,7 +66,7 @@ export default function ServicePage() {
         ) : catalog.length === 0 ? (
           <div className="card-surface p-8 text-center">
             <p className="text-sm text-text-muted">
-              Er zijn op dit moment geen services beschikbaar. Neem contact op via{' '}
+              {t('service.empty')}{' '}
               <a
                 href="mailto:info@caravanstalling-spanje.com"
                 className="text-text underline-offset-4 hover:underline"
@@ -112,34 +115,32 @@ export default function ServicePage() {
       </Section>
 
       {selected && (
-        <Section title="Toelichting">
-          <Field label="Omschrijving (optioneel)">
+        <Section title={t('service.note-section')}>
+          <Field label={`${t('contact.description')} ${t('common.optional')}`}>
             <textarea
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Aanvullende info, voorkeursdatum, etc."
+              placeholder={t('service.note-placeholder')}
               className={`${fieldCls} min-h-[80px] py-2 resize-none`}
             />
           </Field>
         </Section>
       )}
 
-      <Section title="Contactgegevens">
+      <Section title={t('contact.section-heading')}>
         <ContactFields state={contact} onChange={setContact} />
       </Section>
 
       {selected && (
         <div className="rounded-[var(--radius-xl)] bg-surface-2 border border-border p-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-text-muted">Te betalen</span>
+            <span className="text-sm text-text-muted">{t('service.amount-label')}</span>
             <span className="text-lg font-semibold tabular-nums">
               {formatEur(selected.price_eur)}
             </span>
           </div>
-          <p className="text-[11px] text-text-muted mt-2">
-            Je gaat na verzenden naar onze beveiligde Stripe-betaalpagina.
-          </p>
+          <p className="text-[11px] text-text-muted mt-2">{t('service.checkout-hint')}</p>
         </div>
       )}
     </ServicePageShell>

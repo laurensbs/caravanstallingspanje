@@ -6,12 +6,18 @@ import { motion } from 'framer-motion';
 import {
   ArrowRight, LayoutGrid, Refrigerator, ShieldCheck, Wrench, Star,
 } from 'lucide-react';
+import { useLocale } from '@/components/LocaleProvider';
+import LocaleSwitch from '@/components/LocaleSwitch';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 export default function LandingPage() {
+  const { t } = useLocale();
   return (
-    <main className="min-h-screen flex items-center justify-center px-6 py-12 sm:py-20 bg-bg">
+    <main className="min-h-screen flex items-center justify-center px-6 py-12 sm:py-20 bg-bg relative">
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+        <LocaleSwitch />
+      </div>
       <div className="w-full max-w-3xl">
         {/* Hero */}
         <motion.div
@@ -29,10 +35,10 @@ export default function LandingPage() {
             className="mx-auto h-12 sm:h-14 w-auto mb-7 sm:mb-9"
           />
           <h1 className="text-[28px] sm:text-[40px] leading-[1.15] font-semibold tracking-tight">
-            Meer dan een caravanstalling
+            {t('landing.tagline')}
           </h1>
           <p className="text-text-muted mt-4 leading-relaxed max-w-lg mx-auto text-[14px] sm:text-base">
-            Stalling, reparatie, transport en service aan de Costa Brava — alles via één plek, met vast personeel dat om je tweede huis geeft.
+            {t('landing.intro')}
           </p>
 
           {/* Reviews badge */}
@@ -56,7 +62,7 @@ export default function LandingPage() {
               ))}
             </span>
             <span className="text-[11px] font-medium tabular-nums">4.9</span>
-            <span className="text-[11px] text-text-muted">· 25 Google reviews</span>
+            <span className="text-[11px] text-text-muted">{t('landing.reviews-count')}</span>
           </motion.a>
         </motion.div>
 
@@ -64,15 +70,15 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10 sm:mb-12">
           <CtaCard
             href="/diensten"
-            title="Diensten"
-            description="Reparatie, service, inspectie, transport, stalling."
+            title={t('landing.cta-services-title')}
+            description={t('landing.cta-services-desc')}
             icon={LayoutGrid}
             delay={0.12}
           />
           <CtaCard
             href="/koelkast"
-            title="Koelkast huren"
-            description="Bezorgd op je staanplaats. Vanaf één week."
+            title={t('landing.cta-fridge-title')}
+            description={t('landing.cta-fridge-desc')}
             icon={Refrigerator}
             delay={0.18}
           />
@@ -85,20 +91,20 @@ export default function LandingPage() {
           transition={{ delay: 0.28, duration: 0.4, ease: EASE }}
           className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-3"
         >
-          <Usp icon={ShieldCheck} title="24/7 beveiligd">
-            Camera's, alarm + verzekering inbegrepen
+          <Usp icon={ShieldCheck} title={t('landing.usp-secure-title')}>
+            {t('landing.usp-secure-body')}
           </Usp>
-          <Usp icon={Wrench} title="Eigen werkplaats">
-            Reparatie en onderhoud op locatie
+          <Usp icon={Wrench} title={t('landing.usp-workshop-title')}>
+            {t('landing.usp-workshop-body')}
           </Usp>
-          <Usp icon={Star} title="4.9 op Google">
-            Vast personeel, vaste klanten
+          <Usp icon={Star} title={t('landing.usp-rating-title')}>
+            {t('landing.usp-rating-body')}
           </Usp>
         </motion.div>
 
         {/* Footer */}
         <p className="text-xs text-text-muted text-center mt-12 sm:mt-16">
-          Vragen?{' '}
+          {t('common.questions')}{' '}
           <a
             href="mailto:info@caravanstalling-spanje.com"
             className="text-text underline-offset-4 hover:underline"

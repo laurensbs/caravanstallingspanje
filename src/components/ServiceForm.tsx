@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Check, Loader2, Lock } from 'lucide-react';
 import Link from 'next/link';
 import InfoBanner from './InfoBanner';
+import LocaleSwitch from './LocaleSwitch';
+import { useLocale } from './LocaleProvider';
 
 export type ContactState = {
   name: string;
@@ -64,35 +66,36 @@ export function ContactFields({
   showRegistration?: boolean;
   showLocation?: boolean;
 }) {
+  const { t } = useLocale();
   const set = (key: keyof ContactState, value: string) => onChange({ ...state, [key]: value });
   return (
     <div className="space-y-3">
-      <Field label="Naam" required>
+      <Field label={t('contact.name')} required>
         <input required value={state.name} onChange={e => set('name', e.target.value)} autoComplete="name" className={inputCls} />
       </Field>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <Field label="E-mail" required>
+        <Field label={t('contact.email')} required>
           <input required type="email" value={state.email} onChange={e => set('email', e.target.value)} autoComplete="email" className={inputCls} />
         </Field>
-        <Field label="Telefoon" required>
+        <Field label={t('contact.phone')} required>
           <input required type="tel" value={state.phone} onChange={e => set('phone', e.target.value)} autoComplete="tel" className={inputCls} />
         </Field>
       </div>
       {showRegistration && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <Field label="Kenteken">
+          <Field label={t('contact.registration')}>
             <input value={state.registration} onChange={e => set('registration', e.target.value)} placeholder="12-AB-34" className={inputCls} />
           </Field>
-          <Field label="Merk">
+          <Field label={t('contact.brand')}>
             <input value={state.brand} onChange={e => set('brand', e.target.value)} placeholder="Hobby" className={inputCls} />
           </Field>
-          <Field label="Model">
+          <Field label={t('contact.model')}>
             <input value={state.model} onChange={e => set('model', e.target.value)} placeholder="Excellent" className={inputCls} />
           </Field>
         </div>
       )}
       {showLocation && (
-        <Field label="Camping / locatie" hint="Optioneel — bv. 'Camping Eurocamping plek 12'">
+        <Field label={t('contact.location-hint-label')} hint={t('contact.location-hint-help')}>
           <input value={state.locationHint} onChange={e => set('locationHint', e.target.value)} className={inputCls} />
         </Field>
       )}
@@ -107,7 +110,7 @@ export function ServicePageShell({
   submitting,
   error,
   done,
-  doneTitle = 'Aanvraag ontvangen',
+  doneTitle,
   doneBody,
   publicCode,
   paid = false,
@@ -125,6 +128,9 @@ export function ServicePageShell({
   paid?: boolean;
   children: ReactNode;
 }) {
+  const { t } = useLocale();
+  const resolvedDoneTitle = doneTitle ?? t('thanks.request-title');
+  const resolvedDoneBody = doneBody ?? t('thanks.request-body');
   if (done) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-bg px-6 py-12">
@@ -137,20 +143,18 @@ export function ServicePageShell({
           <div className="w-12 h-12 rounded-full bg-success-soft text-success flex items-center justify-center mx-auto mb-6">
             <Check size={20} />
           </div>
-          <h1 className="text-2xl font-medium tracking-tight mb-3">{doneTitle}</h1>
-          <p className="text-text-muted leading-relaxed">
-            {doneBody || 'Bedankt! Je krijgt zo een bevestiging per e-mail. Onze werkplaats neemt zo snel mogelijk contact op.'}
-          </p>
+          <h1 className="text-2xl font-medium tracking-tight mb-3">{resolvedDoneTitle}</h1>
+          <p className="text-text-muted leading-relaxed">{resolvedDoneBody}</p>
           {publicCode && (
             <p className="text-sm text-text-muted mt-6">
-              Referentie: <span className="font-mono text-text">{publicCode}</span>
+              {t('common.reference')} <span className="font-mono text-text">{publicCode}</span>
             </p>
           )}
           <Link
             href="/diensten"
             className="inline-flex items-center gap-1 text-sm text-text-muted hover:text-text mt-8"
           >
-            <ArrowLeft size={14} /> Terug naar diensten
+            <ArrowLeft size={14} /> {t('common.back-to-services')}
           </Link>
         </motion.div>
       </main>
@@ -161,15 +165,18 @@ export function ServicePageShell({
   return (
     <main className="min-h-screen bg-bg">
       <div className="max-w-2xl mx-auto px-6 py-10 sm:py-14">
-        <motion.div
-          initial={{ opacity: 0, x: -4 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3, ease: E }}
-        >
-          <Link href="/diensten" className="inline-flex items-center gap-1 text-sm text-text-muted hover:text-text mb-6 transition-colors">
-            <ArrowLeft size={14} /> Diensten
-          </Link>
-        </motion.div>
+        <div className="flex items-center justify-between mb-6">
+          <motion.div
+            initial={{ opacity: 0, x: -4 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3, ease: E }}
+          >
+            <Link href="/diensten" className="inline-flex items-center gap-1 text-sm text-text-muted hover:text-text transition-colors">
+              <ArrowLeft size={14} /> {t('common.services-link')}
+            </Link>
+          </motion.div>
+          <LocaleSwitch />
+        </div>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -186,7 +193,7 @@ export function ServicePageShell({
           className="mt-6"
         >
           <InfoBanner>
-            <strong>Belangrijk:</strong> gebruik het e-mailadres en telefoonnummer dat bij ons bekend is. Zo koppelen we je aanvraag automatisch aan je klantgegevens.
+            <strong>{t('banner.important')}</strong> {t('banner.match-hint')}
           </InfoBanner>
         </motion.div>
 
@@ -216,14 +223,12 @@ export function ServicePageShell({
           >
             {submitting ? <Loader2 size={16} className="animate-spin" /> : null}
             {submitting
-              ? (paid ? 'Doorsturen…' : 'Versturen…')
-              : (paid ? 'Doorgaan naar betalen' : 'Aanvraag versturen')}
+              ? (paid ? t('common.forwarding') : t('common.sending'))
+              : (paid ? t('common.continue-to-pay') : t('common.send-request'))}
             {!submitting && <ArrowRight size={16} className="transition-transform" />}
           </button>
           <p className="text-xs text-text-muted text-center">
-            {paid
-              ? 'Je gaat door naar onze beveiligde Stripe-betaalpagina.'
-              : 'Je krijgt direct een bevestiging per e-mail. Onze werkplaats neemt zo snel mogelijk contact op.'}
+            {paid ? t('common.stripe-footer-paid') : t('common.email-confirmation-footer')}
           </p>
         </motion.form>
       </div>
@@ -237,6 +242,7 @@ export function ServicePageShell({
 }
 
 function RedirectOverlay() {
+  const { t } = useLocale();
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -254,10 +260,8 @@ function RedirectOverlay() {
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-surface border border-border mb-5">
           <Lock size={18} className="text-text" />
         </div>
-        <h2 className="text-base font-semibold mb-1">Doorsturen naar Stripe…</h2>
-        <p className="text-[13px] text-text-muted leading-relaxed">
-          Je betaling verloopt via een beveiligde verbinding.
-        </p>
+        <h2 className="text-base font-semibold mb-1">{t('common.stripe-redirect')}</h2>
+        <p className="text-[13px] text-text-muted leading-relaxed">{t('common.stripe-secure')}</p>
         <div className="flex justify-center mt-5">
           <Loader2 size={16} className="animate-spin text-text-muted" />
         </div>
