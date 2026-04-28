@@ -10,9 +10,17 @@ import {
   markTransportRequestPaid,
   getPendingIntakeBySession,
   markPendingIntakeForwarded,
+  getFridgeById,
+  getStallingRequestById,
+  getTransportRequestById,
+  setBookingHoldedInvoice,
+  setStallingHoldedInvoice,
+  setTransportHoldedInvoice,
   logActivity,
 } from '@/lib/db';
 import { sendIntake, type IntakePayload } from '@/lib/work-order-hub';
+import { invoiceForCustomer } from '@/lib/holded';
+import { sendMail, paymentReceivedHtml } from '@/lib/email';
 
 // Stripe signature verification needs the raw request body, not the
 // JSON-parsed version, so we run on the Node.js runtime and pass req.text().
@@ -103,20 +111,81 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
     raw: session,
   });
 
+  // Holded + e-mail vars die we hieronder vullen per kind.
+  let customerName = session.customer_details?.name || '';
+  let customerEmail = session.customer_details?.email || session.customer_email || '';
+  let invoiceDescription = (typeof md.description === 'string' ? md.description : '') || kind;
+  const amountEur = (session.amount_total ?? 0) / 100;
+
   if (kind === 'fridge_booking' && refId) {
     const id = Number(refId);
     if (Number.isFinite(id) && id > 0) {
       await markBookingPaid(id, session.id);
+      const fridge = await getFridgeById(id).catch(() => null);
+      if (fridge) {
+        customerName = customerName || fridge.name;
+        customerEmail = customerEmail || fridge.email || '';
+      }
+      // Holded factuur (idempotent: bestaande invoice respecteren).
+      const booking = fridge?.bookings?.find((b: { id: number }) => b.id === id);
+      if (customerEmail && !booking?.holded_invoice_id) {
+        try {
+          const inv = await invoiceForCustomer({
+            customer: { name: customerName || customerEmail, email: customerEmail },
+            description: invoiceDescription,
+            amountEur,
+          });
+          await setBookingHoldedInvoice(id, inv.id, inv.invoiceNum);
+        } catch (err) {
+          await logActivity({ action: 'Holded factuur mislukt (koelkast)', entityType: kind, entityId: refId, details: err instanceof Error ? err.message : 'unknown' });
+        }
+      }
     }
   } else if (kind === 'stalling_request' && refId) {
     const id = Number(refId);
     if (Number.isFinite(id) && id > 0) {
       await markStallingRequestPaid(id);
+      const r = await getStallingRequestById(id).catch(() => null) as { name: string; email: string; type: string; holded_invoice_id?: string | null } | null;
+      if (r) {
+        customerName = customerName || r.name;
+        customerEmail = customerEmail || r.email;
+        invoiceDescription = invoiceDescription || `Stalling ${r.type} — jaarprijs`;
+        if (customerEmail && !r.holded_invoice_id) {
+          try {
+            const inv = await invoiceForCustomer({
+              customer: { name: customerName, email: customerEmail },
+              description: invoiceDescription,
+              amountEur,
+            });
+            await setStallingHoldedInvoice(id, inv.id, inv.invoiceNum);
+          } catch (err) {
+            await logActivity({ action: 'Holded factuur mislukt (stalling)', entityType: kind, entityId: refId, details: err instanceof Error ? err.message : 'unknown' });
+          }
+        }
+      }
     }
   } else if (kind === 'transport_request' && refId) {
     const id = Number(refId);
     if (Number.isFinite(id) && id > 0) {
       await markTransportRequestPaid(id);
+      const r = await getTransportRequestById(id).catch(() => null) as { name: string; email: string; from_location: string; to_location: string; holded_invoice_id?: string | null } | null;
+      if (r) {
+        customerName = customerName || r.name;
+        customerEmail = customerEmail || r.email;
+        invoiceDescription = invoiceDescription || `Transport — ${r.from_location} → ${r.to_location}`;
+        if (customerEmail && !r.holded_invoice_id) {
+          try {
+            const inv = await invoiceForCustomer({
+              customer: { name: customerName, email: customerEmail },
+              description: invoiceDescription,
+              amountEur,
+            });
+            await setTransportHoldedInvoice(id, inv.id, inv.invoiceNum);
+          } catch (err) {
+            await logActivity({ action: 'Holded factuur mislukt (transport)', entityType: kind, entityId: refId, details: err instanceof Error ? err.message : 'unknown' });
+          }
+        }
+      }
     }
   } else if (kind === 'service_intake') {
     // Service-aanvraag pas na betaling doorzetten naar reparatiepanel.
@@ -132,11 +201,26 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
           entityId: String(pending.id),
           entityLabel: result.publicCode,
         });
+        // Customer info uit de pending payload (zelfde formaat als IntakePayload).
+        customerName = customerName || payload.customer?.name || '';
+        customerEmail = customerEmail || payload.customer?.email || '';
+        invoiceDescription = invoiceDescription || payload.title || 'Service';
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'forward failed';
         console.error('[stripe-webhook] forward to reparatiepanel failed:', msg);
-        // Throw so Stripe retries and we get another shot.
         throw new Error(`Forward to reparatiepanel failed: ${msg}`);
+      }
+    }
+    // Holded-factuur voor service.
+    if (customerEmail) {
+      try {
+        await invoiceForCustomer({
+          customer: { name: customerName || customerEmail, email: customerEmail },
+          description: invoiceDescription,
+          amountEur,
+        });
+      } catch (err) {
+        await logActivity({ action: 'Holded factuur mislukt (service)', entityType: kind, entityId: session.id, details: err instanceof Error ? err.message : 'unknown' });
       }
     }
   }
@@ -146,8 +230,22 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
     entityType: kind,
     entityId: refId || session.id,
     entityLabel: session.customer_details?.email || session.customer_email || undefined,
-    details: `${((session.amount_total ?? 0) / 100).toFixed(2)} ${session.currency?.toUpperCase() || 'EUR'}`,
+    details: `${amountEur.toFixed(2)} ${session.currency?.toUpperCase() || 'EUR'}`,
   });
+
+  // Bevestigingsmail naar klant.
+  if (customerEmail) {
+    const reference = refId ? `${kind}-${refId}` : session.id.slice(0, 16);
+    const mail = paymentReceivedHtml({
+      name: customerName || customerEmail,
+      service: invoiceDescription,
+      amountEur,
+      reference,
+    });
+    await sendMail({ to: customerEmail, subject: mail.subject, html: mail.html, text: mail.text }).catch((err) => {
+      console.error('[stripe-webhook] mail send failed:', err);
+    });
+  }
 }
 
 async function handleCheckoutExpired(event: Stripe.Event) {

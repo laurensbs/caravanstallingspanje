@@ -63,6 +63,11 @@ export async function initDatabase() {
   await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_id TEXT`;
   await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_number TEXT`;
 
+  await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS holded_invoice_id TEXT`;
+  await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS holded_invoice_number TEXT`;
+  await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_id TEXT`;
+  await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_number TEXT`;
+
   await sql`CREATE TABLE IF NOT EXISTS pending_intakes (
     id SERIAL PRIMARY KEY,
     stripe_session_id TEXT UNIQUE NOT NULL,
@@ -587,6 +592,24 @@ export async function markStallingRequestPaid(id: number) {
 
 export async function markTransportRequestPaid(id: number) {
   await sql`UPDATE transport_requests SET status = 'betaald', updated_at = NOW() WHERE id = ${id}`;
+}
+
+export async function getStallingRequestById(id: number) {
+  const rows = await sql`SELECT * FROM stalling_requests WHERE id = ${id} LIMIT 1`;
+  return rows[0] || null;
+}
+
+export async function getTransportRequestById(id: number) {
+  const rows = await sql`SELECT * FROM transport_requests WHERE id = ${id} LIMIT 1`;
+  return rows[0] || null;
+}
+
+export async function setStallingHoldedInvoice(id: number, invoiceId: string, invoiceNum: string) {
+  await sql`UPDATE stalling_requests SET holded_invoice_id = ${invoiceId}, holded_invoice_number = ${invoiceNum}, updated_at = NOW() WHERE id = ${id}`;
+}
+
+export async function setTransportHoldedInvoice(id: number, invoiceId: string, invoiceNum: string) {
+  await sql`UPDATE transport_requests SET holded_invoice_id = ${invoiceId}, holded_invoice_number = ${invoiceNum}, updated_at = NOW() WHERE id = ${id}`;
 }
 
 // ─── Transport requests (lokaal — eigen operatie, niet reparatie) ───

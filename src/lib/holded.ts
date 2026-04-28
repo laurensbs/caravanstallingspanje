@@ -124,6 +124,28 @@ export async function getInvoice(id: string): Promise<HoldedInvoiceSummary | nul
   }
 }
 
+// One-shot: find-or-create a contact by email, then create an invoice.
+// Used by the Stripe webhook after a successful payment.
+export async function invoiceForCustomer(input: {
+  customer: { name: string; email: string };
+  description: string;
+  amountEur: number;
+  taxPercent?: number;
+}): Promise<{ id: string; invoiceNum: string; contactId: string }> {
+  const contact = await ensureContact(input.customer);
+  const invoice = await createInvoice({
+    contactId: contact.id,
+    desc: input.description,
+    items: [{
+      name: input.description,
+      units: 1,
+      subtotal: input.amountEur,
+      tax: input.taxPercent ?? 21,
+    }],
+  });
+  return { id: invoice.id, invoiceNum: invoice.invoiceNum, contactId: contact.id };
+}
+
 export async function createInvoice(input: CreateInvoiceInput): Promise<{ id: string; invoiceNum: string }> {
   const body = {
     contactId: input.contactId,

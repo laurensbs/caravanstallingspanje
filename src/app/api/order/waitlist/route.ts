@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createWaitlistEntry, logActivity } from '@/lib/db';
 import { validateBody, waitlistSchema } from '@/lib/validations';
+import { sendMail, requestReceivedHtml } from '@/lib/email';
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,6 +31,14 @@ export async function POST(req: NextRequest) {
       entityLabel: `${d.name} — ${d.device_type}`,
       details: `${d.start_date} t/m ${d.end_date}`,
     });
+
+    const mail = requestReceivedHtml({
+      name: d.name,
+      type: 'wachtlijst',
+      reference: `WL-${entry.id}`,
+    });
+    await sendMail({ to: d.email, subject: mail.subject, html: mail.html, text: mail.text })
+      .catch((e) => console.error('waitlist mail failed:', e));
 
     return NextResponse.json({ success: true });
   } catch (error) {

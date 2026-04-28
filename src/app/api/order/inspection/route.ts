@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { sendIntake } from '@/lib/work-order-hub';
 import { validateBody, inspectionOrderSchema } from '@/lib/validations';
 import { logActivity } from '@/lib/db';
+import { sendMail, requestReceivedHtml } from '@/lib/email';
 
 export async function POST(req: NextRequest) {
   try {
@@ -32,6 +33,16 @@ export async function POST(req: NextRequest) {
       entityId: result.publicCode,
       entityLabel: `${d.name} — ${d.email}`,
     });
+
+    const mail = requestReceivedHtml({
+      name: d.name,
+      type: 'inspectie',
+      description: d.description || undefined,
+      preferredDate: d.preferredDate || null,
+      reference: result.publicCode,
+    });
+    await sendMail({ to: d.email, subject: mail.subject, html: mail.html, text: mail.text })
+      .catch((e) => console.error('inspection mail failed:', e));
 
     return NextResponse.json({ success: true, publicCode: result.publicCode });
   } catch (error) {
