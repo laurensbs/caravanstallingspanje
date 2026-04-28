@@ -5,8 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Check, Loader2, Lock } from 'lucide-react';
 import Link from 'next/link';
 import InfoBanner from './InfoBanner';
-import LocaleSwitch from './LocaleSwitch';
 import CampingPicker from './CampingPicker';
+import PublicHero from './PublicHero';
 import { useLocale } from './LocaleProvider';
 
 export type ContactState = {
@@ -170,33 +170,16 @@ export function ServicePageShell({
   const E = [0.16, 1, 0.3, 1] as const;
   return (
     <main className="min-h-screen bg-bg">
-      <div className="max-w-2xl mx-auto px-6 py-10 sm:py-14">
-        <div className="flex items-center justify-between mb-6">
-          <motion.div
-            initial={{ opacity: 0, x: -4 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3, ease: E }}
-          >
-            <Link href="/diensten" className="inline-flex items-center gap-1 text-sm text-text-muted hover:text-text transition-colors">
-              <ArrowLeft size={14} /> {t('common.services-link')}
-            </Link>
-          </motion.div>
-          <LocaleSwitch />
-        </div>
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, ease: E }}
-        >
-          <h1 className="text-[28px] sm:text-3xl font-semibold tracking-tight">{title}</h1>
-          <p className="text-text-muted mt-2 leading-relaxed text-[14px] sm:text-base">{intro}</p>
-        </motion.div>
-
+      <PublicHero
+        back={{ href: '/diensten', label: t('common.services-link') }}
+        title={title}
+        intro={intro}
+      />
+      <div className="max-w-2xl mx-auto px-6 py-8 sm:py-10">
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.4, ease: E }}
-          className="mt-6"
+          transition={{ duration: 0.4, ease: E }}
         >
           <InfoBanner>
             <strong>{t('banner.important')}</strong> {t('banner.match-hint')}
@@ -206,7 +189,7 @@ export function ServicePageShell({
         <motion.form
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.18, duration: 0.45, ease: E }}
+          transition={{ delay: 0.1, duration: 0.45, ease: E }}
           onSubmit={onSubmit}
           className="mt-6 space-y-7"
         >

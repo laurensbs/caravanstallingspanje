@@ -91,9 +91,10 @@ export async function initDatabase() {
   // Seed default prices once (no-op if already present)
   await sql`INSERT INTO app_settings (key, value) VALUES
     ('stalling_price_binnen', '950'::jsonb),
-    ('stalling_price_buiten', '650'::jsonb),
-    ('transport_price', '275'::jsonb)
+    ('stalling_price_buiten', '650'::jsonb)
     ON CONFLICT (key) DO NOTHING`;
+  // transport_price is dood — transport is geen betaalde dienst meer.
+  await sql`DELETE FROM app_settings WHERE key = 'transport_price'`;
 
   await sql`CREATE TABLE IF NOT EXISTS payments (
     id SERIAL PRIMARY KEY,
@@ -128,6 +129,8 @@ export async function initDatabase() {
     from_location TEXT NOT NULL,
     to_location TEXT NOT NULL,
     preferred_date DATE,
+    return_date DATE,
+    camping TEXT,
     registration TEXT,
     brand TEXT,
     model TEXT,
@@ -136,6 +139,8 @@ export async function initDatabase() {
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
   )`;
+  await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS return_date DATE`;
+  await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS camping TEXT`;
   await sql`CREATE INDEX IF NOT EXISTS idx_transport_requests_status ON transport_requests(status)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_transport_requests_created ON transport_requests(created_at DESC)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_transport_requests_date ON transport_requests(preferred_date)`;
@@ -511,6 +516,8 @@ export async function markStallingRequestPaid(id: number) {
   await sql`UPDATE stalling_requests SET status = 'betaald', updated_at = NOW() WHERE id = ${id}`;
 }
 
+// Kept for admin manual mark-as-paid in /admin/transport even though
+// transport no longer goes through Stripe.
 export async function markTransportRequestPaid(id: number) {
   await sql`UPDATE transport_requests SET status = 'betaald', updated_at = NOW() WHERE id = ${id}`;
 }
@@ -538,20 +545,26 @@ export async function createTransportRequest(data: {
   name: string;
   email: string;
   phone?: string | null;
-  from_location: string;
-  to_location: string;
-  preferred_date?: string | null;
+  /** Camping waar de caravan staat. Heen-rit gaat van stalling → camping,
+   *  terug-rit van camping → stalling. */
+  camping: string;
+  outbound_date: string;
+  return_date: string;
   registration?: string | null;
   brand?: string | null;
   model?: string | null;
   notes?: string | null;
 }) {
+  // from_location/to_location bewaren we voor backwards compat in de admin
+  // tabel (toont de richting van de heen-rit). Echte data = camping +
+  // beide datums.
   const res = await sql`INSERT INTO transport_requests
-    (name, email, phone, from_location, to_location, preferred_date,
+    (name, email, phone, from_location, to_location,
+     camping, preferred_date, return_date,
      registration, brand, model, notes)
     VALUES (${data.name}, ${data.email}, ${data.phone || null},
-      ${data.from_location}, ${data.to_location},
-      ${data.preferred_date || null}::date,
+      'Stalling Cruïlles', ${data.camping},
+      ${data.camping}, ${data.outbound_date}::date, ${data.return_date}::date,
       ${data.registration || null}, ${data.brand || null}, ${data.model || null},
       ${data.notes || null})
     RETURNING *`;

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createTransportRequest, getSettings, logActivity } from '@/lib/db';
+import { createTransportRequest, logActivity } from '@/lib/db';
 import { validateBody, transportOrderSchema } from '@/lib/validations';
-import { createCheckoutSession } from '@/lib/stripe';
+import { sendMail, requestReceivedHtml } from '@/lib/email';
 
-// Transport = lokale eigen operatie. Vast bedrag uit app_settings
-// (admin-instelbaar). Aanvraag staat op 'controleren' tot de webhook
-// 'm op 'betaald' zet.
+// Transport = aanvraag-only. Geen Stripe. Hoort bij de stalling, klant betaalt
+// later (bv. samen met de stallingsfactuur). Klant geeft één camping op +
+// een heen- en terug-datum; we maken één row in transport_requests.
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -15,51 +15,38 @@ export async function POST(req: NextRequest) {
     }
     const d = validated.data;
 
-    const settings = await getSettings(['transport_price']);
-    const priceEur = Number(settings.transport_price ?? 0);
-    if (!priceEur || priceEur <= 0) {
-      return NextResponse.json(
-        { error: 'Prijs nog niet ingesteld — neem contact op.' },
-        { status: 503 },
-      );
-    }
-
     const entry = await createTransportRequest({
       name: d.name,
       email: d.email,
       phone: d.phone,
-      from_location: d.fromLocation,
-      to_location: d.toLocation,
-      preferred_date: d.preferredDate || null,
+      camping: d.camping,
+      outbound_date: d.outboundDate,
+      return_date: d.returnDate,
       registration: d.registration || null,
       brand: d.brand || null,
       model: d.model || null,
       notes: d.description || null,
     });
 
-    const origin = req.nextUrl.origin;
-    const description = `Transport — ${d.fromLocation} → ${d.toLocation}`;
-    const session = await createCheckoutSession({
-      description,
-      amountEur: priceEur,
-      successUrl: `${origin}/diensten/bedankt?session_id={CHECKOUT_SESSION_ID}`,
-      cancelUrl: `${origin}/diensten/transport?cancelled=1`,
-      customerEmail: d.email,
-      metadata: {
-        kind: 'transport_request',
-        refId: String(entry.id),
-        description,
-      },
-    });
-
     await logActivity({
-      action: 'Transport-aanvraag (wacht op betaling)',
+      action: 'Transport-aanvraag ontvangen',
       entityType: 'transport_request',
       entityId: String(entry.id),
-      entityLabel: `${d.name} — ${d.fromLocation} → ${d.toLocation}`,
+      entityLabel: `${d.name} — ${d.camping}`,
+      details: `Heen ${d.outboundDate} · Terug ${d.returnDate}`,
     });
 
-    return NextResponse.json({ success: true, checkoutUrl: session.url });
+    const reference = `TR-${entry.id}`;
+    const mail = requestReceivedHtml({
+      name: d.name,
+      type: 'service',
+      description: `Transport heen-en-terug — ${d.camping}\nHeen: ${d.outboundDate}\nTerug: ${d.returnDate}`,
+      reference,
+    });
+    await sendMail({ to: d.email, subject: mail.subject, html: mail.html, text: mail.text })
+      .catch((err) => console.error('transport mail failed:', err));
+
+    return NextResponse.json({ success: true, publicCode: reference });
   } catch (error) {
     console.error('transport order error:', error);
     return NextResponse.json({ error: 'Aanvraag mislukt' }, { status: 500 });

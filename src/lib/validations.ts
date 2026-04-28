@@ -94,22 +94,27 @@ export const inspectionOrderSchema = z.object({
   description: z.string().max(2000).optional().or(z.literal('')),
 });
 
+// Transport = aanvraag, geen betaling. Klant geeft één camping op (heen
+// vanuit stalling, terug vanaf diezelfde camping) en twee voorkeursdatums.
 export const transportOrderSchema = z.object({
   ...contactBase,
-  fromLocation: knownCamping,
-  toLocation: knownCamping,
-  preferredDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().or(z.literal('')),
+  camping: knownCamping,
+  outboundDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Heen-datum is verplicht'),
+  returnDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Terug-datum is verplicht'),
   description: z.string().max(2000).optional().or(z.literal('')),
-}).refine((d) => d.fromLocation !== d.toLocation, {
-  message: 'Van en naar moeten verschillen',
-  path: ['toLocation'],
+}).refine((d) => new Date(d.returnDate) >= new Date(d.outboundDate), {
+  message: 'Terug-datum moet op of na heen-datum liggen',
+  path: ['returnDate'],
 });
 
 // Stalling stays local; not forwarded to reparatiepanel.
 export const settingsUpdateSchema = z.object({
   stalling_price_binnen: z.number().nonnegative().max(100000).optional(),
   stalling_price_buiten: z.number().nonnegative().max(100000).optional(),
-  transport_price: z.number().nonnegative().max(100000).optional(),
 });
 
 export const stallingOrderSchema = z.object({

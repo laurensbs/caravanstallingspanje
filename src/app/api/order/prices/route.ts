@@ -8,15 +8,13 @@ export async function GET() {
     const map = await getSettings([
       'stalling_price_binnen',
       'stalling_price_buiten',
-      'transport_price',
     ]);
     return NextResponse.json({
       stalling_binnen: Number(map.stalling_price_binnen ?? 0),
       stalling_buiten: Number(map.stalling_price_buiten ?? 0),
-      transport: Number(map.transport_price ?? 0),
     });
   } catch (error) {
     console.error('Public prices GET error:', error);
-    return NextResponse.json({ stalling_binnen: 0, stalling_buiten: 0, transport: 0 });
+    return NextResponse.json({ stalling_binnen: 0, stalling_buiten: 0 });
   }
 }

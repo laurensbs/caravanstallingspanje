@@ -7,15 +7,12 @@ import {
   upsertPayment,
   markBookingPaid,
   markStallingRequestPaid,
-  markTransportRequestPaid,
   getPendingIntakeBySession,
   markPendingIntakeForwarded,
   getFridgeById,
   getStallingRequestById,
-  getTransportRequestById,
   setBookingHoldedInvoice,
   setStallingHoldedInvoice,
-  setTransportHoldedInvoice,
   logActivity,
 } from '@/lib/db';
 import { sendIntake, type IntakePayload } from '@/lib/work-order-hub';
@@ -165,30 +162,6 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
             await setStallingHoldedInvoice(id, inv.id, inv.invoiceNum);
           } catch (err) {
             await logActivity({ action: 'Holded factuur mislukt (stalling)', entityType: kind, entityId: refId, details: err instanceof Error ? err.message : 'unknown' });
-          }
-        }
-      }
-    }
-  } else if (kind === 'transport_request' && refId) {
-    const id = Number(refId);
-    if (Number.isFinite(id) && id > 0) {
-      await markTransportRequestPaid(id);
-      const r = await getTransportRequestById(id).catch(() => null) as { name: string; email: string; phone?: string | null; from_location: string; to_location: string; holded_invoice_id?: string | null } | null;
-      if (r) {
-        customerName = customerName || r.name;
-        customerEmail = customerEmail || r.email;
-        customerPhone = customerPhone || r.phone || '';
-        invoiceDescription = invoiceDescription || `Transport — ${r.from_location} → ${r.to_location}`;
-        if (customerEmail && !r.holded_invoice_id) {
-          try {
-            const inv = await invoiceForCustomer({
-              customer: { name: customerName, email: customerEmail, phone: customerPhone || null },
-              description: invoiceDescription,
-              amountEur,
-            });
-            await setTransportHoldedInvoice(id, inv.id, inv.invoiceNum);
-          } catch (err) {
-            await logActivity({ action: 'Holded factuur mislukt (transport)', entityType: kind, entityId: refId, details: err instanceof Error ? err.message : 'unknown' });
           }
         }
       }

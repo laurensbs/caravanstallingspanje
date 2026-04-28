@@ -1,83 +1,96 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   ContactFields, ServicePageShell, Section, Field, fieldCls,
   emptyContact, useServiceSubmit,
 } from '@/components/ServiceForm';
 import CampingPicker from '@/components/CampingPicker';
 import { useLocale } from '@/components/LocaleProvider';
+import { Truck, ArrowRight as ArrowRightIcon } from 'lucide-react';
 
 export default function TransportPage() {
-  const { t, locale } = useLocale();
-  const formatEur = (eur: number) =>
-    new Intl.NumberFormat(locale === 'nl' ? 'nl-NL' : 'en-IE', {
-      style: 'currency',
-      currency: 'EUR',
-    }).format(eur);
+  const { t } = useLocale();
 
   const [contact, setContact] = useState(emptyContact);
-  const [fromLocation, setFromLocation] = useState('');
-  const [toLocation, setToLocation] = useState('');
-  const [preferredDate, setPreferredDate] = useState('');
+  const [camping, setCamping] = useState('');
+  const [outboundDate, setOutboundDate] = useState('');
+  const [returnDate, setReturnDate] = useState('');
   const [description, setDescription] = useState('');
-  const [price, setPrice] = useState<number | null>(null);
 
-  const { submit, submitting, error, done } = useServiceSubmit('/api/order/transport');
-
-  useEffect(() => {
-    fetch('/api/order/prices')
-      .then((r) => r.json())
-      .then((d) => setPrice(Number(d.transport ?? 0)))
-      .catch(() => setPrice(0));
-  }, []);
+  const { submit, submitting, error, done, publicCode } = useServiceSubmit('/api/order/transport');
 
   return (
     <ServicePageShell
-      paid
       title={t('transport.heading')}
       intro={t('transport.intro')}
-      doneTitle={t('service.done-title')}
       onSubmit={(e) => {
         e.preventDefault();
-        submit({ ...contact, fromLocation, toLocation, preferredDate, description });
+        submit({
+          ...contact,
+          camping,
+          outboundDate,
+          returnDate,
+          description,
+        });
       }}
       submitting={submitting}
       error={error}
       done={done}
+      publicCode={publicCode}
     >
       <Section title={t('transport.section-route')}>
+        {/* Visuele samenvatting van de route — stalling ↔ camping. */}
+        <div className="rounded-[var(--radius-lg)] border border-border bg-surface-2 p-3 flex items-center justify-between text-[12px] text-text-muted gap-3">
+          <span className="inline-flex items-center gap-1.5">
+            <Truck size={13} /> Stalling Cruïlles
+          </span>
+          <ArrowRightIcon size={12} className="text-text-subtle" />
+          <span className="truncate text-text">{camping || '—'}</span>
+          <ArrowRightIcon size={12} className="text-text-subtle rotate-180" />
+          <span className="inline-flex items-center gap-1.5">
+            <Truck size={13} /> Stalling
+          </span>
+        </div>
+
+        <Field label={t('transport.camping-label')} required>
+          <CampingPicker
+            value={camping}
+            onChange={setCamping}
+            placeholder={t('fridge.camping-placeholder')}
+            required
+            ariaLabel={t('transport.camping-label')}
+          />
+        </Field>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Field label={t('transport.from')} required>
-            <CampingPicker
-              value={fromLocation}
-              onChange={setFromLocation}
-              placeholder={t('transport.from-placeholder')}
+          <Field label={t('transport.outbound-date')} required>
+            <input
+              type="date"
               required
-              ariaLabel={t('transport.from')}
-              filter={(c) => c.name !== toLocation}
+              value={outboundDate}
+              min={new Date().toISOString().slice(0, 10)}
+              onChange={(e) => {
+                const v = e.target.value;
+                setOutboundDate(v);
+                // Auto-vul de terug-datum als die nog leeg is of vóór de heen-datum ligt.
+                if (!returnDate || returnDate < v) setReturnDate(v);
+              }}
+              className={fieldCls}
             />
           </Field>
-          <Field label={t('transport.to')} required>
-            <CampingPicker
-              value={toLocation}
-              onChange={setToLocation}
-              placeholder={t('transport.to-placeholder')}
+          <Field label={t('transport.return-date')} required>
+            <input
+              type="date"
               required
-              ariaLabel={t('transport.to')}
-              filter={(c) => c.name !== fromLocation}
+              value={returnDate}
+              min={outboundDate || new Date().toISOString().slice(0, 10)}
+              onChange={(e) => setReturnDate(e.target.value)}
+              className={fieldCls}
             />
           </Field>
         </div>
-        <Field label={`${t('inspection.preferred-date')} ${t('common.optional')}`}>
-          <input
-            type="date"
-            value={preferredDate}
-            onChange={(e) => setPreferredDate(e.target.value)}
-            min={new Date().toISOString().slice(0, 10)}
-            className={fieldCls}
-          />
-        </Field>
+
         <Field label={`${t('contact.note')} ${t('common.optional')}`}>
           <textarea
             rows={3}
@@ -90,18 +103,15 @@ export default function TransportPage() {
       </Section>
 
       <Section title={t('contact.section-heading')}>
-        <ContactFields state={contact} onChange={setContact} />
+        <ContactFields state={contact} onChange={setContact} showLocation={false} />
       </Section>
 
-      {price !== null && price > 0 && (
-        <div className="rounded-[var(--radius-xl)] bg-surface-2 border border-border p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-text-muted">{t('transport.amount-label')}</span>
-            <span className="text-lg font-semibold tabular-nums">{formatEur(price)}</span>
-          </div>
-          <p className="text-[11px] text-text-muted mt-2">{t('service.checkout-hint')}</p>
-        </div>
-      )}
+      <div className="rounded-[var(--radius-xl)] bg-surface-2 border border-border p-4">
+        <p className="text-[12px] text-text-muted leading-relaxed">
+          <strong className="text-text">{t('transport.billing-note-title')}</strong>{' '}
+          {t('transport.billing-note-body')}
+        </p>
+      </div>
     </ServicePageShell>
   );
 }

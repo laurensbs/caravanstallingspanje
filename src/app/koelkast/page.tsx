@@ -7,8 +7,8 @@ import { Check, ArrowRight, Loader2, AlertTriangle, Lock } from 'lucide-react';
 import { calculatePrice, PRICES, MIN_DAYS, type DeviceType } from '@/lib/pricing';
 import InfoBanner from '@/components/InfoBanner';
 import CampingPicker from '@/components/CampingPicker';
+import PublicHero from '@/components/PublicHero';
 import { useLocale } from '@/components/LocaleProvider';
-import LocaleSwitch from '@/components/LocaleSwitch';
 import type { StringKey } from '@/lib/i18n';
 
 type FormState = {
@@ -221,35 +221,18 @@ export default function KoelkastBestelPagina() {
   }
 
   return (
-    <main className="min-h-screen bg-bg relative">
-      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
-        <LocaleSwitch />
-      </div>
-      <div className="max-w-3xl mx-auto px-6 py-10 sm:py-16">
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-            <span className="text-[10px] font-medium tracking-[0.25em] uppercase text-text-muted">
-              {t('common.brand')}
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-medium tracking-tight">
-            {t('fridge.heading')}
-          </h1>
-          <p className="text-text-muted mt-3 text-base sm:text-lg leading-relaxed max-w-xl">
-            {t('fridge.intro')}
-          </p>
-        </motion.div>
-
+    <main className="min-h-screen bg-bg">
+      <PublicHero
+        back={{ href: '/diensten', label: t('common.services-link') }}
+        title={t('fridge.heading')}
+        intro={t('fridge.intro')}
+      />
+      <div className="max-w-3xl mx-auto px-6 py-8 sm:py-10">
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1, duration: 0.5 }}
-          className="mt-8 sm:mt-10 rounded-[var(--radius-xl)] overflow-hidden border border-border bg-surface aspect-[4/3] sm:aspect-[16/9] relative"
+          transition={{ duration: 0.5 }}
+          className="rounded-[var(--radius-xl)] overflow-hidden border border-border bg-surface aspect-[4/3] sm:aspect-[16/9] relative"
         >
           <Image
             src="/images/koelkast.webp"

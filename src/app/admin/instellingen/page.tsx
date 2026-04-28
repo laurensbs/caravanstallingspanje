@@ -9,7 +9,6 @@ import PageHeader from '@/components/admin/PageHeader';
 export default function SettingsPage() {
   const [stallingBinnen, setStallingBinnen] = useState('');
   const [stallingBuiten, setStallingBuiten] = useState('');
-  const [transport, setTransport] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -19,7 +18,6 @@ export default function SettingsPage() {
       .then((d) => {
         setStallingBinnen(String(Number(d.stalling_price_binnen ?? 0)));
         setStallingBuiten(String(Number(d.stalling_price_buiten ?? 0)));
-        setTransport(String(Number(d.transport_price ?? 0)));
       })
       .catch(() => { /* keep empty */ })
       .finally(() => setLoading(false));
@@ -39,7 +37,6 @@ export default function SettingsPage() {
         body: JSON.stringify({
           stalling_price_binnen: parse(stallingBinnen),
           stalling_price_buiten: parse(stallingBuiten),
-          transport_price: parse(transport),
         }),
         credentials: 'include',
       });
@@ -59,7 +56,7 @@ export default function SettingsPage() {
       <PageHeader
         eyebrow="Beheer"
         title="Instellingen"
-        description="Vaste prijzen voor stalling en transport. Een prijs op 0 € verbergt die optie."
+        description="Vaste jaarprijzen voor stalling. Een prijs op 0 € verbergt die optie op de website."
       />
 
       <form onSubmit={save} className="card-surface p-6 max-w-xl space-y-5">
@@ -87,22 +84,6 @@ export default function SettingsPage() {
                 onChange={(e) => setStallingBuiten(e.target.value)}
               />
             </div>
-          )}
-        </div>
-
-        <div>
-          <h2 className="text-[10px] font-medium uppercase tracking-[0.22em] text-text-muted mb-3">
-            Transport (vast bedrag per rit)
-          </h2>
-          {loading ? (
-            <Skeleton className="h-10" />
-          ) : (
-            <Input
-              label="Prijs (€)"
-              inputMode="decimal"
-              value={transport}
-              onChange={(e) => setTransport(e.target.value)}
-            />
           )}
         </div>
 

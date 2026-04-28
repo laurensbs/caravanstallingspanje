@@ -92,7 +92,7 @@ export const STRINGS = {
   'services.inspection-title': { nl: 'Inspectie', en: 'Inspection' },
   'services.inspection-desc': { nl: 'Technische keuring met rapport — vóór seizoen, of na schade.', en: 'Technical inspection with report — before season or after damage.' },
   'services.transport-title': { nl: 'Transport', en: 'Transport' },
-  'services.transport-desc': { nl: 'Ophalen of brengen tussen camping en stalling, of NL ↔ Spanje.', en: 'Pick-up or drop-off between camping and storage, or NL ↔ Spain.' },
+  'services.transport-desc': { nl: 'Heen-en-terug van stalling naar je camping. Wij regelen het.', en: 'Round-trip from storage to your camping. We handle it.' },
   'services.storage-title': { nl: 'Stalling', en: 'Storage' },
   'services.storage-desc': { nl: 'Caravan stallen op ons terrein — binnen overdekt of buiten op plek.', en: 'Storage on our grounds — covered indoor or outside in a dedicated spot.' },
   'services.fridge-title': { nl: 'Koelkast huren', en: 'Rent a fridge' },
@@ -145,8 +145,8 @@ export const STRINGS = {
   // ─── Transport page ──────────────────────────────────────
   'transport.heading': { nl: 'Transport aanvragen', en: 'Request transport' },
   'transport.intro': {
-    nl: 'Ophalen of brengen tussen camping en stalling, of NL ↔ Spanje.',
-    en: 'Pick-up or drop-off between camping and storage, or NL ↔ Spain.',
+    nl: 'Wij brengen je caravan vanaf de stalling naar de camping en halen hem op het einde weer op. Eén heen-rit, één terug-rit.',
+    en: 'We deliver your caravan from our storage to the camping and pick it up again at the end. One outbound, one return.',
   },
   'transport.section-route': { nl: 'Route', en: 'Route' },
   'transport.from': { nl: 'Van', en: 'From' },
@@ -158,6 +158,14 @@ export const STRINGS = {
     en: 'E.g. dimensions, contact person on site, etc.',
   },
   'transport.amount-label': { nl: 'Transport (vast bedrag)', en: 'Transport (flat fee)' },
+  'transport.camping-label': { nl: 'Camping', en: 'Camping' },
+  'transport.outbound-date': { nl: 'Heen-datum', en: 'Outbound date' },
+  'transport.return-date': { nl: 'Terug-datum', en: 'Return date' },
+  'transport.billing-note-title': { nl: 'Facturatie loopt via je stalling.', en: 'Billing goes through your storage account.' },
+  'transport.billing-note-body': {
+    nl: 'Transport hoort bij de stalling — we rekenen het later met je af. Geen online betaling vereist.',
+    en: "Transport is part of your storage — we'll settle it with you later. No online payment required.",
+  },
 
   // ─── Stalling page ───────────────────────────────────────
   'storage.heading': { nl: 'Stalling aanvragen', en: 'Request storage' },

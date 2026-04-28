@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSettings, setSetting, logActivity, getAdminInfo } from '@/lib/db';
 import { validateBody, settingsUpdateSchema } from '@/lib/validations';
 
-const KEYS = ['stalling_price_binnen', 'stalling_price_buiten', 'transport_price'] as const;
+const KEYS = ['stalling_price_binnen', 'stalling_price_buiten'] as const;
 
 export async function GET() {
   try {
@@ -10,7 +10,6 @@ export async function GET() {
     return NextResponse.json({
       stalling_price_binnen: Number(map.stalling_price_binnen ?? 0),
       stalling_price_buiten: Number(map.stalling_price_buiten ?? 0),
-      transport_price: Number(map.transport_price ?? 0),
     });
   } catch (error) {
     console.error('Settings GET error:', error);
