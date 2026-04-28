@@ -57,6 +57,7 @@ export default function StallingPage() {
 
   return (
     <ServicePageShell
+      paid
       title="Stalling aanvragen"
       intro="Caravan stallen op ons terrein aan de Costa Brava — heel jaar vooraf, overdekt of buiten."
       doneTitle="Doorsturen naar betaling…"

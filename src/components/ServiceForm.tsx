@@ -109,6 +109,7 @@ export function ServicePageShell({
   doneTitle = 'Aanvraag ontvangen',
   doneBody,
   publicCode,
+  paid = false,
   children,
 }: {
   title: string;
@@ -120,6 +121,7 @@ export function ServicePageShell({
   doneTitle?: string;
   doneBody?: string;
   publicCode?: string | null;
+  paid?: boolean;
   children: ReactNode;
 }) {
   if (done) {
@@ -136,7 +138,7 @@ export function ServicePageShell({
           </div>
           <h1 className="text-2xl font-medium tracking-tight mb-3">{doneTitle}</h1>
           <p className="text-text-muted leading-relaxed">
-            {doneBody || 'Bedankt! We nemen binnen één werkdag contact op.'}
+            {doneBody || 'Bedankt! Je krijgt zo een bevestiging per e-mail. Onze werkplaats neemt zo snel mogelijk contact op.'}
           </p>
           {publicCode && (
             <p className="text-sm text-text-muted mt-6">
@@ -182,10 +184,16 @@ export function ServicePageShell({
             className="w-full h-12 rounded-[var(--radius-md)] bg-accent text-accent-fg font-medium hover:bg-accent-hover transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2"
           >
             {submitting ? <Loader2 size={16} className="animate-spin" /> : null}
-            {submitting ? 'Versturen...' : 'Aanvraag versturen'}
+            {submitting
+              ? (paid ? 'Doorsturen…' : 'Versturen…')
+              : (paid ? 'Doorgaan naar betalen' : 'Aanvraag versturen')}
             {!submitting && <ArrowRight size={16} />}
           </button>
-          <p className="text-xs text-text-muted text-center">Je krijgt binnen één werkdag een bevestiging.</p>
+          <p className="text-xs text-text-muted text-center">
+            {paid
+              ? 'Je gaat door naar onze beveiligde Stripe-betaalpagina.'
+              : 'Je krijgt direct een bevestiging per e-mail. Onze werkplaats neemt zo snel mogelijk contact op.'}
+          </p>
         </form>
       </div>
     </main>

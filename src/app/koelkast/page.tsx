@@ -404,11 +404,11 @@ export default function KoelkastBestelPagina() {
             className="w-full h-12 rounded-[var(--radius-md)] bg-accent text-accent-fg font-medium hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
           >
             {submitting ? <Loader2 size={16} className="animate-spin" /> : null}
-            {submitting ? 'Versturen...' : 'Aanvraag versturen'}
+            {submitting ? 'Doorsturen…' : 'Doorgaan naar betalen'}
             {!submitting && <ArrowRight size={16} />}
           </button>
           <p className="text-xs text-text-muted text-center">
-            Je krijgt binnen één werkdag een bevestiging. Betaling volgt na contact.
+            Je gaat door naar onze beveiligde Stripe-betaalpagina.
           </p>
         </form>
       </div>

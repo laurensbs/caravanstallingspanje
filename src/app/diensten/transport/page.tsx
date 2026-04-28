@@ -29,6 +29,7 @@ export default function TransportPage() {
 
   return (
     <ServicePageShell
+      paid
       title="Transport aanvragen"
       intro="Ophalen of brengen tussen camping en stalling, of NL ↔ Spanje."
       doneTitle="Doorsturen naar betaling…"

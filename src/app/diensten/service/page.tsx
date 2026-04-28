@@ -40,6 +40,7 @@ export default function ServicePage() {
 
   return (
     <ServicePageShell
+      paid
       title="Service aanvragen"
       intro="Kies een service en betaal direct online."
       onSubmit={(e) => {
