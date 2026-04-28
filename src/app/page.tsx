@@ -22,12 +22,12 @@ export default function LandingPage() {
       className="min-h-screen flex items-center justify-center px-6 py-12 sm:py-20 relative overflow-hidden"
       style={{ background: NAVY_GRAD, color: '#F1F5F9' }}
     >
-      {/* Subtle ambient glow behind the logo so it pops out of the navy */}
+      {/* Sterkere ambient glow achter logo zodat het echt 'pop't tegen het navy */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-[480px] opacity-60 blur-3xl"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[520px] blur-3xl"
         style={{
-          background: `radial-gradient(50% 60% at 50% 30%, rgba(255,255,255,0.10) 0%, transparent 70%)`,
+          background: `radial-gradient(40% 55% at 50% 28%, rgba(126,168,255,0.22) 0%, rgba(126,168,255,0.08) 40%, transparent 75%)`,
         }}
       />
       <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
@@ -45,12 +45,19 @@ export default function LandingPage() {
           <Image
             src="/images/logo.png"
             alt="Caravanstalling Spanje"
-            width={300}
-            height={68}
+            width={420}
+            height={95}
             priority
-            className="mx-auto h-12 sm:h-14 w-auto mb-7 sm:mb-9"
-            // Inverteert het donker logo naar wit zodat het 'pop't tegen het navy
-            style={{ filter: 'brightness(0) invert(1)' }}
+            className="mx-auto h-14 sm:h-20 w-auto mb-7 sm:mb-9"
+            style={{
+              // Inverteer het zwart logo → wit, voeg een zachte halo toe zodat het tegen
+              // het navy een eigen "lift" krijgt in plaats van plat te liggen.
+              filter: `
+                brightness(0) invert(1)
+                drop-shadow(0 0 24px rgba(126,168,255,0.45))
+                drop-shadow(0 1px 2px rgba(0,0,0,0.4))
+              `,
+            }}
           />
           <h1
             className="text-[28px] sm:text-[40px] leading-[1.15] font-semibold tracking-tight"
@@ -175,10 +182,11 @@ function CtaCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.45, ease: EASE }}
+      className="h-full"
     >
       <Link
         href={href}
-        className="press-spring block p-6 rounded-[var(--radius-2xl)] transition-all hover:-translate-y-px"
+        className="press-spring h-full flex flex-col p-6 rounded-[var(--radius-2xl)] transition-all hover:-translate-y-px"
         style={{
           background: 'rgba(255,255,255,0.04)',
           border: '1px solid rgba(255,255,255,0.10)',
