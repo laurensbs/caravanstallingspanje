@@ -63,6 +63,41 @@ export async function initDatabase() {
   await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_id TEXT`;
   await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_number TEXT`;
 
+  await sql`CREATE TABLE IF NOT EXISTS pending_intakes (
+    id SERIAL PRIMARY KEY,
+    stripe_session_id TEXT UNIQUE NOT NULL,
+    payload JSONB NOT NULL,
+    forwarded_at TIMESTAMP,
+    forward_repair_job_id TEXT,
+    created_at TIMESTAMP DEFAULT NOW()
+  )`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_pending_intakes_session ON pending_intakes(stripe_session_id)`;
+
+  await sql`CREATE TABLE IF NOT EXISTS services_catalog (
+    id SERIAL PRIMARY KEY,
+    slug TEXT UNIQUE NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT,
+    price_eur NUMERIC(10,2) NOT NULL,
+    sort_order INTEGER DEFAULT 100,
+    active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  )`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_services_catalog_active ON services_catalog(active, sort_order)`;
+
+  await sql`CREATE TABLE IF NOT EXISTS app_settings (
+    key TEXT PRIMARY KEY,
+    value JSONB NOT NULL,
+    updated_at TIMESTAMP DEFAULT NOW()
+  )`;
+  // Seed default prices once (no-op if already present)
+  await sql`INSERT INTO app_settings (key, value) VALUES
+    ('stalling_price_binnen', '950'::jsonb),
+    ('stalling_price_buiten', '650'::jsonb),
+    ('transport_price', '275'::jsonb)
+    ON CONFLICT (key) DO NOTHING`;
+
   await sql`CREATE TABLE IF NOT EXISTS payments (
     id SERIAL PRIMARY KEY,
     stripe_session_id TEXT UNIQUE,
@@ -397,6 +432,102 @@ export async function countOverlappingBookings(
   return Number((rows as { count: string | number }[])[0]?.count || 0);
 }
 
+// ─── Pending intakes (service-aanvragen wachtend op betaling) ───
+export async function createPendingIntake(stripe_session_id: string, payload: unknown) {
+  const json = JSON.stringify(payload);
+  await sql`INSERT INTO pending_intakes (stripe_session_id, payload)
+    VALUES (${stripe_session_id}, ${json}::jsonb)`;
+}
+
+export async function getPendingIntakeBySession(stripe_session_id: string) {
+  const rows = await sql`SELECT * FROM pending_intakes WHERE stripe_session_id = ${stripe_session_id} LIMIT 1`;
+  return (rows[0] as unknown as { id: number; stripe_session_id: string; payload: unknown; forwarded_at: string | null; forward_repair_job_id: string | null }) || null;
+}
+
+export async function markPendingIntakeForwarded(id: number, repairJobId: string) {
+  await sql`UPDATE pending_intakes SET forwarded_at = NOW(), forward_repair_job_id = ${repairJobId} WHERE id = ${id}`;
+}
+
+// ─── Services catalog (publieke catalogus) ───
+export type ServiceCatalogRow = {
+  id: number;
+  slug: string;
+  name: string;
+  description: string | null;
+  price_eur: string; // numeric → string from pg
+  sort_order: number;
+  active: boolean;
+};
+
+export async function getActiveServices() {
+  const rows = await sql`SELECT * FROM services_catalog WHERE active = true ORDER BY sort_order, name`;
+  return rows as unknown as ServiceCatalogRow[];
+}
+
+export async function getAllServices() {
+  const rows = await sql`SELECT * FROM services_catalog ORDER BY sort_order, name`;
+  return rows as unknown as ServiceCatalogRow[];
+}
+
+export async function getServiceBySlug(slug: string) {
+  const rows = await sql`SELECT * FROM services_catalog WHERE slug = ${slug} AND active = true LIMIT 1`;
+  return (rows[0] as unknown as ServiceCatalogRow) || null;
+}
+
+export async function createService(data: {
+  slug: string;
+  name: string;
+  description?: string | null;
+  price_eur: number;
+  sort_order?: number;
+  active?: boolean;
+}) {
+  const res = await sql`INSERT INTO services_catalog (slug, name, description, price_eur, sort_order, active)
+    VALUES (${data.slug}, ${data.name}, ${data.description || null}, ${data.price_eur},
+      ${data.sort_order ?? 100}, ${data.active ?? true})
+    RETURNING *`;
+  return res[0] as unknown as ServiceCatalogRow;
+}
+
+export async function updateService(id: number, data: {
+  slug?: string;
+  name?: string;
+  description?: string | null;
+  price_eur?: number;
+  sort_order?: number;
+  active?: boolean;
+}) {
+  await sql`UPDATE services_catalog SET
+    slug = COALESCE(${data.slug ?? null}, slug),
+    name = COALESCE(${data.name ?? null}, name),
+    description = COALESCE(${data.description ?? null}, description),
+    price_eur = COALESCE(${data.price_eur ?? null}, price_eur),
+    sort_order = COALESCE(${data.sort_order ?? null}, sort_order),
+    active = COALESCE(${data.active ?? null}, active),
+    updated_at = NOW()
+    WHERE id = ${id}`;
+}
+
+export async function deleteService(id: number) {
+  await sql`DELETE FROM services_catalog WHERE id = ${id}`;
+}
+
+// ─── App settings (key/value JSON) ───
+export async function getSettings(keys: string[]): Promise<Record<string, unknown>> {
+  if (keys.length === 0) return {};
+  const rows = await sql`SELECT key, value FROM app_settings WHERE key = ANY(${keys}::text[])`;
+  const map: Record<string, unknown> = {};
+  for (const r of rows as unknown as { key: string; value: unknown }[]) map[r.key] = r.value;
+  return map;
+}
+
+export async function setSetting(key: string, value: unknown) {
+  const json = JSON.stringify(value);
+  await sql`INSERT INTO app_settings (key, value, updated_at)
+    VALUES (${key}, ${json}::jsonb, NOW())
+    ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`;
+}
+
 // ─── Payments / Stripe ───
 export async function recordStripeEventOnce(eventId: string, type: string): Promise<boolean> {
   // Returns true if this is the first time we see this event id (so caller
@@ -406,6 +537,12 @@ export async function recordStripeEventOnce(eventId: string, type: string): Prom
     ON CONFLICT (id) DO NOTHING
     RETURNING id`;
   return res.length > 0;
+}
+
+export async function unrecordStripeEvent(eventId: string) {
+  // Used when a handler fails — we delete the event marker so Stripe's
+  // retry will be processed instead of skipped as a duplicate.
+  await sql`DELETE FROM stripe_events WHERE id = ${eventId}`;
 }
 
 export async function upsertPayment(data: {
@@ -441,9 +578,15 @@ export async function markBookingPaid(bookingId: number, sessionId: string) {
   await sql`UPDATE fridge_bookings
     SET status = 'compleet', updated_at = NOW()
     WHERE id = ${bookingId}`;
-  // Status 'compleet' is our existing "this booking is set". We rely on the
-  // payments table for the actual payment audit trail.
-  void sessionId; // referenced via payments.ref_id
+  void sessionId;
+}
+
+export async function markStallingRequestPaid(id: number) {
+  await sql`UPDATE stalling_requests SET status = 'betaald', updated_at = NOW() WHERE id = ${id}`;
+}
+
+export async function markTransportRequestPaid(id: number) {
+  await sql`UPDATE transport_requests SET status = 'betaald', updated_at = NOW() WHERE id = ${id}`;
 }
 
 // ─── Transport requests (lokaal — eigen operatie, niet reparatie) ───

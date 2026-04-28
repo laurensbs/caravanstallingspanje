@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sendIntake } from '@/lib/work-order-hub';
+import { logActivity, getServiceBySlug, createPendingIntake } from '@/lib/db';
 import { validateBody, serviceOrderSchema } from '@/lib/validations';
-import { logActivity } from '@/lib/db';
+import { createCheckoutSession } from '@/lib/stripe';
+import type { IntakePayload } from '@/lib/work-order-hub';
 
+// Service flow: pick from catalog → pay → webhook forwards to reparatiepanel.
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -12,24 +14,51 @@ export async function POST(req: NextRequest) {
     }
     const d = validated.data;
 
-    const result = await sendIntake({
+    // Look up the service by slug (passed via serviceCategory) — refuses if not in catalog.
+    const service = await getServiceBySlug(d.serviceCategory);
+    if (!service) {
+      return NextResponse.json({ error: 'Onbekende service' }, { status: 400 });
+    }
+    const priceEur = Number(service.price_eur);
+
+    const intakePayload: IntakePayload = {
       type: 'service',
       customer: { name: d.name, email: d.email, phone: d.phone },
-      unit: d.registration ? { registration: d.registration, brand: d.brand || undefined, model: d.model || undefined } : undefined,
-      title: `Service: ${d.serviceCategory}`,
-      description: d.description || `Service-aanvraag: ${d.serviceCategory}`,
+      unit: d.registration
+        ? { registration: d.registration, brand: d.brand || undefined, model: d.model || undefined }
+        : undefined,
+      title: `Service: ${service.name}`,
+      description: d.description || `Service-aanvraag: ${service.name}`,
       locationHint: d.locationHint || undefined,
-      serviceCategory: d.serviceCategory,
+      serviceCategory: service.name,
+    };
+
+    const origin = req.nextUrl.origin;
+    const session = await createCheckoutSession({
+      description: `${service.name}`,
+      amountEur: priceEur,
+      successUrl: `${origin}/diensten/bedankt?session_id={CHECKOUT_SESSION_ID}`,
+      cancelUrl: `${origin}/diensten/service?cancelled=1`,
+      customerEmail: d.email,
+      metadata: {
+        kind: 'service_intake',
+        serviceSlug: service.slug,
+      },
     });
+    if (!session.url) {
+      return NextResponse.json({ error: 'Checkout-URL ontbreekt' }, { status: 502 });
+    }
+
+    await createPendingIntake(session.id, intakePayload);
 
     await logActivity({
-      action: 'Service-aanvraag doorgestuurd',
-      entityType: 'public_intake',
-      entityId: result.publicCode,
-      entityLabel: `${d.name} — ${d.serviceCategory}`,
+      action: 'Service-aanvraag (wacht op betaling)',
+      entityType: 'pending_intake',
+      entityId: session.id,
+      entityLabel: `${d.name} — ${service.name}`,
     });
 
-    return NextResponse.json({ success: true, publicCode: result.publicCode });
+    return NextResponse.json({ success: true, checkoutUrl: session.url });
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Aanvraag mislukt';
     console.error('service order error:', msg);

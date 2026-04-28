@@ -98,6 +98,21 @@ export const transportOrderSchema = z.object({
 });
 
 // Stalling stays local; not forwarded to reparatiepanel.
+export const serviceCatalogSchema = z.object({
+  slug: z.string().min(2).max(80).regex(/^[a-z0-9][a-z0-9-]*$/i, 'Alleen letters, cijfers en streepjes'),
+  name: z.string().min(2).max(200),
+  description: z.string().max(2000).optional().or(z.literal('')),
+  price_eur: z.number().nonnegative().max(10000),
+  sort_order: z.number().int().optional(),
+  active: z.boolean().optional(),
+});
+
+export const settingsUpdateSchema = z.object({
+  stalling_price_binnen: z.number().nonnegative().max(100000).optional(),
+  stalling_price_buiten: z.number().nonnegative().max(100000).optional(),
+  transport_price: z.number().nonnegative().max(100000).optional(),
+});
+
 export const stallingOrderSchema = z.object({
   type: z.enum(['binnen', 'buiten']),
   name: z.string().min(2).max(200),

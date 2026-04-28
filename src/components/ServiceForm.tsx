@@ -213,6 +213,11 @@ export function useServiceSubmit<T>(endpoint: string) {
         setError(data.error || 'Er ging iets mis');
         return;
       }
+      // Direct doorsturen naar Stripe Checkout indien aangeleverd.
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+        return;
+      }
       setPublicCode(data.publicCode || null);
       setDone(true);
     } catch {

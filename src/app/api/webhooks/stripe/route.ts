@@ -3,10 +3,16 @@ import type Stripe from 'stripe';
 import { stripe, webhookSecret } from '@/lib/stripe';
 import {
   recordStripeEventOnce,
+  unrecordStripeEvent,
   upsertPayment,
   markBookingPaid,
+  markStallingRequestPaid,
+  markTransportRequestPaid,
+  getPendingIntakeBySession,
+  markPendingIntakeForwarded,
   logActivity,
 } from '@/lib/db';
+import { sendIntake, type IntakePayload } from '@/lib/work-order-hub';
 
 // Stripe signature verification needs the raw request body, not the
 // JSON-parsed version, so we run on the Node.js runtime and pass req.text().
@@ -64,10 +70,10 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'handler error';
     console.error(`[stripe-webhook] handler ${event.type} failed:`, msg);
-    // Return 500 so Stripe retries. We've already recorded the event id but
-    // that's fine — recordStripeEventOnce will see it as duplicate next time
-    // and we'll still return 200, which is acceptable: the side-effects are
-    // idempotent (upsertPayment + markBookingPaid both safe to repeat).
+    // Roll back the event-id marker so Stripe's retry will be processed
+    // instead of skipped as duplicate. The DB writes inside the handler
+    // are all idempotent (UPSERT) so re-running is safe.
+    await unrecordStripeEvent(event.id).catch(() => { /* ignore */ });
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 
@@ -101,6 +107,37 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
     const id = Number(refId);
     if (Number.isFinite(id) && id > 0) {
       await markBookingPaid(id, session.id);
+    }
+  } else if (kind === 'stalling_request' && refId) {
+    const id = Number(refId);
+    if (Number.isFinite(id) && id > 0) {
+      await markStallingRequestPaid(id);
+    }
+  } else if (kind === 'transport_request' && refId) {
+    const id = Number(refId);
+    if (Number.isFinite(id) && id > 0) {
+      await markTransportRequestPaid(id);
+    }
+  } else if (kind === 'service_intake') {
+    // Service-aanvraag pas na betaling doorzetten naar reparatiepanel.
+    const pending = await getPendingIntakeBySession(session.id);
+    if (pending && !pending.forwarded_at) {
+      try {
+        const payload = pending.payload as IntakePayload;
+        const result = await sendIntake(payload);
+        await markPendingIntakeForwarded(pending.id, result.repairJobId);
+        await logActivity({
+          action: 'Service doorgestuurd na betaling',
+          entityType: 'pending_intake',
+          entityId: String(pending.id),
+          entityLabel: result.publicCode,
+        });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'forward failed';
+        console.error('[stripe-webhook] forward to reparatiepanel failed:', msg);
+        // Throw so Stripe retries and we get another shot.
+        throw new Error(`Forward to reparatiepanel failed: ${msg}`);
+      }
     }
   }
 

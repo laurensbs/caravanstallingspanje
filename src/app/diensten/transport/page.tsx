@@ -1,10 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ContactFields, ServicePageShell, Section, Field, fieldCls,
   emptyContact, useServiceSubmit,
 } from '@/components/ServiceForm';
+
+function formatEur(eur: number): string {
+  return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(eur);
+}
 
 export default function TransportPage() {
   const [contact, setContact] = useState(emptyContact);
@@ -12,13 +16,22 @@ export default function TransportPage() {
   const [toLocation, setToLocation] = useState('');
   const [preferredDate, setPreferredDate] = useState('');
   const [description, setDescription] = useState('');
+  const [price, setPrice] = useState<number | null>(null);
 
-  const { submit, submitting, error, done, publicCode } = useServiceSubmit('/api/order/transport');
+  const { submit, submitting, error, done } = useServiceSubmit('/api/order/transport');
+
+  useEffect(() => {
+    fetch('/api/order/prices')
+      .then((r) => r.json())
+      .then((d) => setPrice(Number(d.transport ?? 0)))
+      .catch(() => setPrice(0));
+  }, []);
 
   return (
     <ServicePageShell
       title="Transport aanvragen"
       intro="Ophalen of brengen tussen camping en stalling, of NL ↔ Spanje."
+      doneTitle="Doorsturen naar betaling…"
       onSubmit={(e) => {
         e.preventDefault();
         submit({ ...contact, fromLocation, toLocation, preferredDate, description });
@@ -26,7 +39,6 @@ export default function TransportPage() {
       submitting={submitting}
       error={error}
       done={done}
-      publicCode={publicCode}
     >
       <Section title="Route">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -72,6 +84,18 @@ export default function TransportPage() {
       <Section title="Contactgegevens">
         <ContactFields state={contact} onChange={setContact} />
       </Section>
+
+      {price !== null && price > 0 && (
+        <div className="rounded-[var(--radius-xl)] bg-surface-2 border border-border p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-text-muted">Transport (vast bedrag)</span>
+            <span className="text-lg font-semibold tabular-nums">{formatEur(price)}</span>
+          </div>
+          <p className="text-[11px] text-text-muted mt-2">
+            Je gaat na verzenden naar onze beveiligde Stripe-betaalpagina.
+          </p>
+        </div>
+      )}
     </ServicePageShell>
   );
 }
