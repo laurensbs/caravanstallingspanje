@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, ArrowRight, Loader2 } from 'lucide-react';
+import { Check, ArrowRight, Loader2, AlertTriangle } from 'lucide-react';
 import { calculatePrice, formatEur, PRICES, MIN_DAYS, type DeviceType } from '@/lib/pricing';
 
 type FormState = {
@@ -36,6 +36,8 @@ export default function KoelkastBestelPagina() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [done, setDone] = useState<{ total: number; days: number } | null>(null);
+  const [soldOut, setSoldOut] = useState(false);
+  const [waitlistDone, setWaitlistDone] = useState(false);
 
   useEffect(() => {
     fetch('/api/order/campings')
@@ -63,11 +65,38 @@ export default function KoelkastBestelPagina() {
         body: JSON.stringify(form),
       });
       const data = await res.json();
+      if (res.status === 409 && data.soldOut) {
+        setSoldOut(true);
+        return;
+      }
       if (!res.ok || !data.success) {
         setError(data.error || 'Er ging iets mis');
         return;
       }
       setDone({ total: data.total, days: data.days });
+    } catch {
+      setError('Verbindingsfout');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const submitWaitlist = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/order/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setError(data.error || 'Aanmelden mislukt');
+        return;
+      }
+      setWaitlistDone(true);
     } catch {
       setError('Verbindingsfout');
     } finally {
@@ -96,6 +125,75 @@ export default function KoelkastBestelPagina() {
             Vragen? <a href="mailto:info@caravanstalling-spanje.com" className="text-text underline-offset-4 hover:underline">info@caravanstalling-spanje.com</a>
           </p>
         </motion.div>
+      </main>
+    );
+  }
+
+  if (waitlistDone) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-bg px-6 py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="max-w-md text-center"
+        >
+          <div className="w-12 h-12 rounded-full bg-success-soft text-success flex items-center justify-center mx-auto mb-6">
+            <Check size={20} />
+          </div>
+          <h1 className="text-2xl font-medium tracking-tight mb-3">Op de wachtlijst</h1>
+          <p className="text-text-muted leading-relaxed">
+            We hebben je gegevens genoteerd. Zodra er voor jouw periode een {form.device_type.toLowerCase()} vrijkomt, mailen we je direct.
+          </p>
+        </motion.div>
+      </main>
+    );
+  }
+
+  if (soldOut) {
+    return (
+      <main className="min-h-screen bg-bg">
+        <div className="max-w-md mx-auto px-6 py-12 sm:py-20">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <div className="w-12 h-12 rounded-full bg-warning-soft text-warning flex items-center justify-center mb-6">
+              <AlertTriangle size={20} />
+            </div>
+            <h1 className="text-2xl font-medium tracking-tight mb-2">Helaas vol</h1>
+            <p className="text-text-muted leading-relaxed mb-2">
+              Voor de gevraagde periode zijn alle {form.device_type.toLowerCase()}en al gereserveerd.
+            </p>
+            <p className="text-text-muted leading-relaxed mb-8">
+              Laat je gegevens achter en we mailen je zodra er een vrijkomt — of pas je periode aan.
+            </p>
+            <form onSubmit={submitWaitlist} className="space-y-3">
+              {error && (
+                <div className="rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-sm">{error}</div>
+              )}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full h-12 rounded-[var(--radius-md)] bg-accent text-accent-fg font-medium hover:bg-accent-hover transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2"
+              >
+                {submitting ? <Loader2 size={16} className="animate-spin" /> : null}
+                {submitting ? 'Bezig...' : 'Plaats me op de wachtlijst'}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setSoldOut(false); setError(''); }}
+                className="w-full h-12 rounded-[var(--radius-md)] border border-border bg-surface hover:border-border-strong text-sm font-medium transition-colors"
+              >
+                Periode aanpassen
+              </button>
+            </form>
+            <p className="text-xs text-text-muted mt-6">
+              Je gegevens (naam, e-mail, gewenste periode) worden alleen gebruikt om contact op te nemen zodra er plek is.
+            </p>
+          </motion.div>
+        </div>
       </main>
     );
   }

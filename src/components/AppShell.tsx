@@ -3,12 +3,13 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Refrigerator, LogOut } from 'lucide-react';
+import { LayoutDashboard, Refrigerator, Bell, LogOut } from 'lucide-react';
 import { ReactNode } from 'react';
 
 const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { href: '/admin/koelkasten', label: 'Koelkasten', icon: Refrigerator, exact: false },
+  { href: '/admin/wachtlijst', label: 'Wachtlijst', icon: Bell, exact: false },
 ];
 
 interface AppShellProps {

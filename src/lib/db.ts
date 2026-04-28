@@ -63,6 +63,24 @@ export async function initDatabase() {
   await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_id TEXT`;
   await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_number TEXT`;
 
+  await sql`CREATE TABLE IF NOT EXISTS fridge_waitlist (
+    id SERIAL PRIMARY KEY,
+    device_type TEXT NOT NULL,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone TEXT,
+    camping TEXT,
+    spot_number TEXT,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    notes TEXT,
+    status TEXT NOT NULL DEFAULT 'wachtend',
+    created_at TIMESTAMP DEFAULT NOW(),
+    notified_at TIMESTAMP
+  )`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_fridge_waitlist_status ON fridge_waitlist(status)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_fridge_waitlist_dates ON fridge_waitlist(start_date, end_date)`;
+
   await sql`CREATE INDEX IF NOT EXISTS idx_fridge_bookings_fridge ON fridge_bookings(fridge_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_fridge_bookings_start ON fridge_bookings(start_date)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_fridge_bookings_status ON fridge_bookings(status)`;
@@ -277,6 +295,74 @@ export async function getFridgeStats(year?: number) {
     totalBookings: Number(totalBookings[0].c),
     byStatus,
   };
+}
+
+// Number of bookings that are currently "out" (today between start and end),
+// grouped by device_type. start_date inclusive, end_date inclusive.
+export async function getActiveBookingsByType(): Promise<{ device_type: string; count: number }[]> {
+  const rows = await sql`
+    SELECT f.device_type, COUNT(b.id) AS count
+    FROM fridge_bookings b
+    JOIN fridges f ON f.id = b.fridge_id
+    WHERE b.start_date IS NOT NULL
+      AND b.end_date IS NOT NULL
+      AND CURRENT_DATE BETWEEN b.start_date AND b.end_date
+      AND b.status <> 'controleren'
+    GROUP BY f.device_type`;
+  return (rows as { device_type: string; count: string | number }[])
+    .map(r => ({ device_type: r.device_type, count: Number(r.count) }));
+}
+
+// How many fridges of a given type have at least one day overlap with the
+// requested period. Two periods overlap when start <= other_end AND end >= other_start.
+export async function countOverlappingBookings(
+  deviceType: string,
+  startDate: string,
+  endDate: string,
+): Promise<number> {
+  const rows = await sql`
+    SELECT COUNT(b.id) AS count
+    FROM fridge_bookings b
+    JOIN fridges f ON f.id = b.fridge_id
+    WHERE f.device_type = ${deviceType}
+      AND b.start_date IS NOT NULL
+      AND b.end_date IS NOT NULL
+      AND b.start_date <= ${endDate}::date
+      AND b.end_date >= ${startDate}::date`;
+  return Number((rows as { count: string | number }[])[0]?.count || 0);
+}
+
+// ─── Waitlist ───
+export async function createWaitlistEntry(data: {
+  device_type: string;
+  name: string;
+  email: string;
+  phone?: string | null;
+  camping?: string | null;
+  spot_number?: string | null;
+  start_date: string;
+  end_date: string;
+  notes?: string | null;
+}) {
+  const res = await sql`INSERT INTO fridge_waitlist
+    (device_type, name, email, phone, camping, spot_number, start_date, end_date, notes)
+    VALUES (${data.device_type}, ${data.name}, ${data.email}, ${data.phone || null},
+      ${data.camping || null}, ${data.spot_number || null},
+      ${data.start_date}::date, ${data.end_date}::date, ${data.notes || null})
+    RETURNING *`;
+  return res[0];
+}
+
+export async function getWaitlist() {
+  return sql`SELECT * FROM fridge_waitlist ORDER BY created_at DESC`;
+}
+
+export async function deleteWaitlistEntry(id: number) {
+  await sql`DELETE FROM fridge_waitlist WHERE id = ${id}`;
+}
+
+export async function markWaitlistNotified(id: number) {
+  await sql`UPDATE fridge_waitlist SET status = 'genotificeerd', notified_at = NOW() WHERE id = ${id}`;
 }
 
 export { sql };

@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { findFridgeByEmail, createFridge, createFridgeBooking, logActivity } from '@/lib/db';
+import {
+  findFridgeByEmail,
+  createFridge,
+  createFridgeBooking,
+  logActivity,
+  countOverlappingBookings,
+} from '@/lib/db';
 import { validateBody, fridgeOrderSchema } from '@/lib/validations';
-import { calculatePrice, formatEur, type DeviceType } from '@/lib/pricing';
+import { calculatePrice, formatEur, STOCK, type DeviceType } from '@/lib/pricing';
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,6 +17,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: validated.error }, { status: 400 });
     }
     const data = validated.data;
+
+    // Stock check: how many of this device type are reserved during this period?
+    const inUse = await countOverlappingBookings(data.device_type, data.start_date, data.end_date);
+    if (inUse >= STOCK[data.device_type as DeviceType]) {
+      return NextResponse.json(
+        { error: 'Geen voorraad', soldOut: true },
+        { status: 409 },
+      );
+    }
 
     const price = calculatePrice(data.device_type as DeviceType, data.start_date, data.end_date);
 

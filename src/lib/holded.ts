@@ -83,6 +83,47 @@ export type CreateInvoiceInput = {
   items: HoldedInvoiceItem[];
 };
 
+export type HoldedInvoiceStatus = 'paid' | 'partial' | 'unpaid' | 'unknown';
+
+export type HoldedInvoiceSummary = {
+  id: string;
+  docNumber?: string;
+  status: HoldedInvoiceStatus;
+  total?: number;
+  pending?: number;
+  publicUrl?: string;
+};
+
+export async function getInvoice(id: string): Promise<HoldedInvoiceSummary | null> {
+  if (!id) return null;
+  try {
+    const data = await holdedFetch<{
+      id: string;
+      docNumber?: string;
+      status?: number | string;
+      total?: number;
+      pending?: number;
+      publicUrl?: string;
+    }>(`/invoicing/v1/documents/invoice/${id}`);
+    // Holded uses status: 0 = draft, 1 = unpaid, 2 = partial, 3 = paid (codes vary;
+    // also a paid invoice has pending = 0). We treat both signals.
+    let status: HoldedInvoiceStatus = 'unknown';
+    if (data.pending === 0 && data.total && data.total > 0) status = 'paid';
+    else if (data.pending != null && data.total != null && data.pending < data.total) status = 'partial';
+    else if (data.pending != null) status = 'unpaid';
+    return {
+      id: data.id,
+      docNumber: data.docNumber,
+      status,
+      total: data.total,
+      pending: data.pending,
+      publicUrl: data.publicUrl,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function createInvoice(input: CreateInvoiceInput): Promise<{ id: string; invoiceNum: string }> {
   const body = {
     contactId: input.contactId,

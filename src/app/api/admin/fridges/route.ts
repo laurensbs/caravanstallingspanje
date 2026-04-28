@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllFridges, createFridge, getFridgeStats, logActivity, getAdminInfo } from '@/lib/db';
+import { getAllFridges, createFridge, getFridgeStats, getActiveBookingsByType, logActivity, getAdminInfo } from '@/lib/db';
 import { validateBody, fridgeSchema } from '@/lib/validations';
+import { STOCK } from '@/lib/pricing';
 
 export async function GET(req: NextRequest) {
   try {
@@ -12,7 +13,16 @@ export async function GET(req: NextRequest) {
 
     if (url.searchParams.get('stats') === 'true') {
       const stats = await getFridgeStats(year);
-      return NextResponse.json(stats);
+      const active = await getActiveBookingsByType();
+      const inUseLarge = active.find(a => a.device_type === 'Grote koelkast')?.count ?? 0;
+      const inUseTable = active.find(a => a.device_type === 'Tafelmodel koelkast')?.count ?? 0;
+      return NextResponse.json({
+        ...stats,
+        inUse: {
+          large: { current: inUseLarge, capacity: STOCK['Grote koelkast'] },
+          table: { current: inUseTable, capacity: STOCK['Tafelmodel koelkast'] },
+        },
+      });
     }
 
     const result = await getAllFridges(year, status, search);

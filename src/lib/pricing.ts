@@ -3,6 +3,11 @@ export const PRICES = {
   'Tafelmodel koelkast': 25,
 } as const;
 
+export const STOCK = {
+  'Grote koelkast': 110,
+  'Tafelmodel koelkast': 20,
+} as const;
+
 export type DeviceType = keyof typeof PRICES;
 
 export const MIN_DAYS = 7;

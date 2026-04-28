@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
   Plus, Search, Trash2, Pencil, Calendar, MapPin, Tag, Receipt, Link as LinkIcon,
-  AlertCircle, CheckCircle2, ChevronRight,
+  AlertCircle, CheckCircle2, ChevronRight, ExternalLink,
 } from 'lucide-react';
 import { Button, Input, Select, Textarea, Badge, Skeleton, Spinner } from '@/components/ui';
 import Drawer from '@/components/Drawer';
@@ -77,6 +77,7 @@ function KoelkastenContent() {
 
   const [fridges, setFridges] = useState<Fridge[]>([]);
   const [loading, setLoading] = useState(true);
+  const [holdedStatuses, setHoldedStatuses] = useState<Record<number, { status: string; publicUrl?: string }>>({});
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<'create' | 'edit'>('create');
@@ -119,6 +120,14 @@ function KoelkastenContent() {
   }, [year, statusFilter, debouncedSearch]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Fetch Holded payment status for invoiced bookings (cheap; runs once on mount and after refresh)
+  useEffect(() => {
+    fetch('/api/admin/fridges/holded-status', { credentials: 'include' })
+      .then(r => r.ok ? r.json() : { statuses: {} })
+      .then(d => setHoldedStatuses(d.statuses || {}))
+      .catch(() => { /* silent */ });
+  }, [fridges.length]);
 
   const refresh = useCallback(async () => {
     if (drawerFridge) {
@@ -498,7 +507,11 @@ function KoelkastenContent() {
                 <p className="text-xs text-text-muted italic">Nog geen periodes</p>
               ) : (
                 <ul className="space-y-2">
-                  {drawerFridge.bookings.map(b => (
+                  {drawerFridge.bookings.map(b => {
+                    const holded = holdedStatuses[b.id];
+                    const paid = holded?.status === 'paid';
+                    const partial = holded?.status === 'partial';
+                    return (
                     <li key={b.id} className="bg-surface border border-border rounded-[var(--radius-md)] p-3 space-y-2">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0 space-y-1">
@@ -509,6 +522,21 @@ function KoelkastenContent() {
                             </Badge>
                             {b.holded_invoice_number && (
                               <Badge tone="accent"><Receipt size={10} /> {b.holded_invoice_number}</Badge>
+                            )}
+                            {paid && <Badge tone="success">Betaald</Badge>}
+                            {partial && <Badge tone="warning">Deels betaald</Badge>}
+                            {b.holded_invoice_number && !paid && !partial && holded?.status === 'unpaid' && (
+                              <Badge tone="warning">Open</Badge>
+                            )}
+                            {holded?.publicUrl && (
+                              <a
+                                href={holded.publicUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-[10px] font-medium text-text-muted hover:text-text transition-colors"
+                              >
+                                <ExternalLink size={10} /> Open
+                              </a>
                             )}
                           </div>
                           <div className="grid grid-cols-2 gap-2 text-xs text-text">
@@ -543,7 +571,8 @@ function KoelkastenContent() {
                         </div>
                       )}
                     </li>
-                  ))}
+                    );
+                  })}
                 </ul>
               )}
             </div>
