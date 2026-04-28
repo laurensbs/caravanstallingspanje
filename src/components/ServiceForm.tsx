@@ -1,8 +1,8 @@
 'use client';
 
 import { ReactNode, useState } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, ArrowRight, Check, Loader2, Lock } from 'lucide-react';
 import Link from 'next/link';
 import InfoBanner from './InfoBanner';
 
@@ -157,53 +157,112 @@ export function ServicePageShell({
     );
   }
 
+  const E = [0.16, 1, 0.3, 1] as const;
   return (
     <main className="min-h-screen bg-bg">
       <div className="max-w-2xl mx-auto px-6 py-10 sm:py-14">
-        <Link href="/diensten" className="inline-flex items-center gap-1 text-sm text-text-muted hover:text-text mb-6">
-          <ArrowLeft size={14} /> Diensten
-        </Link>
+        <motion.div
+          initial={{ opacity: 0, x: -4 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3, ease: E }}
+        >
+          <Link href="/diensten" className="inline-flex items-center gap-1 text-sm text-text-muted hover:text-text mb-6 transition-colors">
+            <ArrowLeft size={14} /> Diensten
+          </Link>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: E }}
+        >
+          <h1 className="text-[28px] sm:text-3xl font-semibold tracking-tight">{title}</h1>
+          <p className="text-text-muted mt-2 leading-relaxed text-[14px] sm:text-base">{intro}</p>
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ delay: 0.1, duration: 0.4, ease: E }}
+          className="mt-6"
         >
-          <h1 className="text-3xl font-medium tracking-tight">{title}</h1>
-          <p className="text-text-muted mt-2 leading-relaxed">{intro}</p>
-        </motion.div>
-
-        <div className="mt-6">
           <InfoBanner>
             <strong>Belangrijk:</strong> gebruik het e-mailadres en telefoonnummer dat bij ons bekend is. Zo koppelen we je aanvraag automatisch aan je klantgegevens.
           </InfoBanner>
-        </div>
+        </motion.div>
 
-        <form onSubmit={onSubmit} className="mt-6 space-y-7">
+        <motion.form
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.18, duration: 0.45, ease: E }}
+          onSubmit={onSubmit}
+          className="mt-6 space-y-7"
+        >
           {children}
 
           {error && (
-            <div className="rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-sm">{error}</div>
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-sm"
+            >
+              {error}
+            </motion.div>
           )}
 
           <button
             type="submit"
             disabled={submitting}
-            className="w-full h-12 rounded-[var(--radius-md)] bg-accent text-accent-fg font-medium hover:bg-accent-hover transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2"
+            className="press-spring w-full h-12 rounded-[var(--radius-md)] bg-accent text-accent-fg font-medium hover:bg-accent-hover transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2"
           >
             {submitting ? <Loader2 size={16} className="animate-spin" /> : null}
             {submitting
               ? (paid ? 'Doorsturen…' : 'Versturen…')
               : (paid ? 'Doorgaan naar betalen' : 'Aanvraag versturen')}
-            {!submitting && <ArrowRight size={16} />}
+            {!submitting && <ArrowRight size={16} className="transition-transform" />}
           </button>
           <p className="text-xs text-text-muted text-center">
             {paid
               ? 'Je gaat door naar onze beveiligde Stripe-betaalpagina.'
               : 'Je krijgt direct een bevestiging per e-mail. Onze werkplaats neemt zo snel mogelijk contact op.'}
           </p>
-        </form>
+        </motion.form>
       </div>
+
+      {/* Stripe-redirect overlay: voorkomt 'flash of old form' tussen submit en window.location.href */}
+      <AnimatePresence>
+        {paid && submitting && <RedirectOverlay />}
+      </AnimatePresence>
     </main>
+  );
+}
+
+function RedirectOverlay() {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
+      className="fixed inset-0 z-50 bg-bg/95 backdrop-blur-sm flex items-center justify-center px-6"
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.4 }}
+        className="text-center max-w-sm"
+      >
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-surface border border-border mb-5">
+          <Lock size={18} className="text-text" />
+        </div>
+        <h2 className="text-base font-semibold mb-1">Doorsturen naar Stripe…</h2>
+        <p className="text-[13px] text-text-muted leading-relaxed">
+          Je betaling verloopt via een beveiligde verbinding.
+        </p>
+        <div className="flex justify-center mt-5">
+          <Loader2 size={16} className="animate-spin text-text-muted" />
+        </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

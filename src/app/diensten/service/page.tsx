@@ -82,7 +82,8 @@ export default function ServicePage() {
                   key={s.id}
                   type="button"
                   onClick={() => setServiceSlug(s.slug)}
-                  whileTap={{ scale: 0.99 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: 'spring', stiffness: 380, damping: 26 }}
                   className={`text-left p-4 rounded-[var(--radius-lg)] border transition-all ${
                     sel
                       ? 'border-accent bg-surface shadow-md'

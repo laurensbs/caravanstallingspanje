@@ -58,9 +58,9 @@ export default function DienstenPage() {
               Caravanstalling
             </span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-medium tracking-tight">Onze diensten</h1>
-          <p className="text-text-muted mt-3 text-base sm:text-lg leading-relaxed max-w-xl">
-            Kies een dienst om aan te vragen. Wij sturen je binnen één werkdag een bevestiging.
+          <h1 className="text-[28px] sm:text-[40px] leading-[1.15] font-semibold tracking-tight">Onze diensten</h1>
+          <p className="text-text-muted mt-3 text-[14px] sm:text-base leading-relaxed max-w-xl">
+            Kies een dienst om aan te vragen. Online betalen waar mogelijk, anders nemen we contact op.
           </p>
         </motion.div>
 
@@ -70,22 +70,22 @@ export default function DienstenPage() {
             return (
               <motion.div
                 key={s.href}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.04, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ delay: 0.05 + i * 0.06, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
               >
                 <Link
                   href={s.href}
-                  className="group block p-5 sm:p-6 bg-surface border border-border rounded-[var(--radius-xl)] hover:border-border-strong hover:shadow-md transition-all"
+                  className="card-surface group hover-lift press-spring block p-5 sm:p-6"
                 >
-                  <div className="flex items-start justify-between mb-6">
-                    <div className="w-10 h-10 rounded-full bg-surface-2 text-text flex items-center justify-center border border-border">
+                  <div className="flex items-start justify-between mb-6 sm:mb-7">
+                    <div className="w-10 h-10 rounded-[var(--radius-md)] bg-surface-2 text-text flex items-center justify-center border border-border transition-transform group-hover:scale-105">
                       <Icon size={18} />
                     </div>
-                    <ArrowRight size={14} className="text-text-subtle group-hover:text-text transition-colors" />
+                    <ArrowRight size={14} className="text-text-subtle group-hover:text-text transition-transform group-hover:translate-x-0.5" />
                   </div>
-                  <h2 className="text-base font-medium text-text">{s.title}</h2>
-                  <p className="text-sm text-text-muted mt-1 leading-relaxed">{s.description}</p>
+                  <h2 className="text-base font-semibold text-text">{s.title}</h2>
+                  <p className="text-[13px] text-text-muted mt-1 leading-relaxed">{s.description}</p>
                 </Link>
               </motion.div>
             );

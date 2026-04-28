@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, ArrowRight, Loader2, AlertTriangle } from 'lucide-react';
+import { Check, ArrowRight, Loader2, AlertTriangle, Lock } from 'lucide-react';
 import { calculatePrice, formatEur, PRICES, MIN_DAYS, type DeviceType } from '@/lib/pricing';
 import InfoBanner from '@/components/InfoBanner';
 
@@ -265,7 +265,8 @@ export default function KoelkastBestelPagina() {
                     key={type}
                     type="button"
                     onClick={() => setForm({ ...form, device_type: type })}
-                    whileTap={{ scale: 0.99 }}
+                    whileTap={{ scale: 0.97 }}
+                    transition={{ type: 'spring', stiffness: 380, damping: 26 }}
                     className={`text-left p-5 rounded-[var(--radius-xl)] border transition-all ${
                       selected
                         ? 'border-accent bg-surface shadow-md'
@@ -408,7 +409,7 @@ export default function KoelkastBestelPagina() {
           <button
             type="submit"
             disabled={submitting || !price}
-            className="w-full h-12 rounded-[var(--radius-md)] bg-accent text-accent-fg font-medium hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+            className="press-spring w-full h-12 rounded-[var(--radius-md)] bg-accent text-accent-fg font-medium hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
           >
             {submitting ? <Loader2 size={16} className="animate-spin" /> : null}
             {submitting ? 'Doorsturen…' : 'Doorgaan naar betalen'}
@@ -419,6 +420,36 @@ export default function KoelkastBestelPagina() {
           </p>
         </form>
       </div>
+
+      <AnimatePresence>
+        {submitting && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-50 bg-bg/95 backdrop-blur-sm flex items-center justify-center px-6"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.4 }}
+              className="text-center max-w-sm"
+            >
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-surface border border-border mb-5">
+                <Lock size={18} className="text-text" />
+              </div>
+              <h2 className="text-base font-semibold mb-1">Doorsturen naar Stripe…</h2>
+              <p className="text-[13px] text-text-muted leading-relaxed">
+                Je betaling verloopt via een beveiligde verbinding.
+              </p>
+              <div className="flex justify-center mt-5">
+                <Loader2 size={16} className="animate-spin text-text-muted" />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }

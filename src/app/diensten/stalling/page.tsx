@@ -83,7 +83,8 @@ export default function StallingPage() {
                 key={opt.value}
                 type="button"
                 onClick={() => set('type', opt.value)}
-                whileTap={{ scale: 0.99 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: 'spring', stiffness: 380, damping: 26 }}
                 className={`text-left p-4 rounded-[var(--radius-lg)] border transition-all ${
                   selected
                     ? 'border-accent bg-surface shadow-md'
