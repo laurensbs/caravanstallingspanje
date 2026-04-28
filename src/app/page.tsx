@@ -50,12 +50,11 @@ export default function LandingPage() {
             priority
             className="mx-auto h-14 sm:h-20 w-auto mb-7 sm:mb-9"
             style={{
-              // Inverteer het zwart logo → wit, voeg een zachte halo toe zodat het tegen
-              // het navy een eigen "lift" krijgt in plaats van plat te liggen.
+              // Logo op originele kleur (illustratie + oranje wordmark) — die popt
+              // vanzelf tegen het navy. Alleen een zachte halo voor "lift".
               filter: `
-                brightness(0) invert(1)
-                drop-shadow(0 0 24px rgba(126,168,255,0.45))
-                drop-shadow(0 1px 2px rgba(0,0,0,0.4))
+                drop-shadow(0 0 28px rgba(255,255,255,0.18))
+                drop-shadow(0 2px 6px rgba(0,0,0,0.35))
               `,
             }}
           />
