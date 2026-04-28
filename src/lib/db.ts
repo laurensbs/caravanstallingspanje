@@ -78,18 +78,10 @@ export async function initDatabase() {
   )`;
   await sql`CREATE INDEX IF NOT EXISTS idx_pending_intakes_session ON pending_intakes(stripe_session_id)`;
 
-  await sql`CREATE TABLE IF NOT EXISTS services_catalog (
-    id SERIAL PRIMARY KEY,
-    slug TEXT UNIQUE NOT NULL,
-    name TEXT NOT NULL,
-    description TEXT,
-    price_eur NUMERIC(10,2) NOT NULL,
-    sort_order INTEGER DEFAULT 100,
-    active BOOLEAN NOT NULL DEFAULT true,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
-  )`;
-  await sql`CREATE INDEX IF NOT EXISTS idx_services_catalog_active ON services_catalog(active, sort_order)`;
+  // services_catalog tabel is verwijderd — services worden nu beheerd in
+  // het reparatiepaneel en via /api/services-public publiek opgehaald.
+  // De oude tabel laten we in productie staan (geen DROP) maar wordt niet
+  // meer gelezen of geschreven.
 
   await sql`CREATE TABLE IF NOT EXISTS app_settings (
     key TEXT PRIMARY KEY,
@@ -451,70 +443,6 @@ export async function getPendingIntakeBySession(stripe_session_id: string) {
 
 export async function markPendingIntakeForwarded(id: number, repairJobId: string) {
   await sql`UPDATE pending_intakes SET forwarded_at = NOW(), forward_repair_job_id = ${repairJobId} WHERE id = ${id}`;
-}
-
-// ─── Services catalog (publieke catalogus) ───
-export type ServiceCatalogRow = {
-  id: number;
-  slug: string;
-  name: string;
-  description: string | null;
-  price_eur: string; // numeric → string from pg
-  sort_order: number;
-  active: boolean;
-};
-
-export async function getActiveServices() {
-  const rows = await sql`SELECT * FROM services_catalog WHERE active = true ORDER BY sort_order, name`;
-  return rows as unknown as ServiceCatalogRow[];
-}
-
-export async function getAllServices() {
-  const rows = await sql`SELECT * FROM services_catalog ORDER BY sort_order, name`;
-  return rows as unknown as ServiceCatalogRow[];
-}
-
-export async function getServiceBySlug(slug: string) {
-  const rows = await sql`SELECT * FROM services_catalog WHERE slug = ${slug} AND active = true LIMIT 1`;
-  return (rows[0] as unknown as ServiceCatalogRow) || null;
-}
-
-export async function createService(data: {
-  slug: string;
-  name: string;
-  description?: string | null;
-  price_eur: number;
-  sort_order?: number;
-  active?: boolean;
-}) {
-  const res = await sql`INSERT INTO services_catalog (slug, name, description, price_eur, sort_order, active)
-    VALUES (${data.slug}, ${data.name}, ${data.description || null}, ${data.price_eur},
-      ${data.sort_order ?? 100}, ${data.active ?? true})
-    RETURNING *`;
-  return res[0] as unknown as ServiceCatalogRow;
-}
-
-export async function updateService(id: number, data: {
-  slug?: string;
-  name?: string;
-  description?: string | null;
-  price_eur?: number;
-  sort_order?: number;
-  active?: boolean;
-}) {
-  await sql`UPDATE services_catalog SET
-    slug = COALESCE(${data.slug ?? null}, slug),
-    name = COALESCE(${data.name ?? null}, name),
-    description = COALESCE(${data.description ?? null}, description),
-    price_eur = COALESCE(${data.price_eur ?? null}, price_eur),
-    sort_order = COALESCE(${data.sort_order ?? null}, sort_order),
-    active = COALESCE(${data.active ?? null}, active),
-    updated_at = NOW()
-    WHERE id = ${id}`;
-}
-
-export async function deleteService(id: number) {
-  await sql`DELETE FROM services_catalog WHERE id = ${id}`;
 }
 
 // ─── App settings (key/value JSON) ───

@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Refrigerator, Bell, Truck, LogOut, ChevronLeft,
-  Sparkles, Settings,
+  Settings,
 } from 'lucide-react';
 import { ReactNode } from 'react';
 
@@ -28,7 +28,6 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Beheer',
     items: [
-      { href: '/admin/services', label: 'Services', icon: Sparkles },
       { href: '/admin/instellingen', label: 'Instellingen', icon: Settings },
     ],
   },

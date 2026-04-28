@@ -1,10 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { logActivity, getServiceBySlug, createPendingIntake } from '@/lib/db';
+import { logActivity, createPendingIntake } from '@/lib/db';
 import { validateBody, serviceOrderSchema } from '@/lib/validations';
 import { createCheckoutSession } from '@/lib/stripe';
 import type { IntakePayload } from '@/lib/work-order-hub';
 
-// Service flow: pick from catalog → pay → webhook forwards to reparatiepanel.
+// Service flow: read catalog from reparatiepaneel → verify slug + price
+// server-side → Stripe Checkout → webhook forwards to reparatiepaneel.
+type CatalogItem = {
+  slug: string;
+  upstreamId: string;
+  name: string;
+  description: string | null;
+  category: string | null;
+  price_eur: number;
+};
+
+async function fetchCatalog(origin: string): Promise<CatalogItem[]> {
+  const res = await fetch(`${origin}/api/order/services-catalog`, {
+    next: { revalidate: 60 },
+  });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return (data.services as CatalogItem[]) || [];
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -14,12 +33,14 @@ export async function POST(req: NextRequest) {
     }
     const d = validated.data;
 
-    // Look up the service by slug (passed via serviceCategory) — refuses if not in catalog.
-    const service = await getServiceBySlug(d.serviceCategory);
+    // Verify slug against the live catalog (which proxies the reparatiepaneel
+    // endpoint). Never trust the client-supplied price.
+    const catalog = await fetchCatalog(req.nextUrl.origin);
+    const service = catalog.find((s) => s.slug === d.serviceCategory);
     if (!service) {
       return NextResponse.json({ error: 'Onbekende service' }, { status: 400 });
     }
-    const priceEur = Number(service.price_eur);
+    const priceEur = service.price_eur;
 
     const intakePayload: IntakePayload = {
       type: 'service',
@@ -30,12 +51,14 @@ export async function POST(req: NextRequest) {
       title: `Service: ${service.name}`,
       description: d.description || `Service-aanvraag: ${service.name}`,
       locationHint: d.locationHint || undefined,
+      // The intake endpoint matches services on name (case-insensitive),
+      // which lines up with how the reparatiepaneel admin enters them.
       serviceCategory: service.name,
     };
 
     const origin = req.nextUrl.origin;
     const session = await createCheckoutSession({
-      description: `${service.name}`,
+      description: service.name,
       amountEur: priceEur,
       successUrl: `${origin}/diensten/bedankt?session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl: `${origin}/diensten/service?cancelled=1`,
