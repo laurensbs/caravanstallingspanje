@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Warehouse, Sun } from 'lucide-react';
 import {
-  ServicePageShell, Section, Field, fieldCls, useServiceSubmit,
+  MultiStepShell, Section, Field, fieldCls, useServiceSubmit,
 } from '@/components/ServiceForm';
 import { useLocale } from '@/components/LocaleProvider';
 
@@ -58,21 +58,10 @@ export default function StallingPage() {
   }, []);
 
   const currentPrice = prices ? (form.type === 'binnen' ? prices.binnen : prices.buiten) : null;
+  const step1Valid = !!form.start_date;
 
-  return (
-    <ServicePageShell
-      paid
-      title={t('storage.heading')}
-      intro={t('storage.intro')}
-      doneTitle={t('service.done-title')}
-      onSubmit={(e) => {
-        e.preventDefault();
-        submit(form);
-      }}
-      submitting={submitting}
-      error={error}
-      done={done}
-    >
+  const step1 = (
+    <>
       <Section title={t('storage.section-type')}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {([
@@ -89,26 +78,26 @@ export default function StallingPage() {
                 onClick={() => set('type', opt.value)}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: 'spring', stiffness: 380, damping: 26 }}
-                className={`text-left p-4 rounded-[var(--radius-lg)] border transition-all ${
+                className={`text-left p-5 rounded-[var(--radius-xl)] border-2 transition-all ${
                   selected
                     ? 'border-accent bg-surface shadow-md'
                     : 'border-border bg-surface hover:border-border-strong'
                 }`}
               >
                 <div className="flex items-start justify-between mb-3">
-                  <div className="w-9 h-9 rounded-full bg-surface-2 text-text flex items-center justify-center border border-border">
-                    <Icon size={16} />
+                  <div className="w-10 h-10 rounded-[var(--radius-md)] bg-surface-2 text-text flex items-center justify-center border border-border">
+                    <Icon size={18} />
                   </div>
-                  <div className={`w-4 h-4 rounded-full border-2 transition-colors ${selected ? 'border-accent bg-accent' : 'border-border'}`}>
-                    {selected && <Check size={10} className="text-accent-fg" strokeWidth={3} />}
+                  <div className={`w-5 h-5 rounded-full border-2 transition-colors flex items-center justify-center ${selected ? 'border-accent bg-accent' : 'border-border'}`}>
+                    {selected && <Check size={11} className="text-accent-fg" strokeWidth={3} />}
                   </div>
                 </div>
-                <div className="text-sm font-medium">{opt.label}</div>
-                <div className="text-xs text-text-muted mt-1">{opt.description}</div>
+                <div className="text-[15px] font-semibold">{opt.label}</div>
+                <div className="text-[13px] text-text-muted mt-1">{opt.description}</div>
                 {optPrice !== null && optPrice > 0 && (
-                  <div className="text-sm font-semibold tabular-nums mt-2">
+                  <div className="text-[20px] font-semibold tabular-nums mt-3">
                     {formatEur(optPrice)}
-                    <span className="text-[11px] font-normal text-text-muted"> {t('storage.per-year')}</span>
+                    <span className="text-[13px] font-normal text-text-muted"> {t('storage.per-year')}</span>
                   </div>
                 )}
               </motion.button>
@@ -146,7 +135,11 @@ export default function StallingPage() {
           </Field>
         </div>
       </Section>
+    </>
+  );
 
+  const step2 = (
+    <>
       <Section title={t('contact.section-heading')}>
         <Field label={t('contact.name')} required>
           <input required value={form.name} onChange={(e) => set('name', e.target.value)} autoComplete="name" className={fieldCls} />
@@ -169,19 +162,46 @@ export default function StallingPage() {
         </Field>
       </Section>
 
-      {currentPrice !== null && currentPrice > 0 && (
-        <div className="rounded-[var(--radius-xl)] bg-surface-2 border border-border p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-text-muted">
-              {form.type === 'binnen' ? t('storage.summary-indoor') : t('storage.summary-outdoor')}
-            </span>
-            <span className="text-lg font-semibold tabular-nums">
-              {formatEur(currentPrice)}
-            </span>
-          </div>
-          <p className="text-[11px] text-text-muted mt-2">{t('service.checkout-hint')}</p>
-        </div>
-      )}
-    </ServicePageShell>
+      <Section title={t('common.summary')}>
+        <SummaryRow label={t('storage.section-type')} value={form.type === 'binnen' ? t('storage.indoor') : t('storage.outdoor')} />
+        <SummaryRow label={t('storage.start-from')} value={form.start_date} />
+        {form.registration && <SummaryRow label={t('contact.registration')} value={form.registration} />}
+        {currentPrice !== null && currentPrice > 0 && (
+          <SummaryRow
+            label={form.type === 'binnen' ? t('storage.summary-indoor') : t('storage.summary-outdoor')}
+            value={formatEur(currentPrice)}
+            bold
+          />
+        )}
+      </Section>
+    </>
+  );
+
+  return (
+    <MultiStepShell
+      paid
+      title={t('storage.heading')}
+      intro={t('storage.intro')}
+      doneTitle={t('service.done-title')}
+      step1={step1}
+      step2={step2}
+      step1Valid={step1Valid}
+      onSubmit={(e) => {
+        e.preventDefault();
+        submit(form);
+      }}
+      submitting={submitting}
+      error={error}
+      done={done}
+    />
+  );
+}
+
+function SummaryRow({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
+  return (
+    <div className="flex justify-between items-baseline gap-3 py-2 border-b border-border last:border-b-0">
+      <span className="text-[13px] text-text-muted">{label}</span>
+      <span className={`text-[14px] tabular-nums text-right ${bold ? 'font-semibold' : ''}`}>{value}</span>
+    </div>
   );
 }

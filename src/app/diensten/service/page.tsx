@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
 import {
-  ContactFields, ServicePageShell, Section, Field, fieldCls,
+  ContactFields, MultiStepShell, Section, Field, fieldCls,
   emptyContact, useServiceSubmit,
 } from '@/components/ServiceForm';
 import { Skeleton } from '@/components/ui';
@@ -40,22 +40,10 @@ export default function ServicePage() {
   }, []);
 
   const selected = catalog?.find((s) => s.slug === serviceSlug);
+  const step1Valid = !!selected;
 
-  return (
-    <ServicePageShell
-      paid
-      title={t('service.heading')}
-      intro={t('service.intro')}
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (!serviceSlug) return;
-        submit({ ...contact, serviceCategory: serviceSlug, description });
-      }}
-      submitting={submitting}
-      error={error}
-      done={done}
-      doneTitle={t('service.done-title')}
-    >
+  const step1 = (
+    <>
       <Section title={t('service.which')}>
         {catalog === null ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -94,19 +82,19 @@ export default function ServicePage() {
                   }`}
                 >
                   <div className="flex items-start justify-between mb-2 gap-2">
-                    <span className="text-sm font-medium">{s.name}</span>
+                    <span className="text-[15px] font-semibold">{s.name}</span>
                     <div
-                      className={`w-4 h-4 rounded-full border-2 transition-colors shrink-0 ${
+                      className={`w-5 h-5 rounded-full border-2 transition-colors shrink-0 flex items-center justify-center ${
                         sel ? 'border-accent bg-accent' : 'border-border'
                       }`}
                     >
-                      {sel && <Check size={10} className="text-accent-fg" strokeWidth={3} />}
+                      {sel && <Check size={11} className="text-accent-fg" strokeWidth={3} />}
                     </div>
                   </div>
                   {s.description && (
-                    <p className="text-xs text-text-muted leading-relaxed mb-2">{s.description}</p>
+                    <p className="text-[13px] text-text-muted leading-relaxed mb-2">{s.description}</p>
                   )}
-                  <div className="text-sm font-semibold tabular-nums">{formatEur(s.price_eur)}</div>
+                  <div className="text-[16px] font-semibold tabular-nums">{formatEur(s.price_eur)}</div>
                 </motion.button>
               );
             })}
@@ -127,22 +115,50 @@ export default function ServicePage() {
           </Field>
         </Section>
       )}
+    </>
+  );
 
+  const step2 = (
+    <>
       <Section title={t('contact.section-heading')}>
         <ContactFields state={contact} onChange={setContact} />
       </Section>
-
       {selected && (
-        <div className="rounded-[var(--radius-xl)] bg-surface-2 border border-border p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-text-muted">{t('service.amount-label')}</span>
-            <span className="text-lg font-semibold tabular-nums">
-              {formatEur(selected.price_eur)}
-            </span>
-          </div>
-          <p className="text-[11px] text-text-muted mt-2">{t('service.checkout-hint')}</p>
-        </div>
+        <Section title={t('common.summary')}>
+          <SummaryRow label={t('service.which')} value={selected.name} />
+          {description && <SummaryRow label={t('contact.description')} value={description} />}
+          <SummaryRow label={t('service.amount-label')} value={formatEur(selected.price_eur)} bold />
+        </Section>
       )}
-    </ServicePageShell>
+    </>
+  );
+
+  return (
+    <MultiStepShell
+      paid
+      title={t('service.heading')}
+      intro={t('service.intro')}
+      step1={step1}
+      step2={step2}
+      step1Valid={step1Valid}
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!serviceSlug) return;
+        submit({ ...contact, serviceCategory: serviceSlug, description });
+      }}
+      submitting={submitting}
+      error={error}
+      done={done}
+      doneTitle={t('service.done-title')}
+    />
+  );
+}
+
+function SummaryRow({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
+  return (
+    <div className="flex justify-between items-baseline gap-3 py-2 border-b border-border last:border-b-0">
+      <span className="text-[13px] text-text-muted">{label}</span>
+      <span className={`text-[14px] tabular-nums text-right ${bold ? 'font-semibold' : ''}`}>{value}</span>
+    </div>
   );
 }

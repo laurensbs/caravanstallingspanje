@@ -1,11 +1,13 @@
 export const PRICES = {
   'Grote koelkast': 40,
   'Tafelmodel koelkast': 25,
+  'Airco': 50,
 } as const;
 
 export const STOCK = {
   'Grote koelkast': 110,
   'Tafelmodel koelkast': 20,
+  'Airco': 10,
 } as const;
 
 export type DeviceType = keyof typeof PRICES;

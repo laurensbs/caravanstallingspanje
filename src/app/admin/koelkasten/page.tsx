@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
   Plus, Search, Trash2, Pencil, Calendar, MapPin, Tag, Receipt, Link as LinkIcon,
-  AlertCircle, CheckCircle2, ChevronRight, ExternalLink,
+  AlertCircle, CheckCircle2, ChevronRight, ExternalLink, Truck,
 } from 'lucide-react';
 import { Button, Input, Select, Textarea, Badge, Skeleton, Spinner } from '@/components/ui';
 import Drawer from '@/components/Drawer';
@@ -344,6 +344,8 @@ function KoelkastenContent() {
         }
       />
 
+      <ActiveBookingsOverview />
+
       <div className="flex flex-wrap gap-2 mb-6">
         <div className="relative flex-1 min-w-[220px] max-w-md">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle" />
@@ -679,5 +681,85 @@ function KoelkastenContent() {
         onCancel={() => setConfirmDelete(null)}
       />
     </>
+  );
+}
+
+type ActiveBooking = {
+  id: number;
+  fridge_id: number;
+  customer_name: string;
+  email: string | null;
+  device_type: string;
+  camping: string | null;
+  spot_number: string | null;
+  start_date: string;
+  end_date: string;
+  status: string;
+};
+
+type ActiveStats = {
+  large: { current: number; capacity: number };
+  table: { current: number; capacity: number };
+  airco: { current: number; capacity: number };
+};
+
+function ActiveBookingsOverview() {
+  const [data, setData] = useState<{ bookings: ActiveBooking[]; stats: ActiveStats } | null>(null);
+
+  useEffect(() => {
+    fetch('/api/admin/active-bookings', { credentials: 'include' })
+      .then((r) => r.json())
+      .then(setData)
+      .catch(() => setData({ bookings: [], stats: { large: { current: 0, capacity: 0 }, table: { current: 0, capacity: 0 }, airco: { current: 0, capacity: 0 } } }));
+  }, []);
+
+  if (!data) {
+    return (
+      <section className="mb-8">
+        <Skeleton className="h-32 w-full" />
+      </section>
+    );
+  }
+
+  const cards = [
+    { label: 'Grote koelkast', ...data.stats.large },
+    { label: 'Tafelmodel', ...data.stats.table },
+    { label: 'Airco', ...data.stats.airco },
+  ];
+
+  return (
+    <section className="mb-10">
+      <h2 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-text-muted mb-4 flex items-center gap-2">
+        <Truck size={13} /> Op dit moment uit ({data.bookings.length})
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        {cards.map((c) => (
+          <div key={c.label} className="card-surface p-5">
+            <div className="text-[12px] uppercase tracking-[0.18em] text-text-muted font-medium">{c.label}</div>
+            <div className="flex items-baseline gap-2 mt-2">
+              <span className="text-3xl font-semibold tabular-nums">{c.current}</span>
+              <span className="text-[13px] text-text-muted">/ {c.capacity}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+      {data.bookings.length > 0 && (
+        <div className="card-surface divide-y divide-border">
+          {data.bookings.map((b) => (
+            <div key={b.id} className="px-5 py-3.5 flex items-center gap-4">
+              <div className="min-w-0 flex-1">
+                <div className="text-[14px] font-medium truncate">{b.customer_name}</div>
+                <div className="text-[12px] text-text-muted truncate">
+                  {b.device_type}{b.camping ? ` · ${b.camping}` : ''}{b.spot_number ? ` (${b.spot_number})` : ''}
+                </div>
+              </div>
+              <span className="text-[12px] tabular-nums text-text-muted shrink-0">
+                terug {new Date(b.end_date).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' })}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }

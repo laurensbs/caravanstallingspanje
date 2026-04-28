@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowRight, Wrench, Sparkles, Search, Truck, Warehouse, Refrigerator } from 'lucide-react';
+import { ArrowRight, Wrench, Sparkles, Search, Truck, Warehouse, Refrigerator, Wind } from 'lucide-react';
 import { useLocale } from '@/components/LocaleProvider';
 import PublicHero from '@/components/PublicHero';
 import type { StringKey } from '@/lib/i18n';
@@ -14,6 +14,7 @@ const SERVICES: { href: string; titleKey: StringKey; descKey: StringKey; icon: t
   { href: '/diensten/transport',  titleKey: 'services.transport-title',  descKey: 'services.transport-desc',  icon: Truck },
   { href: '/diensten/stalling',   titleKey: 'services.storage-title',    descKey: 'services.storage-desc',    icon: Warehouse },
   { href: '/koelkast',            titleKey: 'services.fridge-title',     descKey: 'services.fridge-desc',     icon: Refrigerator },
+  { href: '/diensten/airco',      titleKey: 'landing.cta-airco-title',   descKey: 'landing.cta-airco-desc',   icon: Wind },
 ];
 
 export default function DienstenPage() {

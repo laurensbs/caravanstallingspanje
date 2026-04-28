@@ -7,6 +7,7 @@ import Link from 'next/link';
 import InfoBanner from './InfoBanner';
 import CampingPicker from './CampingPicker';
 import PublicHero from './PublicHero';
+import Stepper from './Stepper';
 import { useLocale } from './LocaleProvider';
 
 export type ContactState = {
@@ -30,27 +31,27 @@ export const emptyContact: ContactState = {
 };
 
 const inputCls =
-  'w-full h-10 px-3 text-sm bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors placeholder:text-text-subtle';
+  'w-full h-12 px-3.5 text-[15px] bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors placeholder:text-text-subtle';
 
 export const fieldCls = inputCls;
 
 export function Field({ label, required, children, hint }: { label: string; required?: boolean; children: ReactNode; hint?: string }) {
   return (
-    <div className="space-y-1.5">
-      <label className="block text-xs font-medium text-text">
+    <div className="space-y-2">
+      <label className="block text-[13px] font-medium text-text">
         {label}
         {required && <span className="text-text-subtle ml-0.5">*</span>}
       </label>
       {children}
-      {hint && <p className="text-xs text-text-subtle">{hint}</p>}
+      {hint && <p className="text-[12px] text-text-subtle">{hint}</p>}
     </div>
   );
 }
 
 export function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="space-y-3">
-      <h2 className="text-sm font-medium text-text-muted uppercase tracking-wider">{title}</h2>
+    <section className="space-y-4">
+      <h2 className="text-[11px] font-semibold text-text-muted uppercase tracking-[0.18em]">{title}</h2>
       {children}
     </section>
   );
@@ -169,13 +170,13 @@ export function ServicePageShell({
 
   const E = [0.16, 1, 0.3, 1] as const;
   return (
-    <main className="min-h-screen bg-bg">
+    <main className="min-h-screen bg-bg page-public">
       <PublicHero
         back={{ href: '/diensten', label: t('common.services-link') }}
         title={title}
         intro={intro}
       />
-      <div className="max-w-2xl mx-auto px-6 py-8 sm:py-10">
+      <div className="max-w-2xl mx-auto px-6 py-10 sm:py-14">
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -191,7 +192,7 @@ export function ServicePageShell({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.45, ease: E }}
           onSubmit={onSubmit}
-          className="mt-6 space-y-7"
+          className="mt-8 space-y-9"
         >
           {children}
 
@@ -199,7 +200,7 @@ export function ServicePageShell({
             <motion.div
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-sm"
+              className="rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-[14px]"
             >
               {error}
             </motion.div>
@@ -208,21 +209,200 @@ export function ServicePageShell({
           <button
             type="submit"
             disabled={submitting}
-            className="press-spring w-full h-12 rounded-[var(--radius-md)] bg-accent text-accent-fg font-medium hover:bg-accent-hover transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2"
+            className="press-spring w-full h-14 rounded-[var(--radius-lg)] bg-accent text-accent-fg font-semibold text-[15px] hover:bg-accent-hover transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2"
           >
-            {submitting ? <Loader2 size={16} className="animate-spin" /> : null}
+            {submitting ? <Loader2 size={18} className="animate-spin" /> : null}
             {submitting
               ? (paid ? t('common.forwarding') : t('common.sending'))
               : (paid ? t('common.continue-to-pay') : t('common.send-request'))}
-            {!submitting && <ArrowRight size={16} className="transition-transform" />}
+            {!submitting && <ArrowRight size={17} className="transition-transform" />}
           </button>
-          <p className="text-xs text-text-muted text-center">
+          <p className="text-[12px] text-text-muted text-center">
             {paid ? t('common.stripe-footer-paid') : t('common.email-confirmation-footer')}
           </p>
         </motion.form>
       </div>
 
       {/* Stripe-redirect overlay: voorkomt 'flash of old form' tussen submit en window.location.href */}
+      <AnimatePresence>
+        {paid && submitting && <RedirectOverlay />}
+      </AnimatePresence>
+    </main>
+  );
+}
+
+// ─── Multi-step shell ────────────────────────────────────
+// Used by koelkast / service / stalling / transport — pages with multiple
+// distinct decisions. Step 1 = "kiezen" (what + when + where), step 2 =
+// contact + summary + submit. Pages own the form state and the
+// "is step N valid" callback; the shell handles navigation, the
+// Stepper, the back/next buttons and the Stripe redirect overlay.
+
+interface MultiStepProps {
+  title: string;
+  intro: string;
+  /** First step content (selectie). Page renders inputs; shell wraps them. */
+  step1: ReactNode;
+  /** Second step content (contact + samenvatting). */
+  step2: ReactNode;
+  /** Returns true when step1 is filled enough to advance. */
+  step1Valid: boolean;
+  onSubmit: (e: React.FormEvent) => void;
+  submitting: boolean;
+  error: string;
+  done: boolean;
+  doneTitle?: string;
+  doneBody?: string;
+  publicCode?: string | null;
+  /** When true, last button says "Doorgaan naar betalen" + redirect overlay shows. */
+  paid?: boolean;
+  /** Optional sticky summary that shows on the right side on desktop. */
+  summary?: ReactNode;
+}
+
+export function MultiStepShell({
+  title, intro, step1, step2, step1Valid,
+  onSubmit, submitting, error, done, doneTitle, doneBody, publicCode,
+  paid = false, summary,
+}: MultiStepProps) {
+  const { t } = useLocale();
+  const [step, setStep] = useState(0);
+  const E = [0.16, 1, 0.3, 1] as const;
+
+  const stepLabels = [t('common.step-choose'), t('common.step-confirm')];
+
+  if (done) {
+    const resolvedDoneTitle = doneTitle ?? t('thanks.payment-title');
+    const resolvedDoneBody = doneBody ?? t('thanks.payment-services');
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-bg page-public px-6 py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="max-w-md text-center"
+        >
+          <div className="w-14 h-14 rounded-full bg-success-soft text-success flex items-center justify-center mx-auto mb-6">
+            <Check size={22} />
+          </div>
+          <h1 className="text-3xl font-semibold tracking-tight mb-3">{resolvedDoneTitle}</h1>
+          <p className="text-text-muted leading-relaxed">{resolvedDoneBody}</p>
+          {publicCode && (
+            <p className="text-[13px] text-text-muted mt-6">
+              {t('common.reference')} <span className="font-mono text-text">{publicCode}</span>
+            </p>
+          )}
+          <Link
+            href="/diensten"
+            className="inline-flex items-center gap-1 text-[14px] text-text-muted hover:text-text mt-8"
+          >
+            <ArrowLeft size={14} /> {t('common.back-to-services')}
+          </Link>
+        </motion.div>
+      </main>
+    );
+  }
+
+  const goNext = () => {
+    if (step === 0 && step1Valid) setStep(1);
+  };
+
+  return (
+    <main className="min-h-screen bg-bg page-public">
+      <PublicHero
+        back={{ href: '/diensten', label: t('common.services-link') }}
+        title={title}
+        intro={intro}
+      />
+      <div className="max-w-2xl mx-auto px-6 py-10 sm:py-14">
+        <Stepper current={step} steps={stepLabels} />
+
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: E }}
+        >
+          <InfoBanner>
+            <strong>{t('banner.important')}</strong> {t('banner.match-hint')}
+          </InfoBanner>
+        </motion.div>
+
+        <form onSubmit={onSubmit} className="mt-8">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -12 }}
+              transition={{ duration: 0.25, ease: E }}
+              className="space-y-9"
+            >
+              {step === 0 ? step1 : step2}
+            </motion.div>
+          </AnimatePresence>
+
+          {step === 1 && summary && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.35, ease: E }}
+              className="mt-8"
+            >
+              {summary}
+            </motion.div>
+          )}
+
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-6 rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-[14px]"
+            >
+              {error}
+            </motion.div>
+          )}
+
+          <div className="mt-10 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+            {step === 1 ? (
+              <button
+                type="button"
+                onClick={() => setStep(0)}
+                className="press-spring inline-flex items-center justify-center gap-2 h-12 px-5 rounded-[var(--radius-md)] border border-border bg-surface hover:border-border-strong text-[14px] font-medium transition-colors"
+              >
+                <ArrowLeft size={15} /> {t('common.back')}
+              </button>
+            ) : (
+              <span aria-hidden />
+            )}
+            {step === 0 ? (
+              <button
+                type="button"
+                disabled={!step1Valid}
+                onClick={goNext}
+                className="press-spring inline-flex items-center justify-center gap-2 h-14 px-6 rounded-[var(--radius-lg)] bg-accent text-accent-fg font-semibold text-[15px] hover:bg-accent-hover transition-colors disabled:opacity-50 sm:ml-auto"
+              >
+                {t('common.next')} <ArrowRight size={17} />
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={submitting}
+                className="press-spring inline-flex items-center justify-center gap-2 h-14 px-6 rounded-[var(--radius-lg)] bg-accent text-accent-fg font-semibold text-[15px] hover:bg-accent-hover transition-colors disabled:opacity-50 sm:ml-auto"
+              >
+                {submitting ? <Loader2 size={18} className="animate-spin" /> : null}
+                {submitting
+                  ? (paid ? t('common.forwarding') : t('common.sending'))
+                  : (paid ? t('common.continue-to-pay') : t('common.send-request'))}
+                {!submitting && <ArrowRight size={17} />}
+              </button>
+            )}
+          </div>
+          <p className="text-[12px] text-text-muted text-center mt-4">
+            {step === 1 ? (paid ? t('common.stripe-footer-paid') : t('common.email-confirmation-footer')) : ' '}
+          </p>
+        </form>
+      </div>
+
       <AnimatePresence>
         {paid && submitting && <RedirectOverlay />}
       </AnimatePresence>

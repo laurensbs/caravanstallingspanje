@@ -62,33 +62,32 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
     <div className="min-h-screen flex bg-bg">
       {/* Donkere sidebar — reparatiepanel-stijl */}
       <aside
-        className="w-60 shrink-0 flex flex-col h-screen sticky top-0"
+        className="w-64 shrink-0 flex flex-col h-screen sticky top-0"
         style={{ background: 'var(--color-sidebar)', color: 'var(--color-sidebar-fg)' }}
       >
         <div
-          className="px-4 py-4 border-b"
+          className="px-5 py-5 border-b"
           style={{ borderColor: 'var(--color-sidebar-border)' }}
         >
           <Link
             href="/admin"
-            className="flex items-center gap-2.5 group"
+            className="flex items-center gap-3 group"
             title="Naar portaal-keuze"
           >
-            <div className="w-8 h-8 rounded-[var(--radius-md)] bg-white/10 flex items-center justify-center overflow-hidden">
+            <div className="w-11 h-11 rounded-[var(--radius-md)] bg-white flex items-center justify-center overflow-hidden shrink-0">
               <Image
                 src="/images/logo.png"
                 alt="Caravanstalling"
-                width={28}
-                height={28}
+                width={40}
+                height={40}
                 className="object-contain"
-                style={{ filter: 'brightness(0) invert(1)' }}
               />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-[13px] font-medium leading-tight">Caravanstalling</div>
-              <div className="text-[10px] uppercase tracking-[0.18em] text-white/40 mt-0.5">Stalling</div>
+              <div className="text-[14px] font-semibold leading-tight">Caravanstalling</div>
+              <div className="text-[10px] uppercase tracking-[0.18em] text-white/45 mt-1">Stalling</div>
             </div>
-            <ChevronLeft size={12} className="text-white/30 group-hover:text-white/60 transition-colors" />
+            <ChevronLeft size={13} className="text-white/30 group-hover:text-white/60 transition-colors" />
           </Link>
         </div>
 
@@ -108,9 +107,9 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="relative flex items-center gap-3 px-3 h-8 rounded-[var(--radius-md)] text-[13px] transition-colors group"
+                      className="relative flex items-center gap-3 px-3 h-10 rounded-[var(--radius-md)] text-[14px] transition-colors group"
                       style={{
-                        color: active ? 'white' : 'rgba(255,255,255,0.65)',
+                        color: active ? 'white' : 'rgba(255,255,255,0.7)',
                       }}
                     >
                       {active && (
@@ -121,7 +120,7 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
                           transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                         />
                       )}
-                      <Icon size={15} className="relative z-10 shrink-0" />
+                      <Icon size={16} className="relative z-10 shrink-0" />
                       <span className="relative z-10">{item.label}</span>
                     </Link>
                   );
@@ -162,7 +161,7 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-              className="max-w-7xl mx-auto px-6 lg:px-8 py-8 lg:py-10"
+              className="page-admin max-w-7xl mx-auto px-8 lg:px-12 py-10 lg:py-12"
             >
               {children}
             </motion.div>

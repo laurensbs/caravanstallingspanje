@@ -171,3 +171,30 @@ html {
   border: 1px solid color-mix(in oklch, var(--color-border), transparent 40%);
   box-shadow: var(--shadow-card);
 }
+
+/* Public-page typography. Larger than the admin's 13px so marketing pages
+   feel comfortable at arm's length on phones. Wrap a page in `.page-public`
+   to opt in. */
+.page-public {
+  font-size: 15px;
+  line-height: 1.55;
+  letter-spacing: -0.005em;
+}
+@media (min-width: 640px) {
+  .page-public {
+    font-size: 16px;
+  }
+}
+.page-public h1, .page-public h2, .page-public h3 {
+  letter-spacing: -0.018em;
+}
+
+/* Admin-page typography. Slightly larger than the default 13px so admin
+   pages voelen ruimer en leesbaarder zonder vol marketing-grote tekst. */
+.page-admin {
+  font-size: 14px;
+  line-height: 1.55;
+}
+.page-admin h1, .page-admin h2, .page-admin h3 {
+  letter-spacing: -0.014em;
+}

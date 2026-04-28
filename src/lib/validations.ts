@@ -34,7 +34,7 @@ export const fridgeBookingSchema = z.object({
 });
 
 export const waitlistSchema = z.object({
-  device_type: z.enum(['Grote koelkast', 'Tafelmodel koelkast']),
+  device_type: z.enum(['Grote koelkast', 'Tafelmodel koelkast', 'Airco']),
   name: z.string().min(2).max(200),
   email: z.string().email(),
   phone: z.string().min(5).max(40).optional().or(z.literal('')),
@@ -46,7 +46,7 @@ export const waitlistSchema = z.object({
 });
 
 export const fridgeOrderSchema = z.object({
-  device_type: z.enum(['Grote koelkast', 'Tafelmodel koelkast']),
+  device_type: z.enum(['Grote koelkast', 'Tafelmodel koelkast', 'Airco']),
   name: z.string().min(2).max(200),
   email: z.string().email(),
   phone: z.string().min(5).max(40),

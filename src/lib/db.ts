@@ -141,6 +141,7 @@ export async function initDatabase() {
   )`;
   await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS return_date DATE`;
   await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS camping TEXT`;
+  await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS created_via TEXT NOT NULL DEFAULT 'public'`;
   await sql`CREATE INDEX IF NOT EXISTS idx_transport_requests_status ON transport_requests(status)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_transport_requests_created ON transport_requests(created_at DESC)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_transport_requests_date ON transport_requests(preferred_date)`;
@@ -408,6 +409,68 @@ export async function getActiveBookingsByType(): Promise<{ device_type: string; 
     .map(r => ({ device_type: r.device_type, count: Number(r.count) }));
 }
 
+// Currently active bookings (today within start..end). Joins fridge data so
+// the admin can see who has what out, sorted by end_date so soonest-returns
+// come first.
+export async function getActiveBookings(): Promise<Array<{
+  id: number;
+  fridge_id: number;
+  customer_name: string;
+  email: string | null;
+  device_type: string;
+  camping: string | null;
+  spot_number: string | null;
+  start_date: string;
+  end_date: string;
+  status: string;
+}>> {
+  const rows = await sql`
+    SELECT b.id, b.fridge_id, f.name AS customer_name, f.email,
+      f.device_type, b.camping, b.spot_number,
+      b.start_date, b.end_date, b.status
+    FROM fridge_bookings b
+    JOIN fridges f ON f.id = b.fridge_id
+    WHERE b.start_date IS NOT NULL
+      AND b.end_date IS NOT NULL
+      AND CURRENT_DATE BETWEEN b.start_date AND b.end_date
+      AND b.status <> 'controleren'
+    ORDER BY b.end_date ASC`;
+  return rows as never;
+}
+
+// Klant 360°: zoek alle diensten op basis van email (case-insensitive).
+// Gebruikt door /admin/transport om te zien of een klant ook een koelkast
+// of stalling heeft lopen.
+export async function getCustomerOverview(email: string) {
+  if (!email) return { fridges: [], stalling: [], otherTransports: [] };
+  const fridges = await sql`
+    SELECT f.id, f.name, f.device_type,
+      COALESCE(json_agg(json_build_object(
+        'id', b.id, 'camping', b.camping, 'spot_number', b.spot_number,
+        'start_date', b.start_date, 'end_date', b.end_date, 'status', b.status,
+        'holded_invoice_number', b.holded_invoice_number
+      ) ORDER BY b.start_date DESC NULLS LAST) FILTER (WHERE b.id IS NOT NULL), '[]') AS bookings
+    FROM fridges f
+    LEFT JOIN fridge_bookings b ON b.fridge_id = f.id
+    WHERE LOWER(f.email) = LOWER(${email})
+    GROUP BY f.id`;
+  const stalling = await sql`
+    SELECT id, type, start_date, end_date, status, registration
+    FROM stalling_requests
+    WHERE LOWER(email) = LOWER(${email})
+    ORDER BY created_at DESC`;
+  const otherTransports = await sql`
+    SELECT id, camping, preferred_date, return_date, status, created_via
+    FROM transport_requests
+    WHERE LOWER(email) = LOWER(${email})
+    ORDER BY preferred_date DESC NULLS LAST`;
+  return {
+    fridges: fridges as never,
+    stalling: stalling as never,
+    otherTransports: otherTransports as never,
+  };
+}
+
 // How many fridges of a given type have at least one day overlap with the
 // requested period. Two periods overlap when start <= other_end AND end >= other_start.
 export async function countOverlappingBookings(
@@ -554,19 +617,18 @@ export async function createTransportRequest(data: {
   brand?: string | null;
   model?: string | null;
   notes?: string | null;
+  created_via?: 'public' | 'admin';
+  status?: string;
 }) {
-  // from_location/to_location bewaren we voor backwards compat in de admin
-  // tabel (toont de richting van de heen-rit). Echte data = camping +
-  // beide datums.
   const res = await sql`INSERT INTO transport_requests
     (name, email, phone, from_location, to_location,
      camping, preferred_date, return_date,
-     registration, brand, model, notes)
+     registration, brand, model, notes, created_via, status)
     VALUES (${data.name}, ${data.email}, ${data.phone || null},
       'Stalling Cruïlles', ${data.camping},
       ${data.camping}, ${data.outbound_date}::date, ${data.return_date}::date,
       ${data.registration || null}, ${data.brand || null}, ${data.model || null},
-      ${data.notes || null})
+      ${data.notes || null}, ${data.created_via || 'public'}, ${data.status || 'controleren'})
     RETURNING *`;
   return res[0];
 }

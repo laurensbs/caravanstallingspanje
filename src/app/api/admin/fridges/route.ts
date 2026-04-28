@@ -16,11 +16,13 @@ export async function GET(req: NextRequest) {
       const active = await getActiveBookingsByType();
       const inUseLarge = active.find(a => a.device_type === 'Grote koelkast')?.count ?? 0;
       const inUseTable = active.find(a => a.device_type === 'Tafelmodel koelkast')?.count ?? 0;
+      const inUseAirco = active.find(a => a.device_type === 'Airco')?.count ?? 0;
       return NextResponse.json({
         ...stats,
         inUse: {
           large: { current: inUseLarge, capacity: STOCK['Grote koelkast'] },
           table: { current: inUseTable, capacity: STOCK['Tafelmodel koelkast'] },
+          airco: { current: inUseAirco, capacity: STOCK['Airco'] },
         },
       });
     }

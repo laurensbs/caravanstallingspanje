@@ -40,6 +40,11 @@ export const STRINGS = {
   },
   'common.brand': { nl: 'Caravanstalling', en: 'Caravanstalling' },
   'common.locale-switch': { nl: 'NL', en: 'EN' },
+  'common.next': { nl: 'Volgende', en: 'Next' },
+  'common.back': { nl: 'Terug', en: 'Back' },
+  'common.step-choose': { nl: 'Kiezen', en: 'Choose' },
+  'common.step-confirm': { nl: 'Bevestigen', en: 'Confirm' },
+  'common.summary': { nl: 'Overzicht', en: 'Summary' },
 
   // ─── Contact form fields ─────────────────────────────────
   'contact.name': { nl: 'Naam', en: 'Name' },
@@ -258,6 +263,16 @@ export const STRINGS = {
     nl: 'Bedankt! We hebben je aanvraag voor {0} dagen ontvangen — totaalbedrag {1}. We nemen binnen één werkdag contact op om de huur te bevestigen.',
     en: "Thank you! We received your request for {0} days — total {1}. We'll get back to you within one business day to confirm the rental.",
   },
+
+  // ─── Airco ──────────────────────────────────────────────
+  'airco.heading': { nl: 'Huur een airco', en: 'Rent an air conditioner' },
+  'airco.intro': {
+    nl: 'Verkoeling op je staanplaats — bezorgd, geïnstalleerd en weer opgehaald. Vanaf één week.',
+    en: 'Cooling at your pitch — delivered, installed and collected. From one week.',
+  },
+  'airco.device-name': { nl: 'Airco unit', en: 'Air-con unit' },
+  'landing.cta-airco-title': { nl: 'Airco huren', en: 'Rent air-con' },
+  'landing.cta-airco-desc': { nl: 'Verkoeling op je staanplaats. Vanaf één week.', en: 'Cooling at your pitch. From one week.' },
 } as const satisfies Record<string, Record<Locale, string>>;
 
 export type StringKey = keyof typeof STRINGS;
