@@ -20,6 +20,12 @@ async function holdedFetch<T>(path: string, init: RequestInit = {}): Promise<T> 
   let body: unknown;
   try { body = text ? JSON.parse(text) : {}; } catch { body = { raw: text }; }
   if (!res.ok) {
+    if (res.status === 401 || res.status === 403) {
+      throw new Error('Holded weigert de API-key (401/403). Vernieuw de key in Vercel env vars.');
+    }
+    if (res.status === 429) {
+      throw new Error('Holded rate limit bereikt. Probeer het over een minuut opnieuw.');
+    }
     const msg = (body && typeof body === 'object' && 'info' in body && typeof (body as { info: unknown }).info === 'string')
       ? (body as { info: string }).info
       : `Holded ${res.status}`;

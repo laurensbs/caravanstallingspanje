@@ -66,6 +66,9 @@ export async function initDatabase() {
   await sql`CREATE INDEX IF NOT EXISTS idx_fridge_bookings_fridge ON fridge_bookings(fridge_id)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_fridge_bookings_start ON fridge_bookings(start_date)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_fridge_bookings_status ON fridge_bookings(status)`;
+  // Prevents the same booking ever being invoiced twice; if a duplicate POST
+  // sneaks through the application check below, the unique constraint catches it.
+  await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_fridge_bookings_holded_invoice ON fridge_bookings(holded_invoice_id) WHERE holded_invoice_id IS NOT NULL`;
 
   return { success: true };
 }
@@ -133,71 +136,49 @@ export async function getRecentActivity(limit = 30) {
 }
 
 // ─── Fridges ───
+// Status filter forces an INNER JOIN so the customer only appears when at least
+// one of their periods matches; without a status we LEFT JOIN to keep customers
+// without periods visible. Year and search use sentinel values so the WHERE
+// clause stays the same shape across calls.
 export async function getAllFridges(year?: number, status?: string, search?: string) {
   const y = year ?? 0;
   const s = search ? `%${search}%` : null;
-  let rows;
-  if (s && status) {
-    rows = await sql`
-      SELECT f.*,
-        COALESCE(json_agg(json_build_object(
-          'id', b.id, 'camping', b.camping, 'start_date', b.start_date, 'end_date', b.end_date,
-          'spot_number', b.spot_number, 'status', b.status, 'notes', b.notes,
-          'holded_invoice_id', b.holded_invoice_id, 'holded_invoice_number', b.holded_invoice_number
-        ) ORDER BY b.start_date NULLS LAST) FILTER (WHERE b.id IS NOT NULL), '[]') AS bookings
-      FROM fridges f
-      INNER JOIN fridge_bookings b ON b.fridge_id = f.id
-        AND (${y} = 0 OR EXTRACT(YEAR FROM b.start_date) = ${y})
-        AND b.status = ${status}
-      WHERE f.name ILIKE ${s} OR f.email ILIKE ${s} OR EXISTS (
-        SELECT 1 FROM fridge_bookings bb WHERE bb.fridge_id = f.id AND bb.camping ILIKE ${s}
-      )
-      GROUP BY f.id
-      ORDER BY f.name`;
-  } else if (s) {
-    rows = await sql`
-      SELECT f.*,
-        COALESCE(json_agg(json_build_object(
-          'id', b.id, 'camping', b.camping, 'start_date', b.start_date, 'end_date', b.end_date,
-          'spot_number', b.spot_number, 'status', b.status, 'notes', b.notes,
-          'holded_invoice_id', b.holded_invoice_id, 'holded_invoice_number', b.holded_invoice_number
-        ) ORDER BY b.start_date NULLS LAST) FILTER (WHERE b.id IS NOT NULL), '[]') AS bookings
-      FROM fridges f
-      LEFT JOIN fridge_bookings b ON b.fridge_id = f.id
-        AND (${y} = 0 OR EXTRACT(YEAR FROM b.start_date) = ${y})
-      WHERE f.name ILIKE ${s} OR f.email ILIKE ${s} OR EXISTS (
-        SELECT 1 FROM fridge_bookings bb WHERE bb.fridge_id = f.id AND bb.camping ILIKE ${s}
-      )
-      GROUP BY f.id
-      ORDER BY f.name`;
-  } else if (status) {
-    rows = await sql`
-      SELECT f.*,
-        COALESCE(json_agg(json_build_object(
-          'id', b.id, 'camping', b.camping, 'start_date', b.start_date, 'end_date', b.end_date,
-          'spot_number', b.spot_number, 'status', b.status, 'notes', b.notes,
-          'holded_invoice_id', b.holded_invoice_id, 'holded_invoice_number', b.holded_invoice_number
-        ) ORDER BY b.start_date NULLS LAST) FILTER (WHERE b.id IS NOT NULL), '[]') AS bookings
-      FROM fridges f
-      INNER JOIN fridge_bookings b ON b.fridge_id = f.id
-        AND (${y} = 0 OR EXTRACT(YEAR FROM b.start_date) = ${y})
-        AND b.status = ${status}
-      GROUP BY f.id
-      ORDER BY f.name`;
-  } else {
-    rows = await sql`
-      SELECT f.*,
-        COALESCE(json_agg(json_build_object(
-          'id', b.id, 'camping', b.camping, 'start_date', b.start_date, 'end_date', b.end_date,
-          'spot_number', b.spot_number, 'status', b.status, 'notes', b.notes,
-          'holded_invoice_id', b.holded_invoice_id, 'holded_invoice_number', b.holded_invoice_number
-        ) ORDER BY b.start_date NULLS LAST) FILTER (WHERE b.id IS NOT NULL), '[]') AS bookings
-      FROM fridges f
-      LEFT JOIN fridge_bookings b ON b.fridge_id = f.id
-        AND (${y} = 0 OR EXTRACT(YEAR FROM b.start_date) = ${y})
-      GROUP BY f.id
-      ORDER BY f.name`;
-  }
+
+  const rows = status
+    ? await sql`
+        SELECT f.*,
+          COALESCE(json_agg(json_build_object(
+            'id', b.id, 'camping', b.camping, 'start_date', b.start_date, 'end_date', b.end_date,
+            'spot_number', b.spot_number, 'status', b.status, 'notes', b.notes,
+            'holded_invoice_id', b.holded_invoice_id, 'holded_invoice_number', b.holded_invoice_number
+          ) ORDER BY b.start_date NULLS LAST) FILTER (WHERE b.id IS NOT NULL), '[]') AS bookings
+        FROM fridges f
+        INNER JOIN fridge_bookings b ON b.fridge_id = f.id
+          AND (${y} = 0 OR EXTRACT(YEAR FROM b.start_date) = ${y})
+          AND b.status = ${status}
+        WHERE (${s}::text IS NULL
+          OR f.name ILIKE ${s}
+          OR f.email ILIKE ${s}
+          OR EXISTS (SELECT 1 FROM fridge_bookings bb WHERE bb.fridge_id = f.id AND bb.camping ILIKE ${s}))
+        GROUP BY f.id
+        ORDER BY f.name`
+    : await sql`
+        SELECT f.*,
+          COALESCE(json_agg(json_build_object(
+            'id', b.id, 'camping', b.camping, 'start_date', b.start_date, 'end_date', b.end_date,
+            'spot_number', b.spot_number, 'status', b.status, 'notes', b.notes,
+            'holded_invoice_id', b.holded_invoice_id, 'holded_invoice_number', b.holded_invoice_number
+          ) ORDER BY b.start_date NULLS LAST) FILTER (WHERE b.id IS NOT NULL), '[]') AS bookings
+        FROM fridges f
+        LEFT JOIN fridge_bookings b ON b.fridge_id = f.id
+          AND (${y} = 0 OR EXTRACT(YEAR FROM b.start_date) = ${y})
+        WHERE (${s}::text IS NULL
+          OR f.name ILIKE ${s}
+          OR f.email ILIKE ${s}
+          OR EXISTS (SELECT 1 FROM fridge_bookings bb WHERE bb.fridge_id = f.id AND bb.camping ILIKE ${s}))
+        GROUP BY f.id
+        ORDER BY f.name`;
+
   return { fridges: rows, total: rows.length };
 }
 
@@ -220,6 +201,20 @@ export async function createFridge(data: { name: string; email?: string | null; 
   const res = await sql`INSERT INTO fridges (name, email, extra_email, device_type, notes)
     VALUES (${data.name}, ${data.email || null}, ${data.extra_email || null}, ${data.device_type || 'Grote koelkast'}, ${data.notes || null}) RETURNING *`;
   return res[0];
+}
+
+export async function findFridgeByEmail(email: string) {
+  if (!email) return null;
+  const rows = await sql`SELECT * FROM fridges WHERE LOWER(email) = LOWER(${email}) LIMIT 1`;
+  return rows[0] || null;
+}
+
+export async function getCampingSuggestions(): Promise<string[]> {
+  const rows = await sql`
+    SELECT DISTINCT camping FROM fridge_bookings
+    WHERE camping IS NOT NULL AND camping <> ''
+    ORDER BY camping`;
+  return (rows as { camping: string }[]).map(r => r.camping);
 }
 
 export async function updateFridge(id: number, data: { name?: string; email?: string | null; extra_email?: string | null; device_type?: string; notes?: string | null }) {

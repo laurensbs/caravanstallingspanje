@@ -12,6 +12,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
 
     const booking = await getBookingById(parseInt(bookingId));
     if (!booking) return NextResponse.json({ error: 'Periode niet gevonden' }, { status: 404 });
+    if (booking.holded_invoice_id) {
+      return NextResponse.json(
+        {
+          error: 'Voor deze periode bestaat al een factuur',
+          holdedInvoiceId: booking.holded_invoice_id,
+          holdedInvoiceNumber: booking.holded_invoice_number,
+        },
+        { status: 409 },
+      );
+    }
 
     const fridge = await getFridgeById(booking.fridge_id);
     if (!fridge) return NextResponse.json({ error: 'Klant niet gevonden' }, { status: 404 });
