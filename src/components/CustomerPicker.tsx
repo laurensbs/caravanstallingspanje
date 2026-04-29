@@ -33,13 +33,14 @@ export default function CustomerPicker({ value, onSelect, onClear, onCreateNew, 
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<CustomerLite[]>([]);
   const [holdedResults, setHoldedResults] = useState<HoldedHit[]>([]);
+  const [holdedError, setHoldedError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [adoptingId, setAdoptingId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (query.trim().length < 2) { setResults([]); setHoldedResults([]); return; }
+    if (query.trim().length < 2) { setResults([]); setHoldedResults([]); setHoldedError(null); return; }
     setLoading(true);
     const handle = setTimeout(async () => {
       try {
@@ -47,9 +48,11 @@ export default function CustomerPicker({ value, onSelect, onClear, onCreateNew, 
         const data = await res.json();
         setResults(data.customers || []);
         setHoldedResults(data.holded || []);
+        setHoldedError(data.holdedError || null);
       } catch {
         setResults([]);
         setHoldedResults([]);
+        setHoldedError('Verbinding met server mislukt');
       } finally {
         setLoading(false);
       }
@@ -204,8 +207,14 @@ export default function CustomerPicker({ value, onSelect, onClear, onCreateNew, 
 
             {!loading && !hasResults && query.trim().length >= 2 && (
               <p className="px-3 py-4 text-[13px] text-text-muted">
-                Geen klanten gevonden voor &quot;{query}&quot; — niet lokaal en niet in Holded.
+                Geen klanten gevonden voor &quot;{query}&quot;{holdedError ? ' lokaal' : ' — niet lokaal en niet in Holded'}.
               </p>
+            )}
+            {holdedError && (
+              <div className="px-3 py-2.5 text-[12px] border-t border-border bg-warning-soft text-text">
+                <strong className="block">Holded-zoek mislukt:</strong>
+                <span className="text-text-muted">{holdedError}</span>
+              </div>
             )}
           </div>
           <button

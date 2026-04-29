@@ -133,6 +133,8 @@ export async function pushContactToHolded(input: {
 // Zoek Holded-contacten op vrij-formaat zoekterm (naam/email/telefoon).
 // Holded ondersteunt geen ?q= param, dus we trekken de eerste paar pagina's
 // op en filteren client-side. Voor admin-typeahead is dat ruim genoeg.
+// Errors propagate naar de caller zodat de UI ze kan tonen — fail niet
+// stilletjes weg, want dan denkt admin dat er gewoon geen match is.
 export async function searchContactsInHolded(query: string, max = 10): Promise<HoldedContact[]> {
   const q = query.trim().toLowerCase();
   if (q.length < 2) return [];
@@ -142,20 +144,14 @@ export async function searchContactsInHolded(query: string, max = 10): Promise<H
 
   // Probeer eerst directe email-match (snelst).
   if (q.includes('@')) {
-    try {
-      const direct = await findContactByEmail(query);
-      if (direct) return [direct];
-    } catch { /* fall through */ }
+    const direct = await findContactByEmail(query);
+    if (direct) return [direct];
   }
 
   const out: HoldedContact[] = [];
-  for (let page = 1; page <= 4 && out.length < max; page++) {
-    let batch: HoldedContact[] = [];
-    try {
-      batch = await listContactsPaginated(page, 100);
-    } catch {
-      break;
-    }
+  // Stop zodra we genoeg matches hebben of een lege batch krijgen.
+  for (let page = 1; page <= 5 && out.length < max; page++) {
+    const batch = await listContactsPaginated(page, 100);
     if (!Array.isArray(batch) || batch.length === 0) break;
     for (const c of batch) {
       const name = normalize(c.name);
