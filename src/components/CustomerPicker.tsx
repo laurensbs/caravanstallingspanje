@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Search, Plus, Loader2, UserCheck } from 'lucide-react';
+import { toast } from 'sonner';
+import { Search, Plus, Loader2, UserCheck, Cloud, Link2 } from 'lucide-react';
 import { Badge } from './ui';
 
 export type CustomerLite = {
@@ -10,6 +11,13 @@ export type CustomerLite = {
   email: string | null;
   phone: string | null;
   holded_contact_id: string | null;
+};
+
+type HoldedHit = {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
 };
 
 interface Props {
@@ -24,28 +32,31 @@ interface Props {
 export default function CustomerPicker({ value, onSelect, onClear, onCreateNew, placeholder }: Props) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<CustomerLite[]>([]);
+  const [holdedResults, setHoldedResults] = useState<HoldedHit[]>([]);
   const [loading, setLoading] = useState(false);
+  const [adoptingId, setAdoptingId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (query.trim().length < 2) { setResults([]); return; }
+    if (query.trim().length < 2) { setResults([]); setHoldedResults([]); return; }
     setLoading(true);
     const handle = setTimeout(async () => {
       try {
         const res = await fetch(`/api/admin/customers/search?q=${encodeURIComponent(query)}`, { credentials: 'include' });
         const data = await res.json();
         setResults(data.customers || []);
+        setHoldedResults(data.holded || []);
       } catch {
         setResults([]);
+        setHoldedResults([]);
       } finally {
         setLoading(false);
       }
-    }, 250);
+    }, 280);
     return () => clearTimeout(handle);
   }, [query]);
 
-  // Klik buiten dropdown → sluiten
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
@@ -54,6 +65,31 @@ export default function CustomerPicker({ value, onSelect, onClear, onCreateNew, 
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
+
+  const adopt = async (h: HoldedHit) => {
+    setAdoptingId(h.id);
+    try {
+      const res = await fetch('/api/admin/customers/adopt-holded', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ holdedContactId: h.id }),
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || 'Koppelen mislukt');
+        return;
+      }
+      toast.success(data.alreadyLinked ? 'Klant al gekoppeld' : 'Klant uit Holded gekoppeld');
+      onSelect(data.customer);
+      setOpen(false);
+      setQuery('');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Koppelen mislukt');
+    } finally {
+      setAdoptingId(null);
+    }
+  };
 
   if (value) {
     return (
@@ -81,6 +117,8 @@ export default function CustomerPicker({ value, onSelect, onClear, onCreateNew, 
     );
   }
 
+  const hasResults = results.length > 0 || holdedResults.length > 0;
+
   return (
     <div ref={containerRef} className="relative">
       <div className="relative">
@@ -97,31 +135,79 @@ export default function CustomerPicker({ value, onSelect, onClear, onCreateNew, 
         )}
       </div>
 
-      {open && (query.trim().length >= 2 || results.length > 0) && (
+      {open && (query.trim().length >= 2 || hasResults) && (
         <div className="absolute left-0 right-0 top-full mt-1 z-30 card-surface shadow-lg overflow-hidden">
-          {results.length > 0 ? (
-            <ul className="max-h-72 overflow-y-auto divide-y divide-border">
-              {results.map((c) => (
-                <li key={c.id}>
-                  <button
-                    type="button"
-                    onClick={() => { onSelect(c); setOpen(false); setQuery(''); }}
-                    className="w-full text-left px-3 py-2.5 hover:bg-surface-2 transition-colors flex items-center gap-2.5"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <div className="text-sm font-medium truncate">{c.name}</div>
-                      <div className="text-[12px] text-text-muted truncate">
-                        {[c.email, c.phone].filter(Boolean).join(' · ') || '—'}
-                      </div>
-                    </div>
-                    {c.holded_contact_id && <Badge tone="success">Holded</Badge>}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : !loading ? (
-            <p className="px-3 py-3 text-[13px] text-text-muted">Geen klanten gevonden voor &quot;{query}&quot;.</p>
-          ) : null}
+          <div className="max-h-80 overflow-y-auto">
+            {results.length > 0 && (
+              <>
+                <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-text-muted bg-surface-2/50 border-b border-border">
+                  Onze klanten
+                </div>
+                <ul className="divide-y divide-border">
+                  {results.map((c) => (
+                    <li key={`local-${c.id}`}>
+                      <button
+                        type="button"
+                        onClick={() => { onSelect(c); setOpen(false); setQuery(''); }}
+                        className="w-full text-left px-3 py-2.5 hover:bg-surface-2 transition-colors flex items-center gap-2.5"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="text-sm font-medium truncate">{c.name}</div>
+                          <div className="text-[12px] text-text-muted truncate">
+                            {[c.email, c.phone].filter(Boolean).join(' · ') || '—'}
+                          </div>
+                        </div>
+                        {c.holded_contact_id && <Badge tone="success">Holded</Badge>}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+
+            {holdedResults.length > 0 && (
+              <>
+                <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-text-muted bg-surface-2/50 border-b border-t border-border flex items-center gap-1.5">
+                  <Cloud size={11} /> Uit Holded — nog niet lokaal gekoppeld
+                </div>
+                <ul className="divide-y divide-border">
+                  {holdedResults.map((h) => {
+                    const adopting = adoptingId === h.id;
+                    return (
+                      <li key={`holded-${h.id}`}>
+                        <button
+                          type="button"
+                          disabled={adopting}
+                          onClick={() => adopt(h)}
+                          className="w-full text-left px-3 py-2.5 hover:bg-surface-2 transition-colors flex items-center gap-2.5 disabled:opacity-60"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <div className="text-sm font-medium truncate">{h.name}</div>
+                            <div className="text-[12px] text-text-muted truncate">
+                              {[h.email, h.phone].filter(Boolean).join(' · ') || 'Holded-contact'}
+                            </div>
+                          </div>
+                          {adopting ? (
+                            <Loader2 size={13} className="animate-spin text-text-muted shrink-0" />
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-[11px] text-text-muted shrink-0">
+                              <Link2 size={11} /> Koppel
+                            </span>
+                          )}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            )}
+
+            {!loading && !hasResults && query.trim().length >= 2 && (
+              <p className="px-3 py-4 text-[13px] text-text-muted">
+                Geen klanten gevonden voor &quot;{query}&quot; — niet lokaal en niet in Holded.
+              </p>
+            )}
+          </div>
           <button
             type="button"
             onClick={() => { onCreateNew(query); setOpen(false); }}

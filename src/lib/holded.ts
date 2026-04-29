@@ -130,6 +130,50 @@ export async function pushContactToHolded(input: {
   return data.id;
 }
 
+// Zoek Holded-contacten op vrij-formaat zoekterm (naam/email/telefoon).
+// Holded ondersteunt geen ?q= param, dus we trekken de eerste paar pagina's
+// op en filteren client-side. Voor admin-typeahead is dat ruim genoeg.
+export async function searchContactsInHolded(query: string, max = 10): Promise<HoldedContact[]> {
+  const q = query.trim().toLowerCase();
+  if (q.length < 2) return [];
+  const normalize = (s: string | undefined) => (s || '').toLowerCase();
+  const normalizePhoneStr = (s: string | undefined) => (s || '').replace(/[^\d]/g, '');
+  const phoneQ = normalizePhoneStr(query);
+
+  // Probeer eerst directe email-match (snelst).
+  if (q.includes('@')) {
+    try {
+      const direct = await findContactByEmail(query);
+      if (direct) return [direct];
+    } catch { /* fall through */ }
+  }
+
+  const out: HoldedContact[] = [];
+  for (let page = 1; page <= 4 && out.length < max; page++) {
+    let batch: HoldedContact[] = [];
+    try {
+      batch = await listContactsPaginated(page, 100);
+    } catch {
+      break;
+    }
+    if (!Array.isArray(batch) || batch.length === 0) break;
+    for (const c of batch) {
+      const name = normalize(c.name);
+      const email = normalize(c.email);
+      const phone = normalizePhoneStr(c.phone);
+      const mobile = normalizePhoneStr(c.mobile);
+      const hit =
+        (name && name.includes(q)) ||
+        (email && email.includes(q)) ||
+        (phoneQ.length >= 5 && (phone.includes(phoneQ) || mobile.includes(phoneQ)));
+      if (hit) out.push(c);
+      if (out.length >= max) break;
+    }
+    if (batch.length < 100) break;
+  }
+  return out;
+}
+
 export async function findContactByEmail(email: string): Promise<HoldedContact | null> {
   if (!email) return null;
   const data = await holdedFetch<HoldedContact[]>(`/invoicing/v1/contacts?email=${encodeURIComponent(email)}`);
