@@ -840,6 +840,18 @@ async function ensureMiscSchema(): Promise<void> {
     await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS transport_mode TEXT`;
     await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS customer_notified_at TIMESTAMP`;
     await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS notified_status TEXT`;
+    // Holded-factuurstatus cache: paid / partial / unpaid / unknown.
+    // Periodiek bijgewerkt door /api/cron/holded-sync zodat admin niet
+    // zelf in Holded hoeft te kijken om te zien wie betaald heeft.
+    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_status TEXT`;
+    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_synced_at TIMESTAMP`;
+    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_url TEXT`;
+    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS holded_invoice_status TEXT`;
+    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS holded_invoice_synced_at TIMESTAMP`;
+    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS holded_invoice_url TEXT`;
+    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_status TEXT`;
+    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_synced_at TIMESTAMP`;
+    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_url TEXT`;
     await sql`CREATE TABLE IF NOT EXISTS contact_messages (
       id SERIAL PRIMARY KEY,
       name TEXT NOT NULL,
@@ -1297,6 +1309,90 @@ export async function markContactMessageOpen(id: number) {
 export async function deleteContactMessage(id: number) {
   await ensureMiscSchema();
   await sql`DELETE FROM contact_messages WHERE id = ${id}`;
+}
+
+// ─── Holded invoice-status sync ─────────────────────────
+// Lijst alle bookings/requests met een Holded-factuur-id zodat de cron
+// elke status kan ophalen en cachen.
+export async function getInvoicedBookingsForSync() {
+  await ensureMiscSchema();
+  return sql`SELECT id, holded_invoice_id FROM fridge_bookings
+    WHERE holded_invoice_id IS NOT NULL
+      AND (holded_invoice_synced_at IS NULL
+        OR holded_invoice_synced_at < NOW() - INTERVAL '50 minutes'
+        OR holded_invoice_status IS NULL
+        OR holded_invoice_status <> 'paid')
+    ORDER BY holded_invoice_synced_at NULLS FIRST LIMIT 200`;
+}
+
+export async function getInvoicedStallingForSync() {
+  await ensureMiscSchema();
+  return sql`SELECT id, holded_invoice_id FROM stalling_requests
+    WHERE holded_invoice_id IS NOT NULL
+      AND (holded_invoice_synced_at IS NULL
+        OR holded_invoice_synced_at < NOW() - INTERVAL '50 minutes'
+        OR holded_invoice_status IS NULL
+        OR holded_invoice_status <> 'paid')
+    ORDER BY holded_invoice_synced_at NULLS FIRST LIMIT 200`;
+}
+
+export async function getInvoicedTransportForSync() {
+  await ensureMiscSchema();
+  return sql`SELECT id, holded_invoice_id FROM transport_requests
+    WHERE holded_invoice_id IS NOT NULL
+      AND (holded_invoice_synced_at IS NULL
+        OR holded_invoice_synced_at < NOW() - INTERVAL '50 minutes'
+        OR holded_invoice_status IS NULL
+        OR holded_invoice_status <> 'paid')
+    ORDER BY holded_invoice_synced_at NULLS FIRST LIMIT 200`;
+}
+
+export async function setBookingInvoiceStatus(id: number, status: string, url: string | null) {
+  await ensureMiscSchema();
+  await sql`UPDATE fridge_bookings
+    SET holded_invoice_status = ${status},
+      holded_invoice_url = ${url},
+      holded_invoice_synced_at = NOW(),
+      updated_at = NOW()
+    WHERE id = ${id}`;
+}
+
+export async function setStallingInvoiceStatus(id: number, status: string, url: string | null) {
+  await ensureMiscSchema();
+  await sql`UPDATE stalling_requests
+    SET holded_invoice_status = ${status},
+      holded_invoice_url = ${url},
+      holded_invoice_synced_at = NOW(),
+      updated_at = NOW()
+    WHERE id = ${id}`;
+}
+
+export async function setTransportInvoiceStatus(id: number, status: string, url: string | null) {
+  await ensureMiscSchema();
+  await sql`UPDATE transport_requests
+    SET holded_invoice_status = ${status},
+      holded_invoice_url = ${url},
+      holded_invoice_synced_at = NOW(),
+      updated_at = NOW()
+    WHERE id = ${id}`;
+}
+
+// Voor het admin-dashboard: hoeveel bookings staan er nog open in Holded?
+export async function getHoldedInvoiceSummary() {
+  await ensureMiscSchema();
+  const rows = await sql`
+    SELECT 'koelkast' AS kind, holded_invoice_status AS status, COUNT(*) AS count
+      FROM fridge_bookings WHERE holded_invoice_id IS NOT NULL
+      GROUP BY status
+    UNION ALL
+    SELECT 'stalling' AS kind, holded_invoice_status AS status, COUNT(*) AS count
+      FROM stalling_requests WHERE holded_invoice_id IS NOT NULL
+      GROUP BY status
+    UNION ALL
+    SELECT 'transport' AS kind, holded_invoice_status AS status, COUNT(*) AS count
+      FROM transport_requests WHERE holded_invoice_id IS NOT NULL
+      GROUP BY status`;
+  return rows as unknown as Array<{ kind: string; status: string | null; count: string | number }>;
 }
 
 // ─── Stalling notify-tracking ────────────────────────────

@@ -264,7 +264,7 @@ function KoelkastenContent() {
     setBookingDialog({ open: true, mode: 'edit', bookingId: b.id });
   };
 
-  const saveBooking = async (e: React.FormEvent) => {
+  const saveBooking = async (e: React.FormEvent, force = false) => {
     e.preventDefault();
     if (!drawerFridge) return;
     setSavingBooking(true);
@@ -276,9 +276,31 @@ function KoelkastenContent() {
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bookingForm),
+        body: JSON.stringify({ ...bookingForm, force }),
         credentials: 'include',
       });
+      if (res.status === 409) {
+        const d = await res.json().catch(() => ({}));
+        if (d.soldOut && confirm(`${d.error}\n\nToch toevoegen (force)?`)) {
+          // Recurse met force=true. Vermijd recursie-loop: nu accepteert backend.
+          const forceRes = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...bookingForm, force: true }),
+            credentials: 'include',
+          });
+          if (!forceRes.ok) {
+            const fd = await forceRes.json().catch(() => ({}));
+            toast.error(fd.error || 'Opslaan mislukt');
+            return;
+          }
+          toast.success('Periode toegevoegd (force)');
+          setBookingDialog({ open: false, mode: 'create' });
+          await refresh();
+          return;
+        }
+        return;
+      }
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
         toast.error(d.error || 'Opslaan mislukt');

@@ -6,9 +6,10 @@ import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Refrigerator, Bell, Truck, LogOut, ChevronLeft,
-  Settings, Users, Warehouse, MessageSquare,
+  Settings, Users, Warehouse, MessageSquare, Search,
 } from 'lucide-react';
 import { ReactNode } from 'react';
+import CommandPalette from './CommandPalette';
 
 type NavGroup = {
   label: string;
@@ -92,6 +93,20 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
           </Link>
         </div>
 
+        <button
+          type="button"
+          onClick={() => {
+            // Trigger Cmd+K palette via een synthetisch keyboard event
+            window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
+          }}
+          className="mx-3 mt-3 flex items-center gap-2.5 px-3 h-9 rounded-[var(--radius-md)] text-[13px] transition-colors group"
+          style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)' }}
+        >
+          <Search size={14} />
+          <span className="flex-1 text-left">Snel zoeken…</span>
+          <kbd className="text-[10px] tabular-nums px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.55)' }}>⌘K</kbd>
+        </button>
+
         <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto">
           {NAV_GROUPS.map((group) => (
             <div key={group.label}>
@@ -169,6 +184,7 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
           </AnimatePresence>
         </main>
       </div>
+      <CommandPalette />
     </div>
   );
 }
