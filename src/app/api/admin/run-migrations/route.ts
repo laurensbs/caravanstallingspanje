@@ -37,6 +37,20 @@ export async function GET() {
       updated_at TIMESTAMP DEFAULT NOW()
     )`;
   });
+  // Volledige kolom-lijst voor de customers-tabel. Idempotent — als er
+  // ooit een halve / lege variant is aangemaakt vullen we 'm hiermee bij.
+  await ran('customers.name', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS name TEXT NOT NULL DEFAULT ''`);
+  await ran('customers.email', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS email TEXT`);
+  await ran('customers.phone', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS phone TEXT`);
+  await ran('customers.mobile', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS mobile TEXT`);
+  await ran('customers.address', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS address TEXT`);
+  await ran('customers.city', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS city TEXT`);
+  await ran('customers.postal_code', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS postal_code TEXT`);
+  await ran('customers.country', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS country TEXT DEFAULT 'ES'`);
+  await ran('customers.vat_number', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS vat_number TEXT`);
+  await ran('customers.notes', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS notes TEXT`);
+  await ran('customers.created_at', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT NOW()`);
+  await ran('customers.updated_at', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW()`);
   await ran('customers.holded_contact_id', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_contact_id TEXT`);
   await ran('customers.holded_sync_failed', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_sync_failed BOOLEAN DEFAULT false`);
   await ran('customers.deleted_at', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP`);
