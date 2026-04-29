@@ -74,8 +74,13 @@ export async function initDatabase() {
     payload JSONB NOT NULL,
     forwarded_at TIMESTAMP,
     forward_repair_job_id TEXT,
+    abandoned_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT NOW()
   )`;
+  await sql`ALTER TABLE pending_intakes ADD COLUMN IF NOT EXISTS abandoned_at TIMESTAMP`;
+  // Allow rows to exist before we have a Stripe session id (we insert first,
+  // then create the Stripe session, then attach the id). Drop the NOT NULL.
+  await sql`ALTER TABLE pending_intakes ALTER COLUMN stripe_session_id DROP NOT NULL`.catch(() => {});
   await sql`CREATE INDEX IF NOT EXISTS idx_pending_intakes_session ON pending_intakes(stripe_session_id)`;
 
   // services_catalog tabel is verwijderd — services worden nu beheerd in
@@ -497,6 +502,51 @@ export async function createPendingIntake(stripe_session_id: string, payload: un
   const json = JSON.stringify(payload);
   await sql`INSERT INTO pending_intakes (stripe_session_id, payload)
     VALUES (${stripe_session_id}, ${json}::jsonb)`;
+}
+
+// Insert eerst zonder session-id zodat we het ID terug krijgen voor de
+// klant-zichtbare ref. Daarna attachen we de Stripe-session.
+export async function createPendingIntakeReturningId(payload: unknown): Promise<number> {
+  const json = JSON.stringify(payload);
+  const rows = await sql`INSERT INTO pending_intakes (payload, stripe_session_id)
+    VALUES (${json}::jsonb, NULL)
+    RETURNING id`;
+  return Number((rows as { id: number }[])[0].id);
+}
+
+export async function attachStripeSessionToPendingIntake(id: number, stripe_session_id: string) {
+  await sql`UPDATE pending_intakes SET stripe_session_id = ${stripe_session_id} WHERE id = ${id}`;
+}
+
+export async function abandonPendingIntake(id: number, reason?: string) {
+  await sql`UPDATE pending_intakes
+    SET abandoned_at = NOW(),
+      payload = jsonb_set(payload, '{_abandonReason}', to_jsonb(${reason || 'unknown'}::text))
+    WHERE id = ${id}`;
+}
+
+export async function getPendingIntakeById(id: number) {
+  const rows = await sql`SELECT * FROM pending_intakes WHERE id = ${id} LIMIT 1`;
+  return (rows[0] as unknown as {
+    id: number;
+    stripe_session_id: string | null;
+    payload: unknown;
+    forwarded_at: string | null;
+    forward_repair_job_id: string | null;
+    abandoned_at: string | null;
+    created_at: string;
+  }) || null;
+}
+
+// Markeer intakes ouder dan {hours} en zonder forward of abandon als verlaten.
+// Lazy cleanup — aangeroepen vanuit de webhook handler zodat we geen cron
+// nodig hebben.
+export async function cleanupOldPendingIntakes(hours = 24) {
+  await sql`UPDATE pending_intakes
+    SET abandoned_at = NOW()
+    WHERE forwarded_at IS NULL
+      AND abandoned_at IS NULL
+      AND created_at < NOW() - (${hours}::int * INTERVAL '1 hour')`;
 }
 
 export async function getPendingIntakeBySession(stripe_session_id: string) {

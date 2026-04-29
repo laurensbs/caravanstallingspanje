@@ -396,6 +396,9 @@ function RedirectOverlay() {
 }
 
 // Helper hook combining state + submit logic so each page stays small.
+// Voor gratis flows (transport/repair/inspection) redirecten we direct naar
+// /diensten/bedankt?ref=… zodat de klant een uniforme rijke ontvangstpagina
+// te zien krijgt — geen inline done-state meer.
 export function useServiceSubmit<T>(endpoint: string) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -416,9 +419,13 @@ export function useServiceSubmit<T>(endpoint: string) {
         setError(data.error || 'Er ging iets mis');
         return;
       }
-      // Direct doorsturen naar Stripe Checkout indien aangeleverd.
       if (data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
+        return;
+      }
+      const ref = data.ref || data.publicCode;
+      if (ref) {
+        window.location.href = `/diensten/bedankt?ref=${encodeURIComponent(ref)}`;
         return;
       }
       setPublicCode(data.publicCode || null);

@@ -3,6 +3,7 @@ import { sendIntake } from '@/lib/work-order-hub';
 import { validateBody, inspectionOrderSchema } from '@/lib/validations';
 import { logActivity } from '@/lib/db';
 import { sendMail, requestReceivedHtml } from '@/lib/email';
+import { formatRef } from '@/lib/refs';
 
 export async function POST(req: NextRequest) {
   try {
@@ -44,7 +45,8 @@ export async function POST(req: NextRequest) {
     await sendMail({ to: d.email, subject: mail.subject, html: mail.html, text: mail.text })
       .catch((e) => console.error('inspection mail failed:', e));
 
-    return NextResponse.json({ success: true, publicCode: result.publicCode });
+    const ref = formatRef('inspectie', result.publicCode);
+    return NextResponse.json({ success: true, ref, publicCode: result.publicCode });
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Aanvraag mislukt';
     console.error('inspection order error:', msg);

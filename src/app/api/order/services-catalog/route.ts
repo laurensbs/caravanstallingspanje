@@ -35,14 +35,24 @@ function slugify(s: string): string {
 
 const HUB = (process.env.HUB_INBOX_URL || 'https://caravanreparatiespanje.vercel.app').replace(/\/$/, '');
 
+// Statische fallback voor als reparatiepaneel onbereikbaar is. Klant kan
+// in dat geval nog steeds een service kiezen + betalen; intake komt later
+// alsnog door zodra reparatiepaneel weer bereikbaar is (of we leveren het
+// handmatig na). Bedragen zijn incl. 21% btw.
+const FALLBACK_SERVICES = [
+  { slug: 'wax-behandeling',     upstreamId: 'fallback-wax',     name: 'Wax-behandeling',     description: 'Beschermlaag voor de carrosserie',     category: 'onderhoud', price_eur: 95 },
+  { slug: 'grote-schoonmaak',    upstreamId: 'fallback-clean',   name: 'Grote schoonmaak',    description: 'Volledige interieur + exterieur',      category: 'onderhoud', price_eur: 125 },
+  { slug: 'ozon-behandeling',    upstreamId: 'fallback-ozon',    name: 'Ozon-behandeling',    description: 'Geur- en bacterieneutralisatie',       category: 'onderhoud', price_eur: 85 },
+  { slug: 'banden-controle',     upstreamId: 'fallback-banden',  name: 'Banden-controle',     description: 'Spanning, profiel, leeftijd',          category: 'inspectie', price_eur: 35 },
+];
+
 export async function GET() {
   try {
     const res = await fetch(`${HUB}/api/services-public`, {
-      // Light cache so we don't hit the workshop on every page-load.
       next: { revalidate: 60 },
     });
     if (!res.ok) {
-      return NextResponse.json({ services: [] });
+      return NextResponse.json({ services: FALLBACK_SERVICES, stale: true });
     }
     const data = await res.json();
     type Raw = {
@@ -56,19 +66,20 @@ export async function GET() {
     const list = (data.services as Raw[] | undefined)?.map((s) => {
       const incl = s.priceExclVat * (1 + (s.taxPercent ?? 21) / 100);
       return {
-        // Reuse the upstream id as our slug — stable across requests.
         slug: slugify(s.name) || s.id,
         upstreamId: s.id,
         name: s.name,
         description: s.description,
         category: s.category,
-        // Frontend uses this; cleaned up to a nice round amount.
         price_eur: nicePrice(incl),
       };
     }) || [];
+    if (list.length === 0) {
+      return NextResponse.json({ services: FALLBACK_SERVICES, stale: true });
+    }
     return NextResponse.json({ services: list });
   } catch (error) {
     console.error('Public services catalog error:', error);
-    return NextResponse.json({ services: [] });
+    return NextResponse.json({ services: FALLBACK_SERVICES, stale: true });
   }
 }

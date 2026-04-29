@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createTransportRequest, logActivity } from '@/lib/db';
 import { validateBody, transportOrderSchema } from '@/lib/validations';
 import { sendMail, requestReceivedHtml } from '@/lib/email';
+import { formatRef } from '@/lib/refs';
 
 // Transport = aanvraag-only. Geen Stripe. Hoort bij de stalling, klant betaalt
 // later (bv. samen met de stallingsfactuur). Klant geeft één camping op +
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
       details: `Heen ${heen} · Terug ${terug}`,
     });
 
-    const reference = `TR-${entry.id}`;
+    const reference = formatRef('transport', entry.id);
     const mail = requestReceivedHtml({
       name: d.name,
       type: 'service',

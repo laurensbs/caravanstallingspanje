@@ -2,8 +2,7 @@
 
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import SuccessScreen from '@/components/SuccessScreen';
-import { useLocale } from '@/components/LocaleProvider';
+import OrderReceipt from '@/components/OrderReceipt';
 
 export default function ThankYouPage() {
   return (
@@ -14,16 +13,7 @@ export default function ThankYouPage() {
 }
 
 function ThankYouContent() {
-  const { t } = useLocale();
   const params = useSearchParams();
-  const sessionId = params.get('session_id');
-  const reference = sessionId ? `${sessionId.slice(0, 16)}…` : null;
-
-  return (
-    <SuccessScreen
-      title={t('thanks.payment-title')}
-      body={t('thanks.payment-fridge')}
-      reference={reference}
-    />
-  );
+  const ref = params.get('ref');
+  return <OrderReceipt refCode={ref} />;
 }

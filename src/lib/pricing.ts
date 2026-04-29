@@ -14,6 +14,18 @@ export type DeviceType = keyof typeof PRICES;
 
 export const MIN_DAYS = 7;
 
+// TEST_MODE laat de hele flow voor €0.50 (Stripe minimum) doorlopen zodat
+// admins end-to-end kunnen testen zonder echte bedragen. Activeren via
+// NEXT_PUBLIC_TEST_MODE=true op de preview-environment of in .env.local.
+// Het oorspronkelijke bedrag bewaren we nog steeds in de DB en in Stripe
+// metadata zodat Holded-facturen later niet vervuild raken.
+export const TEST_MODE = process.env.NEXT_PUBLIC_TEST_MODE === 'true';
+export const TEST_AMOUNT_EUR = 0.5;
+
+export function effectiveAmountEur(originalEur: number): number {
+  return TEST_MODE ? TEST_AMOUNT_EUR : originalEur;
+}
+
 /**
  * Calculate the rental price.
  *

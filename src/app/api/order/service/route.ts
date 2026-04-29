@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { logActivity, createPendingIntake } from '@/lib/db';
+import {
+  logActivity,
+  createPendingIntakeReturningId,
+  attachStripeSessionToPendingIntake,
+  abandonPendingIntake,
+} from '@/lib/db';
 import { validateBody, serviceOrderSchema } from '@/lib/validations';
 import { createCheckoutSession } from '@/lib/stripe';
+import { effectiveAmountEur } from '@/lib/pricing';
+import { formatRef } from '@/lib/refs';
 import type { IntakePayload } from '@/lib/work-order-hub';
 
 // Service flow: read catalog from reparatiepaneel → verify slug + price
@@ -56,32 +63,47 @@ export async function POST(req: NextRequest) {
       serviceCategory: service.name,
     };
 
+    // Intake eerst opslaan zodat we een ID hebben voor de ref-code en zodat
+    // de payload niet verloren gaat als Stripe na ons faalt.
+    const intakeId = await createPendingIntakeReturningId(intakePayload);
+    const ref = formatRef('service', intakeId);
+
     const origin = req.nextUrl.origin;
-    const session = await createCheckoutSession({
-      description: service.name,
-      amountEur: priceEur,
-      successUrl: `${origin}/diensten/bedankt?session_id={CHECKOUT_SESSION_ID}`,
-      cancelUrl: `${origin}/diensten/service?cancelled=1`,
-      customerEmail: d.email,
-      metadata: {
-        kind: 'service_intake',
-        serviceSlug: service.slug,
-      },
-    });
+    let session;
+    try {
+      session = await createCheckoutSession({
+        description: service.name,
+        amountEur: effectiveAmountEur(priceEur),
+        successUrl: `${origin}/diensten/bedankt?ref=${ref}&session_id={CHECKOUT_SESSION_ID}`,
+        cancelUrl: `${origin}/diensten/service?cancelled=1`,
+        customerEmail: d.email,
+        metadata: {
+          kind: 'service_intake',
+          refId: String(intakeId),
+          ref,
+          originalAmountCents: String(Math.round(priceEur * 100)),
+          serviceSlug: service.slug,
+        },
+      });
+    } catch (err) {
+      await abandonPendingIntake(intakeId, err instanceof Error ? err.message : 'stripe failed');
+      throw err;
+    }
     if (!session.url) {
+      await abandonPendingIntake(intakeId, 'no checkout url');
       return NextResponse.json({ error: 'Checkout-URL ontbreekt' }, { status: 502 });
     }
 
-    await createPendingIntake(session.id, intakePayload);
+    await attachStripeSessionToPendingIntake(intakeId, session.id);
 
     await logActivity({
       action: 'Service-aanvraag (wacht op betaling)',
       entityType: 'pending_intake',
-      entityId: session.id,
+      entityId: String(intakeId),
       entityLabel: `${d.name} — ${service.name}`,
     });
 
-    return NextResponse.json({ success: true, checkoutUrl: session.url });
+    return NextResponse.json({ success: true, ref, checkoutUrl: session.url });
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Aanvraag mislukt';
     console.error('service order error:', msg);

@@ -14,10 +14,13 @@ import {
   setBookingHoldedInvoice,
   setStallingHoldedInvoice,
   logActivity,
+  cleanupOldPendingIntakes,
 } from '@/lib/db';
 import { sendIntake, type IntakePayload } from '@/lib/work-order-hub';
 import { invoiceForCustomer } from '@/lib/holded';
 import { sendMail, paymentReceivedHtml } from '@/lib/email';
+import { TEST_MODE } from '@/lib/pricing';
+import { formatRef, refKindForFridge } from '@/lib/refs';
 
 // Stripe signature verification needs the raw request body, not the
 // JSON-parsed version, so we run on the Node.js runtime and pass req.text().
@@ -92,7 +95,15 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
   const md = session.metadata || {};
   const kind = md.kind || 'unknown';
   const refId = md.refId || null;
+  const metaRef = typeof md.ref === 'string' ? md.ref : null;
+  const originalAmountCents = md.originalAmountCents ? Number(md.originalAmountCents) : null;
+  const originalAmountEur = originalAmountCents !== null && Number.isFinite(originalAmountCents)
+    ? originalAmountCents / 100 : null;
   const intentId = typeof session.payment_intent === 'string' ? session.payment_intent : null;
+
+  // Lazy cleanup: markeer pending_intakes ouder dan 24u als verlaten zodat
+  // de tabel netjes blijft. Best-effort.
+  await cleanupOldPendingIntakes(24).catch(() => {});
 
   await upsertPayment({
     stripe_session_id: session.id,
@@ -113,7 +124,10 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
   let customerEmail = session.customer_details?.email || session.customer_email || '';
   let customerPhone = session.customer_details?.phone || '';
   let invoiceDescription = (typeof md.description === 'string' ? md.description : '') || kind;
-  const amountEur = (session.amount_total ?? 0) / 100;
+  const paidAmountEur = (session.amount_total ?? 0) / 100;
+  // Voor Holded gebruiken we altijd het oorspronkelijke bedrag (echte prijs),
+  // niet de €0.50 test-betaling. Voor klant-mail/receipt is dat ook netter.
+  const amountEur = originalAmountEur ?? paidAmountEur;
 
   if (kind === 'fridge_booking' && refId) {
     const id = Number(refId);
@@ -129,7 +143,9 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
       }
       // Holded factuur (idempotent: bestaande invoice respecteren).
       const booking = fridge?.bookings?.find((b: { id: number }) => b.id === id);
-      if (customerEmail && !booking?.holded_invoice_id) {
+      if (TEST_MODE) {
+        await logActivity({ action: 'Holded overgeslagen (testmodus)', entityType: kind, entityId: refId });
+      } else if (customerEmail && !booking?.holded_invoice_id) {
         try {
           const inv = await invoiceForCustomer({
             customer: { name: customerName || customerEmail, email: customerEmail, phone: customerPhone || null },
@@ -152,7 +168,9 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
         customerEmail = customerEmail || r.email;
         customerPhone = customerPhone || r.phone || '';
         invoiceDescription = invoiceDescription || `Stalling ${r.type} — jaarprijs`;
-        if (customerEmail && !r.holded_invoice_id) {
+        if (TEST_MODE) {
+          await logActivity({ action: 'Holded overgeslagen (testmodus)', entityType: kind, entityId: refId });
+        } else if (customerEmail && !r.holded_invoice_id) {
           try {
             const inv = await invoiceForCustomer({
               customer: { name: customerName, email: customerEmail, phone: customerPhone || null },
@@ -192,7 +210,9 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
       }
     }
     // Holded-factuur voor service.
-    if (customerEmail) {
+    if (TEST_MODE) {
+      await logActivity({ action: 'Holded overgeslagen (testmodus)', entityType: kind, entityId: session.id });
+    } else if (customerEmail) {
       try {
         await invoiceForCustomer({
           customer: { name: customerName || customerEmail, email: customerEmail, phone: customerPhone || null },
@@ -213,9 +233,21 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
     details: `${amountEur.toFixed(2)} ${session.currency?.toUpperCase() || 'EUR'}`,
   });
 
-  // Bevestigingsmail naar klant.
+  // Bevestigingsmail naar klant. Reference: metadata.ref van de order route
+  // is leidend (KK-12, ST-3, SR-7); fallback voor oude sessions zonder ref.
   if (customerEmail) {
-    const reference = refId ? `${kind}-${refId}` : session.id.slice(0, 16);
+    let reference = metaRef;
+    if (!reference && refId) {
+      if (kind === 'fridge_booking') {
+        reference = formatRef(refKindForFridge(invoiceDescription.startsWith('Airco') ? 'Airco' : ''), refId);
+      } else if (kind === 'stalling_request') {
+        reference = formatRef('stalling', refId);
+      } else if (kind === 'service_intake') {
+        reference = formatRef('service', refId);
+      }
+    }
+    if (!reference) reference = session.id.slice(0, 16);
+
     const mail = paymentReceivedHtml({
       name: customerName || customerEmail,
       service: invoiceDescription,

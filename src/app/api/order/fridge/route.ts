@@ -7,8 +7,9 @@ import {
   countOverlappingBookings,
 } from '@/lib/db';
 import { validateBody, fridgeOrderSchema } from '@/lib/validations';
-import { calculatePrice, formatEur, STOCK, type DeviceType } from '@/lib/pricing';
+import { calculatePrice, formatEur, STOCK, effectiveAmountEur, type DeviceType } from '@/lib/pricing';
 import { createCheckoutSession } from '@/lib/stripe';
+import { formatRef, refKindForFridge } from '@/lib/refs';
 
 export async function POST(req: NextRequest) {
   try {
@@ -69,17 +70,20 @@ export async function POST(req: NextRequest) {
     // webhook flips it to 'compleet' on payment.
     const origin = req.nextUrl.origin;
     const description = `${data.device_type} — ${data.camping} — ${data.start_date} t/m ${data.end_date}`;
+    const ref = formatRef(refKindForFridge(data.device_type), booking.id);
     let checkoutUrl: string | null = null;
     try {
       const session = await createCheckoutSession({
         description,
-        amountEur: price.total,
-        successUrl: `${origin}/koelkast/bedankt?session_id={CHECKOUT_SESSION_ID}`,
+        amountEur: effectiveAmountEur(price.total),
+        successUrl: `${origin}/koelkast/bedankt?ref=${ref}&session_id={CHECKOUT_SESSION_ID}`,
         cancelUrl: `${origin}/koelkast?cancelled=1`,
         customerEmail: data.email,
         metadata: {
           kind: 'fridge_booking',
           refId: String(booking.id),
+          ref,
+          originalAmountCents: String(Math.round(price.total * 100)),
           description,
         },
       });
@@ -87,15 +91,13 @@ export async function POST(req: NextRequest) {
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Checkout-fout';
       console.error('Stripe checkout error:', msg);
-      // Booking blijft staan op 'controleren'; we geven success terug zonder
-      // checkout-URL zodat de klant via de "bedankt"-pagina te zien krijgt
-      // dat we hen handmatig benaderen.
     }
 
     return NextResponse.json({
       success: true,
       total: price.total,
       days: price.days,
+      ref,
       checkoutUrl,
     });
   } catch (error) {

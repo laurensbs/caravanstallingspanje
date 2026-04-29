@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createStallingRequest, getSettings, logActivity } from '@/lib/db';
 import { validateBody, stallingOrderSchema } from '@/lib/validations';
 import { createCheckoutSession } from '@/lib/stripe';
+import { effectiveAmountEur } from '@/lib/pricing';
+import { formatRef } from '@/lib/refs';
 
 // Stalling = lokaal, klant betaalt het hele jaar vooruit. Bedrag komt uit
 // app_settings (admin-instelbaar). Aanvraag staat op 'controleren' tot
@@ -43,15 +45,18 @@ export async function POST(req: NextRequest) {
 
     const origin = req.nextUrl.origin;
     const description = `Stalling ${d.type} — startdatum ${d.start_date}`;
+    const ref = formatRef('stalling', entry.id);
     const session = await createCheckoutSession({
       description,
-      amountEur: priceEur,
-      successUrl: `${origin}/diensten/bedankt?session_id={CHECKOUT_SESSION_ID}`,
+      amountEur: effectiveAmountEur(priceEur),
+      successUrl: `${origin}/diensten/bedankt?ref=${ref}&session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl: `${origin}/diensten/stalling?cancelled=1`,
       customerEmail: d.email,
       metadata: {
         kind: 'stalling_request',
         refId: String(entry.id),
+        ref,
+        originalAmountCents: String(Math.round(priceEur * 100)),
         description,
       },
     });
@@ -63,7 +68,7 @@ export async function POST(req: NextRequest) {
       entityLabel: `${d.name} — ${d.type}`,
     });
 
-    return NextResponse.json({ success: true, checkoutUrl: session.url });
+    return NextResponse.json({ success: true, ref, checkoutUrl: session.url });
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Aanvraag mislukt';
     console.error('stalling order error:', msg);
