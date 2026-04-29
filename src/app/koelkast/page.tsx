@@ -1,10 +1,10 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Loader2, AlertTriangle } from 'lucide-react';
 import AnimatedServiceIcon from '@/components/AnimatedServiceIcon';
-import { calculatePrice, PRICES, MIN_DAYS, type DeviceType } from '@/lib/pricing';
+import { calculatePriceWith, PRICES, MIN_DAYS, type DeviceType } from '@/lib/pricing';
 import {
   ContactFields, MultiStepShell, Section, Field, fieldCls, emptyContact,
   type ContactState,
@@ -63,16 +63,34 @@ export default function KoelkastBestelPagina() {
   const [done, setDone] = useState<{ total: number; days: number } | null>(null);
   const [soldOut, setSoldOut] = useState(false);
   const [waitlistDone, setWaitlistDone] = useState(false);
+  // Live prijzen uit /api/order/prices, met hardcoded fallback zodat de
+  // pagina meteen iets toont (en zonder hick-up als API onbereikbaar).
+  const [livePrices, setLivePrices] = useState<Record<DeviceType, number>>({ ...PRICES });
+
+  useEffect(() => {
+    fetch('/api/order/prices')
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => {
+        if (d?.fridge) {
+          setLivePrices({
+            'Grote koelkast': Number(d.fridge['Grote koelkast'] ?? PRICES['Grote koelkast']),
+            'Tafelmodel koelkast': Number(d.fridge['Tafelmodel koelkast'] ?? PRICES['Tafelmodel koelkast']),
+            'Airco': Number(d.fridge['Airco'] ?? PRICES['Airco']),
+          });
+        }
+      })
+      .catch(() => { /* fallback blijft */ });
+  }, []);
 
   const price = useMemo(() => {
     if (!form.start_date || !form.end_date) return null;
     if (new Date(form.end_date) <= new Date(form.start_date)) return null;
     try {
-      return calculatePrice(form.device_type, form.start_date, form.end_date);
+      return calculatePriceWith(livePrices[form.device_type], form.start_date, form.end_date);
     } catch {
       return null;
     }
-  }, [form.device_type, form.start_date, form.end_date]);
+  }, [form.device_type, form.start_date, form.end_date, livePrices]);
 
   const step1Valid = !!(form.start_date && form.end_date && form.camping && price);
 
@@ -248,7 +266,8 @@ export default function KoelkastBestelPagina() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {(Object.keys(PRICES) as DeviceType[]).filter(t => t !== 'Airco').map(type => {
             const selected = form.device_type === type;
-            const dayPrice = Math.ceil((PRICES[type] / 7) * 100) / 100;
+            const weekPrice = livePrices[type];
+            const dayPrice = Math.ceil((weekPrice / 7) * 100) / 100;
             return (
               <motion.button
                 key={type}
@@ -274,7 +293,7 @@ export default function KoelkastBestelPagina() {
                   </div>
                 </div>
                 <div className="text-[26px] font-semibold tabular-nums mt-1">
-                  {formatEur(PRICES[type])}
+                  {formatEur(weekPrice)}
                   <span className="text-[14px] font-normal text-text-muted"> {t('fridge.per-week')}</span>
                 </div>
                 <div className="text-[13px] text-text-muted mt-1">

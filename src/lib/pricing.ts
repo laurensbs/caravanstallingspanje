@@ -29,25 +29,35 @@ export const STOCK_SETTING_KEYS = {
 } as const;
 
 export async function getEffectivePrices(): Promise<Record<DeviceType, number>> {
-  const { getSettings } = await import('./db');
-  const keys = Object.values(PRICE_SETTING_KEYS);
-  const map = await getSettings(keys);
-  return {
-    'Grote koelkast': Number(map[PRICE_SETTING_KEYS['Grote koelkast']] ?? PRICES['Grote koelkast']),
-    'Tafelmodel koelkast': Number(map[PRICE_SETTING_KEYS['Tafelmodel koelkast']] ?? PRICES['Tafelmodel koelkast']),
-    'Airco': Number(map[PRICE_SETTING_KEYS['Airco']] ?? PRICES['Airco']),
-  };
+  try {
+    const { getSettings } = await import('./db');
+    const keys = Object.values(PRICE_SETTING_KEYS);
+    const map = await getSettings(keys);
+    return {
+      'Grote koelkast': Number(map[PRICE_SETTING_KEYS['Grote koelkast']] ?? PRICES['Grote koelkast']),
+      'Tafelmodel koelkast': Number(map[PRICE_SETTING_KEYS['Tafelmodel koelkast']] ?? PRICES['Tafelmodel koelkast']),
+      'Airco': Number(map[PRICE_SETTING_KEYS['Airco']] ?? PRICES['Airco']),
+    };
+  } catch (err) {
+    console.error('[pricing] getEffectivePrices fallback to hardcoded:', err);
+    return { ...PRICES };
+  }
 }
 
 export async function getEffectiveStock(): Promise<Record<DeviceType, number>> {
-  const { getSettings } = await import('./db');
-  const keys = Object.values(STOCK_SETTING_KEYS);
-  const map = await getSettings(keys);
-  return {
-    'Grote koelkast': Number(map[STOCK_SETTING_KEYS['Grote koelkast']] ?? STOCK['Grote koelkast']),
-    'Tafelmodel koelkast': Number(map[STOCK_SETTING_KEYS['Tafelmodel koelkast']] ?? STOCK['Tafelmodel koelkast']),
-    'Airco': Number(map[STOCK_SETTING_KEYS['Airco']] ?? STOCK['Airco']),
-  };
+  try {
+    const { getSettings } = await import('./db');
+    const keys = Object.values(STOCK_SETTING_KEYS);
+    const map = await getSettings(keys);
+    return {
+      'Grote koelkast': Number(map[STOCK_SETTING_KEYS['Grote koelkast']] ?? STOCK['Grote koelkast']),
+      'Tafelmodel koelkast': Number(map[STOCK_SETTING_KEYS['Tafelmodel koelkast']] ?? STOCK['Tafelmodel koelkast']),
+      'Airco': Number(map[STOCK_SETTING_KEYS['Airco']] ?? STOCK['Airco']),
+    };
+  } catch (err) {
+    console.error('[pricing] getEffectiveStock fallback to hardcoded:', err);
+    return { ...STOCK };
+  }
 }
 
 export async function calculatePriceWithSettings(deviceType: DeviceType, startDate: string, endDate: string) {
@@ -63,6 +73,13 @@ function calculatePriceFor(weekPrice: number, startDate: string, endDate: string
   const extraTotal = Math.round(extraDays * dayPrice * 100) / 100;
   const total = Math.round((weekPrice + extraTotal) * 100) / 100;
   return { days, weekPrice, dayPrice, extraDays, extraTotal, total };
+}
+
+// Client-side variant: gebruikt de meegegeven weekprijs (uit /api/order/prices)
+// in plaats van de hardcoded PRICES-tabel. Zo blijft de display in sync met
+// wat admin in de instellingen heeft gezet.
+export function calculatePriceWith(weekPrice: number, startDate: string, endDate: string) {
+  return calculatePriceFor(weekPrice, startDate, endDate);
 }
 
 // Helper om future test-modes makkelijk te plumben. Op productie altijd

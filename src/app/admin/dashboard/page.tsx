@@ -36,21 +36,24 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetch('/api/admin/fridges?stats=true', { credentials: 'include' })
-      .then((r) => r.json())
-      .then(setStats)
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => {
+        if (!d || !Array.isArray(d.byStatus)) {
+          setStats({ totalFridges: 0, totalBookings: 0, byStatus: [] });
+          return;
+        }
+        setStats(d);
+      })
       .catch(() => setStats({ totalFridges: 0, totalBookings: 0, byStatus: [] }));
     fetch('/api/admin/activity', { credentials: 'include' })
-      .then((r) => r.json())
+      .then((r) => r.ok ? r.json() : { events: [] })
       .then((d) => setEvents(d.events || []))
       .catch(() => setEvents([]));
   }, []);
 
-  const compleet = parseInt(
-    stats?.byStatus.find((s) => s.status === 'compleet')?.count || '0'
-  );
-  const controleren = parseInt(
-    stats?.byStatus.find((s) => s.status === 'controleren')?.count || '0'
-  );
+  const byStatus = stats?.byStatus ?? [];
+  const compleet = parseInt(byStatus.find((s) => s.status === 'compleet')?.count || '0');
+  const controleren = parseInt(byStatus.find((s) => s.status === 'controleren')?.count || '0');
 
   const inUseLarge = stats?.inUse?.large.current ?? 0;
   const inUseTable = stats?.inUse?.table.current ?? 0;

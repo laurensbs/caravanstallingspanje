@@ -35,6 +35,7 @@ type Fridge = {
   device_type: string;
   notes: string | null;
   holded_contact_id: string | null;
+  customer_id: number | null;
   bookings: Booking[];
 };
 
@@ -173,9 +174,27 @@ function KoelkastenContent() {
       extra_email: f.extra_email || '',
       device_type: f.device_type || 'Grote koelkast',
       notes: f.notes || '',
-      customer_id: null,
+      customer_id: f.customer_id ?? null,
     });
     setDrawerOpen(true);
+    // Als de fridge al een gekoppelde klant heeft, halen we de details op
+    // zodat de picker direct de juiste klant in "geselecteerd"-state toont.
+    if (f.customer_id) {
+      fetch(`/api/admin/customers/${f.customer_id}`, { credentials: 'include' })
+        .then((r) => r.ok ? r.json() : null)
+        .then((data) => {
+          if (data?.customer) {
+            setPickedCustomer({
+              id: data.customer.id,
+              name: data.customer.name,
+              email: data.customer.email,
+              phone: data.customer.phone,
+              holded_contact_id: data.customer.holded_contact_id,
+            });
+          }
+        })
+        .catch(() => { /* ignore */ });
+    }
   };
 
   const saveFridge = async (e?: React.FormEvent) => {
@@ -498,6 +517,35 @@ function KoelkastenContent() {
           )}
           {drawerMode === 'edit' && (
             <>
+              <div>
+                <label className="block text-xs font-medium text-text mb-1.5">
+                  Klant {fridgeForm.customer_id ? '· gekoppeld' : '· nog niet gekoppeld'}
+                </label>
+                <CustomerPicker
+                  value={pickedCustomer}
+                  onSelect={(c) => {
+                    setPickedCustomer(c);
+                    setFridgeForm({
+                      ...fridgeForm,
+                      customer_id: c.id,
+                      name: c.name,
+                      email: c.email || fridgeForm.email,
+                    });
+                  }}
+                  onClear={() => {
+                    setPickedCustomer(null);
+                    setFridgeForm({ ...fridgeForm, customer_id: null });
+                  }}
+                  onCreateNew={(q) => {
+                    setNewCustomerInitial(q);
+                    setNewCustomerOpen(true);
+                  }}
+                  placeholder="Zoek bestaande klant…"
+                />
+                <p className="text-[11px] text-text-muted mt-1.5">
+                  Link deze koelkast/airco aan een centrale klant uit Holded; nieuwe klant hier ook aan te maken.
+                </p>
+              </div>
               <Input label="Naam" required value={fridgeForm.name} onChange={e => setFridgeForm({ ...fridgeForm, name: e.target.value })} />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <Input label="E-mail" type="email" value={fridgeForm.email} onChange={e => setFridgeForm({ ...fridgeForm, email: e.target.value })} />

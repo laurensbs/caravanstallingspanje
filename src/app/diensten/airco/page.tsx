@@ -1,10 +1,10 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, AlertTriangle } from 'lucide-react';
 import AnimatedServiceIcon from '@/components/AnimatedServiceIcon';
-import { calculatePrice, PRICES, MIN_DAYS } from '@/lib/pricing';
+import { calculatePriceWith, PRICES, MIN_DAYS } from '@/lib/pricing';
 import {
   ContactFields, MultiStepShell, Section, Field, fieldCls, emptyContact,
   type ContactState,
@@ -43,16 +43,26 @@ export default function AircoPage() {
   const [error, setError] = useState('');
   const [done, setDone] = useState<{ total: number; days: number } | null>(null);
   const [soldOut, setSoldOut] = useState(false);
+  const [aircoWeekPrice, setAircoWeekPrice] = useState<number>(PRICES.Airco);
+
+  useEffect(() => {
+    fetch('/api/order/prices')
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => {
+        if (d?.fridge?.Airco) setAircoWeekPrice(Number(d.fridge.Airco));
+      })
+      .catch(() => { /* fallback blijft */ });
+  }, []);
 
   const price = useMemo(() => {
     if (!form.start_date || !form.end_date) return null;
     if (new Date(form.end_date) <= new Date(form.start_date)) return null;
     try {
-      return calculatePrice('Airco', form.start_date, form.end_date);
+      return calculatePriceWith(aircoWeekPrice, form.start_date, form.end_date);
     } catch {
       return null;
     }
-  }, [form.start_date, form.end_date]);
+  }, [form.start_date, form.end_date, aircoWeekPrice]);
 
   const step1Valid = !!(form.start_date && form.end_date && form.camping && price);
 
@@ -135,7 +145,7 @@ export default function AircoPage() {
     );
   }
 
-  const dayPrice = Math.ceil((PRICES.Airco / 7) * 100) / 100;
+  const dayPrice = Math.ceil((aircoWeekPrice / 7) * 100) / 100;
 
   const step1 = (
     <>
@@ -150,7 +160,7 @@ export default function AircoPage() {
             </div>
           </div>
           <div className="text-[26px] font-semibold tabular-nums mt-1">
-            {formatEur(PRICES.Airco)}
+            {formatEur(aircoWeekPrice)}
             <span className="text-[14px] font-normal text-text-muted"> {t('fridge.per-week')}</span>
           </div>
           <div className="text-[13px] text-text-muted mt-1">

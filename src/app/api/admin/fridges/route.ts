@@ -12,12 +12,23 @@ export async function GET(req: NextRequest) {
     const search = url.searchParams.get('search') || undefined;
 
     if (url.searchParams.get('stats') === 'true') {
-      const stats = await getFridgeStats(year);
-      const active = await getActiveBookingsByType();
+      // Elke sub-call los try-catchen zodat een rotte tabel niet de hele
+      // dashboard-pagina laat crashen.
+      const stats = await getFridgeStats(year).catch((e) => {
+        console.error('[fridges/stats] getFridgeStats failed:', e);
+        return { totalFridges: 0, totalBookings: 0, byStatus: [] };
+      });
+      const active = await getActiveBookingsByType().catch((e) => {
+        console.error('[fridges/stats] getActiveBookingsByType failed:', e);
+        return [];
+      });
+      const stock = await getEffectiveStock().catch((e) => {
+        console.error('[fridges/stats] getEffectiveStock failed:', e);
+        return { 'Grote koelkast': 110, 'Tafelmodel koelkast': 20, 'Airco': 10 };
+      });
       const inUseLarge = active.find(a => a.device_type === 'Grote koelkast')?.count ?? 0;
       const inUseTable = active.find(a => a.device_type === 'Tafelmodel koelkast')?.count ?? 0;
       const inUseAirco = active.find(a => a.device_type === 'Airco')?.count ?? 0;
-      const stock = await getEffectiveStock();
       return NextResponse.json({
         ...stats,
         inUse: {
