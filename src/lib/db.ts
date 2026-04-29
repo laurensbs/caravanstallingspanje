@@ -323,6 +323,7 @@ export async function getRecentActivity(limit = 30) {
 // without periods visible. Year and search use sentinel values so the WHERE
 // clause stays the same shape across calls.
 export async function getAllFridges(year?: number, status?: string, search?: string) {
+  await ensureCustomerSchema();
   const y = year ?? 0;
   const s = search ? `%${search}%` : null;
 
@@ -365,6 +366,7 @@ export async function getAllFridges(year?: number, status?: string, search?: str
 }
 
 export async function getFridgeById(id: number) {
+  await ensureCustomerSchema();
   const rows = await sql`
     SELECT f.*,
       COALESCE(json_agg(json_build_object(
@@ -387,6 +389,7 @@ export async function createFridge(data: {
   notes?: string | null;
   customer_id?: number | null;
 }) {
+  await ensureCustomerSchema();
   const res = await sql`INSERT INTO fridges
     (name, email, extra_email, device_type, notes, customer_id)
     VALUES (${data.name}, ${data.email || null}, ${data.extra_email || null},
@@ -397,12 +400,14 @@ export async function createFridge(data: {
 
 export async function findFridgeByEmail(email: string) {
   if (!email) return null;
+  await ensureCustomerSchema();
   const rows = await sql`SELECT * FROM fridges WHERE LOWER(email) = LOWER(${email}) LIMIT 1`;
   return rows[0] || null;
 }
 
 
 export async function updateFridge(id: number, data: { name?: string; email?: string | null; extra_email?: string | null; device_type?: string; notes?: string | null; customer_id?: number | null }) {
+  await ensureCustomerSchema();
   await sql`UPDATE fridges SET
     name = COALESCE(${data.name ?? null}, name),
     email = COALESCE(${data.email ?? null}, email),
@@ -907,8 +912,16 @@ async function ensureCustomerSchema(): Promise<void> {
     await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_holded_id ON customers (holded_contact_id) WHERE holded_contact_id IS NOT NULL`;
     await sql`CREATE INDEX IF NOT EXISTS idx_customers_phone ON customers (phone)`;
     await sql`ALTER TABLE fridges ADD COLUMN IF NOT EXISTS customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL`;
+    await sql`ALTER TABLE fridges ADD COLUMN IF NOT EXISTS holded_contact_id TEXT`;
+    await sql`ALTER TABLE fridges ADD COLUMN IF NOT EXISTS extra_email TEXT`;
+    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_id TEXT`;
+    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_number TEXT`;
     await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL`;
+    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS holded_invoice_id TEXT`;
+    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS holded_invoice_number TEXT`;
     await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL`;
+    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_id TEXT`;
+    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_number TEXT`;
   })().catch((err) => {
     console.error('[customer migrations] failed:', err);
     _migrationsApplied = null; // retry next call
