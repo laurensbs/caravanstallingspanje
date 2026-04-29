@@ -38,9 +38,9 @@ export default function Stepper({ current, steps }: StepperProps) {
                 {done ? <Check size={13} strokeWidth={3} /> : i + 1}
               </motion.div>
               <span
-                className={`text-[13px] sm:text-sm whitespace-nowrap transition-colors ${
+                className={`text-[12px] sm:text-sm whitespace-nowrap transition-colors ${
                   active ? 'text-text font-medium' : 'text-text-muted'
-                } hidden sm:inline`}
+                }`}
               >
                 {label}
               </span>

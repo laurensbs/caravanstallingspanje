@@ -85,9 +85,12 @@ export default function StallingPage() {
                 }`}
               >
                 <div className="flex items-start justify-between mb-3">
-                  <div className="w-10 h-10 rounded-[var(--radius-md)] bg-surface-2 text-text flex items-center justify-center border border-border">
-                    <Icon size={18} />
-                  </div>
+                  <motion.div
+                    whileHover={{ rotate: [-2, 2, 0], transition: { duration: 0.5 } }}
+                    className="w-11 h-11 rounded-[var(--radius-md)] bg-surface-2 text-text flex items-center justify-center border border-border"
+                  >
+                    <Icon size={20} />
+                  </motion.div>
                   <div className={`w-5 h-5 rounded-full border-2 transition-colors flex items-center justify-center ${selected ? 'border-accent bg-accent' : 'border-border'}`}>
                     {selected && <Check size={11} className="text-accent-fg" strokeWidth={3} />}
                   </div>

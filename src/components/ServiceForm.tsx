@@ -2,12 +2,12 @@
 
 import { ReactNode, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Check, Loader2, Lock } from 'lucide-react';
-import Link from 'next/link';
+import { ArrowLeft, ArrowRight, Loader2, Lock } from 'lucide-react';
 import InfoBanner from './InfoBanner';
 import CampingPicker from './CampingPicker';
 import PublicHero from './PublicHero';
 import Stepper from './Stepper';
+import SuccessScreen from './SuccessScreen';
 import { useLocale } from './LocaleProvider';
 
 export type ContactState = {
@@ -136,35 +136,13 @@ export function ServicePageShell({
   children: ReactNode;
 }) {
   const { t } = useLocale();
-  const resolvedDoneTitle = doneTitle ?? t('thanks.request-title');
-  const resolvedDoneBody = doneBody ?? t('thanks.request-body');
   if (done) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-bg px-6 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="max-w-md text-center"
-        >
-          <div className="w-12 h-12 rounded-full bg-success-soft text-success flex items-center justify-center mx-auto mb-6">
-            <Check size={20} />
-          </div>
-          <h1 className="text-2xl font-medium tracking-tight mb-3">{resolvedDoneTitle}</h1>
-          <p className="text-text-muted leading-relaxed">{resolvedDoneBody}</p>
-          {publicCode && (
-            <p className="text-sm text-text-muted mt-6">
-              {t('common.reference')} <span className="font-mono text-text">{publicCode}</span>
-            </p>
-          )}
-          <Link
-            href="/diensten"
-            className="inline-flex items-center gap-1 text-sm text-text-muted hover:text-text mt-8"
-          >
-            <ArrowLeft size={14} /> {t('common.back-to-services')}
-          </Link>
-        </motion.div>
-      </main>
+      <SuccessScreen
+        title={doneTitle ?? t('thanks.request-title')}
+        body={doneBody ?? t('thanks.request-body')}
+        reference={publicCode || null}
+      />
     );
   }
 
@@ -176,7 +154,7 @@ export function ServicePageShell({
         title={title}
         intro={intro}
       />
-      <div className="max-w-2xl mx-auto px-6 py-10 sm:py-14">
+      <div className="max-w-2xl mx-auto px-5 sm:px-6 py-8 sm:py-14">
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -272,34 +250,12 @@ export function MultiStepShell({
   const stepLabels = [t('common.step-choose'), t('common.step-confirm')];
 
   if (done) {
-    const resolvedDoneTitle = doneTitle ?? t('thanks.payment-title');
-    const resolvedDoneBody = doneBody ?? t('thanks.payment-services');
     return (
-      <main className="min-h-screen flex items-center justify-center bg-bg page-public px-6 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="max-w-md text-center"
-        >
-          <div className="w-14 h-14 rounded-full bg-success-soft text-success flex items-center justify-center mx-auto mb-6">
-            <Check size={22} />
-          </div>
-          <h1 className="text-3xl font-semibold tracking-tight mb-3">{resolvedDoneTitle}</h1>
-          <p className="text-text-muted leading-relaxed">{resolvedDoneBody}</p>
-          {publicCode && (
-            <p className="text-[13px] text-text-muted mt-6">
-              {t('common.reference')} <span className="font-mono text-text">{publicCode}</span>
-            </p>
-          )}
-          <Link
-            href="/diensten"
-            className="inline-flex items-center gap-1 text-[14px] text-text-muted hover:text-text mt-8"
-          >
-            <ArrowLeft size={14} /> {t('common.back-to-services')}
-          </Link>
-        </motion.div>
-      </main>
+      <SuccessScreen
+        title={doneTitle ?? t('thanks.payment-title')}
+        body={doneBody ?? t('thanks.payment-services')}
+        reference={publicCode || null}
+      />
     );
   }
 
@@ -314,7 +270,7 @@ export function MultiStepShell({
         title={title}
         intro={intro}
       />
-      <div className="max-w-2xl mx-auto px-6 py-10 sm:py-14">
+      <div className="max-w-2xl mx-auto px-5 sm:px-6 py-8 sm:py-14">
         <Stepper current={step} steps={stepLabels} />
 
         <motion.div
@@ -362,24 +318,24 @@ export function MultiStepShell({
             </motion.div>
           )}
 
-          <div className="mt-10 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+          <div className="mt-10 flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between">
             {step === 1 ? (
               <button
                 type="button"
                 onClick={() => setStep(0)}
-                className="press-spring inline-flex items-center justify-center gap-2 h-12 px-5 rounded-[var(--radius-md)] border border-border bg-surface hover:border-border-strong text-[14px] font-medium transition-colors"
+                className="press-spring inline-flex items-center justify-center gap-2 h-12 px-5 rounded-[var(--radius-md)] border border-border bg-surface hover:border-border-strong text-[14px] font-medium transition-colors w-full sm:w-auto"
               >
                 <ArrowLeft size={15} /> {t('common.back')}
               </button>
             ) : (
-              <span aria-hidden />
+              <span aria-hidden className="hidden sm:block" />
             )}
             {step === 0 ? (
               <button
                 type="button"
                 disabled={!step1Valid}
                 onClick={goNext}
-                className="press-spring inline-flex items-center justify-center gap-2 h-14 px-6 rounded-[var(--radius-lg)] bg-accent text-accent-fg font-semibold text-[15px] hover:bg-accent-hover transition-colors disabled:opacity-50 sm:ml-auto"
+                className="press-spring inline-flex items-center justify-center gap-2 h-14 px-6 rounded-[var(--radius-lg)] bg-accent text-accent-fg font-semibold text-[15px] hover:bg-accent-hover transition-colors disabled:opacity-50 w-full sm:w-auto sm:ml-auto"
               >
                 {t('common.next')} <ArrowRight size={17} />
               </button>
@@ -387,7 +343,7 @@ export function MultiStepShell({
               <button
                 type="submit"
                 disabled={submitting}
-                className="press-spring inline-flex items-center justify-center gap-2 h-14 px-6 rounded-[var(--radius-lg)] bg-accent text-accent-fg font-semibold text-[15px] hover:bg-accent-hover transition-colors disabled:opacity-50 sm:ml-auto"
+                className="press-spring inline-flex items-center justify-center gap-2 h-14 px-6 rounded-[var(--radius-lg)] bg-accent text-accent-fg font-semibold text-[15px] hover:bg-accent-hover transition-colors disabled:opacity-50 w-full sm:w-auto sm:ml-auto"
               >
                 {submitting ? <Loader2 size={18} className="animate-spin" /> : null}
                 {submitting

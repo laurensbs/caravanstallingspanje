@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, AlertTriangle, Wind } from 'lucide-react';
+import { Check, AlertTriangle } from 'lucide-react';
+import AnimatedServiceIcon from '@/components/AnimatedServiceIcon';
 import { calculatePrice, PRICES, MIN_DAYS } from '@/lib/pricing';
 import {
   ContactFields, MultiStepShell, Section, Field, fieldCls, emptyContact,
@@ -142,8 +143,8 @@ export default function AircoPage() {
         <div className="rounded-[var(--radius-xl)] border-2 border-accent bg-surface shadow-md p-5">
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-[var(--radius-md)] bg-surface-2 border border-border flex items-center justify-center">
-                <Wind size={18} className="text-text" />
+              <div className="w-11 h-11 rounded-[var(--radius-md)] bg-surface-2 border border-border flex items-center justify-center text-text">
+                <AnimatedServiceIcon kind="airco" size={20} loop />
               </div>
               <span className="text-[15px] font-semibold">{t('airco.device-name')}</span>
             </div>

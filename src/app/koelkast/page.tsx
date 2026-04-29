@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Loader2, AlertTriangle, Refrigerator } from 'lucide-react';
+import { Check, Loader2, AlertTriangle } from 'lucide-react';
+import AnimatedServiceIcon from '@/components/AnimatedServiceIcon';
 import { calculatePrice, PRICES, MIN_DAYS, type DeviceType } from '@/lib/pricing';
 import {
   ContactFields, MultiStepShell, Section, Field, fieldCls, emptyContact,
@@ -263,8 +264,8 @@ export default function KoelkastBestelPagina() {
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-[var(--radius-md)] bg-surface-2 border border-border flex items-center justify-center">
-                      <Refrigerator size={18} className="text-text" />
+                    <div className="w-11 h-11 rounded-[var(--radius-md)] bg-surface-2 border border-border flex items-center justify-center text-text">
+                      <AnimatedServiceIcon kind="fridge" size={20} loop />
                     </div>
                     <span className="text-[15px] font-semibold">{t(DEVICE_LABEL_KEY[type])}</span>
                   </div>

@@ -7,7 +7,8 @@ import {
 } from '@/components/ServiceForm';
 import CampingPicker from '@/components/CampingPicker';
 import { useLocale } from '@/components/LocaleProvider';
-import { Truck, ArrowRight as ArrowRightIcon } from 'lucide-react';
+import { ArrowRight as ArrowRightIcon } from 'lucide-react';
+import AnimatedServiceIcon from '@/components/AnimatedServiceIcon';
 
 export default function TransportPage() {
   const { t } = useLocale();
@@ -28,13 +29,13 @@ export default function TransportPage() {
     <Section title={t('transport.section-route')}>
       <div className="rounded-[var(--radius-lg)] border border-border bg-surface-2 p-3 flex items-center justify-between text-[12px] text-text-muted gap-3">
         <span className="inline-flex items-center gap-1.5">
-          <Truck size={13} /> Stalling Cruïlles
+          <AnimatedServiceIcon kind="transport" size={14} loop /> Stalling Cruïlles
         </span>
         <ArrowRightIcon size={12} className="text-text-subtle" />
         <span className="truncate text-text">{camping || '—'}</span>
         <ArrowRightIcon size={12} className="text-text-subtle rotate-180" />
         <span className="inline-flex items-center gap-1.5">
-          <Truck size={13} /> Stalling
+          <AnimatedServiceIcon kind="transport" size={14} loop /> Stalling
         </span>
       </div>
 
