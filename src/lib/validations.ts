@@ -48,9 +48,9 @@ export const waitlistSchema = z.object({
 
 export const fridgeOrderSchema = z.object({
   device_type: z.enum(['Grote koelkast', 'Tafelmodel koelkast', 'Airco']),
-  name: z.string().min(2).max(200),
-  email: z.string().email(),
-  phone: z.string().min(5).max(40),
+  name: z.string().min(2, 'Vul je naam in').max(200),
+  email: z.string().email('Vul een geldig e-mailadres in'),
+  phone: z.string().min(5, 'Vul je telefoonnummer in').max(40),
   camping: knownCamping,
   spot_number: z.string().max(50).optional().or(z.literal('')),
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Datum is verplicht'),

@@ -809,6 +809,49 @@ export async function markWaitlistNotified(id: number) {
   await sql`UPDATE fridge_waitlist SET status = 'genotificeerd', notified_at = NOW() WHERE id = ${id}`;
 }
 
+// ─── Lazy migratie: zorgt dat customer-gerelateerde kolommen bestaan
+// voordat de eerste query crasht. Wordt één keer per process gedaan en
+// daarna gecached. Komt voor de helpers zodat deze nooit crashen op een
+// koude DB die niet via /api/setup is geïnitialiseerd.
+let _migrationsApplied: Promise<void> | null = null;
+async function ensureCustomerSchema(): Promise<void> {
+  if (_migrationsApplied) return _migrationsApplied;
+  _migrationsApplied = (async () => {
+    await sql`CREATE TABLE IF NOT EXISTS customers (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      email TEXT,
+      phone TEXT,
+      mobile TEXT,
+      address TEXT,
+      city TEXT,
+      postal_code TEXT,
+      country TEXT DEFAULT 'ES',
+      vat_number TEXT,
+      notes TEXT,
+      holded_contact_id TEXT,
+      holded_sync_failed BOOLEAN DEFAULT false,
+      source TEXT DEFAULT 'manual',
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )`;
+    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP`;
+    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_synced_at TIMESTAMP`;
+    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_sync_failed BOOLEAN DEFAULT false`;
+    await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_email_lower_alive ON customers (LOWER(email)) WHERE email IS NOT NULL AND deleted_at IS NULL`;
+    await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_holded_id ON customers (holded_contact_id) WHERE holded_contact_id IS NOT NULL`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_customers_phone ON customers (phone)`;
+    await sql`ALTER TABLE fridges ADD COLUMN IF NOT EXISTS customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL`;
+    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL`;
+    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL`;
+  })().catch((err) => {
+    console.error('[customer migrations] failed:', err);
+    _migrationsApplied = null; // retry next call
+    throw err;
+  });
+  return _migrationsApplied;
+}
+
 // ─── Customers ───────────────────────────────────────────
 export type CustomerRow = {
   id: number;
@@ -830,6 +873,7 @@ export type CustomerRow = {
 };
 
 export async function searchCustomers(q: string, limit = 10): Promise<CustomerRow[]> {
+  await ensureCustomerSchema();
   const term = `%${q.trim()}%`;
   if (!q.trim()) return [];
   const rows = await sql`
@@ -848,6 +892,7 @@ export async function searchCustomers(q: string, limit = 10): Promise<CustomerRo
 }
 
 export async function listCustomers(opts: { page?: number; pageSize?: number; search?: string } = {}) {
+  await ensureCustomerSchema();
   const pageSize = opts.pageSize ?? 50;
   const page = Math.max(1, opts.page ?? 1);
   const offset = (page - 1) * pageSize;
@@ -873,18 +918,21 @@ export async function listCustomers(opts: { page?: number; pageSize?: number; se
 }
 
 export async function getCustomerById(id: number): Promise<CustomerRow | null> {
+  await ensureCustomerSchema();
   const rows = await sql`SELECT * FROM customers WHERE id = ${id} AND deleted_at IS NULL LIMIT 1`;
   return (rows[0] as CustomerRow) || null;
 }
 
 export async function getCustomerByEmail(email: string): Promise<CustomerRow | null> {
   if (!email) return null;
+  await ensureCustomerSchema();
   const rows = await sql`SELECT * FROM customers WHERE LOWER(email) = LOWER(${email}) AND deleted_at IS NULL LIMIT 1`;
   return (rows[0] as CustomerRow) || null;
 }
 
 export async function getCustomerByHoldedId(holdedId: string): Promise<CustomerRow | null> {
   if (!holdedId) return null;
+  await ensureCustomerSchema();
   const rows = await sql`SELECT * FROM customers WHERE holded_contact_id = ${holdedId} AND deleted_at IS NULL LIMIT 1`;
   return (rows[0] as CustomerRow) || null;
 }
@@ -904,6 +952,7 @@ export async function createCustomer(data: {
   holded_sync_failed?: boolean;
   source?: string;
 }): Promise<CustomerRow> {
+  await ensureCustomerSchema();
   const rows = await sql`INSERT INTO customers
     (name, email, phone, mobile, address, city, postal_code, country, vat_number, notes,
      holded_contact_id, holded_sync_failed, source)
@@ -921,6 +970,7 @@ export async function updateCustomer(id: number, data: Partial<{
   country: string | null; vat_number: string | null; notes: string | null;
   holded_contact_id: string | null;
 }>) {
+  await ensureCustomerSchema();
   await sql`UPDATE customers SET
     name = COALESCE(${data.name ?? null}, name),
     email = COALESCE(${data.email ?? null}, email),
@@ -938,20 +988,24 @@ export async function updateCustomer(id: number, data: Partial<{
 }
 
 export async function setCustomerHoldedId(id: number, holdedId: string | null, failed = false) {
+  await ensureCustomerSchema();
   await sql`UPDATE customers
     SET holded_contact_id = ${holdedId}, holded_sync_failed = ${failed}, updated_at = NOW()
     WHERE id = ${id}`;
 }
 
 export async function linkFridgeToCustomer(fridgeId: number, customerId: number) {
+  await ensureCustomerSchema();
   await sql`UPDATE fridges SET customer_id = ${customerId}, updated_at = NOW() WHERE id = ${fridgeId}`;
 }
 
 export async function linkStallingToCustomer(stallingId: number, customerId: number) {
+  await ensureCustomerSchema();
   await sql`UPDATE stalling_requests SET customer_id = ${customerId}, updated_at = NOW() WHERE id = ${stallingId}`;
 }
 
 export async function linkTransportToCustomer(transportId: number, customerId: number) {
+  await ensureCustomerSchema();
   await sql`UPDATE transport_requests SET customer_id = ${customerId}, updated_at = NOW() WHERE id = ${transportId}`;
 }
 
@@ -959,6 +1013,7 @@ export async function linkTransportToCustomer(transportId: number, customerId: n
 // stallingen per klant. Email-fallback voor backward-compat met bestaande
 // rijen die nog geen customer_id hebben.
 export async function getCustomerCounts(customerId: number, customerEmail: string | null) {
+  await ensureCustomerSchema();
   const fridgeRows = await sql`
     SELECT COUNT(*) AS c FROM fridges
     WHERE customer_id = ${customerId}
@@ -980,6 +1035,7 @@ export async function getCustomerCounts(customerId: number, customerEmail: strin
 
 // Soft-delete: zet deleted_at; FK ON DELETE SET NULL ruimt de relaties op.
 export async function softDeleteCustomer(id: number) {
+  await ensureCustomerSchema();
   await sql`UPDATE customers SET deleted_at = NOW(), updated_at = NOW() WHERE id = ${id}`;
   // Cascade: gerelateerde rijen verliezen hun customer_id zodat ze
   // los blijven staan voor historisch bewaaren / re-link.
@@ -991,6 +1047,7 @@ export async function softDeleteCustomer(id: number) {
 // Detail-pagina helper: customer + alle gerelateerde items (op customer_id
 // of, voor backward-compat, op email-match).
 export async function getCustomerWithRelated(id: number) {
+  await ensureCustomerSchema();
   const customer = await getCustomerById(id);
   if (!customer) return null;
   const email = customer.email;

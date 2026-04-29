@@ -46,7 +46,11 @@ export default function KlantenPage() {
       params.set('page', String(page));
       if (debounced) params.set('search', debounced);
       const res = await fetch(`/api/admin/customers?${params}`, { credentials: 'include' });
-      const json = await res.json();
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !Array.isArray(json?.customers)) {
+        setData({ customers: [], total: 0, page: 1, pageSize: 50 });
+        return;
+      }
       setData(json);
     } catch {
       setData({ customers: [], total: 0, page: 1, pageSize: 50 });
