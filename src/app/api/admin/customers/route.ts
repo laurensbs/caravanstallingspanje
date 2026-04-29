@@ -44,14 +44,16 @@ export async function POST(req: NextRequest) {
     // Probeer Holded match (op email, dan phone) zodat we niet dubbel pushen.
     let holdedId: string | null = null;
     let holdedSyncFailed = false;
+    let holdedSyncError: string | null = null;
+    let holdedSource: 'matched-email' | 'matched-phone' | 'created' | 'failed' | 'no-key' = 'failed';
     try {
       if (email) {
         const match = await findContactByEmail(email);
-        if (match) holdedId = match.id;
+        if (match) { holdedId = match.id; holdedSource = 'matched-email'; }
       }
       if (!holdedId && phone) {
         const match = await findContactByPhone(phone);
-        if (match) holdedId = match.id;
+        if (match) { holdedId = match.id; holdedSource = 'matched-phone'; }
       }
       if (!holdedId) {
         holdedId = await pushContactToHolded({
@@ -65,10 +67,20 @@ export async function POST(req: NextRequest) {
           country: body.country || 'ES',
           vat_number: body.vat_number || null,
         });
+        holdedSource = 'created';
       }
     } catch (err) {
-      console.error('holded push failed:', err);
+      console.error('[customers POST] holded push failed:', err);
       holdedSyncFailed = true;
+      holdedSyncError = err instanceof Error ? err.message : 'unknown';
+      holdedSource = holdedSyncError.includes('HOLDED_API_KEY') ? 'no-key' : 'failed';
+      await logActivity({
+        actor: admin.name, role: admin.role,
+        action: 'Holded sync mislukt (klant-aanmaak)',
+        entityType: 'customer',
+        entityLabel: name,
+        details: holdedSyncError,
+      }).catch(() => {});
     }
 
     const customer = await createCustomer({
@@ -96,7 +108,12 @@ export async function POST(req: NextRequest) {
       entityId: String(customer.id),
       entityLabel: name,
     });
-    return NextResponse.json({ customer, alreadyExisted: false });
+    return NextResponse.json({
+      customer,
+      alreadyExisted: false,
+      holdedSource,
+      holdedSyncError,
+    });
   } catch (err) {
     console.error('customer create error:', err);
     return NextResponse.json({ error: err instanceof Error ? err.message : 'create failed' }, { status: 500 });

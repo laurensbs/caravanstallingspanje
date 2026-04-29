@@ -54,8 +54,14 @@ export default function NewCustomerDialog({ open, onClose, onCreated, initialQue
       }
       if (data.alreadyExisted) {
         toast.success('Bestaande klant gekoppeld');
+      } else if (data.holdedSource === 'created') {
+        toast.success('Klant aangemaakt en gepushed naar Holded');
+      } else if (data.holdedSource === 'matched-email' || data.holdedSource === 'matched-phone') {
+        toast.success('Klant aangemaakt en gekoppeld aan bestaand Holded-contact');
+      } else if (data.holdedSource === 'no-key') {
+        toast.error('Klant aangemaakt — Holded API-key ontbreekt op de server.');
       } else {
-        toast.success(data.customer.holded_contact_id ? 'Klant aangemaakt en in Holded' : 'Klant aangemaakt (Holded sync mislukt)');
+        toast.error(`Klant aangemaakt — Holded sync mislukt: ${data.holdedSyncError || 'onbekende fout'}`);
       }
       onCreated(data.customer);
       onClose();
