@@ -34,16 +34,14 @@ export default function PortalPicker() {
           transition={{ duration: 0.5, ease: EASE }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white shadow-lg mb-6">
-            <Image
-              src="/images/logo.png"
-              alt="Caravanstalling"
-              width={56}
-              height={56}
-              priority
-              className="object-contain"
-            />
-          </div>
+          <Image
+            src="/images/logo.png"
+            alt="Caravanstalling"
+            width={420}
+            height={95}
+            priority
+            className="mx-auto h-20 w-auto mb-6"
+          />
           <p
             className="text-[10px] font-medium tracking-[0.25em] uppercase"
             style={{ color: 'rgba(241,245,249,0.55)' }}

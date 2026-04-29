@@ -77,15 +77,13 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
             className="flex items-center gap-3 group"
             title="Naar portaal-keuze"
           >
-            <div className="w-11 h-11 rounded-[var(--radius-md)] bg-white flex items-center justify-center overflow-hidden shrink-0">
-              <Image
-                src="/images/logo.png"
-                alt="Caravanstalling"
-                width={40}
-                height={40}
-                className="object-contain"
-              />
-            </div>
+            <Image
+              src="/images/logo.png"
+              alt="Caravanstalling"
+              width={48}
+              height={48}
+              className="object-contain shrink-0 h-11 w-auto"
+            />
             <div className="flex-1 min-w-0">
               <div className="text-[14px] font-semibold leading-tight">Caravanstalling</div>
               <div className="text-[10px] uppercase tracking-[0.18em] text-white/45 mt-1">Stalling</div>
