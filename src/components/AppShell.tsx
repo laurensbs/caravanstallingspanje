@@ -75,21 +75,19 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
         >
           <Link
             href="/admin"
-            className="flex items-center gap-3 group"
+            className="flex items-center justify-between group"
             title="Naar portaal-keuze"
           >
             <Image
               src="/images/logo.png"
               alt="Caravanstalling"
-              width={48}
-              height={48}
-              className="object-contain shrink-0 h-11 w-auto"
+              width={420}
+              height={95}
+              priority
+              quality={100}
+              className="h-12 w-auto"
             />
-            <div className="flex-1 min-w-0">
-              <div className="text-[14px] font-semibold leading-tight">Caravanstalling</div>
-              <div className="text-[10px] uppercase tracking-[0.18em] text-white/45 mt-1">Stalling</div>
-            </div>
-            <ChevronLeft size={13} className="text-white/30 group-hover:text-white/60 transition-colors" />
+            <ChevronLeft size={14} className="text-white/30 group-hover:text-white/60 transition-colors shrink-0" />
           </Link>
         </div>
 
