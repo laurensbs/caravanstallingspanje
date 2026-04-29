@@ -118,6 +118,12 @@ export const transportOrderSchema = z.object({
 export const settingsUpdateSchema = z.object({
   stalling_price_binnen: z.number().nonnegative().max(100000).optional(),
   stalling_price_buiten: z.number().nonnegative().max(100000).optional(),
+  fridge_price_grote: z.number().nonnegative().max(10000).optional(),
+  fridge_price_tafel: z.number().nonnegative().max(10000).optional(),
+  fridge_price_airco: z.number().nonnegative().max(10000).optional(),
+  fridge_stock_grote: z.number().int().nonnegative().max(10000).optional(),
+  fridge_stock_tafel: z.number().int().nonnegative().max(10000).optional(),
+  fridge_stock_airco: z.number().int().nonnegative().max(10000).optional(),
 });
 
 export const stallingOrderSchema = z.object({

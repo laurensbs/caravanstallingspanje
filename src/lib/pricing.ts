@@ -14,6 +14,57 @@ export type DeviceType = keyof typeof PRICES;
 
 export const MIN_DAYS = 7;
 
+// Admin-overrides via app_settings. Hardcoded waarden zijn de fallback
+// zodat de site nooit zonder prijs komt te staan.
+export const PRICE_SETTING_KEYS = {
+  'Grote koelkast': 'fridge_price_grote',
+  'Tafelmodel koelkast': 'fridge_price_tafel',
+  'Airco': 'fridge_price_airco',
+} as const;
+
+export const STOCK_SETTING_KEYS = {
+  'Grote koelkast': 'fridge_stock_grote',
+  'Tafelmodel koelkast': 'fridge_stock_tafel',
+  'Airco': 'fridge_stock_airco',
+} as const;
+
+export async function getEffectivePrices(): Promise<Record<DeviceType, number>> {
+  const { getSettings } = await import('./db');
+  const keys = Object.values(PRICE_SETTING_KEYS);
+  const map = await getSettings(keys);
+  return {
+    'Grote koelkast': Number(map[PRICE_SETTING_KEYS['Grote koelkast']] ?? PRICES['Grote koelkast']),
+    'Tafelmodel koelkast': Number(map[PRICE_SETTING_KEYS['Tafelmodel koelkast']] ?? PRICES['Tafelmodel koelkast']),
+    'Airco': Number(map[PRICE_SETTING_KEYS['Airco']] ?? PRICES['Airco']),
+  };
+}
+
+export async function getEffectiveStock(): Promise<Record<DeviceType, number>> {
+  const { getSettings } = await import('./db');
+  const keys = Object.values(STOCK_SETTING_KEYS);
+  const map = await getSettings(keys);
+  return {
+    'Grote koelkast': Number(map[STOCK_SETTING_KEYS['Grote koelkast']] ?? STOCK['Grote koelkast']),
+    'Tafelmodel koelkast': Number(map[STOCK_SETTING_KEYS['Tafelmodel koelkast']] ?? STOCK['Tafelmodel koelkast']),
+    'Airco': Number(map[STOCK_SETTING_KEYS['Airco']] ?? STOCK['Airco']),
+  };
+}
+
+export async function calculatePriceWithSettings(deviceType: DeviceType, startDate: string, endDate: string) {
+  const prices = await getEffectivePrices();
+  return calculatePriceFor(prices[deviceType], startDate, endDate);
+}
+
+function calculatePriceFor(weekPrice: number, startDate: string, endDate: string) {
+  const dayPrice = Math.ceil((weekPrice / 7) * 100) / 100;
+  const ms = new Date(endDate).getTime() - new Date(startDate).getTime();
+  const days = Math.max(MIN_DAYS, Math.round(ms / (1000 * 60 * 60 * 24)));
+  const extraDays = Math.max(0, days - MIN_DAYS);
+  const extraTotal = Math.round(extraDays * dayPrice * 100) / 100;
+  const total = Math.round((weekPrice + extraTotal) * 100) / 100;
+  return { days, weekPrice, dayPrice, extraDays, extraTotal, total };
+}
+
 // Helper om future test-modes makkelijk te plumben. Op productie altijd
 // het echte bedrag.
 export const TEST_MODE = false;

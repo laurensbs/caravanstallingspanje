@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSettings, setSetting, logActivity, getAdminInfo } from '@/lib/db';
 import { validateBody, settingsUpdateSchema } from '@/lib/validations';
 
-const KEYS = ['stalling_price_binnen', 'stalling_price_buiten'] as const;
+const KEYS = [
+  'stalling_price_binnen', 'stalling_price_buiten',
+  'fridge_price_grote', 'fridge_price_tafel', 'fridge_price_airco',
+  'fridge_stock_grote', 'fridge_stock_tafel', 'fridge_stock_airco',
+] as const;
 
 export async function GET() {
   try {
@@ -10,6 +14,12 @@ export async function GET() {
     return NextResponse.json({
       stalling_price_binnen: Number(map.stalling_price_binnen ?? 0),
       stalling_price_buiten: Number(map.stalling_price_buiten ?? 0),
+      fridge_price_grote: Number(map.fridge_price_grote ?? 40),
+      fridge_price_tafel: Number(map.fridge_price_tafel ?? 25),
+      fridge_price_airco: Number(map.fridge_price_airco ?? 50),
+      fridge_stock_grote: Number(map.fridge_stock_grote ?? 110),
+      fridge_stock_tafel: Number(map.fridge_stock_tafel ?? 20),
+      fridge_stock_airco: Number(map.fridge_stock_airco ?? 10),
     });
   } catch (error) {
     console.error('Settings GET error:', error);

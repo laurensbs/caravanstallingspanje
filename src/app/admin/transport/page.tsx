@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
   Mail, Phone, Calendar, Trash2, Truck, ArrowRight, MapPin, CheckCircle2, Ban,
-  Plus, ChevronDown, Refrigerator, Warehouse,
+  Plus, ChevronDown, Refrigerator, Warehouse, Pencil,
 } from 'lucide-react';
 import { Button, Badge, Skeleton, Select, Input } from '@/components/ui';
 import PageHeader from '@/components/admin/PageHeader';
@@ -93,6 +93,7 @@ export default function TransportPage() {
   const [entries, setEntries] = useState<Entry[] | null>(null);
   const [filter, setFilter] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -124,23 +125,59 @@ export default function TransportPage() {
     load();
   };
 
+  const openEdit = (e: Entry) => {
+    setEditingId(e.id);
+    setForm({
+      name: e.name,
+      email: e.email,
+      phone: e.phone || '',
+      camping: e.camping || e.to_location || '',
+      outbound_date: e.preferred_date ? e.preferred_date.slice(0, 10) : '',
+      outbound_time: e.outbound_time || '',
+      return_date: e.return_date ? e.return_date.slice(0, 10) : '',
+      return_time: e.return_time || '',
+      registration: e.registration || '',
+      brand: e.brand || '',
+      model: e.model || '',
+      notes: e.notes || '',
+    });
+    setDrawerOpen(true);
+  };
+
+  const openCreate = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+    setDrawerOpen(true);
+  };
+
   const submitNew = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     try {
-      const res = await fetch('/api/admin/transport', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-        credentials: 'include',
-      });
+      let res: Response;
+      if (editingId) {
+        res = await fetch('/api/admin/transport', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: editingId, action: 'update', fields: form }),
+          credentials: 'include',
+        });
+      } else {
+        res = await fetch('/api/admin/transport', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form),
+          credentials: 'include',
+        });
+      }
       const data = await res.json();
-      if (!res.ok || !data.success) {
-        toast.error(data.error || 'Kon transport niet aanmaken');
+      if (!res.ok || data.error) {
+        toast.error(data.error || 'Opslaan mislukt');
         return;
       }
-      toast.success('Transport toegevoegd');
+      toast.success(editingId ? 'Transport bijgewerkt' : 'Transport toegevoegd');
       setForm(emptyForm);
+      setEditingId(null);
       setDrawerOpen(false);
       load();
     } finally {
@@ -172,7 +209,7 @@ export default function TransportPage() {
               <option value="">Alle statussen</option>
               {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
             </Select>
-            <Button onClick={() => setDrawerOpen(true)}>
+            <Button onClick={openCreate}>
               <Plus size={14} /> Transport toevoegen
             </Button>
           </div>
@@ -242,6 +279,13 @@ export default function TransportPage() {
                           <CheckCircle2 size={12} /> Voltooid
                         </Button>
                       )}
+                      <button
+                        onClick={() => openEdit(e)}
+                        className="w-8 h-8 inline-flex items-center justify-center rounded-[var(--radius-md)] text-text-muted hover:text-text hover:bg-surface-2 transition-colors"
+                        aria-label="Bewerken"
+                      >
+                        <Pencil size={13} />
+                      </button>
                       <button
                         onClick={() => action(e.id, { action: 'delete' }, 'Verwijderd')}
                         className="w-8 h-8 inline-flex items-center justify-center rounded-[var(--radius-md)] text-text-muted hover:text-danger hover:bg-danger-soft transition-colors"
@@ -316,7 +360,7 @@ export default function TransportPage() {
         </ul>
       )}
 
-      <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} title="Nieuw transport" width={580}>
+      <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} title={editingId ? 'Transport bewerken' : 'Nieuw transport'} width={580}>
         <form onSubmit={submitNew} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Input label="Naam" required value={form.name}

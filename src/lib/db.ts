@@ -217,7 +217,12 @@ export async function initDatabase() {
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
   )`;
-  await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_email_lower ON customers (LOWER(email)) WHERE email IS NOT NULL`;
+  await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP`;
+  await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_synced_at TIMESTAMP`;
+  // Email-uniqueness alleen voor levende klanten — soft-deleted rows mogen
+  // hun email vrij geven aan een nieuwe klant.
+  await sql`DROP INDEX IF EXISTS idx_customers_email_lower`;
+  await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_email_lower_alive ON customers (LOWER(email)) WHERE email IS NOT NULL AND deleted_at IS NULL`;
   await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_holded_id ON customers (holded_contact_id) WHERE holded_contact_id IS NOT NULL`;
   await sql`CREATE INDEX IF NOT EXISTS idx_customers_phone ON customers (phone)`;
 
@@ -379,13 +384,14 @@ export async function findFridgeByEmail(email: string) {
 }
 
 
-export async function updateFridge(id: number, data: { name?: string; email?: string | null; extra_email?: string | null; device_type?: string; notes?: string | null }) {
+export async function updateFridge(id: number, data: { name?: string; email?: string | null; extra_email?: string | null; device_type?: string; notes?: string | null; customer_id?: number | null }) {
   await sql`UPDATE fridges SET
     name = COALESCE(${data.name ?? null}, name),
     email = COALESCE(${data.email ?? null}, email),
     extra_email = COALESCE(${data.extra_email ?? null}, extra_email),
     device_type = COALESCE(${data.device_type ?? null}, device_type),
     notes = COALESCE(${data.notes ?? null}, notes),
+    customer_id = COALESCE(${data.customer_id ?? null}, customer_id),
     updated_at = NOW()
     WHERE id = ${id}`;
 }
@@ -828,7 +834,8 @@ export async function searchCustomers(q: string, limit = 10): Promise<CustomerRo
   if (!q.trim()) return [];
   const rows = await sql`
     SELECT * FROM customers
-    WHERE name ILIKE ${term} OR email ILIKE ${term} OR phone ILIKE ${term}
+    WHERE deleted_at IS NULL
+      AND (name ILIKE ${term} OR email ILIKE ${term} OR phone ILIKE ${term})
     ORDER BY
       CASE
         WHEN name ILIKE ${q + '%'} THEN 0
@@ -847,12 +854,16 @@ export async function listCustomers(opts: { page?: number; pageSize?: number; se
   const term = opts.search ? `%${opts.search.trim()}%` : null;
   const rows = term
     ? await sql`SELECT * FROM customers
-        WHERE name ILIKE ${term} OR email ILIKE ${term} OR phone ILIKE ${term}
+        WHERE deleted_at IS NULL
+          AND (name ILIKE ${term} OR email ILIKE ${term} OR phone ILIKE ${term})
         ORDER BY name ASC LIMIT ${pageSize} OFFSET ${offset}`
-    : await sql`SELECT * FROM customers ORDER BY name ASC LIMIT ${pageSize} OFFSET ${offset}`;
+    : await sql`SELECT * FROM customers WHERE deleted_at IS NULL
+        ORDER BY name ASC LIMIT ${pageSize} OFFSET ${offset}`;
   const totalRows = term
-    ? await sql`SELECT COUNT(*) AS c FROM customers WHERE name ILIKE ${term} OR email ILIKE ${term} OR phone ILIKE ${term}`
-    : await sql`SELECT COUNT(*) AS c FROM customers`;
+    ? await sql`SELECT COUNT(*) AS c FROM customers
+        WHERE deleted_at IS NULL
+          AND (name ILIKE ${term} OR email ILIKE ${term} OR phone ILIKE ${term})`
+    : await sql`SELECT COUNT(*) AS c FROM customers WHERE deleted_at IS NULL`;
   return {
     customers: rows as unknown as CustomerRow[],
     total: Number((totalRows[0] as { c: string | number }).c),
@@ -862,19 +873,19 @@ export async function listCustomers(opts: { page?: number; pageSize?: number; se
 }
 
 export async function getCustomerById(id: number): Promise<CustomerRow | null> {
-  const rows = await sql`SELECT * FROM customers WHERE id = ${id} LIMIT 1`;
+  const rows = await sql`SELECT * FROM customers WHERE id = ${id} AND deleted_at IS NULL LIMIT 1`;
   return (rows[0] as CustomerRow) || null;
 }
 
 export async function getCustomerByEmail(email: string): Promise<CustomerRow | null> {
   if (!email) return null;
-  const rows = await sql`SELECT * FROM customers WHERE LOWER(email) = LOWER(${email}) LIMIT 1`;
+  const rows = await sql`SELECT * FROM customers WHERE LOWER(email) = LOWER(${email}) AND deleted_at IS NULL LIMIT 1`;
   return (rows[0] as CustomerRow) || null;
 }
 
 export async function getCustomerByHoldedId(holdedId: string): Promise<CustomerRow | null> {
   if (!holdedId) return null;
-  const rows = await sql`SELECT * FROM customers WHERE holded_contact_id = ${holdedId} LIMIT 1`;
+  const rows = await sql`SELECT * FROM customers WHERE holded_contact_id = ${holdedId} AND deleted_at IS NULL LIMIT 1`;
   return (rows[0] as CustomerRow) || null;
 }
 
@@ -965,6 +976,154 @@ export async function getCustomerCounts(customerId: number, customerEmail: strin
     stalling: Number((stallingRows[0] as { c: string | number }).c),
     transport: Number((transportRows[0] as { c: string | number }).c),
   };
+}
+
+// Soft-delete: zet deleted_at; FK ON DELETE SET NULL ruimt de relaties op.
+export async function softDeleteCustomer(id: number) {
+  await sql`UPDATE customers SET deleted_at = NOW(), updated_at = NOW() WHERE id = ${id}`;
+  // Cascade: gerelateerde rijen verliezen hun customer_id zodat ze
+  // los blijven staan voor historisch bewaaren / re-link.
+  await sql`UPDATE fridges SET customer_id = NULL, updated_at = NOW() WHERE customer_id = ${id}`;
+  await sql`UPDATE stalling_requests SET customer_id = NULL, updated_at = NOW() WHERE customer_id = ${id}`;
+  await sql`UPDATE transport_requests SET customer_id = NULL, updated_at = NOW() WHERE customer_id = ${id}`;
+}
+
+// Detail-pagina helper: customer + alle gerelateerde items (op customer_id
+// of, voor backward-compat, op email-match).
+export async function getCustomerWithRelated(id: number) {
+  const customer = await getCustomerById(id);
+  if (!customer) return null;
+  const email = customer.email;
+  const fridges = await sql`
+    SELECT f.*, COALESCE(json_agg(
+      json_build_object(
+        'id', b.id, 'camping', b.camping, 'spot_number', b.spot_number,
+        'start_date', b.start_date, 'end_date', b.end_date,
+        'status', b.status, 'holded_invoice_id', b.holded_invoice_id,
+        'holded_invoice_number', b.holded_invoice_number
+      ) ORDER BY b.start_date DESC NULLS LAST) FILTER (WHERE b.id IS NOT NULL), '[]') AS bookings
+    FROM fridges f
+    LEFT JOIN fridge_bookings b ON b.fridge_id = f.id
+    WHERE f.customer_id = ${id}
+       OR (f.customer_id IS NULL AND ${email}::text IS NOT NULL AND LOWER(f.email) = LOWER(${email}))
+    GROUP BY f.id
+    ORDER BY f.created_at DESC`;
+  const stalling = await sql`
+    SELECT * FROM stalling_requests
+    WHERE customer_id = ${id}
+       OR (customer_id IS NULL AND ${email}::text IS NOT NULL AND LOWER(email) = LOWER(${email}))
+    ORDER BY created_at DESC`;
+  const transports = await sql`
+    SELECT * FROM transport_requests
+    WHERE customer_id = ${id}
+       OR (customer_id IS NULL AND ${email}::text IS NOT NULL AND LOWER(email) = LOWER(${email}))
+    ORDER BY preferred_date DESC NULLS LAST`;
+  return {
+    customer,
+    fridges: fridges as never,
+    stalling: stalling as never,
+    transports: transports as never,
+  };
+}
+
+// ─── Activity-log per entiteit ───────────────────────────
+export async function getActivityForEntity(entityType: string, entityId: string, limit = 30) {
+  return sql`SELECT * FROM activity_log
+    WHERE entity_type = ${entityType} AND entity_id = ${entityId}
+    ORDER BY created_at DESC LIMIT ${limit}`;
+}
+
+// Customer-activity = directe events + events van gerelateerde subentiteiten.
+// Pragmatisch: we matchen op entity_label LIKE "%email%" voor backward-compat.
+export async function getActivityForCustomer(customerId: number, customerEmail: string | null, limit = 30) {
+  const idStr = String(customerId);
+  const rows = await sql`SELECT * FROM activity_log
+    WHERE (entity_type = 'customer' AND entity_id = ${idStr})
+       OR entity_label ILIKE ${'%' + (customerEmail || '___no_match___') + '%'}
+    ORDER BY created_at DESC LIMIT ${limit}`;
+  return rows;
+}
+
+// ─── Stalling-admin CRUD ─────────────────────────────────
+export async function getAllStallingRequests(status?: string) {
+  if (status) {
+    return sql`SELECT * FROM stalling_requests WHERE status = ${status} ORDER BY created_at DESC`;
+  }
+  return sql`SELECT * FROM stalling_requests ORDER BY created_at DESC`;
+}
+
+export async function updateStallingRequest(id: number, data: Partial<{
+  type: 'binnen' | 'buiten';
+  name: string;
+  email: string;
+  phone: string | null;
+  start_date: string;
+  end_date: string | null;
+  registration: string | null;
+  brand: string | null;
+  model: string | null;
+  length: string | null;
+  notes: string | null;
+  status: string;
+  customer_id: number | null;
+}>) {
+  await sql`UPDATE stalling_requests SET
+    type = COALESCE(${data.type ?? null}, type),
+    name = COALESCE(${data.name ?? null}, name),
+    email = COALESCE(${data.email ?? null}, email),
+    phone = COALESCE(${data.phone ?? null}, phone),
+    start_date = COALESCE(${data.start_date ?? null}::date, start_date),
+    end_date = COALESCE(${data.end_date ?? null}::date, end_date),
+    registration = COALESCE(${data.registration ?? null}, registration),
+    brand = COALESCE(${data.brand ?? null}, brand),
+    model = COALESCE(${data.model ?? null}, model),
+    length = COALESCE(${data.length ?? null}, length),
+    notes = COALESCE(${data.notes ?? null}, notes),
+    status = COALESCE(${data.status ?? null}, status),
+    customer_id = COALESCE(${data.customer_id ?? null}, customer_id),
+    updated_at = NOW()
+    WHERE id = ${id}`;
+}
+
+export async function deleteStallingRequest(id: number) {
+  await sql`DELETE FROM stalling_requests WHERE id = ${id}`;
+}
+
+// ─── Transport-edit (was alleen status-PATCH) ────────────
+export async function updateTransportRequest(id: number, data: Partial<{
+  name: string;
+  email: string;
+  phone: string | null;
+  camping: string;
+  outbound_date: string;
+  outbound_time: string | null;
+  return_date: string;
+  return_time: string | null;
+  registration: string | null;
+  brand: string | null;
+  model: string | null;
+  notes: string | null;
+  status: string;
+  customer_id: number | null;
+}>) {
+  await sql`UPDATE transport_requests SET
+    name = COALESCE(${data.name ?? null}, name),
+    email = COALESCE(${data.email ?? null}, email),
+    phone = COALESCE(${data.phone ?? null}, phone),
+    camping = COALESCE(${data.camping ?? null}, camping),
+    to_location = COALESCE(${data.camping ?? null}, to_location),
+    preferred_date = COALESCE(${data.outbound_date ?? null}::date, preferred_date),
+    outbound_time = COALESCE(${data.outbound_time ?? null}, outbound_time),
+    return_date = COALESCE(${data.return_date ?? null}::date, return_date),
+    return_time = COALESCE(${data.return_time ?? null}, return_time),
+    registration = COALESCE(${data.registration ?? null}, registration),
+    brand = COALESCE(${data.brand ?? null}, brand),
+    model = COALESCE(${data.model ?? null}, model),
+    notes = COALESCE(${data.notes ?? null}, notes),
+    status = COALESCE(${data.status ?? null}, status),
+    customer_id = COALESCE(${data.customer_id ?? null}, customer_id),
+    updated_at = NOW()
+    WHERE id = ${id}`;
 }
 
 export { sql };

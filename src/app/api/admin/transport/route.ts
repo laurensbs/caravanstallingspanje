@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import {
   getAllTransportRequests,
   updateTransportRequestStatus,
+  updateTransportRequest,
   deleteTransportRequest,
   createTransportRequest,
   logActivity,
@@ -60,9 +61,21 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const { id, action, status } = await req.json();
+    const body = await req.json();
+    const { id, action, status, fields } = body;
     if (!id || !action) return NextResponse.json({ error: 'Bad request' }, { status: 400 });
     const admin = getAdminInfo(req);
+
+    if (action === 'update' && fields && typeof fields === 'object') {
+      await updateTransportRequest(Number(id), fields);
+      await logActivity({
+        actor: admin.name, role: admin.role,
+        action: 'Transport bijgewerkt',
+        entityType: 'transport_request',
+        entityId: String(id),
+      });
+      return NextResponse.json({ success: true });
+    }
 
     if (action === 'set-status' && typeof status === 'string') {
       await updateTransportRequestStatus(Number(id), status);

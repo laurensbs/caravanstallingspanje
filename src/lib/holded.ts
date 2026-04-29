@@ -61,6 +61,38 @@ export async function listAllContacts(): Promise<HoldedContact[]> {
   return all;
 }
 
+// Update een bestaand Holded-contact. Holded gebruikt PUT op het ID-pad.
+export async function updateContactInHolded(holdedId: string, input: {
+  name?: string;
+  email?: string | null;
+  phone?: string | null;
+  mobile?: string | null;
+  address?: string | null;
+  city?: string | null;
+  postal_code?: string | null;
+  country?: string | null;
+  vat_number?: string | null;
+}): Promise<void> {
+  const body: Record<string, unknown> = {};
+  if (input.name !== undefined) body.name = input.name;
+  if (input.email !== undefined) body.email = input.email || undefined;
+  if (input.phone !== undefined) body.phone = input.phone || undefined;
+  if (input.mobile !== undefined) body.mobile = input.mobile || undefined;
+  if (input.vat_number !== undefined) body.vatnumber = input.vat_number || undefined;
+  if (input.address !== undefined || input.city !== undefined || input.postal_code !== undefined || input.country !== undefined) {
+    body.address = {
+      address: input.address || undefined,
+      city: input.city || undefined,
+      postalCode: input.postal_code || undefined,
+      country: input.country || 'ES',
+    };
+  }
+  await holdedFetch<{ status: number; id: string }>(
+    `/invoicing/v1/contacts/${holdedId}`,
+    { method: 'PUT', body: JSON.stringify(body) }
+  );
+}
+
 // Verlengde create voor het admin-paneel: meer velden dan ensureContact
 // gebruikt. Returnt het nieuwe Holded-id.
 export async function pushContactToHolded(input: {

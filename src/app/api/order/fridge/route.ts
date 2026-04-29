@@ -7,7 +7,7 @@ import {
   countOverlappingBookings,
 } from '@/lib/db';
 import { validateBody, fridgeOrderSchema } from '@/lib/validations';
-import { calculatePrice, formatEur, STOCK, effectiveAmountEur, type DeviceType } from '@/lib/pricing';
+import { calculatePriceWithSettings, formatEur, getEffectiveStock, effectiveAmountEur, type DeviceType } from '@/lib/pricing';
 import { createCheckoutSession } from '@/lib/stripe';
 import { formatRef, refKindForFridge } from '@/lib/refs';
 
@@ -22,14 +22,15 @@ export async function POST(req: NextRequest) {
 
     // Stock check: how many of this device type are reserved during this period?
     const inUse = await countOverlappingBookings(data.device_type, data.start_date, data.end_date);
-    if (inUse >= STOCK[data.device_type as DeviceType]) {
+    const stock = await getEffectiveStock();
+    if (inUse >= stock[data.device_type as DeviceType]) {
       return NextResponse.json(
         { error: 'Geen voorraad', soldOut: true },
         { status: 409 },
       );
     }
 
-    const price = calculatePrice(data.device_type as DeviceType, data.start_date, data.end_date);
+    const price = await calculatePriceWithSettings(data.device_type as DeviceType, data.start_date, data.end_date);
 
     // Find existing customer by email or create one
     let fridge = await findFridgeByEmail(data.email);

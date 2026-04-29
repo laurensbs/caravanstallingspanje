@@ -1,20 +1,21 @@
 import { NextResponse } from 'next/server';
 import { getActiveBookings, getActiveBookingsByType } from '@/lib/db';
-import { STOCK } from '@/lib/pricing';
+import { getEffectiveStock } from '@/lib/pricing';
 
 export async function GET() {
   try {
-    const [bookings, byType] = await Promise.all([
+    const [bookings, byType, stock] = await Promise.all([
       getActiveBookings(),
       getActiveBookingsByType(),
+      getEffectiveStock(),
     ]);
     const find = (t: string) => byType.find((r) => r.device_type === t)?.count ?? 0;
     return NextResponse.json({
       bookings,
       stats: {
-        large: { current: find('Grote koelkast'), capacity: STOCK['Grote koelkast'] },
-        table: { current: find('Tafelmodel koelkast'), capacity: STOCK['Tafelmodel koelkast'] },
-        airco: { current: find('Airco'), capacity: STOCK['Airco'] },
+        large: { current: find('Grote koelkast'), capacity: stock['Grote koelkast'] },
+        table: { current: find('Tafelmodel koelkast'), capacity: stock['Tafelmodel koelkast'] },
+        airco: { current: find('Airco'), capacity: stock['Airco'] },
       },
     });
   } catch (error) {

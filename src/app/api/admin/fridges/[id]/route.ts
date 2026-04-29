@@ -26,6 +26,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       extra_email: validated.data.extra_email,
       device_type: validated.data.device_type,
       notes: validated.data.notes,
+      customer_id: validated.data.customer_id ?? null,
     });
     const admin = getAdminInfo(req);
     await logActivity({ actor: admin.name, role: admin.role, action: 'Koelkast bijgewerkt', entityType: 'fridge', entityId: id, entityLabel: validated.data.name || '' });

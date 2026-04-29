@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
@@ -133,7 +134,10 @@ export default function KlantenPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, x: -6 }}
                 >
-                  <div className="px-5 py-3.5 flex items-start gap-4 hover:bg-surface-2 transition-colors">
+                  <Link
+                    href={`/admin/klanten/${c.id}`}
+                    className="px-5 py-3.5 flex items-start gap-4 hover:bg-surface-2 transition-colors"
+                  >
                     <div className="w-9 h-9 rounded-full bg-surface-2 text-text flex items-center justify-center text-xs font-medium shrink-0 border border-border">
                       {initials(c.name)}
                     </div>
@@ -172,7 +176,7 @@ export default function KlantenPage() {
                         <Badge tone="neutral">{c.counts.transport}× transport</Badge>
                       )}
                     </div>
-                  </div>
+                  </Link>
                 </motion.li>
               ))}
             </AnimatePresence>
