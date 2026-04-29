@@ -2,53 +2,82 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ArrowRight, Refrigerator, Wrench, ExternalLink } from 'lucide-react';
+import { ArrowRight, Refrigerator, Wrench } from 'lucide-react';
 
 const REPAIR_URL =
   process.env.NEXT_PUBLIC_REPAIR_URL || 'https://caravanreparatiespanje.vercel.app';
 
+const NAVY_GRAD =
+  'radial-gradient(120% 90% at 50% 0%, #142F4D 0%, #0A1929 60%, #050D18 100%)';
+
+const EASE = [0.16, 1, 0.3, 1] as const;
+
 export default function PortalPicker() {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-bg px-6 py-12">
-      <div className="w-full max-w-2xl">
+    <main
+      className="min-h-screen flex items-center justify-center px-6 py-12 relative overflow-hidden"
+      style={{ background: NAVY_GRAD, color: '#F1F5F9' }}
+    >
+      {/* zachte halo bovenin */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[400px] blur-3xl"
+        style={{
+          background:
+            'radial-gradient(40% 60% at 50% 30%, rgba(126,168,255,0.18) 0%, rgba(126,168,255,0.06) 40%, transparent 75%)',
+        }}
+      />
+      <div className="relative w-full max-w-2xl">
         <motion.div
-          initial={{ opacity: 0, y: 8 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.5, ease: EASE }}
           className="text-center mb-12"
         >
-          <Image
-            src="/images/logo.png"
-            alt="Caravanstalling"
-            width={220}
-            height={50}
-            priority
-            className="mx-auto h-9 w-auto opacity-90 mb-6"
-          />
-          <p className="text-[10px] font-medium tracking-[0.25em] uppercase text-text-muted">
-            Beheerportaal
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white shadow-lg mb-6">
+            <Image
+              src="/images/logo.png"
+              alt="Caravanstalling"
+              width={56}
+              height={56}
+              priority
+              className="object-contain"
+            />
+          </div>
+          <p
+            className="text-[10px] font-medium tracking-[0.25em] uppercase"
+            style={{ color: 'rgba(241,245,249,0.55)' }}
+          >
+            Admin portal
           </p>
-          <h1 className="text-2xl font-semibold tracking-tight mt-2">
-            Welk portaal wil je openen?
+          <h1
+            className="text-3xl sm:text-4xl font-semibold tracking-tight mt-3"
+            style={{ color: '#FFFFFF' }}
+          >
+            Which portal would you like to open?
           </h1>
+          <p
+            className="mt-3 text-[14px] leading-relaxed max-w-md mx-auto"
+            style={{ color: 'rgba(241,245,249,0.65)' }}
+          >
+            Two systems, one team. Pick where you want to work.
+          </p>
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <PortalCard
             href="/admin/dashboard"
-            external={false}
             icon={Refrigerator}
-            title="Stalling"
-            description="Koelkasten, transport, wachtlijst en stallingaanvragen."
-            delay={0.05}
+            title="Storage"
+            description="Fridges, air-con, transport, waitlist and storage requests."
+            delay={0.1}
           />
           <PortalCard
             href={REPAIR_URL}
-            external
             icon={Wrench}
-            title="Reparatie & Work Orders"
-            description="Werkbonnen, services, onderdelen en planning."
-            delay={0.1}
+            title="Repair & work orders"
+            description="Work orders, services, parts and scheduling."
+            delay={0.18}
           />
         </div>
       </div>
@@ -58,52 +87,62 @@ export default function PortalPicker() {
 
 interface PortalCardProps {
   href: string;
-  external: boolean;
   icon: typeof Refrigerator;
   title: string;
   description: string;
   delay: number;
 }
 
-function PortalCard({ href, external, icon: Icon, title, description, delay }: PortalCardProps) {
-  const inner = (
-    <div className="card-surface group hover-lift block p-6 cursor-pointer">
-      <div className="flex items-start justify-between mb-8">
-        <div className="w-10 h-10 rounded-[var(--radius-md)] bg-surface-2 text-text flex items-center justify-center border border-border">
-          <Icon size={18} />
-        </div>
-        {external ? (
-          <ExternalLink
-            size={14}
-            className="text-text-subtle group-hover:text-text transition-colors"
-          />
-        ) : (
-          <ArrowRight
-            size={14}
-            className="text-text-subtle group-hover:text-text transition-transform group-hover:translate-x-0.5"
-          />
-        )}
-      </div>
-      <h2 className="text-base font-semibold text-text">{title}</h2>
-      <p className="text-[13px] text-text-muted mt-1 leading-relaxed">{description}</p>
-    </div>
-  );
-
+function PortalCard({ href, icon: Icon, title, description, delay }: PortalCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ delay, duration: 0.4, ease: EASE }}
     >
-      {external ? (
-        <a href={href} target="_blank" rel="noopener noreferrer" className="block">
-          {inner}
-        </a>
-      ) : (
-        <a href={href} className="block">
-          {inner}
-        </a>
-      )}
+      <a
+        href={href}
+        className="group block p-6 rounded-2xl transition-all relative overflow-hidden"
+        style={{
+          background: 'rgba(255,255,255,0.06)',
+          border: '1px solid rgba(255,255,255,0.10)',
+          backdropFilter: 'blur(6px)',
+        }}
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-400"
+          style={{
+            background:
+              'radial-gradient(60% 60% at 30% 20%, rgba(126,168,255,0.14) 0%, transparent 70%)',
+          }}
+        />
+        <div className="relative flex items-start justify-between mb-8">
+          <div
+            className="w-11 h-11 rounded-[12px] flex items-center justify-center transition-transform group-hover:scale-105"
+            style={{
+              background: 'rgba(255,255,255,0.10)',
+              border: '1px solid rgba(255,255,255,0.14)',
+            }}
+          >
+            <Icon size={20} style={{ color: '#F1F5F9' }} />
+          </div>
+          <ArrowRight
+            size={16}
+            className="transition-transform group-hover:translate-x-0.5"
+            style={{ color: 'rgba(241,245,249,0.45)' }}
+          />
+        </div>
+        <h2 className="relative text-lg font-semibold" style={{ color: '#FFFFFF' }}>
+          {title}
+        </h2>
+        <p
+          className="relative text-[13px] mt-1.5 leading-relaxed"
+          style={{ color: 'rgba(241,245,249,0.62)' }}
+        >
+          {description}
+        </p>
+      </a>
     </motion.div>
   );
 }
