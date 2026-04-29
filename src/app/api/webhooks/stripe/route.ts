@@ -15,11 +15,14 @@ import {
   setStallingHoldedInvoice,
   logActivity,
   cleanupOldPendingIntakes,
+  getCustomerByEmail,
+  createCustomer,
+  linkFridgeToCustomer,
+  linkStallingToCustomer,
 } from '@/lib/db';
 import { sendIntake, type IntakePayload } from '@/lib/work-order-hub';
-import { invoiceForCustomer } from '@/lib/holded';
+import { invoiceForCustomer, findContactByEmail } from '@/lib/holded';
 import { sendMail, paymentReceivedHtml } from '@/lib/email';
-import { TEST_MODE } from '@/lib/pricing';
 import { formatRef, refKindForFridge } from '@/lib/refs';
 
 // Stripe signature verification needs the raw request body, not the
@@ -143,9 +146,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
       }
       // Holded factuur (idempotent: bestaande invoice respecteren).
       const booking = fridge?.bookings?.find((b: { id: number }) => b.id === id);
-      if (TEST_MODE) {
-        await logActivity({ action: 'Holded overgeslagen (testmodus)', entityType: kind, entityId: refId });
-      } else if (customerEmail && !booking?.holded_invoice_id) {
+      if (customerEmail && !booking?.holded_invoice_id) {
         try {
           const inv = await invoiceForCustomer({
             customer: { name: customerName || customerEmail, email: customerEmail, phone: customerPhone || null },
@@ -153,6 +154,10 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
             amountEur,
           });
           await setBookingHoldedInvoice(id, inv.id, inv.invoiceNum);
+          // Customer-record aanmaken/koppelen: invoiceForCustomer heeft net
+          // ensureContact gedaan, dus de Holded-id zit nu in de invoice.
+          const linkedCustomer = await ensureLocalCustomer(customerName, customerEmail, customerPhone, inv.contactId);
+          if (linkedCustomer) await linkFridgeToCustomer(id, linkedCustomer.id);
         } catch (err) {
           await logActivity({ action: 'Holded factuur mislukt (koelkast)', entityType: kind, entityId: refId, details: err instanceof Error ? err.message : 'unknown' });
         }
@@ -168,9 +173,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
         customerEmail = customerEmail || r.email;
         customerPhone = customerPhone || r.phone || '';
         invoiceDescription = invoiceDescription || `Stalling ${r.type} — jaarprijs`;
-        if (TEST_MODE) {
-          await logActivity({ action: 'Holded overgeslagen (testmodus)', entityType: kind, entityId: refId });
-        } else if (customerEmail && !r.holded_invoice_id) {
+        if (customerEmail && !r.holded_invoice_id) {
           try {
             const inv = await invoiceForCustomer({
               customer: { name: customerName, email: customerEmail, phone: customerPhone || null },
@@ -178,6 +181,8 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
               amountEur,
             });
             await setStallingHoldedInvoice(id, inv.id, inv.invoiceNum);
+            const linkedCustomer = await ensureLocalCustomer(customerName, customerEmail, customerPhone, inv.contactId);
+            if (linkedCustomer) await linkStallingToCustomer(id, linkedCustomer.id);
           } catch (err) {
             await logActivity({ action: 'Holded factuur mislukt (stalling)', entityType: kind, entityId: refId, details: err instanceof Error ? err.message : 'unknown' });
           }
@@ -210,9 +215,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
       }
     }
     // Holded-factuur voor service.
-    if (TEST_MODE) {
-      await logActivity({ action: 'Holded overgeslagen (testmodus)', entityType: kind, entityId: session.id });
-    } else if (customerEmail) {
+    if (customerEmail) {
       try {
         await invoiceForCustomer({
           customer: { name: customerName || customerEmail, email: customerEmail, phone: customerPhone || null },
@@ -344,4 +347,48 @@ async function handleDisputeCreated(event: Stripe.Event) {
     entityId: dispute.id,
     details: dispute.reason || undefined,
   });
+}
+
+// Zoekt een lokale customer-rij op email; maakt anders aan, gekoppeld aan
+// het Holded-contact uit de net-aangemaakte factuur. Failsafe: gooit nooit.
+async function ensureLocalCustomer(
+  name: string,
+  email: string,
+  phone: string,
+  holdedContactId: string,
+) {
+  if (!email) return null;
+  try {
+    const existing = await getCustomerByEmail(email);
+    if (existing) {
+      // Als bestaande rij geen Holded-id had, vul deze nu aan.
+      if (!existing.holded_contact_id && holdedContactId) {
+        await updateCustomerHoldedId(existing.id, holdedContactId);
+      }
+      return existing;
+    }
+    // Match Holded-side first om dubbele contact_ids te voorkomen.
+    let finalHoldedId = holdedContactId;
+    if (!finalHoldedId) {
+      const match = await findContactByEmail(email).catch(() => null);
+      if (match) finalHoldedId = match.id;
+    }
+    return await createCustomer({
+      name: name || email,
+      email,
+      phone: phone || null,
+      holded_contact_id: finalHoldedId || null,
+      source: 'stripe',
+    });
+  } catch (err) {
+    console.error('[webhook] ensureLocalCustomer failed:', err);
+    return null;
+  }
+}
+
+// Inline zodat de helper hierboven hem kan gebruiken zonder DB-helper toe
+// te voegen die elders geen waarde levert.
+async function updateCustomerHoldedId(id: number, holdedId: string) {
+  const { sql } = await import('@/lib/db');
+  await sql`UPDATE customers SET holded_contact_id = ${holdedId}, updated_at = NOW() WHERE id = ${id}`;
 }

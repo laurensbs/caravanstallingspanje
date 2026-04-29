@@ -12,6 +12,8 @@ import { Button, Input, Select, Textarea, Badge, Skeleton, Spinner } from '@/com
 import Drawer from '@/components/Drawer';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import PageHeader from '@/components/admin/PageHeader';
+import CustomerPicker, { type CustomerLite } from '@/components/CustomerPicker';
+import NewCustomerDialog from '@/components/NewCustomerDialog';
 
 type Booking = {
   id: number;
@@ -36,7 +38,9 @@ type Fridge = {
   bookings: Booking[];
 };
 
-const emptyFridge = { name: '', email: '', extra_email: '', device_type: 'Grote koelkast', notes: '' };
+const emptyFridge: { name: string; email: string; extra_email: string; device_type: string; notes: string; customer_id: number | null } = {
+  name: '', email: '', extra_email: '', device_type: 'Grote koelkast', notes: '', customer_id: null,
+};
 const emptyBooking: { camping: string; start_date: string; end_date: string; spot_number: string; status: 'compleet' | 'controleren'; notes: string } = {
   camping: '', start_date: '', end_date: '', spot_number: '', status: 'compleet', notes: '',
 };
@@ -84,6 +88,9 @@ function KoelkastenContent() {
   const [drawerMode, setDrawerMode] = useState<'create' | 'edit'>('create');
   const [drawerFridge, setDrawerFridge] = useState<Fridge | null>(null);
   const [fridgeForm, setFridgeForm] = useState(emptyFridge);
+  const [pickedCustomer, setPickedCustomer] = useState<CustomerLite | null>(null);
+  const [newCustomerOpen, setNewCustomerOpen] = useState(false);
+  const [newCustomerInitial, setNewCustomerInitial] = useState<string | undefined>(undefined);
   const [savingFridge, setSavingFridge] = useState(false);
   const [holdedSyncing, setHoldedSyncing] = useState(false);
 
@@ -152,18 +159,21 @@ function KoelkastenContent() {
     setDrawerMode('create');
     setDrawerFridge(null);
     setFridgeForm(emptyFridge);
+    setPickedCustomer(null);
     setDrawerOpen(true);
   };
 
   const openEdit = (f: Fridge) => {
     setDrawerMode('edit');
     setDrawerFridge(f);
+    setPickedCustomer(null);
     setFridgeForm({
       name: f.name,
       email: f.email || '',
       extra_email: f.extra_email || '',
-      device_type: f.device_type,
+      device_type: f.device_type || 'Grote koelkast',
       notes: f.notes || '',
+      customer_id: null,
     });
     setDrawerOpen(true);
   };
@@ -458,16 +468,48 @@ function KoelkastenContent() {
         )}
       >
         <form onSubmit={saveFridge} className="space-y-4">
-          <Input label="Naam" required value={fridgeForm.name} onChange={e => setFridgeForm({ ...fridgeForm, name: e.target.value })} />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <Input label="E-mail" type="email" value={fridgeForm.email} onChange={e => setFridgeForm({ ...fridgeForm, email: e.target.value })} />
-            <Input label="Extra e-mail" type="email" value={fridgeForm.extra_email} onChange={e => setFridgeForm({ ...fridgeForm, extra_email: e.target.value })} />
-          </div>
+          {drawerMode === 'create' && (
+            <div>
+              <label className="block text-xs font-medium text-text mb-1.5">Klant</label>
+              <CustomerPicker
+                value={pickedCustomer}
+                onSelect={(c) => {
+                  setPickedCustomer(c);
+                  setFridgeForm({
+                    ...fridgeForm,
+                    customer_id: c.id,
+                    name: c.name,
+                    email: c.email || '',
+                  });
+                }}
+                onClear={() => {
+                  setPickedCustomer(null);
+                  setFridgeForm({ ...fridgeForm, customer_id: null, name: '', email: '' });
+                }}
+                onCreateNew={(q) => {
+                  setNewCustomerInitial(q);
+                  setNewCustomerOpen(true);
+                }}
+              />
+              <p className="text-[11px] text-text-muted mt-1.5">
+                Selecteer een bestaande klant of maak een nieuwe aan — die komt direct ook in Holded.
+              </p>
+            </div>
+          )}
+          {drawerMode === 'edit' && (
+            <>
+              <Input label="Naam" required value={fridgeForm.name} onChange={e => setFridgeForm({ ...fridgeForm, name: e.target.value })} />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <Input label="E-mail" type="email" value={fridgeForm.email} onChange={e => setFridgeForm({ ...fridgeForm, email: e.target.value })} />
+                <Input label="Extra e-mail" type="email" value={fridgeForm.extra_email} onChange={e => setFridgeForm({ ...fridgeForm, extra_email: e.target.value })} />
+              </div>
+            </>
+          )}
           <div>
             <label className="block text-xs font-medium text-text mb-1.5">Soort apparaat</label>
             <input
               list="device-types"
-              value={fridgeForm.device_type}
+              value={fridgeForm.device_type ?? ''}
               onChange={e => setFridgeForm({ ...fridgeForm, device_type: e.target.value })}
               className="w-full h-10 px-3 text-sm bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors"
             />
@@ -679,6 +721,21 @@ function KoelkastenContent() {
         destructive
         onConfirm={confirmDeleteAction}
         onCancel={() => setConfirmDelete(null)}
+      />
+
+      <NewCustomerDialog
+        open={newCustomerOpen}
+        onClose={() => setNewCustomerOpen(false)}
+        initialQuery={newCustomerInitial}
+        onCreated={(c) => {
+          setPickedCustomer(c);
+          setFridgeForm({
+            ...fridgeForm,
+            customer_id: c.id,
+            name: c.name,
+            email: c.email || '',
+          });
+        }}
       />
     </>
   );

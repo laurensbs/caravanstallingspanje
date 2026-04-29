@@ -3,7 +3,6 @@ import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import { Toaster } from 'sonner';
 import { LocaleProvider } from '@/components/LocaleProvider';
-import TestModeBanner from '@/components/TestModeBanner';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -20,7 +19,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="nl" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <body>
-        <TestModeBanner />
         <LocaleProvider>{children}</LocaleProvider>
         <Toaster
           position="top-right"

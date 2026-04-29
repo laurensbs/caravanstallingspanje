@@ -17,6 +17,7 @@ export const setPasswordSchema = z.object({
 });
 
 export const fridgeSchema = z.object({
+  customer_id: z.number().int().positive().optional(),
   name: z.string().min(1).max(200),
   email: z.string().email().optional().or(z.literal('')),
   extra_email: z.string().email().optional().or(z.literal('')),

@@ -46,6 +46,7 @@ export async function POST(req: NextRequest) {
       extra_email: validated.data.extra_email || null,
       device_type: validated.data.device_type,
       notes: validated.data.notes,
+      customer_id: validated.data.customer_id || null,
     });
     const admin = getAdminInfo(req);
     await logActivity({ actor: admin.name, role: admin.role, action: 'Koelkast aangemaakt', entityType: 'fridge', entityId: String(fridge.id), entityLabel: validated.data.name });

@@ -3,9 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
-import {
-  Check, Clock, Mail, Phone, FileText, Send, Sparkles, AlertTriangle,
-} from 'lucide-react';
+import { Check, Clock, Mail, Phone, Sparkles } from 'lucide-react';
 import { useLocale } from './LocaleProvider';
 
 type Lookup = {
@@ -20,7 +18,6 @@ type Lookup = {
   invoiceNumber: string | null;
   forwardedToWorkshop: boolean;
   forwardCode?: string;
-  testMode?: boolean;
 };
 
 interface Props {
@@ -129,18 +126,6 @@ export default function OrderReceipt({ refCode, fallbackTitle, fallbackBody }: P
             </p>
           )}
         </motion.div>
-
-        {data?.testMode && (
-          <motion.div
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45 }}
-            className="mb-6 rounded-[var(--radius-md)] border border-warning bg-warning-soft text-text px-4 py-3 text-[13px] flex items-center gap-2"
-          >
-            <AlertTriangle size={14} className="text-warning shrink-0" />
-            <span><strong>Testmodus actief.</strong> Geen factuur in Holded; betaling was €0,50.</span>
-          </motion.div>
-        )}
 
         {/* Detail-blok */}
         {data && (
@@ -258,7 +243,6 @@ function buildSteps(data: Lookup | null, _t: TFn): Step[] {
   } else {
     steps.push({
       label: 'Betaling ontvangen',
-      detail: data.testMode ? 'Testmodus — €0,50' : undefined,
       done: data.status === 'betaald' || data.status === 'doorgestuurd',
     });
   }
@@ -271,9 +255,9 @@ function buildSteps(data: Lookup | null, _t: TFn): Step[] {
   // 3. Factuur
   if (data.kind === 'koelkast' || data.kind === 'airco' || data.kind === 'stalling' || data.kind === 'service') {
     steps.push({
-      label: data.testMode ? 'Factuur (overgeslagen in testmodus)' : 'Factuur aangemaakt in Holded',
+      label: 'Factuur aangemaakt in Holded',
       detail: data.invoiceNumber ? `nr. ${data.invoiceNumber}` : undefined,
-      done: data.invoiceCreated || !!data.testMode,
+      done: data.invoiceCreated,
     });
   }
   // 4. Doorgezet naar werkplaats
@@ -298,5 +282,3 @@ function buildSteps(data: Lookup | null, _t: TFn): Step[] {
   return steps;
 }
 
-void Send;
-void FileText;

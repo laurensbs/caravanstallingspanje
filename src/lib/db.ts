@@ -198,6 +198,37 @@ export async function initDatabase() {
   // sneaks through the application check below, the unique constraint catches it.
   await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_fridge_bookings_holded_invoice ON fridge_bookings(holded_invoice_id) WHERE holded_invoice_id IS NOT NULL`;
 
+  // ─── Centraal klantenregister ──────────────────────────────
+  await sql`CREATE TABLE IF NOT EXISTS customers (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT,
+    phone TEXT,
+    mobile TEXT,
+    address TEXT,
+    city TEXT,
+    postal_code TEXT,
+    country TEXT DEFAULT 'ES',
+    vat_number TEXT,
+    notes TEXT,
+    holded_contact_id TEXT,
+    holded_sync_failed BOOLEAN DEFAULT false,
+    source TEXT DEFAULT 'manual',
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  )`;
+  await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_email_lower ON customers (LOWER(email)) WHERE email IS NOT NULL`;
+  await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_holded_id ON customers (holded_contact_id) WHERE holded_contact_id IS NOT NULL`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_customers_phone ON customers (phone)`;
+
+  // FK kolommen voor migratie naar customer-centrisch model.
+  await sql`ALTER TABLE fridges ADD COLUMN IF NOT EXISTS customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_fridges_customer ON fridges(customer_id)`;
+  await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_stalling_requests_customer ON stalling_requests(customer_id)`;
+  await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_transport_requests_customer ON transport_requests(customer_id)`;
+
   return { success: true };
 }
 
@@ -325,9 +356,19 @@ export async function getFridgeById(id: number) {
   return rows[0] || null;
 }
 
-export async function createFridge(data: { name: string; email?: string | null; extra_email?: string | null; device_type?: string; notes?: string | null }) {
-  const res = await sql`INSERT INTO fridges (name, email, extra_email, device_type, notes)
-    VALUES (${data.name}, ${data.email || null}, ${data.extra_email || null}, ${data.device_type || 'Grote koelkast'}, ${data.notes || null}) RETURNING *`;
+export async function createFridge(data: {
+  name: string;
+  email?: string | null;
+  extra_email?: string | null;
+  device_type?: string;
+  notes?: string | null;
+  customer_id?: number | null;
+}) {
+  const res = await sql`INSERT INTO fridges
+    (name, email, extra_email, device_type, notes, customer_id)
+    VALUES (${data.name}, ${data.email || null}, ${data.extra_email || null},
+      ${data.device_type || 'Grote koelkast'}, ${data.notes || null}, ${data.customer_id || null})
+    RETURNING *`;
   return res[0];
 }
 
@@ -760,6 +801,170 @@ export async function deleteWaitlistEntry(id: number) {
 
 export async function markWaitlistNotified(id: number) {
   await sql`UPDATE fridge_waitlist SET status = 'genotificeerd', notified_at = NOW() WHERE id = ${id}`;
+}
+
+// ─── Customers ───────────────────────────────────────────
+export type CustomerRow = {
+  id: number;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  mobile: string | null;
+  address: string | null;
+  city: string | null;
+  postal_code: string | null;
+  country: string | null;
+  vat_number: string | null;
+  notes: string | null;
+  holded_contact_id: string | null;
+  holded_sync_failed: boolean;
+  source: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export async function searchCustomers(q: string, limit = 10): Promise<CustomerRow[]> {
+  const term = `%${q.trim()}%`;
+  if (!q.trim()) return [];
+  const rows = await sql`
+    SELECT * FROM customers
+    WHERE name ILIKE ${term} OR email ILIKE ${term} OR phone ILIKE ${term}
+    ORDER BY
+      CASE
+        WHEN name ILIKE ${q + '%'} THEN 0
+        WHEN email ILIKE ${q + '%'} THEN 1
+        ELSE 2
+      END,
+      name ASC
+    LIMIT ${limit}`;
+  return rows as unknown as CustomerRow[];
+}
+
+export async function listCustomers(opts: { page?: number; pageSize?: number; search?: string } = {}) {
+  const pageSize = opts.pageSize ?? 50;
+  const page = Math.max(1, opts.page ?? 1);
+  const offset = (page - 1) * pageSize;
+  const term = opts.search ? `%${opts.search.trim()}%` : null;
+  const rows = term
+    ? await sql`SELECT * FROM customers
+        WHERE name ILIKE ${term} OR email ILIKE ${term} OR phone ILIKE ${term}
+        ORDER BY name ASC LIMIT ${pageSize} OFFSET ${offset}`
+    : await sql`SELECT * FROM customers ORDER BY name ASC LIMIT ${pageSize} OFFSET ${offset}`;
+  const totalRows = term
+    ? await sql`SELECT COUNT(*) AS c FROM customers WHERE name ILIKE ${term} OR email ILIKE ${term} OR phone ILIKE ${term}`
+    : await sql`SELECT COUNT(*) AS c FROM customers`;
+  return {
+    customers: rows as unknown as CustomerRow[],
+    total: Number((totalRows[0] as { c: string | number }).c),
+    page,
+    pageSize,
+  };
+}
+
+export async function getCustomerById(id: number): Promise<CustomerRow | null> {
+  const rows = await sql`SELECT * FROM customers WHERE id = ${id} LIMIT 1`;
+  return (rows[0] as CustomerRow) || null;
+}
+
+export async function getCustomerByEmail(email: string): Promise<CustomerRow | null> {
+  if (!email) return null;
+  const rows = await sql`SELECT * FROM customers WHERE LOWER(email) = LOWER(${email}) LIMIT 1`;
+  return (rows[0] as CustomerRow) || null;
+}
+
+export async function getCustomerByHoldedId(holdedId: string): Promise<CustomerRow | null> {
+  if (!holdedId) return null;
+  const rows = await sql`SELECT * FROM customers WHERE holded_contact_id = ${holdedId} LIMIT 1`;
+  return (rows[0] as CustomerRow) || null;
+}
+
+export async function createCustomer(data: {
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  mobile?: string | null;
+  address?: string | null;
+  city?: string | null;
+  postal_code?: string | null;
+  country?: string | null;
+  vat_number?: string | null;
+  notes?: string | null;
+  holded_contact_id?: string | null;
+  holded_sync_failed?: boolean;
+  source?: string;
+}): Promise<CustomerRow> {
+  const rows = await sql`INSERT INTO customers
+    (name, email, phone, mobile, address, city, postal_code, country, vat_number, notes,
+     holded_contact_id, holded_sync_failed, source)
+    VALUES (${data.name}, ${data.email || null}, ${data.phone || null}, ${data.mobile || null},
+      ${data.address || null}, ${data.city || null}, ${data.postal_code || null},
+      ${data.country || 'ES'}, ${data.vat_number || null}, ${data.notes || null},
+      ${data.holded_contact_id || null}, ${data.holded_sync_failed ?? false}, ${data.source || 'manual'})
+    RETURNING *`;
+  return (rows[0] as CustomerRow);
+}
+
+export async function updateCustomer(id: number, data: Partial<{
+  name: string; email: string | null; phone: string | null; mobile: string | null;
+  address: string | null; city: string | null; postal_code: string | null;
+  country: string | null; vat_number: string | null; notes: string | null;
+  holded_contact_id: string | null;
+}>) {
+  await sql`UPDATE customers SET
+    name = COALESCE(${data.name ?? null}, name),
+    email = COALESCE(${data.email ?? null}, email),
+    phone = COALESCE(${data.phone ?? null}, phone),
+    mobile = COALESCE(${data.mobile ?? null}, mobile),
+    address = COALESCE(${data.address ?? null}, address),
+    city = COALESCE(${data.city ?? null}, city),
+    postal_code = COALESCE(${data.postal_code ?? null}, postal_code),
+    country = COALESCE(${data.country ?? null}, country),
+    vat_number = COALESCE(${data.vat_number ?? null}, vat_number),
+    notes = COALESCE(${data.notes ?? null}, notes),
+    holded_contact_id = COALESCE(${data.holded_contact_id ?? null}, holded_contact_id),
+    updated_at = NOW()
+    WHERE id = ${id}`;
+}
+
+export async function setCustomerHoldedId(id: number, holdedId: string | null, failed = false) {
+  await sql`UPDATE customers
+    SET holded_contact_id = ${holdedId}, holded_sync_failed = ${failed}, updated_at = NOW()
+    WHERE id = ${id}`;
+}
+
+export async function linkFridgeToCustomer(fridgeId: number, customerId: number) {
+  await sql`UPDATE fridges SET customer_id = ${customerId}, updated_at = NOW() WHERE id = ${fridgeId}`;
+}
+
+export async function linkStallingToCustomer(stallingId: number, customerId: number) {
+  await sql`UPDATE stalling_requests SET customer_id = ${customerId}, updated_at = NOW() WHERE id = ${stallingId}`;
+}
+
+export async function linkTransportToCustomer(transportId: number, customerId: number) {
+  await sql`UPDATE transport_requests SET customer_id = ${customerId}, updated_at = NOW() WHERE id = ${transportId}`;
+}
+
+// Snel statistiekje voor de overzichtspagina: hoeveel koelkasten en
+// stallingen per klant. Email-fallback voor backward-compat met bestaande
+// rijen die nog geen customer_id hebben.
+export async function getCustomerCounts(customerId: number, customerEmail: string | null) {
+  const fridgeRows = await sql`
+    SELECT COUNT(*) AS c FROM fridges
+    WHERE customer_id = ${customerId}
+       OR (customer_id IS NULL AND ${customerEmail}::text IS NOT NULL AND LOWER(email) = LOWER(${customerEmail}))`;
+  const stallingRows = await sql`
+    SELECT COUNT(*) AS c FROM stalling_requests
+    WHERE customer_id = ${customerId}
+       OR (customer_id IS NULL AND ${customerEmail}::text IS NOT NULL AND LOWER(email) = LOWER(${customerEmail}))`;
+  const transportRows = await sql`
+    SELECT COUNT(*) AS c FROM transport_requests
+    WHERE customer_id = ${customerId}
+       OR (customer_id IS NULL AND ${customerEmail}::text IS NOT NULL AND LOWER(email) = LOWER(${customerEmail}))`;
+  return {
+    fridges: Number((fridgeRows[0] as { c: string | number }).c),
+    stalling: Number((stallingRows[0] as { c: string | number }).c),
+    transport: Number((transportRows[0] as { c: string | number }).c),
+  };
 }
 
 export { sql };

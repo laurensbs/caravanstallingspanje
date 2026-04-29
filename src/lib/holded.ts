@@ -40,7 +40,63 @@ export type HoldedContact = {
   email?: string;
   phone?: string;
   mobile?: string;
+  vatnumber?: string;
+  address?: { address?: string; city?: string; postalCode?: string; country?: string };
 };
+
+// Holded paginatie. Default page-size is 50; we vragen max op om import-tempo
+// te verhogen. Stoppen zodra een page minder dan {limit} entries teruggeeft.
+export async function listContactsPaginated(page = 1, limit = 500): Promise<HoldedContact[]> {
+  return holdedFetch<HoldedContact[]>(`/invoicing/v1/contacts?page=${page}&limit=${limit}`);
+}
+
+export async function listAllContacts(): Promise<HoldedContact[]> {
+  const all: HoldedContact[] = [];
+  for (let page = 1; page < 200; page++) {
+    const batch = await listContactsPaginated(page, 500);
+    if (!Array.isArray(batch) || batch.length === 0) break;
+    all.push(...batch);
+    if (batch.length < 500) break;
+  }
+  return all;
+}
+
+// Verlengde create voor het admin-paneel: meer velden dan ensureContact
+// gebruikt. Returnt het nieuwe Holded-id.
+export async function pushContactToHolded(input: {
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  mobile?: string | null;
+  address?: string | null;
+  city?: string | null;
+  postal_code?: string | null;
+  country?: string | null;
+  vat_number?: string | null;
+}): Promise<string> {
+  const body: Record<string, unknown> = {
+    name: input.name,
+    email: input.email || undefined,
+    phone: input.phone || undefined,
+    mobile: input.mobile || input.phone || undefined,
+    type: 'client',
+    isperson: 1,
+  };
+  if (input.address || input.city || input.postal_code || input.country) {
+    body.address = {
+      address: input.address || undefined,
+      city: input.city || undefined,
+      postalCode: input.postal_code || undefined,
+      country: input.country || 'ES',
+    };
+  }
+  if (input.vat_number) body.vatnumber = input.vat_number;
+  const data = await holdedFetch<{ status: number; id: string }>(
+    '/invoicing/v1/contacts',
+    { method: 'POST', body: JSON.stringify(body) }
+  );
+  return data.id;
+}
 
 export async function findContactByEmail(email: string): Promise<HoldedContact | null> {
   if (!email) return null;
