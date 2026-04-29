@@ -99,6 +99,7 @@ export const inspectionOrderSchema = z.object({
 // vanuit stalling, terug vanaf diezelfde camping) en twee voorkeursdatums.
 export const transportOrderSchema = z.object({
   ...contactBase,
+  mode: z.enum(['wij_rijden', 'zelf']),
   camping: knownCamping,
   outboundDate: z
     .string()
@@ -114,6 +115,15 @@ export const transportOrderSchema = z.object({
   path: ['returnDate'],
 });
 
+// Publiek contact-formulier — landen in admin-inbox + mail naar info@.
+export const contactMessageSchema = z.object({
+  name: z.string().min(2, 'Vul je naam in').max(200),
+  email: z.string().email('Vul een geldig e-mailadres in'),
+  phone: z.string().max(40).optional().or(z.literal('')),
+  subject: z.string().max(200).optional().or(z.literal('')),
+  message: z.string().min(5, 'Schrijf een bericht').max(5000),
+});
+
 // Stalling stays local; not forwarded to reparatiepanel.
 export const settingsUpdateSchema = z.object({
   stalling_price_binnen: z.number().nonnegative().max(100000).optional(),
@@ -124,6 +134,9 @@ export const settingsUpdateSchema = z.object({
   fridge_stock_grote: z.number().int().nonnegative().max(10000).optional(),
   fridge_stock_tafel: z.number().int().nonnegative().max(10000).optional(),
   fridge_stock_airco: z.number().int().nonnegative().max(10000).optional(),
+  transport_price_wij_rijden: z.number().nonnegative().max(10000).optional(),
+  transport_price_zelf: z.number().nonnegative().max(10000).optional(),
+  stalling_address: z.string().max(500).optional(),
 });
 
 export const stallingOrderSchema = z.object({

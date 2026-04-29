@@ -172,6 +172,24 @@ export async function initDatabase() {
   )`;
   await sql`CREATE INDEX IF NOT EXISTS idx_stalling_requests_status ON stalling_requests(status)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_stalling_requests_created ON stalling_requests(created_at DESC)`;
+  await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS customer_notified_at TIMESTAMP`;
+  await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS notified_status TEXT`;
+  await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS transport_mode TEXT`;
+
+  await sql`CREATE TABLE IF NOT EXISTS contact_messages (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone TEXT,
+    subject TEXT,
+    message TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'open',
+    handled_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  )`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_contact_messages_status ON contact_messages(status)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_contact_messages_created ON contact_messages(created_at DESC)`;
 
   await sql`CREATE TABLE IF NOT EXISTS fridge_waitlist (
     id SERIAL PRIMARY KEY,
@@ -720,17 +738,22 @@ export async function createTransportRequest(data: {
   notes?: string | null;
   created_via?: 'public' | 'admin';
   status?: string;
+  /** 'wij_rijden' (€100) of 'zelf' (€50). NULL voor oude rijen vóór de
+   *  betaalde-flow live ging. */
+  mode?: 'wij_rijden' | 'zelf' | null;
 }) {
+  await ensureMiscSchema();
   const res = await sql`INSERT INTO transport_requests
     (name, email, phone, from_location, to_location,
      camping, preferred_date, return_date, outbound_time, return_time,
-     registration, brand, model, notes, created_via, status)
+     registration, brand, model, notes, created_via, status, transport_mode)
     VALUES (${data.name}, ${data.email}, ${data.phone || null},
       'Stalling Cruïlles', ${data.camping},
       ${data.camping}, ${data.outbound_date}::date, ${data.return_date}::date,
       ${data.outbound_time || null}, ${data.return_time || null},
       ${data.registration || null}, ${data.brand || null}, ${data.model || null},
-      ${data.notes || null}, ${data.created_via || 'public'}, ${data.status || 'controleren'})
+      ${data.notes || null}, ${data.created_via || 'public'}, ${data.status || 'controleren'},
+      ${data.mode || null})
     RETURNING *`;
   return res[0];
 }
@@ -807,6 +830,36 @@ export async function deleteWaitlistEntry(id: number) {
 
 export async function markWaitlistNotified(id: number) {
   await sql`UPDATE fridge_waitlist SET status = 'genotificeerd', notified_at = NOW() WHERE id = ${id}`;
+}
+
+// ─── Lazy migratie voor contact_messages en uitbreidingen op transport/stalling.
+let _miscMigrationsApplied: Promise<void> | null = null;
+async function ensureMiscSchema(): Promise<void> {
+  if (_miscMigrationsApplied) return _miscMigrationsApplied;
+  _miscMigrationsApplied = (async () => {
+    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS transport_mode TEXT`;
+    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS customer_notified_at TIMESTAMP`;
+    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS notified_status TEXT`;
+    await sql`CREATE TABLE IF NOT EXISTS contact_messages (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      phone TEXT,
+      subject TEXT,
+      message TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'open',
+      handled_at TIMESTAMP,
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_contact_messages_status ON contact_messages(status)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_contact_messages_created ON contact_messages(created_at DESC)`;
+  })().catch((err) => {
+    console.error('[misc migrations] failed:', err);
+    _miscMigrationsApplied = null;
+    throw err;
+  });
+  return _miscMigrationsApplied;
 }
 
 // ─── Lazy migratie: zorgt dat customer-gerelateerde kolommen bestaan
@@ -1180,6 +1233,77 @@ export async function updateTransportRequest(id: number, data: Partial<{
     status = COALESCE(${data.status ?? null}, status),
     customer_id = COALESCE(${data.customer_id ?? null}, customer_id),
     updated_at = NOW()
+    WHERE id = ${id}`;
+}
+
+// ─── Contact messages ───────────────────────────────────
+export type ContactMessageRow = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  subject: string | null;
+  message: string;
+  status: string;
+  handled_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export async function createContactMessage(data: {
+  name: string;
+  email: string;
+  phone?: string | null;
+  subject?: string | null;
+  message: string;
+}): Promise<ContactMessageRow> {
+  await ensureMiscSchema();
+  const rows = await sql`INSERT INTO contact_messages
+    (name, email, phone, subject, message)
+    VALUES (${data.name}, ${data.email}, ${data.phone || null},
+      ${data.subject || null}, ${data.message})
+    RETURNING *`;
+  return rows[0] as ContactMessageRow;
+}
+
+export async function listContactMessages(status?: string) {
+  await ensureMiscSchema();
+  if (status) {
+    return sql`SELECT * FROM contact_messages WHERE status = ${status} ORDER BY created_at DESC`;
+  }
+  return sql`SELECT * FROM contact_messages ORDER BY created_at DESC`;
+}
+
+export async function getContactMessageById(id: number): Promise<ContactMessageRow | null> {
+  await ensureMiscSchema();
+  const rows = await sql`SELECT * FROM contact_messages WHERE id = ${id} LIMIT 1`;
+  return (rows[0] as ContactMessageRow) || null;
+}
+
+export async function markContactMessageHandled(id: number) {
+  await ensureMiscSchema();
+  await sql`UPDATE contact_messages
+    SET status = 'handled', handled_at = NOW(), updated_at = NOW()
+    WHERE id = ${id}`;
+}
+
+export async function markContactMessageOpen(id: number) {
+  await ensureMiscSchema();
+  await sql`UPDATE contact_messages
+    SET status = 'open', handled_at = NULL, updated_at = NOW()
+    WHERE id = ${id}`;
+}
+
+export async function deleteContactMessage(id: number) {
+  await ensureMiscSchema();
+  await sql`DELETE FROM contact_messages WHERE id = ${id}`;
+}
+
+// ─── Stalling notify-tracking ────────────────────────────
+export async function markStallingCustomerNotified(id: number, statusNotified: string) {
+  await ensureMiscSchema();
+  await sql`UPDATE stalling_requests
+    SET customer_notified_at = NOW(), notified_status = ${statusNotified}, updated_at = NOW()
     WHERE id = ${id}`;
 }
 

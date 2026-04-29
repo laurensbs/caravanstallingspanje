@@ -65,18 +65,35 @@ export async function GET(req: NextRequest) {
         status: string; camping: string | null; to_location: string;
         preferred_date: string | null; return_date: string | null;
         email: string; name: string;
+        transport_mode: string | null;
+        holded_invoice_id: string | null;
+        holded_invoice_number: string | null;
       };
       if (!r) return NextResponse.json({ error: 'not found' }, { status: 404 });
+      const modeLabel = r.transport_mode === 'zelf'
+        ? 'Zelf brengen/halen'
+        : r.transport_mode === 'wij_rijden'
+          ? 'Wij rijden voor je'
+          : null;
+      const serviceLabel = modeLabel
+        ? `Transport · ${modeLabel} — ${r.camping || r.to_location}`
+        : `Transport — ${r.camping || r.to_location}`;
+      const status = r.status === 'betaald'
+        ? 'betaald'
+        : r.status === 'controleren'
+          ? 'wacht op betaling'
+          : r.status;
       return NextResponse.json({
         kind: parsed.kind,
         ref,
-        status: r.status,
-        service: `Transport — ${r.camping || r.to_location}`,
+        status,
+        service: serviceLabel,
+        mode: r.transport_mode,
         period: r.preferred_date ? `Heen ${r.preferred_date}${r.return_date ? ` · Terug ${r.return_date}` : ''}` : null,
         customerEmail: r.email,
         customerName: r.name,
-        invoiceCreated: false,
-        invoiceNumber: null,
+        invoiceCreated: !!r.holded_invoice_id,
+        invoiceNumber: r.holded_invoice_number,
         forwardedToWorkshop: false,
         testMode: TEST_MODE,
       });
@@ -101,6 +118,25 @@ export async function GET(req: NextRequest) {
         invoiceNumber: null,
         forwardedToWorkshop: !!intake.forwarded_at,
         forwardCode: intake.forward_repair_job_id,
+        testMode: TEST_MODE,
+      });
+    }
+
+    if (parsed.kind === 'contact') {
+      const { getContactMessageById } = await import('@/lib/db');
+      const m = await getContactMessageById(idNum);
+      if (!m) return NextResponse.json({ error: 'not found' }, { status: 404 });
+      return NextResponse.json({
+        kind: parsed.kind,
+        ref,
+        status: m.status === 'handled' ? 'beantwoord' : 'ontvangen',
+        service: m.subject || 'Contact-bericht',
+        period: null,
+        customerEmail: m.email,
+        customerName: m.name,
+        invoiceCreated: false,
+        invoiceNumber: null,
+        forwardedToWorkshop: false,
         testMode: TEST_MODE,
       });
     }

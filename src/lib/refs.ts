@@ -1,7 +1,7 @@
 // Publieke referentiecodes voor klant-zichtbare bevestigingen.
 // Format: PREFIX-{id}. Prefix maakt op één blik duidelijk wat het is.
 
-export type RefKind = 'koelkast' | 'airco' | 'stalling' | 'transport' | 'service' | 'reparatie' | 'inspectie';
+export type RefKind = 'koelkast' | 'airco' | 'stalling' | 'transport' | 'service' | 'reparatie' | 'inspectie' | 'contact';
 
 const PREFIXES: Record<RefKind, string> = {
   koelkast: 'KK',
@@ -11,6 +11,7 @@ const PREFIXES: Record<RefKind, string> = {
   service: 'SR',
   reparatie: 'RE',
   inspectie: 'IN',
+  contact: 'CT',
 };
 
 const PREFIX_TO_KIND: Record<string, RefKind> = Object.fromEntries(

@@ -3,14 +3,15 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Check, Clock, Mail, Phone, Sparkles } from 'lucide-react';
+import { Check, Clock, Mail, MessageSquare, Sparkles } from 'lucide-react';
 import { useLocale } from './LocaleProvider';
 
 type Lookup = {
-  kind: 'koelkast' | 'airco' | 'stalling' | 'transport' | 'service' | 'reparatie' | 'inspectie';
+  kind: 'koelkast' | 'airco' | 'stalling' | 'transport' | 'service' | 'reparatie' | 'inspectie' | 'contact';
   ref: string;
   status: string;
   service: string;
+  mode?: string | null;
   period: string | null;
   customerEmail: string | null;
   customerName: string | null;
@@ -155,9 +156,12 @@ export default function OrderReceipt({ refCode, fallbackTitle, fallbackBody }: P
             transition={{ delay: 0.5, duration: 0.4, ease: EASE }}
             className="card-surface p-5 mb-8"
           >
-            <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted mb-4">
+            <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted mb-2">
               Wat gebeurt er nu?
             </h2>
+            <p className="text-[14px] text-text mb-4 leading-relaxed">
+              We gaan aan de slag — we koppelen terug zodra het klaar is.
+            </p>
             <ul className="space-y-3">
               {steps.map((s, i) => (
                 <li key={i} className="flex items-start gap-3">
@@ -187,24 +191,25 @@ export default function OrderReceipt({ refCode, fallbackTitle, fallbackBody }: P
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.4, ease: EASE }}
-          className="text-center space-y-2.5 pt-4 border-t border-border"
+          className="text-center pt-5 border-t border-border space-y-3"
         >
-          <p className="text-[14px] text-text-muted inline-flex items-center justify-center gap-1.5">
-            <Mail size={13} />
-            <a href="mailto:info@caravanstalling-spanje.com" className="text-text underline-offset-4 hover:underline">
+          <p className="text-[13px] text-text-muted">Vragen? We helpen je graag verder.</p>
+          <Link
+            href="/contact"
+            className="press-spring inline-flex items-center gap-2 h-11 px-5 rounded-[var(--radius-lg)] bg-accent text-accent-fg font-medium text-[14px] hover:bg-accent-hover transition-colors"
+          >
+            <MessageSquare size={14} /> Stuur ons een bericht
+          </Link>
+          <p className="text-[12px] text-text-muted inline-flex items-center justify-center gap-1.5 pt-1">
+            <Mail size={12} />
+            <a href="mailto:info@caravanstalling-spanje.com" className="text-text-muted hover:text-text underline-offset-4 hover:underline">
               info@caravanstalling-spanje.com
             </a>
           </p>
-          <p className="text-[14px] text-text-muted inline-flex items-center justify-center gap-1.5">
-            <Phone size={13} />
-            <a href="tel:+34633778699" className="text-text underline-offset-4 hover:underline">
-              +34 633 778 699
-            </a>
-          </p>
-          <div className="pt-3">
+          <div className="pt-2">
             <Link
               href="/"
-              className="inline-block text-[14px] text-text-muted hover:text-text underline-offset-4 hover:underline transition-colors"
+              className="inline-block text-[13px] text-text-muted hover:text-text underline-offset-4 hover:underline transition-colors"
             >
               {t('common.back-to-website')}
             </Link>
@@ -233,12 +238,21 @@ function buildSteps(data: Lookup | null, _t: TFn): Step[] {
   if (!data) {
     return [
       { label: 'Aanvraag ontvangen', done: true },
-      { label: 'Wij nemen binnen 1 werkdag contact met je op', done: false },
+      { label: 'We koppelen terug zodra het klaar is', done: false },
     ];
   }
+
+  // Contact-bericht heeft een eigen, simpel pad.
+  if (data.kind === 'contact') {
+    return [
+      { label: 'Bericht ontvangen', done: true },
+      { label: 'We sturen je snel een persoonlijke reactie', done: false },
+    ];
+  }
+
   const steps: Step[] = [];
   // 1. Ontvangen / betaald
-  if (data.kind === 'transport' || data.kind === 'reparatie' || data.kind === 'inspectie') {
+  if (data.kind === 'reparatie' || data.kind === 'inspectie') {
     steps.push({ label: 'Aanvraag ontvangen', done: true });
   } else {
     steps.push({
@@ -246,39 +260,56 @@ function buildSteps(data: Lookup | null, _t: TFn): Step[] {
       done: data.status === 'betaald' || data.status === 'doorgestuurd',
     });
   }
+
   // 2. Mail
   steps.push({
     label: 'Bevestigingsmail verstuurd',
     detail: data.customerEmail ? `naar ${data.customerEmail}` : undefined,
     done: !!data.customerEmail,
   });
-  // 3. Factuur
-  if (data.kind === 'koelkast' || data.kind === 'airco' || data.kind === 'stalling' || data.kind === 'service') {
+
+  // 3. Factuur — alle betaalde kinds (incl. transport)
+  if (data.kind === 'koelkast' || data.kind === 'airco' || data.kind === 'stalling' || data.kind === 'service' || data.kind === 'transport') {
     steps.push({
       label: 'Factuur aangemaakt in Holded',
       detail: data.invoiceNumber ? `nr. ${data.invoiceNumber}` : undefined,
       done: data.invoiceCreated,
     });
   }
-  // 4. Doorgezet naar werkplaats
-  if (data.kind === 'service' || data.kind === 'reparatie' || data.kind === 'inspectie') {
+
+  // 4. Doorgezet naar werkplaats — alleen voor service (intake naar reparatiepanel)
+  if (data.kind === 'service') {
     steps.push({
       label: 'Doorgegeven aan onze werkplaats',
       detail: data.forwardCode ? `intern: ${data.forwardCode}` : undefined,
       done: data.forwardedToWorkshop,
     });
   }
-  // 5. Volgende stap
-  steps.push({
-    label: data.kind === 'koelkast' || data.kind === 'airco'
-      ? 'Onze monteur bezorgt op je staanplaats'
-      : data.kind === 'transport'
-      ? 'We plannen je transport in en bevestigen tijdsblok'
-      : data.kind === 'stalling'
-      ? 'We bevestigen je plek en sturen aanvullende info'
-      : 'We nemen binnen 1 werkdag contact met je op',
-    done: false,
-  });
+
+  // 5. Volgende stap — kind-specifieke copy
+  let nextLabel = '';
+  switch (data.kind) {
+    case 'koelkast':
+    case 'airco':
+      nextLabel = 'Onze monteur bezorgt op je staanplaats. Je hoort van ons als hij klaar staat.';
+      break;
+    case 'service':
+      nextLabel = 'Onze werkplaats gaat aan de slag — je caravan staat hier al. We sturen je binnenkort de factuur met de uitgevoerde reparatie.';
+      break;
+    case 'stalling':
+      nextLabel = 'We bekijken je aanvraag. Bij akkoord krijg je het adres en kun je langskomen; helaas niet toegekend? Dan laten we het ook weten.';
+      break;
+    case 'transport':
+      nextLabel = 'We zorgen dat hij op de bestemming staat. Je hoort van ons zodra het is gepland of uitgevoerd.';
+      break;
+    case 'reparatie':
+    case 'inspectie':
+      nextLabel = 'Onze werkplaats gaat aan de slag! Je hoort binnenkort van ons.';
+      break;
+  }
+  if (nextLabel) {
+    steps.push({ label: nextLabel, done: false });
+  }
   return steps;
 }
 

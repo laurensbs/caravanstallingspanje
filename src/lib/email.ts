@@ -156,6 +156,101 @@ export function requestReceivedHtml(input: {
   return { subject, html: shell(card), text };
 }
 
+// Stalling-aanvraag is goedgekeurd: klant mag de caravan brengen.
+export function stallingApprovedHtml(input: {
+  name: string;
+  address: string;
+  startDate: string;
+  reference?: string;
+}): { subject: string; html: string; text: string } {
+  const subject = 'Stalling bevestigd — je kunt langskomen';
+  const refBlock = input.reference
+    ? `<p class="ref">Referentie: ${escapeHtml(input.reference)}</p>`
+    : '';
+  const card = `
+    <div class="card">
+      <h1>Goed nieuws, ${escapeHtml(input.name)}</h1>
+      <p>Je stalling-aanvraag is bevestigd. Vanaf <strong>${fmtDate(input.startDate)}</strong> kun je je caravan brengen.</p>
+      <div class="row"><span class="muted">Adres</span><strong>${escapeHtml(input.address)}</strong></div>
+      <div class="row"><span class="muted">Vanaf</span><strong>${fmtDate(input.startDate)}</strong></div>
+      <p style="margin-top:24px;">Heb je vragen of wil je een ander moment afspreken? Stuur ons gerust een bericht.</p>
+      ${refBlock}
+    </div>`;
+  const text = `Hi ${input.name},\n\nJe stalling-aanvraag is bevestigd. Vanaf ${fmtDate(input.startDate)} kun je je caravan brengen naar:\n\n${input.address}\n\nHeb je vragen? Stuur ons een bericht.${input.reference ? `\n\nReferentie: ${input.reference}` : ''}`;
+  return { subject, html: shell(card), text };
+}
+
+// Stalling-aanvraag afgewezen: helaas geen plek.
+export function stallingRejectedHtml(input: {
+  name: string;
+  reference?: string;
+}): { subject: string; html: string; text: string } {
+  const subject = 'Stalling-aanvraag — helaas geen plek';
+  const refBlock = input.reference
+    ? `<p class="ref">Referentie: ${escapeHtml(input.reference)}</p>`
+    : '';
+  const card = `
+    <div class="card">
+      <h1>Helaas, ${escapeHtml(input.name)}</h1>
+      <p>Bedankt voor je stalling-aanvraag. Op dit moment hebben we geen plek meer beschikbaar.</p>
+      <p>Wil je toch graag bij ons stallen? Stuur ons een bericht — we houden je op de hoogte zodra er een plek vrijkomt.</p>
+      ${refBlock}
+    </div>`;
+  const text = `Hi ${input.name},\n\nHelaas hebben we op dit moment geen plek meer beschikbaar voor stalling. Stuur ons een bericht als je toch op de wachtlijst wilt.${input.reference ? `\n\nReferentie: ${input.reference}` : ''}`;
+  return { subject, html: shell(card), text };
+}
+
+// Bevestiging aan klant dat het contact-bericht is ontvangen.
+export function contactReceivedHtml(input: {
+  name: string;
+  message: string;
+  reference?: string;
+}): { subject: string; html: string; text: string } {
+  const subject = 'We hebben je bericht ontvangen';
+  const refBlock = input.reference
+    ? `<p class="ref">Referentie: ${escapeHtml(input.reference)}</p>`
+    : '';
+  const card = `
+    <div class="card">
+      <h1>Bedankt, ${escapeHtml(input.name)}</h1>
+      <p>We hebben je bericht ontvangen en sturen je snel een persoonlijke reactie.</p>
+      <div class="row"><span class="muted">Jouw bericht</span><span>${escapeHtml(input.message).slice(0, 500)}</span></div>
+      ${refBlock}
+    </div>`;
+  const text = `Bedankt ${input.name},\n\nWe hebben je bericht ontvangen:\n"${input.message.slice(0, 500)}"\n\nWe sturen je snel een persoonlijke reactie.${input.reference ? `\n\nReferentie: ${input.reference}` : ''}`;
+  return { subject, html: shell(card), text };
+}
+
+// Interne notificatie naar info@-mailbox bij een nieuw contact-bericht.
+export function contactNotifyHtml(input: {
+  name: string;
+  email: string;
+  phone?: string | null;
+  subject?: string | null;
+  message: string;
+  reference: string;
+}): { subject: string; html: string; text: string } {
+  const subject = `Nieuw contact-bericht: ${input.subject || input.name}`;
+  const phoneRow = input.phone
+    ? `<div class="row"><span class="muted">Telefoon</span><strong>${escapeHtml(input.phone)}</strong></div>`
+    : '';
+  const subjectRow = input.subject
+    ? `<div class="row"><span class="muted">Onderwerp</span><strong>${escapeHtml(input.subject)}</strong></div>`
+    : '';
+  const card = `
+    <div class="card">
+      <h1>Nieuw bericht via /contact</h1>
+      <div class="row"><span class="muted">Naam</span><strong>${escapeHtml(input.name)}</strong></div>
+      <div class="row"><span class="muted">E-mail</span><strong>${escapeHtml(input.email)}</strong></div>
+      ${phoneRow}
+      ${subjectRow}
+      <div class="row"><span class="muted">Bericht</span><span>${escapeHtml(input.message)}</span></div>
+      <p class="ref">Referentie: ${escapeHtml(input.reference)}</p>
+    </div>`;
+  const text = `Nieuw contact-bericht (${input.reference})\n\nNaam: ${input.name}\nE-mail: ${input.email}${input.phone ? `\nTelefoon: ${input.phone}` : ''}${input.subject ? `\nOnderwerp: ${input.subject}` : ''}\n\n${input.message}`;
+  return { subject, html: shell(card), text };
+}
+
 function escapeHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }

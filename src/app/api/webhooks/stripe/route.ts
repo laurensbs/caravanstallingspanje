@@ -7,18 +7,22 @@ import {
   upsertPayment,
   markBookingPaid,
   markStallingRequestPaid,
+  markTransportRequestPaid,
   getPendingIntakeBySession,
   markPendingIntakeForwarded,
   getFridgeById,
   getStallingRequestById,
+  getTransportRequestById,
   setBookingHoldedInvoice,
   setStallingHoldedInvoice,
+  setTransportHoldedInvoice,
   logActivity,
   cleanupOldPendingIntakes,
   getCustomerByEmail,
   createCustomer,
   linkFridgeToCustomer,
   linkStallingToCustomer,
+  linkTransportToCustomer,
 } from '@/lib/db';
 import { sendIntake, type IntakePayload } from '@/lib/work-order-hub';
 import { invoiceForCustomer, findContactByEmail } from '@/lib/holded';
@@ -189,6 +193,37 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
         }
       }
     }
+  } else if (kind === 'transport_request' && refId) {
+    const id = Number(refId);
+    if (Number.isFinite(id) && id > 0) {
+      await markTransportRequestPaid(id);
+      const r = await getTransportRequestById(id).catch(() => null) as null | {
+        name: string; email: string; phone?: string | null;
+        camping?: string | null; transport_mode?: string | null;
+        holded_invoice_id?: string | null;
+      };
+      if (r) {
+        customerName = customerName || r.name;
+        customerEmail = customerEmail || r.email;
+        customerPhone = customerPhone || r.phone || '';
+        const modeLabel = r.transport_mode === 'zelf' ? 'zelf-rijden' : 'heen-en-terug';
+        invoiceDescription = invoiceDescription || `Transport ${modeLabel} — ${r.camping || ''}`.trim();
+        if (customerEmail && !r.holded_invoice_id) {
+          try {
+            const inv = await invoiceForCustomer({
+              customer: { name: customerName, email: customerEmail, phone: customerPhone || null },
+              description: invoiceDescription,
+              amountEur,
+            });
+            await setTransportHoldedInvoice(id, inv.id, inv.invoiceNum);
+            const linkedCustomer = await ensureLocalCustomer(customerName, customerEmail, customerPhone, inv.contactId);
+            if (linkedCustomer) await linkTransportToCustomer(id, linkedCustomer.id);
+          } catch (err) {
+            await logActivity({ action: 'Holded factuur mislukt (transport)', entityType: kind, entityId: refId, details: err instanceof Error ? err.message : 'unknown' });
+          }
+        }
+      }
+    }
   } else if (kind === 'service_intake') {
     // Service-aanvraag pas na betaling doorzetten naar reparatiepanel.
     const pending = await getPendingIntakeBySession(session.id);
@@ -245,6 +280,8 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
         reference = formatRef(refKindForFridge(invoiceDescription.startsWith('Airco') ? 'Airco' : ''), refId);
       } else if (kind === 'stalling_request') {
         reference = formatRef('stalling', refId);
+      } else if (kind === 'transport_request') {
+        reference = formatRef('transport', refId);
       } else if (kind === 'service_intake') {
         reference = formatRef('service', refId);
       }

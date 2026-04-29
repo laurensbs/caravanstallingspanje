@@ -15,12 +15,17 @@ type FormState = {
   fridge_stock_grote: string;
   fridge_stock_tafel: string;
   fridge_stock_airco: string;
+  transport_price_wij_rijden: string;
+  transport_price_zelf: string;
+  stalling_address: string;
 };
 
 const empty: FormState = {
   stalling_price_binnen: '', stalling_price_buiten: '',
   fridge_price_grote: '', fridge_price_tafel: '', fridge_price_airco: '',
   fridge_stock_grote: '', fridge_stock_tafel: '', fridge_stock_airco: '',
+  transport_price_wij_rijden: '', transport_price_zelf: '',
+  stalling_address: '',
 };
 
 export default function SettingsPage() {
@@ -41,6 +46,9 @@ export default function SettingsPage() {
           fridge_stock_grote: String(Number(d.fridge_stock_grote ?? 110)),
           fridge_stock_tafel: String(Number(d.fridge_stock_tafel ?? 20)),
           fridge_stock_airco: String(Number(d.fridge_stock_airco ?? 10)),
+          transport_price_wij_rijden: String(Number(d.transport_price_wij_rijden ?? 100)),
+          transport_price_zelf: String(Number(d.transport_price_zelf ?? 50)),
+          stalling_address: String(d.stalling_address ?? ''),
         });
       })
       .catch(() => { /* keep empty */ })
@@ -70,6 +78,9 @@ export default function SettingsPage() {
         fridge_stock_grote: parseInt0(form.fridge_stock_grote),
         fridge_stock_tafel: parseInt0(form.fridge_stock_tafel),
         fridge_stock_airco: parseInt0(form.fridge_stock_airco),
+        transport_price_wij_rijden: parse(form.transport_price_wij_rijden),
+        transport_price_zelf: parse(form.transport_price_zelf),
+        stalling_address: form.stalling_address,
       };
       const res = await fetch('/api/admin/settings', {
         method: 'PATCH',
@@ -161,6 +172,42 @@ export default function SettingsPage() {
                 value={form.fridge_stock_airco}
                 onChange={(e) => set('fridge_stock_airco', e.target.value)} />
             </div>
+          )}
+        </div>
+
+        <div className="card-surface p-6 space-y-4">
+          <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+            Transport-tarieven
+          </h2>
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[0, 1].map(i => <Skeleton key={i} className="h-10" delayMs={i * 40} />)}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Input label="Wij rijden — heen + terug (€)" inputMode="decimal"
+                value={form.transport_price_wij_rijden}
+                onChange={(e) => set('transport_price_wij_rijden', e.target.value)} />
+              <Input label="Zelf brengen/halen (€)" inputMode="decimal"
+                value={form.transport_price_zelf}
+                onChange={(e) => set('transport_price_zelf', e.target.value)} />
+            </div>
+          )}
+        </div>
+
+        <div className="card-surface p-6 space-y-4">
+          <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+            Stalling-adres (gebruikt in mails na akkoord)
+          </h2>
+          {loading ? (
+            <Skeleton className="h-10" />
+          ) : (
+            <Input
+              label="Adres"
+              placeholder="Stalling Cruïlles, Cruïlles (Girona), Spanje"
+              value={form.stalling_address}
+              onChange={(e) => set('stalling_address', e.target.value)}
+            />
           )}
         </div>
 

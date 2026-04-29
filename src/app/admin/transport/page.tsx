@@ -30,6 +30,7 @@ type Entry = {
   notes: string | null;
   status: string;
   created_via?: string;
+  transport_mode?: string | null;
   created_at: string;
 };
 
@@ -68,6 +69,7 @@ type CustomerOverview = {
 
 const STATUS_OPTIONS = [
   { value: 'controleren', label: 'Controleren', tone: 'warning' as const },
+  { value: 'betaald', label: 'Betaald', tone: 'success' as const },
   { value: 'gepland', label: 'Gepland', tone: 'accent' as const },
   { value: 'uitgevoerd', label: 'Uitgevoerd', tone: 'success' as const },
   { value: 'afgewezen', label: 'Afgewezen', tone: 'danger' as const },
@@ -253,6 +255,12 @@ export default function TransportPage() {
                         </Badge>
                         {e.created_via === 'admin' && (
                           <Badge tone="neutral">Handmatig</Badge>
+                        )}
+                        {e.transport_mode === 'wij_rijden' && (
+                          <Badge tone="accent">Wij rijden</Badge>
+                        )}
+                        {e.transport_mode === 'zelf' && (
+                          <Badge tone="accent">Zelf</Badge>
                         )}
                       </div>
                       <p className="text-[11px] text-text-muted mt-1">

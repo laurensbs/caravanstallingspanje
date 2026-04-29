@@ -6,6 +6,8 @@ const KEYS = [
   'stalling_price_binnen', 'stalling_price_buiten',
   'fridge_price_grote', 'fridge_price_tafel', 'fridge_price_airco',
   'fridge_stock_grote', 'fridge_stock_tafel', 'fridge_stock_airco',
+  'transport_price_wij_rijden', 'transport_price_zelf',
+  'stalling_address',
 ] as const;
 
 export async function GET() {
@@ -20,6 +22,11 @@ export async function GET() {
       fridge_stock_grote: Number(map.fridge_stock_grote ?? 110),
       fridge_stock_tafel: Number(map.fridge_stock_tafel ?? 20),
       fridge_stock_airco: Number(map.fridge_stock_airco ?? 10),
+      transport_price_wij_rijden: Number(map.transport_price_wij_rijden ?? 100),
+      transport_price_zelf: Number(map.transport_price_zelf ?? 50),
+      stalling_address: typeof map.stalling_address === 'string'
+        ? map.stalling_address
+        : 'Stalling Cruïlles, Cruïlles (Girona), Spanje',
     });
   } catch (error) {
     console.error('Settings GET error:', error);
