@@ -1393,19 +1393,21 @@ export async function setTransportInvoiceStatus(id: number, status: string, url:
 // Voor het admin-dashboard: hoeveel bookings staan er nog open in Holded?
 export async function getHoldedInvoiceSummary() {
   await ensureMiscSchema();
-  const rows = await sql`
-    SELECT 'koelkast' AS kind, holded_invoice_status AS status, COUNT(*) AS count
-      FROM fridge_bookings WHERE holded_invoice_id IS NOT NULL
-      GROUP BY status
-    UNION ALL
-    SELECT 'stalling' AS kind, holded_invoice_status AS status, COUNT(*) AS count
-      FROM stalling_requests WHERE holded_invoice_id IS NOT NULL
-      GROUP BY status
-    UNION ALL
-    SELECT 'transport' AS kind, holded_invoice_status AS status, COUNT(*) AS count
-      FROM transport_requests WHERE holded_invoice_id IS NOT NULL
-      GROUP BY status`;
-  return rows as unknown as Array<{ kind: string; status: string | null; count: string | number }>;
+  // Drie losse queries i.p.v. UNION ALL omdat status-alias in GROUP BY
+  // problematisch is binnen UNION's. Concat lokaal — kost geen perf op
+  // de schaal van een paar honderd rijen.
+  const [a, b, c] = await Promise.all([
+    sql`SELECT 'koelkast' AS kind, holded_invoice_status AS status, COUNT(*)::text AS count
+        FROM fridge_bookings WHERE holded_invoice_id IS NOT NULL
+        GROUP BY holded_invoice_status`,
+    sql`SELECT 'stalling' AS kind, holded_invoice_status AS status, COUNT(*)::text AS count
+        FROM stalling_requests WHERE holded_invoice_id IS NOT NULL
+        GROUP BY holded_invoice_status`,
+    sql`SELECT 'transport' AS kind, holded_invoice_status AS status, COUNT(*)::text AS count
+        FROM transport_requests WHERE holded_invoice_id IS NOT NULL
+        GROUP BY holded_invoice_status`,
+  ]);
+  return [...a, ...b, ...c] as unknown as Array<{ kind: string; status: string | null; count: string | number }>;
 }
 
 // ─── Stalling notify-tracking ────────────────────────────

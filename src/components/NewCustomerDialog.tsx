@@ -63,6 +63,11 @@ export default function NewCustomerDialog({ open, onClose, onCreated, initialQue
       } else {
         toast.error(`Klant aangemaakt — Holded sync mislukt: ${data.holdedSyncError || 'onbekende fout'}`);
       }
+      if (!data.customer || typeof data.customer.id !== 'number') {
+        toast.error('Onverwacht serverantwoord — refresh de pagina.');
+        console.error('[new-customer] missing customer in response:', data);
+        return;
+      }
       onCreated(data.customer);
       onClose();
     } finally {

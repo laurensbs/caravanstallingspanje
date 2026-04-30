@@ -41,8 +41,8 @@ export default function DashboardPage() {
 
   const loadHolded = () => {
     fetch('/api/admin/holded-status', { credentials: 'include' })
-      .then((r) => r.ok ? r.json() : { rows: [] })
-      .then((d) => setHolded(d.rows || []))
+      .then((r) => r.json().catch(() => ({ rows: [] })))
+      .then((d) => setHolded(Array.isArray(d?.rows) ? d.rows : []))
       .catch(() => setHolded([]));
   };
 
