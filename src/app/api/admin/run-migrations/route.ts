@@ -39,7 +39,19 @@ export async function GET() {
   });
   // Volledige kolom-lijst voor de customers-tabel. Idempotent — als er
   // ooit een halve / lege variant is aangemaakt vullen we 'm hiermee bij.
+  // Legacy-tabel kan first_name/last_name/customer_number/password_hash
+  // hebben uit een ander project; die maken we nullable zodat onze
+  // INSERTs (die alleen 'name' vullen) niet crashen.
+  await ran('customers.first_name nullable', () => sql`ALTER TABLE customers ALTER COLUMN first_name DROP NOT NULL`);
+  await ran('customers.last_name nullable', () => sql`ALTER TABLE customers ALTER COLUMN last_name DROP NOT NULL`);
+  await ran('customers.email nullable (legacy)', () => sql`ALTER TABLE customers ALTER COLUMN email DROP NOT NULL`);
   await ran('customers.name', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS name TEXT NOT NULL DEFAULT ''`);
+  // Vul name uit first_name+last_name voor bestaande rijen (eenmalig).
+  await ran('customers.name backfill from first_name+last_name', () => sql`
+    UPDATE customers
+    SET name = TRIM(BOTH ' ' FROM CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, '')))
+    WHERE (name IS NULL OR name = '') AND (first_name IS NOT NULL OR last_name IS NOT NULL)
+  `);
   await ran('customers.email', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS email TEXT`);
   await ran('customers.phone', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS phone TEXT`);
   await ran('customers.mobile', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS mobile TEXT`);
