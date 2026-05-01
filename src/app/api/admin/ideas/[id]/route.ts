@@ -10,7 +10,7 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
     await setIdeaFeatured(Number(id), body.featured);
     await logActivity({
       actor: admin.name, role: admin.role,
-      action: `Idee featured → ${body.featured ? 'aan' : 'uit'}`,
+      action: `Idea featured → ${body.featured ? 'on' : 'off'}`,
       entityType: 'idea',
       entityId: id,
     });
@@ -22,7 +22,7 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
   await setIdeaStatus(Number(id), status);
   await logActivity({
     actor: admin.name, role: admin.role,
-    action: `Idee status → ${status}`,
+    action: `Idea status → ${status}`,
     entityType: 'idea',
     entityId: id,
   });
@@ -35,7 +35,7 @@ export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: stri
   await deleteIdea(Number(id));
   await logActivity({
     actor: admin.name, role: admin.role,
-    action: 'Idee verwijderd',
+    action: 'Idea deleted',
     entityType: 'idea',
     entityId: id,
   });

@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
       customer_id: validated.data.customer_id || null,
     });
     const admin = getAdminInfo(req);
-    await logActivity({ actor: admin.name, role: admin.role, action: 'Koelkast aangemaakt', entityType: 'fridge', entityId: String(fridge.id), entityLabel: validated.data.name });
+    await logActivity({ actor: admin.name, role: admin.role, action: 'Fridge created', entityType: 'fridge', entityId: String(fridge.id), entityLabel: validated.data.name });
     // Frontend verwacht altijd een bookings-array op een Fridge — ook voor
     // pas-aangemaakte fridges zonder periodes.
     return NextResponse.json({ fridge: { ...fridge, bookings: [] } }, { status: 201 });

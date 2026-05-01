@@ -10,7 +10,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ book
     if (!validated.success) return NextResponse.json({ error: validated.error }, { status: 400 });
     await updateFridgeBooking(parseInt(bookingId), validated.data);
     const admin = getAdminInfo(req);
-    await logActivity({ actor: admin.name, role: admin.role, action: 'Koelkast-periode bijgewerkt', entityType: 'fridge_booking', entityId: bookingId, entityLabel: validated.data.camping || '' });
+    await logActivity({ actor: admin.name, role: admin.role, action: 'Fridge period updated', entityType: 'fridge_booking', entityId: bookingId, entityLabel: validated.data.camping || '' });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Booking PUT error:', error);
@@ -23,7 +23,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ b
     const { bookingId } = await params;
     await deleteFridgeBooking(parseInt(bookingId));
     const admin = getAdminInfo(req);
-    await logActivity({ actor: admin.name, role: admin.role, action: 'Koelkast-periode verwijderd', entityType: 'fridge_booking', entityId: bookingId });
+    await logActivity({ actor: admin.name, role: admin.role, action: 'Fridge period deleted', entityType: 'fridge_booking', entityId: bookingId });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Booking DELETE error:', error);

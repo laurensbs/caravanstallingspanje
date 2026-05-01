@@ -37,7 +37,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
     const { bookingId } = await params;
     const id = Number(bookingId);
     if (!Number.isFinite(id) || id <= 0) {
-      return NextResponse.json({ error: 'Ongeldige booking-id' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid booking id' }, { status: 400 });
     }
 
     const body = await req.json().catch(() => ({}));
@@ -47,10 +47,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
     const taxPercent = Number.isFinite(Number(body.taxPercent)) ? Number(body.taxPercent) : 21;
 
     if (!Number.isFinite(amountEur) || amountEur <= 0) {
-      return NextResponse.json({ error: 'Vul een geldig bedrag in' }, { status: 400 });
+      return NextResponse.json({ error: 'Enter a valid amount' }, { status: 400 });
     }
     if (!description || description.length < 3) {
-      return NextResponse.json({ error: 'Vul een omschrijving in' }, { status: 400 });
+      return NextResponse.json({ error: 'Enter a description' }, { status: 400 });
     }
 
     const booking = await getBookingById(id) as null | {
@@ -58,17 +58,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
       start_date: string | null; end_date: string | null; spot_number: string | null;
       status: string; holded_invoice_id: string | null; holded_invoice_number: string | null;
     };
-    if (!booking) return NextResponse.json({ error: 'Periode niet gevonden' }, { status: 404 });
+    if (!booking) return NextResponse.json({ error: 'Period not found' }, { status: 404 });
 
     const fridge = await getFridgeById(booking.fridge_id) as null | {
       id: number; name: string; email: string | null; device_type: string;
       holded_contact_id: string | null; customer_id: number | null;
     };
-    if (!fridge) return NextResponse.json({ error: 'Klant niet gevonden' }, { status: 404 });
+    if (!fridge) return NextResponse.json({ error: 'Customer not found' }, { status: 404 });
 
     const customerEmail = overrideEmail || fridge.email || '';
     if (!customerEmail) {
-      return NextResponse.json({ error: 'Klant heeft geen e-mailadres — vul er een in' }, { status: 400 });
+      return NextResponse.json({ error: 'Customer has no email address — please enter one' }, { status: 400 });
     }
 
     // ── Verzamel ALLE bekende klantdata voor Holded ──
@@ -165,7 +165,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
     });
 
     if (!session.url) {
-      return NextResponse.json({ error: 'Stripe gaf geen checkout-url terug' }, { status: 502 });
+      return NextResponse.json({ error: 'Stripe did not return a checkout URL' }, { status: 502 });
     }
 
     await setBookingPaymentLink(id, session.url, customerEmail, Math.round(amountEur * 100));
@@ -192,7 +192,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
     await logActivity({
       actor: admin.name,
       role: admin.role,
-      action: mailRes.ok ? 'Betaallink verstuurd' : 'Betaallink mail mislukt (link wel gemaakt)',
+      action: mailRes.ok ? 'Payment link sent' : 'Payment link mail failed (link created)',
       entityType: 'fridge_booking',
       entityId: String(id),
       entityLabel: `${fridge.name} — ${customerEmail}`,
@@ -210,7 +210,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
       holdedPublicUrl,
     });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Verzenden mislukt';
+    const msg = err instanceof Error ? err.message : 'Sending failed';
     console.error('[payment-link] error:', msg);
     return NextResponse.json({ error: msg }, { status: 500 });
   }

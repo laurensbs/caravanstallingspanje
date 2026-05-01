@@ -7,7 +7,7 @@ export async function GET() {
     return NextResponse.json({ entries });
   } catch (error) {
     console.error('Waitlist GET error:', error);
-    return NextResponse.json({ error: 'Kon wachtlijst niet laden' }, { status: 500 });
+    return NextResponse.json({ error: 'Could not load waitlist' }, { status: 500 });
   }
 }
 
@@ -22,7 +22,7 @@ export async function PATCH(req: NextRequest) {
       await markWaitlistNotified(Number(id));
       await logActivity({
         actor: admin.name, role: admin.role,
-        action: 'Wachtlijst genotificeerd',
+        action: 'Waitlist notified',
         entityType: 'waitlist',
         entityId: String(id),
       });
@@ -32,15 +32,15 @@ export async function PATCH(req: NextRequest) {
       await deleteWaitlistEntry(Number(id));
       await logActivity({
         actor: admin.name, role: admin.role,
-        action: 'Wachtlijst verwijderd',
+        action: 'Waitlist deleted',
         entityType: 'waitlist',
         entityId: String(id),
       });
       return NextResponse.json({ success: true });
     }
-    return NextResponse.json({ error: 'Onbekende actie' }, { status: 400 });
+    return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
   } catch (error) {
     console.error('Waitlist PATCH error:', error);
-    return NextResponse.json({ error: 'Kon actie niet uitvoeren' }, { status: 500 });
+    return NextResponse.json({ error: 'Could not perform action' }, { status: 500 });
   }
 }

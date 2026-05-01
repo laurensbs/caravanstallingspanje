@@ -26,7 +26,7 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
   await updateStallingRequest(idNum, body);
   await logActivity({
     actor: admin.name, role: admin.role,
-    action: 'Stalling bijgewerkt',
+    action: 'Storage updated',
     entityType: 'stalling_request',
     entityId: id,
   });
@@ -58,7 +58,7 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
           await markStallingCustomerNotified(idNum, newStatus);
           await logActivity({
             actor: admin.name, role: admin.role,
-            action: 'Stalling-mail verstuurd: akkoord',
+            action: 'Storage email sent: approved',
             entityType: 'stalling_request',
             entityId: id,
             entityLabel: after.email,
@@ -72,7 +72,7 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
           await markStallingCustomerNotified(idNum, newStatus);
           await logActivity({
             actor: admin.name, role: admin.role,
-            action: 'Stalling-mail verstuurd: afgewezen',
+            action: 'Storage email sent: rejected',
             entityType: 'stalling_request',
             entityId: id,
             entityLabel: after.email,
@@ -82,7 +82,7 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
         // Fail-soft: PUT slaagt nog steeds, alleen mail-fout in log.
         await logActivity({
           actor: admin.name, role: admin.role,
-          action: 'Stalling-mail mislukt',
+          action: 'Storage email failed',
           entityType: 'stalling_request',
           entityId: id,
           details: err instanceof Error ? err.message : 'unknown',
@@ -100,7 +100,7 @@ export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: stri
   await deleteStallingRequest(Number(id));
   await logActivity({
     actor: admin.name, role: admin.role,
-    action: 'Stalling verwijderd',
+    action: 'Storage deleted',
     entityType: 'stalling_request',
     entityId: id,
   });

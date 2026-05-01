@@ -9,18 +9,18 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validated = validateBody(loginSchema, body);
     if (!validated.success) {
-      return NextResponse.json({ error: 'Ongeldige inloggegevens' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid credentials' }, { status: 400 });
     }
     const { adminId, password } = validated.data;
 
     const admin = await getAdminById(adminId);
     if (!admin) {
-      return NextResponse.json({ error: 'Ongeldige inloggegevens' }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
     if (await isAccountLocked(admin.id)) {
       return NextResponse.json(
-        { error: 'Account tijdelijk vergrendeld. Probeer het over 15 minuten opnieuw.' },
+        { error: 'Account temporarily locked. Please try again in 15 minutes.' },
         { status: 423 }
       );
     }
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     const valid = await verifyPassword(password, admin.password_hash);
     if (!valid) {
       await recordLoginFailure(admin.id);
-      return NextResponse.json({ error: 'Ongeldige inloggegevens' }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
     if (admin.must_change_password) {
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     }
 
     await recordLoginSuccess(admin.id);
-    await logActivity({ actor: admin.name, role: admin.role, action: 'Ingelogd', entityType: 'auth', entityLabel: admin.email });
+    await logActivity({ actor: admin.name, role: admin.role, action: 'Logged in', entityType: 'auth', entityLabel: admin.email });
 
     const token = await createAdminToken({ id: admin.id, name: admin.name, email: admin.email, role: admin.role });
 
@@ -58,6 +58,6 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error) {
     console.error('Admin login error:', error);
-    return NextResponse.json({ error: 'Inloggen mislukt' }, { status: 500 });
+    return NextResponse.json({ error: 'Login failed' }, { status: 500 });
   }
 }

@@ -20,7 +20,7 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
     await markContactMessageHandled(idNum);
     await logActivity({
       actor: admin.name, role: admin.role,
-      action: 'Contact-bericht afgehandeld',
+      action: 'Contact message handled',
       entityType: 'contact_message',
       entityId: id,
     });
@@ -28,7 +28,7 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
     await markContactMessageOpen(idNum);
     await logActivity({
       actor: admin.name, role: admin.role,
-      action: 'Contact-bericht heropend',
+      action: 'Contact message reopened',
       entityType: 'contact_message',
       entityId: id,
     });
@@ -44,7 +44,7 @@ export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: stri
   await deleteContactMessage(Number(id));
   await logActivity({
     actor: admin.name, role: admin.role,
-    action: 'Contact-bericht verwijderd',
+    action: 'Contact message deleted',
     entityType: 'contact_message',
     entityId: id,
   });

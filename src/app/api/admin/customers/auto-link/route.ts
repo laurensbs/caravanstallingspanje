@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
 
     await logActivity({
       actor: admin.name, role: admin.role,
-      action: 'Auto-koppeling klanten',
+      action: 'Auto-link customers',
       entityType: 'customer',
       details: `fridges=${out.fridges} stalling=${out.stalling} transport=${out.transport} skipped=${out.skipped}`,
     });

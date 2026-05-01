@@ -52,7 +52,7 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
       await sql`UPDATE customers SET holded_sync_failed = true WHERE id = ${idNum}`;
       await logActivity({
         actor: admin.name, role: admin.role,
-        action: 'Holded sync mislukt (klant)',
+        action: 'Holded sync failed (customer)',
         entityType: 'customer',
         entityId: id,
         details: err instanceof Error ? err.message : 'unknown',
@@ -62,7 +62,7 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
 
   await logActivity({
     actor: admin.name, role: admin.role,
-    action: 'Klant bijgewerkt',
+    action: 'Customer updated',
     entityType: 'customer',
     entityId: id,
     entityLabel: customer?.name,
@@ -80,7 +80,7 @@ export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: stri
   await softDeleteCustomer(idNum);
   await logActivity({
     actor: admin.name, role: admin.role,
-    action: 'Klant verwijderd (soft)',
+    action: 'Customer deleted (soft)',
     entityType: 'customer',
     entityId: id,
     entityLabel: customer.name,
@@ -131,7 +131,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     }
     await logActivity({
       actor: admin.name, role: admin.role,
-      action: 'Klant gesynced met Holded',
+      action: 'Customer synced with Holded',
       entityType: 'customer',
       entityId: id,
       entityLabel: customer.name,

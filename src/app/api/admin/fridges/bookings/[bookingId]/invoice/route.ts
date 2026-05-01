@@ -11,11 +11,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
     if (!validated.success) return NextResponse.json({ error: validated.error }, { status: 400 });
 
     const booking = await getBookingById(parseInt(bookingId));
-    if (!booking) return NextResponse.json({ error: 'Periode niet gevonden' }, { status: 404 });
+    if (!booking) return NextResponse.json({ error: 'Period not found' }, { status: 404 });
     if (booking.holded_invoice_id) {
       return NextResponse.json(
         {
-          error: 'Voor deze periode bestaat al een factuur',
+          error: 'This period already has an invoice',
           holdedInvoiceId: booking.holded_invoice_id,
           holdedInvoiceNumber: booking.holded_invoice_number,
         },
@@ -24,11 +24,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
     }
 
     const fridge = await getFridgeById(booking.fridge_id);
-    if (!fridge) return NextResponse.json({ error: 'Klant niet gevonden' }, { status: 404 });
+    if (!fridge) return NextResponse.json({ error: 'Customer not found' }, { status: 404 });
 
     let holdedContactId: string | undefined = fridge.holded_contact_id;
     if (!holdedContactId) {
-      if (!fridge.email) return NextResponse.json({ error: 'Klant heeft geen e-mailadres' }, { status: 400 });
+      if (!fridge.email) return NextResponse.json({ error: 'Customer has no email address' }, { status: 400 });
       const contact = await ensureContact({ name: fridge.name, email: fridge.email });
       holdedContactId = contact.id;
       await setFridgeHoldedContact(fridge.id, contact.id);
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
     await logActivity({
       actor: admin.name,
       role: admin.role,
-      action: 'Holded factuur aangemaakt',
+      action: 'Holded invoice created',
       entityType: 'fridge_booking',
       entityId: bookingId,
       entityLabel: invoice.invoiceNum || invoice.id,
@@ -64,9 +64,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
 
     return NextResponse.json({ holdedInvoiceId: invoice.id, holdedInvoiceNumber: invoice.invoiceNum });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Holded-fout';
+    const msg = error instanceof Error ? error.message : 'Holded error';
     console.error('Holded invoice error:', msg);
-    await logActivity({ action: 'Holded factuur mislukt', entityType: 'fridge_booking', details: msg });
+    await logActivity({ action: 'Holded invoice failed', entityType: 'fridge_booking', details: msg });
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

@@ -30,7 +30,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Settings GET error:', error);
-    return NextResponse.json({ error: 'Kon instellingen niet laden' }, { status: 500 });
+    return NextResponse.json({ error: 'Could not load settings' }, { status: 500 });
   }
 }
 

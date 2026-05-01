@@ -15,12 +15,12 @@ export async function POST(req: NextRequest) {
 
     const admin = await getAdminById(adminId);
     if (!admin) {
-      return NextResponse.json({ error: 'Ongeldige inloggegevens' }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
     if (await isAccountLocked(admin.id)) {
       return NextResponse.json(
-        { error: 'Account tijdelijk vergrendeld. Probeer het over 15 minuten opnieuw.' },
+        { error: 'Account temporarily locked. Please try again in 15 minutes.' },
         { status: 423 }
       );
     }
@@ -28,11 +28,11 @@ export async function POST(req: NextRequest) {
     const valid = await verifyPassword(currentPassword, admin.password_hash);
     if (!valid) {
       await recordLoginFailure(admin.id);
-      return NextResponse.json({ error: 'Huidig wachtwoord klopt niet' }, { status: 401 });
+      return NextResponse.json({ error: 'Current password is incorrect' }, { status: 401 });
     }
 
     if (currentPassword === newPassword) {
-      return NextResponse.json({ error: 'Kies een ander wachtwoord dan het huidige' }, { status: 400 });
+      return NextResponse.json({ error: 'Choose a different password from the current one' }, { status: 400 });
     }
 
     const hash = await hashPassword(newPassword);
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     await logActivity({
       actor: admin.name,
       role: admin.role,
-      action: 'Wachtwoord ingesteld',
+      action: 'Password set',
       entityType: 'auth',
       entityLabel: admin.email,
     });
@@ -58,6 +58,6 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error) {
     console.error('Set password error:', error);
-    return NextResponse.json({ error: 'Wachtwoord instellen mislukt' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to set password' }, { status: 500 });
   }
 }

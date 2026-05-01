@@ -6,8 +6,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   try {
     const { id } = await params;
     const fridge = await getFridgeById(parseInt(id));
-    if (!fridge) return NextResponse.json({ error: 'Niet gevonden' }, { status: 404 });
-    if (!fridge.email) return NextResponse.json({ error: 'Klant heeft geen e-mailadres' }, { status: 400 });
+    if (!fridge) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    if (!fridge.email) return NextResponse.json({ error: 'Customer has no email address' }, { status: 400 });
 
     const contact = await ensureContact({ name: fridge.name, email: fridge.email });
     await setFridgeHoldedContact(parseInt(id), contact.id);
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     await logActivity({
       actor: admin.name,
       role: admin.role,
-      action: 'Holded-contact gekoppeld',
+      action: 'Holded contact linked',
       entityType: 'fridge',
       entityId: id,
       entityLabel: fridge.name,
@@ -24,9 +24,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     return NextResponse.json({ holdedContactId: contact.id });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Holded-fout';
+    const msg = error instanceof Error ? error.message : 'Holded error';
     console.error('Holded contact error:', msg);
-    await logActivity({ action: 'Holded-contact mislukt', entityType: 'fridge', details: msg });
+    await logActivity({ action: 'Holded contact failed', entityType: 'fridge', details: msg });
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

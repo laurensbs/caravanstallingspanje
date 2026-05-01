@@ -12,7 +12,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       columns: cols,
-      hint: 'Zie je hier "name" niet staan? Dan zit Vercel op een andere DB dan run-migrations gebruikte.',
+      hint: 'Don\'t see "name" here? Then Vercel is on a different DB than run-migrations used.',
     });
   } catch (err) {
     return NextResponse.json({

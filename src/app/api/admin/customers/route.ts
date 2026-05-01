@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const admin = getAdminInfo(req);
     const name = String(body.name || '').trim();
-    if (!name) return NextResponse.json({ error: 'naam is verplicht' }, { status: 400 });
+    if (!name) return NextResponse.json({ error: 'name is required' }, { status: 400 });
 
     const email = body.email ? String(body.email).trim() : null;
     const phone = body.phone ? String(body.phone).trim() : null;
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
       holdedSource = holdedSyncError.includes('HOLDED_API_KEY') ? 'no-key' : 'failed';
       await logActivity({
         actor: admin.name, role: admin.role,
-        action: 'Holded sync mislukt (klant-aanmaak)',
+        action: 'Holded sync failed (customer creation)',
         entityType: 'customer',
         entityLabel: name,
         details: holdedSyncError,
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
 
     await logActivity({
       actor: admin.name, role: admin.role,
-      action: 'Klant aangemaakt',
+      action: 'Customer created',
       entityType: 'customer',
       entityId: String(customer.id),
       entityLabel: name,

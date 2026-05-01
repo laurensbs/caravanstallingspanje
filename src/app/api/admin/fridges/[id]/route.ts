@@ -29,7 +29,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       customer_id: validated.data.customer_id ?? null,
     });
     const admin = getAdminInfo(req);
-    await logActivity({ actor: admin.name, role: admin.role, action: 'Koelkast bijgewerkt', entityType: 'fridge', entityId: id, entityLabel: validated.data.name || '' });
+    await logActivity({ actor: admin.name, role: admin.role, action: 'Fridge updated', entityType: 'fridge', entityId: id, entityLabel: validated.data.name || '' });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Fridge PUT error:', error);
@@ -43,7 +43,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     const fridge = await getFridgeById(parseInt(id));
     await deleteFridge(parseInt(id));
     const admin = getAdminInfo(req);
-    await logActivity({ actor: admin.name, role: admin.role, action: 'Koelkast verwijderd', entityType: 'fridge', entityId: id, entityLabel: fridge?.name || '' });
+    await logActivity({ actor: admin.name, role: admin.role, action: 'Fridge deleted', entityType: 'fridge', entityId: id, entityLabel: fridge?.name || '' });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Fridge DELETE error:', error);

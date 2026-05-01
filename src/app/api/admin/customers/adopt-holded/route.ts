@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     const all = await listAllContacts();
     const hit = all.find((c) => c.id === holdedId);
     if (!hit) {
-      return NextResponse.json({ error: 'Holded-contact niet gevonden' }, { status: 404 });
+      return NextResponse.json({ error: 'Holded contact not found' }, { status: 404 });
     }
 
     // 3. Email-match: bestaande lokale rij verrijken met Holded-id.
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     if (!customer) {
       const addr = hit.address;
       customer = await createCustomer({
-        name: hit.name || '(naamloos)',
+        name: hit.name || '(unnamed)',
         email: hit.email || null,
         phone: hit.phone || null,
         mobile: hit.mobile || null,
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
 
     await logActivity({
       actor: admin.name, role: admin.role,
-      action: 'Holded-klant gekoppeld vanuit zoek',
+      action: 'Holded customer linked from search',
       entityType: 'customer',
       entityId: String(customer!.id),
       entityLabel: customer!.name,

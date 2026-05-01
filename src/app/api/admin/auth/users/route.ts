@@ -12,6 +12,6 @@ export async function GET() {
     return NextResponse.json({ admins: list });
   } catch (error) {
     console.error('Auth users GET error:', error);
-    return NextResponse.json({ error: 'Kon gebruikers niet ophalen' }, { status: 500 });
+    return NextResponse.json({ error: 'Could not fetch users' }, { status: 500 });
   }
 }

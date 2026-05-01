@@ -13,13 +13,13 @@ export async function GET() {
       return NextResponse.json({
         ok: true,
         already_exists: true,
-        message: `Helen bestaat al (id ${existing.id}). Niets gedaan.`,
+        message: `Helen already exists (id ${existing.id}). No action taken.`,
       });
     }
     const hash = await hashPassword('admin1234');
     await createAdmin('Helen', email, hash, 'admin', true);
     await logActivity({
-      action: 'Admin Helen aangemaakt (must_change_password)',
+      action: 'Admin Helen created (must_change_password)',
       entityType: 'admin_user',
       entityLabel: email,
     });
@@ -28,7 +28,7 @@ export async function GET() {
       created: true,
       email,
       tempPassword: 'admin1234',
-      message: 'Helen kan nu inloggen met admin1234. Bij eerste login moet ze een eigen wachtwoord kiezen.',
+      message: 'Helen can now sign in with admin1234. On first login she must choose her own password.',
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'unknown';

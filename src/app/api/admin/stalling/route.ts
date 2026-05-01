@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const required = ['type', 'name', 'email', 'start_date'];
     for (const k of required) {
-      if (!body[k]) return NextResponse.json({ error: `Veld "${k}" ontbreekt` }, { status: 400 });
+      if (!body[k]) return NextResponse.json({ error: `Field "${k}" is missing` }, { status: 400 });
     }
     const admin = getAdminInfo(req);
     const created = await createStallingRequest({
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     });
     await logActivity({
       actor: admin.name, role: admin.role,
-      action: 'Stalling handmatig toegevoegd',
+      action: 'Storage added manually',
       entityType: 'stalling_request',
       entityId: String(created.id),
       entityLabel: `${body.name} — ${body.type}`,

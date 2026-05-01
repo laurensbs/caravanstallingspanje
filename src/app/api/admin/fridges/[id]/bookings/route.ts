@@ -11,7 +11,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (!validated.success) return NextResponse.json({ error: validated.error }, { status: 400 });
 
     const fridge = await getFridgeById(parseInt(id));
-    if (!fridge) return NextResponse.json({ error: 'Klant niet gevonden' }, { status: 404 });
+    if (!fridge) return NextResponse.json({ error: 'Customer not found' }, { status: 404 });
 
     // Capaciteits-check: alleen als zowel start als end zijn ingevuld én force
     // niet expliciet is gezet. Admin kan met `force: true` overrullen voor
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         );
         if (inUse >= cap) {
           return NextResponse.json({
-            error: `Geen voorraad: alle ${cap} ${fridge.device_type}-units zijn al verhuurd in deze periode (${inUse} actief). Stuur 'force: true' om alsnog door te zetten.`,
+            error: `Out of stock: all ${cap} ${fridge.device_type} units are already rented in this period (${inUse} active). Send 'force: true' to override.`,
             soldOut: true,
             inUse,
             capacity: cap,
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const admin = getAdminInfo(req);
     await logActivity({
       actor: admin.name, role: admin.role,
-      action: force ? 'Koelkast-periode toegevoegd (force)' : 'Koelkast-periode toegevoegd',
+      action: force ? 'Fridge period added (force)' : 'Fridge period added',
       entityType: 'fridge', entityId: id,
       entityLabel: `${fridge?.name || ''} - ${validated.data.camping || ''}`,
     });

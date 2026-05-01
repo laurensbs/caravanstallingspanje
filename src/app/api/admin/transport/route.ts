@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ entries });
   } catch (error) {
     console.error('Transport GET error:', error);
-    return NextResponse.json({ error: 'Kon transporten niet laden' }, { status: 500 });
+    return NextResponse.json({ error: 'Could not load transports' }, { status: 500 });
   }
 }
 
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const required = ['name', 'email', 'camping', 'outbound_date', 'return_date'];
     for (const k of required) {
-      if (!body[k]) return NextResponse.json({ error: `Veld "${k}" ontbreekt` }, { status: 400 });
+      if (!body[k]) return NextResponse.json({ error: `Field "${k}" is missing` }, { status: 400 });
     }
     const admin = getAdminInfo(req);
     const created = await createTransportRequest({
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     });
     await logActivity({
       actor: admin.name, role: admin.role,
-      action: 'Transport handmatig toegevoegd',
+      action: 'Transport added manually',
       entityType: 'transport_request',
       entityId: String(created.id),
       entityLabel: `${body.name} — ${body.camping}`,
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, entry: created });
   } catch (error) {
     console.error('Transport POST error:', error);
-    return NextResponse.json({ error: 'Kon transport niet aanmaken' }, { status: 500 });
+    return NextResponse.json({ error: 'Could not create transport' }, { status: 500 });
   }
 }
 
@@ -70,7 +70,7 @@ export async function PATCH(req: NextRequest) {
       await updateTransportRequest(Number(id), fields);
       await logActivity({
         actor: admin.name, role: admin.role,
-        action: 'Transport bijgewerkt',
+        action: 'Transport updated',
         entityType: 'transport_request',
         entityId: String(id),
       });
@@ -92,16 +92,16 @@ export async function PATCH(req: NextRequest) {
       await deleteTransportRequest(Number(id));
       await logActivity({
         actor: admin.name, role: admin.role,
-        action: 'Transport verwijderd',
+        action: 'Transport deleted',
         entityType: 'transport_request',
         entityId: String(id),
       });
       return NextResponse.json({ success: true });
     }
 
-    return NextResponse.json({ error: 'Onbekende actie' }, { status: 400 });
+    return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
   } catch (error) {
     console.error('Transport PATCH error:', error);
-    return NextResponse.json({ error: 'Kon actie niet uitvoeren' }, { status: 500 });
+    return NextResponse.json({ error: 'Could not perform action' }, { status: 500 });
   }
 }

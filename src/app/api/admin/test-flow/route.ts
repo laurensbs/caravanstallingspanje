@@ -33,14 +33,14 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const kind = body.kind as TestKind | undefined;
   const email = String(body.email || '').trim();
-  const name = String(body.name || 'Test Klant').trim();
+  const name = String(body.name || 'Test Customer').trim();
   const skipMail = body.skipMail === true;
 
   if (!kind || !['koelkast', 'airco', 'transport', 'service'].includes(kind)) {
-    return NextResponse.json({ error: 'kind moet koelkast/airco/transport/service zijn' }, { status: 400 });
+    return NextResponse.json({ error: 'kind must be koelkast/airco/transport/service' }, { status: 400 });
   }
   if (!email || !email.includes('@')) {
-    return NextResponse.json({ error: 'geldig e-mailadres vereist' }, { status: 400 });
+    return NextResponse.json({ error: 'valid email address required' }, { status: 400 });
   }
 
   const admin = getAdminInfo(req);
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
   const plus7 = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const plus14 = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-  const log: string[] = [`▶ Start test-flow: ${kind}, e-mail=${email}`];
+  const log: string[] = [`▶ Start test flow: ${kind}, email=${email}`];
   const result: {
     kind: TestKind;
     ref?: string;
@@ -79,19 +79,19 @@ export async function POST(req: NextRequest) {
     if (kind === 'koelkast' || kind === 'airco') {
       const deviceType = kind === 'airco' ? 'Airco' : 'Grote koelkast';
       amountEur = prices[deviceType] ?? (kind === 'airco' ? 50 : 40);
-      description = `${deviceType} — TEST — Camping Eurocamping plek T01 — ${todayIso} t/m ${plus7}`;
+      description = `${deviceType} — TEST — Camping Eurocamping spot T01 — ${todayIso} until ${plus7}`;
 
-      log.push(`✓ Prijs: €${amountEur} (${deviceType})`);
+      log.push(`✓ Price: €${amountEur} (${deviceType})`);
 
       // 1. Klant in fridges-tabel
       const fridge = await createFridge({
         name: `${name} (TEST)`,
         email,
         device_type: deviceType,
-        notes: 'TEST-flow vanuit admin — automatisch aangemaakt',
+        notes: 'TEST flow from admin — automatically created',
       });
       result.fridgeId = fridge.id;
-      log.push(`✓ Fridge-rij aangemaakt: id=${fridge.id}`);
+      log.push(`✓ Fridge row created: id=${fridge.id}`);
 
       // 2. Booking
       const booking = await createFridgeBooking(fridge.id, {
@@ -105,14 +105,14 @@ export async function POST(req: NextRequest) {
       result.bookingId = booking.id;
       ref = formatRef(kind === 'airco' ? 'airco' : 'koelkast', booking.id);
       result.ref = ref;
-      log.push(`✓ Booking aangemaakt: id=${booking.id} ref=${ref}`);
+      log.push(`✓ Booking created: id=${booking.id} ref=${ref}`);
 
       // 3. Mark paid (simuleer webhook)
       await markBookingPaid(booking.id, `test_session_${Date.now()}`);
-      log.push('✓ Booking status → compleet');
+      log.push('✓ Booking status → complete');
     } else if (kind === 'transport') {
       amountEur = 100;
-      description = `Transport heen-en-terug — TEST — Camping Eurocamping`;
+      description = `Transport round trip — TEST — Camping Eurocamping`;
       const transport = await createTransportRequest({
         name: `${name} (TEST)`,
         email,
@@ -121,36 +121,36 @@ export async function POST(req: NextRequest) {
         outbound_date: todayIso,
         return_date: plus14,
         registration: 'TEST-99',
-        notes: 'TEST-flow vanuit admin',
+        notes: 'TEST flow from admin',
         mode: 'wij_rijden',
         status: 'controleren',
       });
       result.transportId = transport.id;
       ref = formatRef('transport', transport.id);
       result.ref = ref;
-      log.push(`✓ Transport-rij aangemaakt: id=${transport.id} ref=${ref}`);
+      log.push(`✓ Transport row created: id=${transport.id} ref=${ref}`);
 
       await markTransportRequestPaid(transport.id);
-      log.push('✓ Transport status → betaald');
+      log.push('✓ Transport status → paid');
     } else if (kind === 'service') {
       amountEur = 95;
-      description = `Service: Wax-behandeling (TEST)`;
+      description = `Service: Wax treatment (TEST)`;
       const intakePayload: IntakePayload = {
         type: 'service',
         customer: { name: `${name} (TEST)`, email, phone: '+34 600 000 000' },
-        title: 'Service: Wax-behandeling (TEST)',
-        description: 'TEST-flow vanuit admin — automatisch aangemaakt',
-        serviceCategory: 'Wax-behandeling',
+        title: 'Service: Wax treatment (TEST)',
+        description: 'TEST flow from admin — automatically created',
+        serviceCategory: 'Wax treatment',
       };
       const intakeId = await createPendingIntakeReturningId(intakePayload);
       result.intakeId = intakeId;
       ref = formatRef('service', intakeId);
       result.ref = ref;
-      log.push(`✓ Pending intake aangemaakt: id=${intakeId} ref=${ref}`);
+      log.push(`✓ Pending intake created: id=${intakeId} ref=${ref}`);
 
       // Simuleer Stripe session-id koppeling
       await attachStripeSessionToPendingIntake(intakeId, `test_session_${Date.now()}`);
-      log.push('✓ Stripe-session gekoppeld');
+      log.push('✓ Stripe session linked');
 
       // Stuur door naar reparatiepaneel (echte API-call)
       try {
@@ -158,9 +158,9 @@ export async function POST(req: NextRequest) {
         await markPendingIntakeForwarded(intakeId, intakeResult.repairJobId);
         result.workshopJobId = intakeResult.repairJobId;
         result.workshopPublicCode = intakeResult.publicCode;
-        log.push(`✓ Doorgezet naar reparatiepaneel: jobId=${intakeResult.repairJobId} code=${intakeResult.publicCode}`);
+        log.push(`✓ Forwarded to repair panel: jobId=${intakeResult.repairJobId} code=${intakeResult.publicCode}`);
       } catch (err) {
-        log.push(`✗ Reparatiepaneel-doorzet mislukt: ${err instanceof Error ? err.message : 'unknown'}`);
+        log.push(`✗ Repair panel forwarding failed: ${err instanceof Error ? err.message : 'unknown'}`);
       }
     }
 
@@ -175,16 +175,16 @@ export async function POST(req: NextRequest) {
         holded_contact_id: matched?.id ?? null,
         source: 'stripe',
       });
-      log.push(`✓ Customer aangemaakt: id=${customer.id}${matched ? ' (gekoppeld aan Holded)' : ''}`);
+      log.push(`✓ Customer created: id=${customer.id}${matched ? ' (linked to Holded)' : ''}`);
     } else {
-      log.push(`✓ Bestaande customer gevonden: id=${customer.id}`);
+      log.push(`✓ Existing customer found: id=${customer.id}`);
     }
     result.customerId = customer.id;
 
     // 5. Link fridge/transport aan customer
     if (result.fridgeId) await linkFridgeToCustomer(result.fridgeId, customer.id);
     if (result.transportId) await linkTransportToCustomer(result.transportId, customer.id);
-    log.push('✓ Booking gekoppeld aan customer');
+    log.push('✓ Booking linked to customer');
 
     // 6. Holded-factuur
     try {
@@ -200,9 +200,9 @@ export async function POST(req: NextRequest) {
       }
       result.holdedInvoiceId = inv.id;
       result.holdedInvoiceNum = inv.invoiceNum;
-      log.push(`✓ Holded-factuur aangemaakt: ${inv.invoiceNum} (id=${inv.id})`);
+      log.push(`✓ Holded invoice created: ${inv.invoiceNum} (id=${inv.id})`);
     } catch (err) {
-      log.push(`✗ Holded-factuur mislukt: ${err instanceof Error ? err.message : 'unknown'}`);
+      log.push(`✗ Holded invoice failed: ${err instanceof Error ? err.message : 'unknown'}`);
     }
 
     // 7. Bevestigingsmail naar test-email
@@ -217,12 +217,12 @@ export async function POST(req: NextRequest) {
         });
         const sent = await sendMail({ to: email, subject: mail.subject, html: mail.html, text: mail.text });
         result.mailSent = sent.ok;
-        log.push(sent.ok ? `✓ Bevestigingsmail verstuurd naar ${email}` : `✗ Mail mislukt: ${sent.error}`);
+        log.push(sent.ok ? `✓ Confirmation email sent to ${email}` : `✗ Mail failed: ${sent.error}`);
       } catch (err) {
-        log.push(`✗ Mail-fout: ${err instanceof Error ? err.message : 'unknown'}`);
+        log.push(`✗ Mail error: ${err instanceof Error ? err.message : 'unknown'}`);
       }
     } else {
-      log.push('— Mail overgeslagen (skipMail=true)');
+      log.push('— Mail skipped (skipMail=true)');
     }
 
     // 8. Activity-log
@@ -234,11 +234,11 @@ export async function POST(req: NextRequest) {
     };
     await logActivity({
       actor: admin.name, role: admin.role,
-      action: 'TEST-flow uitgevoerd',
+      action: 'TEST flow executed',
       entityType: entityTypeMap[kind],
       entityId: String(result.bookingId || result.transportId || result.intakeId || ''),
       entityLabel: ref,
-      details: `email=${email} bedrag=${amountEur}`,
+      details: `email=${email} amount=${amountEur}`,
     });
 
     // 9. URLs voor admin om te checken
@@ -251,12 +251,12 @@ export async function POST(req: NextRequest) {
     } else {
       result.adminUrl = `${origin}/admin/koelkasten?focus=${result.fridgeId}`;
     }
-    log.push(`✓ Receipt-pagina: ${result.receiptUrl}`);
-    log.push(`✓ Admin-overzicht: ${result.adminUrl}`);
+    log.push(`✓ Receipt page: ${result.receiptUrl}`);
+    log.push(`✓ Admin overview: ${result.adminUrl}`);
 
     return NextResponse.json({ ok: true, ...result });
   } catch (err) {
-    log.push(`✗ Onverwachte fout: ${err instanceof Error ? err.message : 'unknown'}`);
+    log.push(`✗ Unexpected error: ${err instanceof Error ? err.message : 'unknown'}`);
     return NextResponse.json({ ok: false, ...result, error: err instanceof Error ? err.message : 'unknown' }, { status: 500 });
   }
 }
