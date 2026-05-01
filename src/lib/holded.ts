@@ -362,6 +362,11 @@ export async function invoiceForCustomer(input: {
 
 // Maakt een Holded pro forma. NIET een echte factuur.
 // Endpoint: POST /invoicing/v1/documents/proform
+//
+// BELANGRIJK: pro forma's zijn puur voor onze interne boekhouding —
+// klanten mogen 'r GEEN automatische mail van Holded over ontvangen.
+// We zetten daarom expliciet alle Holded-notify-flags uit. Klanten
+// krijgen alleen onze eigen Stripe-betaallink-mail (zie payment-link route).
 export async function createProforma(input: CreateInvoiceInput): Promise<{ id: string; invoiceNum: string }> {
   const body = {
     contactId: input.contactId,
@@ -369,6 +374,13 @@ export async function createProforma(input: CreateInvoiceInput): Promise<{ id: s
     date: input.date || Math.floor(Date.now() / 1000),
     notes: input.notes || '',
     items: input.items,
+    // Holded-velden om automatische klant-mail te onderdrukken.
+    // De API negeert onbekende keys, dus 't is veilig om alle bekende
+    // varianten mee te sturen — afhankelijk van account-config wint er één.
+    notifyAtCreate: false,
+    sendMail: false,
+    sendByEmail: false,
+    notify: false,
   };
   const data = await holdedFetch<{ status: number; id: string; invoiceNum?: string; docNumber?: string }>(
     '/invoicing/v1/documents/proform',
