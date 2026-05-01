@@ -790,24 +790,22 @@ function KoelkastenContent() {
 
         {drawerMode === 'edit' && drawerFridge && (
           <>
-            {/* Holded sync */}
-            <div className="mt-8 p-4 bg-surface-2 rounded-[var(--radius-lg)] border border-border">
-              <div className="flex items-start gap-3">
-                <div className="flex-1">
-                  <div className="text-xs font-medium text-text mb-1">Holded</div>
-                  <p className="text-xs text-text-muted">
-                    {drawerFridge.holded_contact_id
-                      ? `Gekoppeld (id ${drawerFridge.holded_contact_id.slice(0, 8)}…)`
-                      : 'Nog niet gekoppeld'}
-                  </p>
-                </div>
-                {!drawerFridge.holded_contact_id && (
+            {/* Holded sync — alleen tonen als er écht nog geen koppeling is.
+               Een gekoppelde centrale customer of bestaand holded_contact_id
+               op de fridge zelf telt allebei als gekoppeld. */}
+            {!drawerFridge.holded_contact_id && !drawerFridge.customer_id && !pickedCustomer?.holded_contact_id && (
+              <div className="mt-8 p-4 bg-surface-2 rounded-[var(--radius-lg)] border border-border">
+                <div className="flex items-start gap-3">
+                  <div className="flex-1">
+                    <div className="text-xs font-medium text-text mb-1">Holded</div>
+                    <p className="text-xs text-text-muted">Nog niet gekoppeld</p>
+                  </div>
                   <Button size="sm" variant="secondary" onClick={syncHolded} loading={holdedSyncing}>
                     Koppelen
                   </Button>
-                )}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Bookings */}
             <div className="mt-8">
