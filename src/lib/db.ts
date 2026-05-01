@@ -475,10 +475,23 @@ export async function deleteFridge(id: number) {
 }
 
 export async function createFridgeBooking(fridgeId: number, data: { camping?: string | null; start_date?: string | null; end_date?: string | null; spot_number?: string | null; status?: string; notes?: string | null; device_type?: string | null }) {
-  await ensureMiscSchema();
-  const res = await sql`INSERT INTO fridge_bookings (fridge_id, camping, start_date, end_date, spot_number, status, notes, device_type)
-    VALUES (${fridgeId}, ${data.camping || null}, ${data.start_date || null}::date, ${data.end_date || null}::date, ${data.spot_number || null}, ${data.status || 'compleet'}, ${data.notes || null}, ${data.device_type || null}) RETURNING *`;
-  return res[0];
+  // Probeer ensureMiscSchema (voegt device_type kolom toe als 'm mist) maar
+  // laat een eventuele migratie-fout de booking-create niet blokkeren.
+  await ensureMiscSchema().catch(() => {});
+  try {
+    const res = await sql`INSERT INTO fridge_bookings (fridge_id, camping, start_date, end_date, spot_number, status, notes, device_type)
+      VALUES (${fridgeId}, ${data.camping || null}, ${data.start_date || null}::date, ${data.end_date || null}::date, ${data.spot_number || null}, ${data.status || 'compleet'}, ${data.notes || null}, ${data.device_type || null}) RETURNING *`;
+    return res[0];
+  } catch (err) {
+    // Fallback: oude DB zonder device_type kolom. Insert zonder dat veld.
+    const msg = err instanceof Error ? err.message : '';
+    if (/column.*device_type.*does not exist/i.test(msg)) {
+      const res = await sql`INSERT INTO fridge_bookings (fridge_id, camping, start_date, end_date, spot_number, status, notes)
+        VALUES (${fridgeId}, ${data.camping || null}, ${data.start_date || null}::date, ${data.end_date || null}::date, ${data.spot_number || null}, ${data.status || 'compleet'}, ${data.notes || null}) RETURNING *`;
+      return res[0];
+    }
+    throw err;
+  }
 }
 
 export async function updateFridgeBooking(id: number, data: { camping?: string | null; start_date?: string | null; end_date?: string | null; spot_number?: string | null; status?: string; notes?: string | null }) {
