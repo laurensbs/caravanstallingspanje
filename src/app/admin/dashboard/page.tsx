@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
   Refrigerator, ArrowUpRight, AlertCircle, CheckCircle2, Truck, Package,
-  Activity, Receipt, RefreshCw, Loader2, Sparkles,
+  Activity, Receipt, RefreshCw, Loader2, Sparkles, FileCheck2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import PageHeader from '@/components/admin/PageHeader';
@@ -20,6 +20,7 @@ type Stats = {
     table: { current: number; capacity: number };
     airco: { current: number; capacity: number };
   };
+  needsSalesInvoice?: number;
 };
 
 type ActivityEvent = {
@@ -110,6 +111,7 @@ export default function DashboardPage() {
     { label: 'Currently out', value: inUseTotal, href: '/admin/koelkasten', icon: Truck },
     { label: 'Needs review', value: controleren, href: '/admin/koelkasten?status=controleren', icon: AlertCircle, tone: 'warning' as const },
     { label: 'Periods complete', value: compleet, href: '/admin/koelkasten?status=compleet', icon: CheckCircle2, tone: 'success' as const },
+    { label: 'Needs sales invoice', value: stats?.needsSalesInvoice ?? 0, href: '/admin/koelkasten', icon: FileCheck2, tone: ((stats?.needsSalesInvoice ?? 0) > 0 ? 'warning' : 'success') as 'warning' | 'success' },
   ];
 
   return (
@@ -162,7 +164,7 @@ export default function DashboardPage() {
         </motion.div>
       )}
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {tiles.map((t, i) => {
           const Icon = t.icon;
           const toneClass =

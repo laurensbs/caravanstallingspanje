@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllFridges, createFridge, getFridgeStats, getActiveBookingsByType, logActivity, getAdminInfo } from '@/lib/db';
+import { getAllFridges, createFridge, getFridgeStats, getActiveBookingsByType, logActivity, getAdminInfo, getNeedsSalesInvoiceCount } from '@/lib/db';
 import { validateBody, fridgeSchema } from '@/lib/validations';
 import { getEffectiveStock } from '@/lib/pricing';
 
@@ -29,6 +29,10 @@ export async function GET(req: NextRequest) {
       const inUseLarge = active.find(a => a.device_type === 'Grote koelkast')?.count ?? 0;
       const inUseTable = active.find(a => a.device_type === 'Tafelmodel koelkast')?.count ?? 0;
       const inUseAirco = active.find(a => a.device_type === 'Airco')?.count ?? 0;
+      const needsSalesInvoice = await getNeedsSalesInvoiceCount().catch((e) => {
+        console.error('[fridges/stats] getNeedsSalesInvoiceCount failed:', e);
+        return 0;
+      });
       return NextResponse.json({
         ...stats,
         inUse: {
@@ -36,6 +40,7 @@ export async function GET(req: NextRequest) {
           table: { current: inUseTable, capacity: stock['Tafelmodel koelkast'] },
           airco: { current: inUseAirco, capacity: stock['Airco'] },
         },
+        needsSalesInvoice,
       });
     }
 

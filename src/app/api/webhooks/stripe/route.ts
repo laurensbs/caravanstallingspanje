@@ -16,6 +16,9 @@ import {
   setBookingHoldedInvoice,
   setStallingHoldedInvoice,
   setTransportHoldedInvoice,
+  setBookingPaidAt,
+  setStallingPaidAt,
+  setTransportPaidAt,
   logActivity,
   cleanupOldPendingIntakes,
   getCustomerByEmail,
@@ -107,6 +110,9 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
   const originalAmountEur = originalAmountCents !== null && Number.isFinite(originalAmountCents)
     ? originalAmountCents / 100 : null;
   const intentId = typeof session.payment_intent === 'string' ? session.payment_intent : null;
+  // Stripe-event timestamp = vrijwel exact het moment van de capture,
+  // bruikbaar als 'paid_at' zonder een extra API-call naar paymentIntents.
+  const paidAt = new Date(event.created * 1000);
 
   // Lazy cleanup: markeer pending_intakes ouder dan 24u als verlaten zodat
   // de tabel netjes blijft. Best-effort.
@@ -154,6 +160,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
     const id = Number(refId);
     if (Number.isFinite(id) && id > 0) {
       await markBookingPaid(id, session.id);
+      await setBookingPaidAt(id, paidAt, intentId).catch(() => {});
       const fridge = await getFridgeById(id).catch(() => null);
       if (fridge) {
         customerName = customerName || fridge.name;
@@ -171,6 +178,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
     const id = Number(refId);
     if (Number.isFinite(id) && id > 0) {
       await markBookingPaid(id, session.id);
+      await setBookingPaidAt(id, paidAt, intentId).catch(() => {});
       const fridge = await getFridgeById(id).catch(() => null);
       if (fridge) {
         customerName = customerName || fridge.name;
@@ -202,6 +210,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
     const id = Number(refId);
     if (Number.isFinite(id) && id > 0) {
       await markStallingRequestPaid(id);
+      await setStallingPaidAt(id, paidAt, intentId).catch(() => {});
       const r = await getStallingRequestById(id).catch(() => null) as { name: string; email: string; phone?: string | null; type: string; holded_invoice_id?: string | null } | null;
       if (r) {
         customerName = customerName || r.name;
@@ -228,6 +237,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
     const id = Number(refId);
     if (Number.isFinite(id) && id > 0) {
       await markTransportRequestPaid(id);
+      await setTransportPaidAt(id, paidAt, intentId).catch(() => {});
       const r = await getTransportRequestById(id).catch(() => null) as null | {
         name: string; email: string; phone?: string | null;
         camping?: string | null; transport_mode?: string | null;

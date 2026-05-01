@@ -369,7 +369,10 @@ export async function getAllFridges(year?: number, status?: string, search?: str
             'holded_invoice_id', b.holded_invoice_id, 'holded_invoice_number', b.holded_invoice_number,
             'holded_invoice_url', b.holded_invoice_url, 'holded_invoice_status', b.holded_invoice_status,
             'payment_link_url', b.payment_link_url, 'payment_link_sent_at', b.payment_link_sent_at,
-            'payment_link_email', b.payment_link_email, 'payment_link_amount_cents', b.payment_link_amount_cents
+            'payment_link_email', b.payment_link_email, 'payment_link_amount_cents', b.payment_link_amount_cents,
+            'paid_at', b.paid_at, 'stripe_payment_intent_id', b.stripe_payment_intent_id,
+            'sales_invoice_converted_at', b.sales_invoice_converted_at,
+            'sales_invoice_converted_by', b.sales_invoice_converted_by
           ) ORDER BY b.start_date NULLS LAST) FILTER (WHERE b.id IS NOT NULL), '[]') AS bookings
         FROM fridges f
         INNER JOIN fridge_bookings b ON b.fridge_id = f.id
@@ -389,7 +392,10 @@ export async function getAllFridges(year?: number, status?: string, search?: str
             'holded_invoice_id', b.holded_invoice_id, 'holded_invoice_number', b.holded_invoice_number,
             'holded_invoice_url', b.holded_invoice_url, 'holded_invoice_status', b.holded_invoice_status,
             'payment_link_url', b.payment_link_url, 'payment_link_sent_at', b.payment_link_sent_at,
-            'payment_link_email', b.payment_link_email, 'payment_link_amount_cents', b.payment_link_amount_cents
+            'payment_link_email', b.payment_link_email, 'payment_link_amount_cents', b.payment_link_amount_cents,
+            'paid_at', b.paid_at, 'stripe_payment_intent_id', b.stripe_payment_intent_id,
+            'sales_invoice_converted_at', b.sales_invoice_converted_at,
+            'sales_invoice_converted_by', b.sales_invoice_converted_by
           ) ORDER BY b.start_date NULLS LAST) FILTER (WHERE b.id IS NOT NULL), '[]') AS bookings
         FROM fridges f
         LEFT JOIN fridge_bookings b ON b.fridge_id = f.id
@@ -502,6 +508,104 @@ export async function setBookingPaymentLink(
         payment_link_sent_at = NOW(),
         updated_at = NOW()
     WHERE id = ${id}`;
+}
+
+// Bij Stripe-webhook na betaling: vul paid_at + payment_intent_id zodat we
+// de exacte betaaldatum kunnen tonen in de admin-UI. Idempotent: COALESCE
+// laat een eerder gezet paid_at staan (bv. bij dubbele webhook events).
+export async function setBookingPaidAt(id: number, paidAt: Date, paymentIntentId: string | null) {
+  await ensureMiscSchema();
+  await sql`UPDATE fridge_bookings
+    SET paid_at = COALESCE(paid_at, ${paidAt.toISOString()}::timestamp),
+        stripe_payment_intent_id = COALESCE(stripe_payment_intent_id, ${paymentIntentId}),
+        updated_at = NOW()
+    WHERE id = ${id}`;
+}
+
+export async function setStallingPaidAt(id: number, paidAt: Date, paymentIntentId: string | null) {
+  await ensureMiscSchema();
+  await sql`UPDATE stalling_requests
+    SET paid_at = COALESCE(paid_at, ${paidAt.toISOString()}::timestamp),
+        stripe_payment_intent_id = COALESCE(stripe_payment_intent_id, ${paymentIntentId}),
+        updated_at = NOW()
+    WHERE id = ${id}`;
+}
+
+export async function setTransportPaidAt(id: number, paidAt: Date, paymentIntentId: string | null) {
+  await ensureMiscSchema();
+  await sql`UPDATE transport_requests
+    SET paid_at = COALESCE(paid_at, ${paidAt.toISOString()}::timestamp),
+        stripe_payment_intent_id = COALESCE(stripe_payment_intent_id, ${paymentIntentId}),
+        updated_at = NOW()
+    WHERE id = ${id}`;
+}
+
+// Toggle pro-forma → sales-invoice flag. converted=true zet timestamp+admin;
+// converted=false maakt 'm leeg (Undo).
+export async function setBookingSalesInvoice(id: number, converted: boolean, adminName: string | null) {
+  await ensureMiscSchema();
+  if (converted) {
+    await sql`UPDATE fridge_bookings
+      SET sales_invoice_converted_at = NOW(),
+          sales_invoice_converted_by = ${adminName || 'admin'},
+          updated_at = NOW()
+      WHERE id = ${id}`;
+  } else {
+    await sql`UPDATE fridge_bookings
+      SET sales_invoice_converted_at = NULL,
+          sales_invoice_converted_by = NULL,
+          updated_at = NOW()
+      WHERE id = ${id}`;
+  }
+}
+
+export async function setStallingSalesInvoice(id: number, converted: boolean, adminName: string | null) {
+  await ensureMiscSchema();
+  if (converted) {
+    await sql`UPDATE stalling_requests
+      SET sales_invoice_converted_at = NOW(),
+          sales_invoice_converted_by = ${adminName || 'admin'},
+          updated_at = NOW()
+      WHERE id = ${id}`;
+  } else {
+    await sql`UPDATE stalling_requests
+      SET sales_invoice_converted_at = NULL,
+          sales_invoice_converted_by = NULL,
+          updated_at = NOW()
+      WHERE id = ${id}`;
+  }
+}
+
+export async function setTransportSalesInvoice(id: number, converted: boolean, adminName: string | null) {
+  await ensureMiscSchema();
+  if (converted) {
+    await sql`UPDATE transport_requests
+      SET sales_invoice_converted_at = NOW(),
+          sales_invoice_converted_by = ${adminName || 'admin'},
+          updated_at = NOW()
+      WHERE id = ${id}`;
+  } else {
+    await sql`UPDATE transport_requests
+      SET sales_invoice_converted_at = NULL,
+          sales_invoice_converted_by = NULL,
+          updated_at = NOW()
+      WHERE id = ${id}`;
+  }
+}
+
+// Voor het dashboard: hoeveel betaalde pro-forma's wachten nog op handmatige
+// sales-invoice-conversie? Telt alle drie de bronnen.
+export async function getNeedsSalesInvoiceCount() {
+  await ensureMiscSchema();
+  const fridges = await sql`SELECT COUNT(*) AS c FROM fridge_bookings
+    WHERE holded_invoice_status = 'paid' AND sales_invoice_converted_at IS NULL`;
+  const stallings = await sql`SELECT COUNT(*) AS c FROM stalling_requests
+    WHERE holded_invoice_status = 'paid' AND sales_invoice_converted_at IS NULL`;
+  const transports = await sql`SELECT COUNT(*) AS c FROM transport_requests
+    WHERE holded_invoice_status = 'paid' AND sales_invoice_converted_at IS NULL`;
+  return Number((fridges[0] as { c: string | number }).c)
+    + Number((stallings[0] as { c: string | number }).c)
+    + Number((transports[0] as { c: string | number }).c);
 }
 
 export async function getBookingById(id: number) {
@@ -923,6 +1027,21 @@ async function ensureMiscSchema(): Promise<void> {
     await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_status TEXT`;
     await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_synced_at TIMESTAMP`;
     await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_url TEXT`;
+    // Stripe paid_at + payment_intent_id én sales-invoice-conversion flag.
+    // Pro forma's blijven pro forma in Holded; dit vinkje markeert dat een
+    // admin 'm handmatig heeft omgezet naar een echte sales invoice in Holded.
+    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP`;
+    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS stripe_payment_intent_id TEXT`;
+    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS sales_invoice_converted_at TIMESTAMP`;
+    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS sales_invoice_converted_by TEXT`;
+    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP`;
+    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS stripe_payment_intent_id TEXT`;
+    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS sales_invoice_converted_at TIMESTAMP`;
+    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS sales_invoice_converted_by TEXT`;
+    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP`;
+    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS stripe_payment_intent_id TEXT`;
+    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS sales_invoice_converted_at TIMESTAMP`;
+    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS sales_invoice_converted_by TEXT`;
     await sql`CREATE TABLE IF NOT EXISTS contact_messages (
       id SERIAL PRIMARY KEY,
       name TEXT NOT NULL,

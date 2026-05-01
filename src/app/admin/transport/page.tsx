@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import {
   Mail, Phone, Calendar, Trash2, Truck, ArrowRight, MapPin, CheckCircle2, Ban,
   Plus, ChevronDown, Refrigerator, Warehouse, Pencil,
+  FileCheck2, Square, CheckSquare, Receipt,
 } from 'lucide-react';
 import { Button, Badge, Skeleton, Select, Input } from '@/components/ui';
 import PageHeader from '@/components/admin/PageHeader';
@@ -33,6 +34,13 @@ type Entry = {
   transport_mode?: string | null;
   pickup_location?: string | null;
   created_at: string;
+  holded_invoice_id?: string | null;
+  holded_invoice_number?: string | null;
+  holded_invoice_status?: string | null;
+  holded_invoice_url?: string | null;
+  paid_at?: string | null;
+  sales_invoice_converted_at?: string | null;
+  sales_invoice_converted_by?: string | null;
 };
 
 type CustomerOverview = {
@@ -126,6 +134,26 @@ export default function TransportPage() {
     if (!res.ok) { toast.error('Could not perform action'); return; }
     toast.success(msg);
     load();
+  };
+
+  const toggleSalesInvoice = async (id: number, converted: boolean) => {
+    try {
+      const res = await fetch(`/api/admin/transport/${id}/sales-invoice`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ converted }),
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        toast.error(d.error || 'Update failed');
+        return;
+      }
+      toast.success(converted ? 'Marked as converted to sales invoice' : 'Sales invoice flag cleared');
+      load();
+    } catch {
+      toast.error('Update failed');
+    }
   };
 
   const openEdit = (e: Entry) => {
@@ -353,6 +381,18 @@ export default function TransportPage() {
                     </p>
                   )}
 
+                  {e.holded_invoice_id && (
+                    <SalesInvoiceStripTransport
+                      paidAt={e.paid_at ?? null}
+                      holdedPaid={e.holded_invoice_status === 'paid'}
+                      holdedNumber={e.holded_invoice_number ?? null}
+                      holdedUrl={e.holded_invoice_url ?? null}
+                      convertedAt={e.sales_invoice_converted_at ?? null}
+                      convertedBy={e.sales_invoice_converted_by ?? null}
+                      onToggle={(c) => toggleSalesInvoice(e.id, c)}
+                    />
+                  )}
+
                   <button
                     onClick={() => toggleExpand(e)}
                     className="mt-4 inline-flex items-center gap-1.5 text-[12px] text-text-muted hover:text-text transition-colors"
@@ -494,6 +534,67 @@ function CustomerOverviewView({ overview, currentTransportId }: { overview?: Cus
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function SalesInvoiceStripTransport({
+  paidAt, holdedPaid, holdedNumber, holdedUrl, convertedAt, convertedBy, onToggle,
+}: {
+  paidAt: string | null;
+  holdedPaid: boolean;
+  holdedNumber: string | null;
+  holdedUrl: string | null;
+  convertedAt: string | null;
+  convertedBy: string | null;
+  onToggle: (converted: boolean) => void;
+}) {
+  const isConverted = !!convertedAt;
+  const canToggle = holdedPaid || isConverted;
+  const fmt = (s: string | null) =>
+    s ? new Date(s).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : null;
+
+  return (
+    <div
+      className={`mt-3 rounded-[var(--radius-md)] border p-3 ${
+        isConverted
+          ? 'bg-success-soft border-success/30'
+          : holdedPaid
+            ? 'bg-warning-soft border-warning/30'
+            : 'bg-surface-2 border-border'
+      }`}
+    >
+      <div className="flex items-start gap-2.5">
+        <button
+          type="button"
+          onClick={() => canToggle && onToggle(!isConverted)}
+          disabled={!canToggle}
+          className={`mt-0.5 transition-colors ${
+            isConverted ? 'text-success' : canToggle ? 'text-warning hover:text-text' : 'text-text-subtle cursor-not-allowed'
+          }`}
+          title={!canToggle ? 'Available once Holded marks the pro forma as paid' : isConverted ? 'Click to undo' : 'Click to mark as converted'}
+        >
+          {isConverted ? <CheckSquare size={16} /> : <Square size={16} />}
+        </button>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap text-[12px]">
+            <FileCheck2 size={12} className={isConverted ? 'text-success' : holdedPaid ? 'text-warning' : 'text-text-subtle'} />
+            <span className={`font-medium ${isConverted ? 'text-success' : 'text-text'}`}>
+              {isConverted ? 'Converted to sales invoice' : holdedPaid ? 'Needs to be made into sales invoice' : 'Awaiting payment before sales invoice'}
+            </span>
+            {holdedUrl && (
+              <a href={holdedUrl} target="_blank" rel="noopener noreferrer"
+                 className="inline-flex items-center gap-1 text-[11px] font-medium text-accent hover:underline underline-offset-2 ml-auto">
+                <Receipt size={11} /> {holdedNumber || 'Pro forma'}
+              </a>
+            )}
+          </div>
+          <div className="text-[11px] text-text-muted mt-1 flex flex-wrap gap-x-3 gap-y-0.5">
+            {paidAt && <span>Paid {fmt(paidAt)} · via Stripe</span>}
+            {isConverted && <span>by {convertedBy || 'admin'} on {fmt(convertedAt)}</span>}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

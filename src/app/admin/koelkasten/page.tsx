@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import {
   Plus, Search, Trash2, Pencil, Calendar, MapPin, Tag, Receipt, Link as LinkIcon,
   AlertCircle, CheckCircle2, ChevronRight, ExternalLink, Truck, Send, Mail, RefreshCw,
+  FileCheck2, Square, CheckSquare,
 } from 'lucide-react';
 import { Button, Input, Select, Textarea, Badge, Skeleton, Spinner } from '@/components/ui';
 import Drawer from '@/components/Drawer';
@@ -31,6 +32,10 @@ type Booking = {
   payment_link_sent_at: string | null;
   payment_link_email: string | null;
   payment_link_amount_cents: number | null;
+  paid_at: string | null;
+  stripe_payment_intent_id: string | null;
+  sales_invoice_converted_at: string | null;
+  sales_invoice_converted_by: string | null;
 };
 
 type Fridge = {
@@ -432,6 +437,29 @@ function KoelkastenContent() {
     }
   };
 
+  // ─── Sales-invoice toggle ───
+  // Optimistic update: vink direct in UI aan, rollback bij fout. Refresh
+  // daarna om ook converted_by + converted_at uit DB op te halen.
+  const toggleSalesInvoice = async (bookingId: number, converted: boolean) => {
+    try {
+      const res = await fetch(`/api/admin/fridges/bookings/${bookingId}/sales-invoice`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ converted }),
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        toast.error(d.error || 'Update failed');
+        return;
+      }
+      toast.success(converted ? 'Marked as converted to sales invoice' : 'Sales invoice flag cleared');
+      await refresh();
+    } catch {
+      toast.error('Update failed');
+    }
+  };
+
   // ─── Delete ───
   const confirmDeleteAction = async () => {
     if (!confirmDelete) return;
@@ -679,6 +707,23 @@ function KoelkastenContent() {
                                       <Receipt size={10} /> {b.holded_invoice_number}
                                     </span>
                                   )}
+                                  {b.sales_invoice_converted_at ? (
+                                    <span
+                                      className="inline-flex items-center gap-1 text-[11px] font-medium text-success bg-success-soft border border-success/30 rounded-full px-2 py-0.5"
+                                      title={`Converted to sales invoice by ${b.sales_invoice_converted_by || 'admin'}`}
+                                    >
+                                      <FileCheck2 size={10} /> Sales invoice
+                                    </span>
+                                  ) : holdedPaid ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleSalesInvoice(b.id, true)}
+                                      className="inline-flex items-center gap-1 text-[11px] font-medium text-warning bg-warning-soft border border-warning/30 rounded-full px-2 py-0.5 hover:bg-warning-soft/70 transition-colors"
+                                      title="Mark as converted to sales invoice"
+                                    >
+                                      <Square size={10} /> Needs sales invoice
+                                    </button>
+                                  ) : null}
                                 </div>
                               );
                             })}
@@ -935,6 +980,18 @@ function KoelkastenContent() {
                           </a>
                         )}
                       </div>
+                      {/* Sales-invoice conversie-tracker. Verschijnt zodra 'r een
+                          pro forma in Holded staat — checkbox is alleen klikbaar als
+                          de pro forma ook al betaald is, anders te vroeg. */}
+                      {b.holded_invoice_id && (
+                        <SalesInvoiceStrip
+                          paidAt={b.paid_at}
+                          holdedPaid={holdedPaid}
+                          convertedAt={b.sales_invoice_converted_at}
+                          convertedBy={b.sales_invoice_converted_by}
+                          onToggle={(c) => toggleSalesInvoice(b.id, c)}
+                        />
+                      )}
                     </li>
                     );
                   })}
@@ -1233,5 +1290,68 @@ function ActiveBookingsOverview({ onFilterDevice, activeFilter }: {
         </div>
       )}
     </section>
+  );
+}
+
+// Sales-invoice tracker-strip — toont paid_at + checkbox 'Converted to sales
+// invoice'. Checkbox is disabled tot de Holded-pro forma als 'paid' staat,
+// want anders zou je 'm te vroeg afvinken. Undo (uitvinken) is altijd toegestaan.
+function SalesInvoiceStrip({
+  paidAt, holdedPaid, convertedAt, convertedBy, onToggle,
+}: {
+  paidAt: string | null;
+  holdedPaid: boolean;
+  convertedAt: string | null;
+  convertedBy: string | null;
+  onToggle: (converted: boolean) => void;
+}) {
+  const isConverted = !!convertedAt;
+  const canToggle = holdedPaid || isConverted;
+  const fmt = (s: string | null) =>
+    s ? new Date(s).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : null;
+
+  return (
+    <div
+      className={`mt-2 rounded-[var(--radius-md)] border p-2.5 ${
+        isConverted
+          ? 'bg-success-soft border-success/30'
+          : holdedPaid
+            ? 'bg-warning-soft border-warning/30'
+            : 'bg-surface-2 border-border'
+      }`}
+    >
+      <div className="flex items-start gap-2.5">
+        <button
+          type="button"
+          onClick={() => canToggle && onToggle(!isConverted)}
+          disabled={!canToggle}
+          className={`mt-0.5 transition-colors ${
+            isConverted
+              ? 'text-success'
+              : canToggle
+                ? 'text-warning hover:text-text'
+                : 'text-text-subtle cursor-not-allowed'
+          }`}
+          title={!canToggle ? 'Available once Holded marks the pro forma as paid' : isConverted ? 'Click to undo' : 'Click to mark as converted'}
+          aria-label="Toggle sales invoice"
+        >
+          {isConverted ? <CheckSquare size={16} /> : <Square size={16} />}
+        </button>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 flex-wrap text-[12px]">
+            <FileCheck2 size={11} className={isConverted ? 'text-success' : holdedPaid ? 'text-warning' : 'text-text-subtle'} />
+            <span className={`font-medium ${isConverted ? 'text-success' : 'text-text'}`}>
+              {isConverted ? 'Converted to sales invoice' : holdedPaid ? 'Needs to be made into sales invoice' : 'Awaiting payment before sales invoice'}
+            </span>
+          </div>
+          <div className="text-[11px] text-text-muted mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5">
+            {paidAt && <span>Paid {fmt(paidAt)} · via Stripe</span>}
+            {isConverted && (
+              <span>by {convertedBy || 'admin'} on {fmt(convertedAt)}</span>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
