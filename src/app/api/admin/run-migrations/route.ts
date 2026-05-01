@@ -69,6 +69,11 @@ export async function GET() {
   await ran('customers.holded_synced_at', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_synced_at TIMESTAMP`);
   await ran('customers.source', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'manual'`);
 
+  // Legacy UNIQUE-constraint uit een eerder DB-schema (heette
+  // customers_email_key). Botst met case-insensitive matching + soft-deletes,
+  // dus weghalen ten faveure van onze partial index hieronder.
+  await ran('drop legacy customers_email_key', () => sql`ALTER TABLE customers DROP CONSTRAINT IF EXISTS customers_email_key`);
+  await ran('drop legacy customers_email_unique', () => sql`ALTER TABLE customers DROP CONSTRAINT IF EXISTS customers_email_unique`);
   await ran('idx_customers_email_lower_alive', () => sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_email_lower_alive ON customers (LOWER(email)) WHERE email IS NOT NULL AND deleted_at IS NULL`);
   await ran('idx_customers_holded_id', () => sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_holded_id ON customers (holded_contact_id) WHERE holded_contact_id IS NOT NULL`);
   await ran('idx_customers_phone', () => sql`CREATE INDEX IF NOT EXISTS idx_customers_phone ON customers (phone)`);

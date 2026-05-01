@@ -243,6 +243,10 @@ export async function initDatabase() {
   // Email-uniqueness alleen voor levende klanten — soft-deleted rows mogen
   // hun email vrij geven aan een nieuwe klant.
   await sql`DROP INDEX IF EXISTS idx_customers_email_lower`;
+  // Legacy UNIQUE-constraint van een eerder DB-schema. Botst met onze
+  // case-insensitive + soft-delete matching, dus weghalen.
+  await sql`ALTER TABLE customers DROP CONSTRAINT IF EXISTS customers_email_key`;
+  await sql`ALTER TABLE customers DROP CONSTRAINT IF EXISTS customers_email_unique`;
   await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_email_lower_alive ON customers (LOWER(email)) WHERE email IS NOT NULL AND deleted_at IS NULL`;
   await sql`CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_holded_id ON customers (holded_contact_id) WHERE holded_contact_id IS NOT NULL`;
   await sql`CREATE INDEX IF NOT EXISTS idx_customers_phone ON customers (phone)`;
