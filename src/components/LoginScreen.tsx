@@ -157,22 +157,16 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-10"
         >
-          {/* Witte badge zodat het kleur-correcte logo (donkerblauw, zoals op
-              de homepage) leesbaar blijft tegen de navy-portal-achtergrond.
-              Identiek met de sidebar-versie zodat 't visueel klopt. */}
-          <div
-            className="mx-auto mb-5 inline-flex items-center justify-center px-5 py-3 rounded-[var(--radius-lg)]"
-            style={{ background: '#FFFFFF', boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}
-          >
-            <Image
-              src="/images/logo.png"
-              alt="Caravanstalling"
-              width={220}
-              height={50}
-              priority
-              className="h-9 w-auto"
-            />
-          </div>
+          {/* Logo direct op de navy gradient — de PNG is wit-op-transparant
+              dus 'm rendert vanzelf goed leesbaar zonder witte chip. */}
+          <Image
+            src="/images/logo.png"
+            alt="Caravanstalling"
+            width={220}
+            height={50}
+            priority
+            className="mx-auto mb-5 h-10 w-auto"
+          />
           <p className="text-[10px] font-medium tracking-[0.25em] uppercase" style={{ color: 'rgba(241,245,249,0.55)' }}>
             Admin portal
           </p>

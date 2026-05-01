@@ -104,12 +104,12 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
           }}
         >
           <Link href="/admin" className="flex items-center gap-3 group w-full" title="Back to portal selection">
-            {/* Witte chip rond het logo. Bij collapsed = compacte 48×48 vierkant
-                (toont een uitsnede van het logo); bij expanded = full-width chip. */}
+            {/* Logo direct op de navy achtergrond — transparante PNG (wit-op-niets)
+                ploft eruit zonder witte chip eromheen. Container clipt 'm bij
+                collapsed naar een vierkant zodat alleen het symbool zichtbaar is. */}
             <div
-              className="inline-flex items-center justify-center rounded-[var(--radius-md)] shrink-0 overflow-hidden"
+              className="inline-flex items-center shrink-0 overflow-hidden"
               style={{
-                background: '#FFFFFF',
                 width: expanded ? 200 : 48,
                 height: 48,
                 transition: 'width 220ms cubic-bezier(0.16, 1, 0.3, 1)',
@@ -123,7 +123,7 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
                 priority
                 quality={100}
                 style={{
-                  height: 32,
+                  height: 36,
                   width: 'auto',
                   maxWidth: 'none',
                   objectFit: 'contain',
