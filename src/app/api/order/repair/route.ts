@@ -16,7 +16,10 @@ export async function POST(req: NextRequest) {
 
     const result = await sendIntake({
       type: 'repair',
-      customer: { name: d.name, email: d.email, phone: d.phone },
+      customer: {
+        name: d.name, email: d.email, phone: d.phone,
+        address: d.address, postalCode: d.postal_code, city: d.city, country: d.country,
+      },
       unit: d.registration ? { registration: d.registration, brand: d.brand || undefined, model: d.model || undefined } : undefined,
       title: 'Reparatie-aanvraag',
       description: d.description,

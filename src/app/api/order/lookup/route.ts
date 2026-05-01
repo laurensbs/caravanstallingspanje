@@ -8,6 +8,16 @@ import {
 import { parseRef } from '@/lib/refs';
 import { TEST_MODE } from '@/lib/pricing';
 
+// Format DB date (Date object of ISO string) als nette NL-datum.
+// Voorkomt dat raw Date.toString() ("Fri May 01 2026 00:00:00 GMT+0000…") naar
+// de klant lekt op de bevestigingspagina.
+function fmtDate(d: unknown): string | null {
+  if (!d) return null;
+  const date = d instanceof Date ? d : new Date(String(d));
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
 // Publieke lookup: GET /api/order/lookup?ref=KK-12 → details voor de
 // klant-bevestigingspagina. Geen gevoelige data — alleen wat de klant
 // zelf heeft ingevoerd.
@@ -30,7 +40,7 @@ export async function GET(req: NextRequest) {
         status: bookings.booking.status === 'compleet' ? 'betaald' : 'wacht op betaling',
         service: `${bookings.fridge.device_type} — ${bookings.booking.camping || 'locatie volgt'}${bookings.booking.spot_number ? ` plek ${bookings.booking.spot_number}` : ''}`,
         period: bookings.booking.start_date && bookings.booking.end_date
-          ? `${bookings.booking.start_date} → ${bookings.booking.end_date}` : null,
+          ? `${fmtDate(bookings.booking.start_date)} → ${fmtDate(bookings.booking.end_date)}` : null,
         customerEmail: bookings.fridge.email,
         customerName: bookings.fridge.name,
         invoiceCreated: !!bookings.booking.holded_invoice_id,
@@ -51,7 +61,7 @@ export async function GET(req: NextRequest) {
         ref,
         status: r.status === 'betaald' ? 'betaald' : 'wacht op betaling',
         service: `Stalling ${r.type}`,
-        period: r.start_date ? `vanaf ${r.start_date}` : null,
+        period: r.start_date ? `vanaf ${fmtDate(r.start_date)}` : null,
         customerEmail: r.email,
         customerName: r.name,
         invoiceCreated: !!r.holded_invoice_id,
@@ -89,7 +99,7 @@ export async function GET(req: NextRequest) {
         status,
         service: serviceLabel,
         mode: r.transport_mode,
-        period: r.preferred_date ? `Heen ${r.preferred_date}${r.return_date ? ` · Terug ${r.return_date}` : ''}` : null,
+        period: r.preferred_date ? `Heen ${fmtDate(r.preferred_date)}${r.return_date ? ` · Terug ${fmtDate(r.return_date)}` : ''}` : null,
         customerEmail: r.email,
         customerName: r.name,
         invoiceCreated: !!r.holded_invoice_id,

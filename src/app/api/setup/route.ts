@@ -21,9 +21,12 @@ async function handleSetup(request: NextRequest) {
 
     // Seed admin accounts
     const accounts = [
-      { name: 'Jake', email: 'jake@caravanstalling-spanje.com', role: 'admin' },
-      { name: 'Johan', email: 'johan@caravanstalling-spanje.com', role: 'admin' },
-      { name: 'Laurens', email: 'laurens@caravanstalling-spanje.com', role: 'admin' },
+      { name: 'Jake', email: 'jake@caravanstalling-spanje.com', role: 'admin', mustChange: false },
+      { name: 'Johan', email: 'johan@caravanstalling-spanje.com', role: 'admin', mustChange: false },
+      { name: 'Laurens', email: 'laurens@caravanstalling-spanje.com', role: 'admin', mustChange: false },
+      // Helen krijgt een tijdelijk wachtwoord; bij eerste login moet ze het
+      // direct vervangen door must_change_password=true.
+      { name: 'Helen', email: 'helen@caravanstalling-spanje.com', role: 'admin', mustChange: true },
     ];
     const defaultPassword = 'admin1234';
 
@@ -31,7 +34,7 @@ async function handleSetup(request: NextRequest) {
       const existing = await getAdminByEmail(account.email);
       if (!existing) {
         const hash = await hashPassword(defaultPassword);
-        await createAdmin(account.name, account.email, hash, account.role);
+        await createAdmin(account.name, account.email, hash, account.role, account.mustChange);
       }
     }
 

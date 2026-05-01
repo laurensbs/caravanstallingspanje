@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Check, Clock, Mail, MessageSquare, Sparkles } from 'lucide-react';
+import { Check, Clock, Mail, Sparkles } from 'lucide-react';
 import { useLocale } from './LocaleProvider';
 
 type Lookup = {
@@ -191,12 +191,6 @@ export default function OrderReceipt({ refCode, fallbackTitle, fallbackBody }: P
           className="text-center pt-5 border-t border-border space-y-3"
         >
           <p className="text-[13px] text-text-muted">Vragen? We helpen je graag verder.</p>
-          <Link
-            href="/contact"
-            className="press-spring inline-flex items-center gap-2 h-11 px-5 rounded-[var(--radius-lg)] bg-accent text-accent-fg font-medium text-[14px] hover:bg-accent-hover transition-colors"
-          >
-            <MessageSquare size={14} /> Stuur ons een bericht
-          </Link>
           <p className="text-[12px] text-text-muted inline-flex items-center justify-center gap-1.5 pt-1">
             <Mail size={12} />
             <a href="mailto:info@caravanstalling-spanje.com" className="text-text-muted hover:text-text underline-offset-4 hover:underline">

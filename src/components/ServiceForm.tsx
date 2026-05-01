@@ -14,6 +14,11 @@ export type ContactState = {
   name: string;
   email: string;
   phone: string;
+  address: string;
+  postal_code: string;
+  city: string;
+  country: string;
+  vat_number: string;
   registration: string;
   brand: string;
   model: string;
@@ -24,6 +29,11 @@ export const emptyContact: ContactState = {
   name: '',
   email: '',
   phone: '',
+  address: '',
+  postal_code: '',
+  city: '',
+  country: 'Nederland',
+  vat_number: '',
   registration: '',
   brand: '',
   model: '',
@@ -83,6 +93,56 @@ export function ContactFields({
           <input required type="tel" value={state.phone} onChange={e => set('phone', e.target.value)} autoComplete="tel" className={inputCls} />
         </Field>
       </div>
+      {/* Adresgegevens — verplicht voor de boekhouding-pro forma in Holded. */}
+      <Field label="Adres" required>
+        <input
+          required
+          value={state.address}
+          onChange={e => set('address', e.target.value)}
+          autoComplete="street-address"
+          placeholder="Straat 12"
+          className={inputCls}
+        />
+      </Field>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <Field label="Postcode" required>
+          <input
+            required
+            value={state.postal_code}
+            onChange={e => set('postal_code', e.target.value)}
+            autoComplete="postal-code"
+            placeholder="1234 AB"
+            className={inputCls}
+          />
+        </Field>
+        <Field label="Plaats" required>
+          <input
+            required
+            value={state.city}
+            onChange={e => set('city', e.target.value)}
+            autoComplete="address-level2"
+            placeholder="Amsterdam"
+            className={inputCls}
+          />
+        </Field>
+        <Field label="Land" required>
+          <input
+            required
+            value={state.country}
+            onChange={e => set('country', e.target.value)}
+            autoComplete="country-name"
+            className={inputCls}
+          />
+        </Field>
+      </div>
+      <Field label="BTW-nummer" hint="Optioneel — alleen voor zakelijke klanten">
+        <input
+          value={state.vat_number}
+          onChange={e => set('vat_number', e.target.value)}
+          placeholder="NL123456789B01"
+          className={inputCls}
+        />
+      </Field>
       {showRegistration && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <Field label={t('contact.registration')}>

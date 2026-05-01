@@ -199,8 +199,19 @@ export async function findContactByPhone(phone: string): Promise<HoldedContact |
   return null;
 }
 
-export async function createContact(input: { name: string; email?: string | null; phone?: string | null }): Promise<HoldedContact> {
-  const body = {
+export type ContactInput = {
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  city?: string | null;
+  postal_code?: string | null;
+  country?: string | null;
+  vat_number?: string | null;
+};
+
+export async function createContact(input: ContactInput): Promise<HoldedContact> {
+  const body: Record<string, unknown> = {
     name: input.name,
     email: input.email || undefined,
     phone: input.phone || undefined,
@@ -208,6 +219,15 @@ export async function createContact(input: { name: string; email?: string | null
     type: 'client',
     isperson: 1,
   };
+  if (input.address || input.city || input.postal_code || input.country) {
+    body.address = {
+      address: input.address || undefined,
+      city: input.city || undefined,
+      postalCode: input.postal_code || undefined,
+      country: input.country || 'ES',
+    };
+  }
+  if (input.vat_number) body.vatnumber = input.vat_number;
   const data = await holdedFetch<{ status: number; id: string }>(
     '/invoicing/v1/contacts',
     { method: 'POST', body: JSON.stringify(body) }
@@ -220,12 +240,25 @@ export async function createContact(input: { name: string; email?: string | null
   };
 }
 
-export async function ensureContact(input: { name: string; email?: string | null; phone?: string | null }): Promise<HoldedContact> {
+export async function ensureContact(input: ContactInput): Promise<HoldedContact> {
   // 1. Try exact email match first (fast — Holded supports ?email=).
   if (input.email) {
     try {
       const byEmail = await findContactByEmail(input.email);
-      if (byEmail) return byEmail;
+      if (byEmail) {
+        // Bestaande contact — vul ontbrekende adresvelden bij zodat de
+        // pro forma volledig is voor de boekhouding. Best-effort, niet fataal.
+        if (input.address && !byEmail.address?.address) {
+          await updateContactInHolded(byEmail.id, {
+            address: input.address,
+            city: input.city || null,
+            postal_code: input.postal_code || null,
+            country: input.country || null,
+            vat_number: input.vat_number || null,
+          }).catch(() => {});
+        }
+        return byEmail;
+      }
     } catch { /* ignore + fall through to phone */ }
   }
   // 2. Fall back to phone match (scans first page, normalises +/space/dashes).
@@ -308,7 +341,7 @@ export async function getInvoice(id: string): Promise<HoldedInvoiceSummary | nul
 // uitschrijft. Klant ziet er niets van: betaling werkt gewoon, mail en
 // admin tonen de pro-forma-koppeling als bewijsstuk.
 export async function invoiceForCustomer(input: {
-  customer: { name: string; email: string; phone?: string | null };
+  customer: ContactInput & { email: string };
   description: string;
   amountEur: number;
   taxPercent?: number;

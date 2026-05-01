@@ -84,6 +84,11 @@ export default function AircoPage() {
           name: contact.name,
           email: contact.email,
           phone: contact.phone,
+          address: contact.address,
+          postal_code: contact.postal_code,
+          city: contact.city,
+          country: contact.country,
+          vat_number: contact.vat_number,
         }),
       });
       const data = await res.json();

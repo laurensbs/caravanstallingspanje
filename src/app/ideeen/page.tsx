@@ -156,7 +156,10 @@ export default function IdeeenPage() {
           onSubmit={submit}
           className="space-y-7"
         >
-          <Section title="Welk soort idee?">
+          <Section title="Welk soort idee? (optioneel)">
+            <p className="text-[12px] text-text-muted -mt-1 mb-2">
+              Sla gerust over — je idee mag echt over wat dan ook gaan. Een categorie helpt ons alleen om je inzending sneller bij de juiste persoon te krijgen.
+            </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {CATEGORIES.map((c) => {
                 const Icon = c.icon;
@@ -165,7 +168,8 @@ export default function IdeeenPage() {
                   <motion.button
                     key={c.value}
                     type="button"
-                    onClick={() => setCategory(c.value)}
+                    // Klik nogmaals = deselecteren. Zo voelt 't echt optioneel.
+                    onClick={() => setCategory(sel ? '' : c.value)}
                     whileTap={{ scale: 0.96 }}
                     transition={{ type: 'spring', stiffness: 380, damping: 26 }}
                     className={`text-left p-3 rounded-[var(--radius-md)] border transition-all ${
@@ -180,6 +184,15 @@ export default function IdeeenPage() {
                 );
               })}
             </div>
+            {category && (
+              <button
+                type="button"
+                onClick={() => setCategory('')}
+                className="text-[12px] text-text-muted hover:text-text underline-offset-4 hover:underline mt-2"
+              >
+                Geen categorie kiezen
+              </button>
+            )}
           </Section>
 
           <AnimatePresence>

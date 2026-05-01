@@ -32,7 +32,15 @@ export async function createCheckoutSession(input: {
   cancelUrl: string;
   customerEmail?: string;
   metadata: Record<string, string>; // { kind: 'fridge_booking', refId: '12' }
+  /** Override expiry. Default 30 minuten (web-flow); admin-betaallinks
+   *  zetten dit op 24*30 zodat klant 'm in alle rust kan betalen.
+   *  Stripe staat min 30 min tot max ~30 dagen toe. */
+  expiresInHours?: number;
 }): Promise<Stripe.Checkout.Session> {
+  const expSec = Math.max(
+    30 * 60,
+    Math.min(30 * 24 * 3600, Math.round((input.expiresInHours ?? 0.5) * 3600)),
+  );
   return stripe().checkout.sessions.create({
     mode: 'payment',
     payment_method_types: ['card', 'ideal', 'bancontact'],
@@ -54,6 +62,6 @@ export async function createCheckoutSession(input: {
     cancel_url: input.cancelUrl,
     locale: 'nl',
     automatic_tax: { enabled: false },
-    expires_at: Math.floor(Date.now() / 1000) + 60 * 30, // 30 min
+    expires_at: Math.floor(Date.now() / 1000) + expSec,
   });
 }

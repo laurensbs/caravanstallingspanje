@@ -51,6 +51,11 @@ export const fridgeOrderSchema = z.object({
   name: z.string().min(2, 'Vul je naam in').max(200),
   email: z.string().email('Vul een geldig e-mailadres in'),
   phone: z.string().min(5, 'Vul je telefoonnummer in').max(40),
+  address: z.string().min(2, 'Vul je adres in').max(300),
+  postal_code: z.string().min(2, 'Vul je postcode in').max(20),
+  city: z.string().min(2, 'Vul je woonplaats in').max(150),
+  country: z.string().min(2, 'Vul je land in').max(80),
+  vat_number: z.string().max(40).optional().or(z.literal('')),
   camping: knownCamping,
   spot_number: z.string().max(50).optional().or(z.literal('')),
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Datum is verplicht'),
@@ -70,10 +75,22 @@ export const fridgeOrderSchema = z.object({
 // ─── Public service requests (forwarded to reparatiepanel) ───
 // Vriendelijke meldingen — geen "Too small: expected string to have >=2 chars"
 // achtige rauwe Zod-output meer richting de klant.
+// Adresgegevens horen bij elke betaalde dienst — anders missen ze in de
+// pro forma in Holded en kloppen onze boekhouding-exports niet.
+// vat_number is optioneel (particulieren hebben er geen).
+const billingFields = {
+  address: z.string().min(2, 'Vul je adres in').max(300),
+  postal_code: z.string().min(2, 'Vul je postcode in').max(20),
+  city: z.string().min(2, 'Vul je woonplaats in').max(150),
+  country: z.string().min(2, 'Vul je land in').max(80),
+  vat_number: z.string().max(40).optional().or(z.literal('')),
+};
+
 const contactBase = {
   name: z.string().min(2, 'Vul je naam in').max(200),
   email: z.string().email('Vul een geldig e-mailadres in'),
   phone: z.string().min(5, 'Vul je telefoonnummer in').max(40),
+  ...billingFields,
   registration: z.string().max(40).optional().or(z.literal('')),
   brand: z.string().max(80).optional().or(z.literal('')),
   model: z.string().max(80).optional().or(z.literal('')),
@@ -158,6 +175,11 @@ export const stallingOrderSchema = z.object({
   name: z.string().min(2, 'Vul je naam in').max(200),
   email: z.string().email('Vul een geldig e-mailadres in'),
   phone: z.string().min(5, 'Vul je telefoonnummer in').max(40),
+  address: z.string().min(2, 'Vul je adres in').max(300),
+  postal_code: z.string().min(2, 'Vul je postcode in').max(20),
+  city: z.string().min(2, 'Vul je woonplaats in').max(150),
+  country: z.string().min(2, 'Vul je land in').max(80),
+  vat_number: z.string().max(40).optional().or(z.literal('')),
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Datum is verplicht'),
   end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().or(z.literal('')),
   registration: z.string().max(40).optional().or(z.literal('')),

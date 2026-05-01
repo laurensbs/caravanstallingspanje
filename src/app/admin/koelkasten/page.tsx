@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
   Plus, Search, Trash2, Pencil, Calendar, MapPin, Tag, Receipt, Link as LinkIcon,
-  AlertCircle, CheckCircle2, ChevronRight, ExternalLink, Truck,
+  AlertCircle, CheckCircle2, ChevronRight, ExternalLink, Truck, Send, Mail, RefreshCw,
 } from 'lucide-react';
 import { Button, Input, Select, Textarea, Badge, Skeleton, Spinner } from '@/components/ui';
 import Drawer from '@/components/Drawer';
@@ -25,6 +25,12 @@ type Booking = {
   notes: string | null;
   holded_invoice_id: string | null;
   holded_invoice_number: string | null;
+  holded_invoice_url: string | null;
+  holded_invoice_status: string | null;
+  payment_link_url: string | null;
+  payment_link_sent_at: string | null;
+  payment_link_email: string | null;
+  payment_link_amount_cents: number | null;
 };
 
 type Fridge = {
@@ -102,6 +108,10 @@ function KoelkastenContent() {
   const [invoiceDialog, setInvoiceDialog] = useState<{ open: boolean; booking: Booking | null }>({ open: false, booking: null });
   const [invoiceForm, setInvoiceForm] = useState({ description: '', units: '1', subtotal: '', tax: '21', notes: '' });
   const [creatingInvoice, setCreatingInvoice] = useState(false);
+
+  const [payLinkDialog, setPayLinkDialog] = useState<{ open: boolean; booking: Booking | null }>({ open: false, booking: null });
+  const [payLinkForm, setPayLinkForm] = useState({ description: '', amount: '', email: '', tax: '21' });
+  const [sendingPayLink, setSendingPayLink] = useState(false);
 
   const [confirmDelete, setConfirmDelete] = useState<{ type: 'fridge' | 'booking'; id: number } | null>(null);
 
@@ -362,6 +372,60 @@ function KoelkastenContent() {
     }
   };
 
+  // ─── Stuur betaallink ───
+  const openPayLink = (b: Booking) => {
+    if (!drawerFridge) return;
+    setPayLinkForm({
+      description: bookingDescription(b, drawerFridge.name),
+      amount: '',
+      email: drawerFridge.email || '',
+      tax: '21',
+    });
+    setPayLinkDialog({ open: true, booking: b });
+  };
+
+  const sendPayLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!payLinkDialog.booking) return;
+    const amount = parseFloat(payLinkForm.amount.replace(',', '.'));
+    if (!Number.isFinite(amount) || amount <= 0) {
+      toast.error('Vul een geldig bedrag in');
+      return;
+    }
+    if (!payLinkForm.email || !payLinkForm.email.includes('@')) {
+      toast.error('Vul een geldig e-mailadres in');
+      return;
+    }
+    setSendingPayLink(true);
+    try {
+      const res = await fetch(`/api/admin/fridges/bookings/${payLinkDialog.booking.id}/payment-link`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amountEur: amount,
+          description: payLinkForm.description,
+          email: payLinkForm.email,
+          taxPercent: parseFloat(payLinkForm.tax) || 21,
+        }),
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || 'Verzenden mislukt');
+        return;
+      }
+      if (data.mailOk === false) {
+        toast.error(`Pro forma ${data.holdedInvoiceNumber || ''} aangemaakt, maar mail mislukt: ${data.mailError || ''}`);
+      } else {
+        toast.success(`Betaallink verstuurd naar ${data.sentTo}`);
+      }
+      setPayLinkDialog({ open: false, booking: null });
+      await refresh();
+    } finally {
+      setSendingPayLink(false);
+    }
+  };
+
   // ─── Delete ───
   const confirmDeleteAction = async () => {
     if (!confirmDelete) return;
@@ -445,6 +509,15 @@ function KoelkastenContent() {
               {fridges.map(f => {
                 const hasCheck = f.bookings.some(b => b.status === 'controleren');
                 const hasInvoice = f.bookings.some(b => b.holded_invoice_number);
+                // Sorteer periodes op startdatum (recentst eerst) en toon
+                // standaard de eerste 3; rest komt in de drawer.
+                const sortedBookings = [...f.bookings].sort((a, b) => {
+                  const ta = a.start_date ? new Date(a.start_date).getTime() : 0;
+                  const tb = b.start_date ? new Date(b.start_date).getTime() : 0;
+                  return tb - ta;
+                });
+                const previewBookings = sortedBookings.slice(0, 3);
+                const extraBookings = sortedBookings.length - previewBookings.length;
                 return (
                   <motion.li
                     key={f.id}
@@ -456,28 +529,72 @@ function KoelkastenContent() {
                   >
                     <button
                       onClick={() => openEdit(f)}
-                      className="w-full flex items-center gap-4 px-5 py-3.5 hover:bg-surface-2 transition-colors text-left group"
+                      className="w-full flex items-start gap-4 px-5 py-3.5 hover:bg-surface-2 transition-colors text-left group"
                     >
-                      <div className="w-9 h-9 rounded-full bg-surface-2 text-text flex items-center justify-center text-xs font-medium shrink-0 border border-border">
+                      <div className="w-9 h-9 rounded-full bg-surface-2 text-text flex items-center justify-center text-xs font-medium shrink-0 border border-border mt-0.5">
                         {f.name.split(/\s+/).slice(0, 2).map(p => p[0]?.toUpperCase()).join('')}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-sm font-medium text-text">{f.name}</span>
-                          {f.holded_contact_id && (
-                            <span title="Gekoppeld aan Holded">
-                              <LinkIcon size={11} className="text-text-subtle" />
+                      <div className="flex-1 min-w-0 space-y-1.5">
+                        <div className="flex items-start justify-between gap-2 flex-wrap">
+                          <div className="flex items-center gap-2 flex-wrap min-w-0">
+                            <span className="text-sm font-medium text-text">{f.name}</span>
+                            {f.holded_contact_id && (
+                              <span title="Gekoppeld aan Holded">
+                                <LinkIcon size={11} className="text-text-subtle" />
+                              </span>
+                            )}
+                            <span className="text-xs text-text-muted">
+                              · {f.device_type}{f.email ? ` · ${f.email}` : ''}
                             </span>
-                          )}
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            {hasInvoice && <Badge tone="success"><Receipt size={10} /> Pro forma</Badge>}
+                            {hasCheck && <Badge tone="warning"><AlertCircle size={10} /> Controleren</Badge>}
+                            <ChevronRight size={14} className="text-text-subtle group-hover:text-text transition-colors" />
+                          </div>
                         </div>
-                        <div className="text-xs text-text-muted mt-0.5 truncate">
-                          {f.device_type} · {f.bookings.length} periode{f.bookings.length === 1 ? '' : 's'}{f.email ? ` · ${f.email}` : ''}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        {hasInvoice && <Badge tone="success"><Receipt size={10} /> Pro forma</Badge>}
-                        {hasCheck && <Badge tone="warning"><AlertCircle size={10} /> Controleren</Badge>}
-                        <ChevronRight size={14} className="text-text-subtle group-hover:text-text transition-colors" />
+                        {previewBookings.length === 0 ? (
+                          <p className="text-[11px] text-text-subtle italic">Nog geen periodes</p>
+                        ) : (
+                          <div className="flex flex-wrap gap-1.5">
+                            {previewBookings.map(b => {
+                              const paid = b.status === 'compleet' || b.holded_invoice_status === 'paid';
+                              const linkSent = !!b.payment_link_sent_at && !paid;
+                              const period = fmtPeriod(b);
+                              const camping = b.camping ? ` · ${b.camping}` : '';
+                              const spot = b.spot_number ? ` (${b.spot_number})` : '';
+                              return (
+                                <span
+                                  key={b.id}
+                                  className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] border ${
+                                    paid
+                                      ? 'bg-success-soft text-success border-success/30'
+                                      : linkSent
+                                        ? 'bg-accent-soft text-accent border-accent/30'
+                                        : b.status === 'controleren'
+                                          ? 'bg-warning-soft text-warning border-warning/30'
+                                          : 'bg-surface-2 text-text-muted border-border'
+                                  }`}
+                                  title={`${period}${camping}${spot} · ${b.status}${b.holded_invoice_number ? ` · ${b.holded_invoice_number}` : ''}`}
+                                >
+                                  {paid && <CheckCircle2 size={9} />}
+                                  {linkSent && <Send size={9} />}
+                                  {!paid && !linkSent && b.status === 'controleren' && <AlertCircle size={9} />}
+                                  <span className="tabular-nums">{period}</span>
+                                  {b.camping && <span className="opacity-70">· {b.camping}</span>}
+                                  {b.holded_invoice_number && (
+                                    <span className="opacity-70 font-mono">· {b.holded_invoice_number}</span>
+                                  )}
+                                </span>
+                              );
+                            })}
+                            {extraBookings > 0 && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] bg-surface-2 text-text-muted border border-border">
+                                +{extraBookings} meer
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </button>
                   </motion.li>
@@ -627,8 +744,19 @@ function KoelkastenContent() {
                 <ul className="space-y-2">
                   {drawerFridge.bookings.map(b => {
                     const holded = holdedStatuses[b.id];
-                    const paid = holded?.status === 'paid';
+                    const paid = holded?.status === 'paid' || b.status === 'compleet';
                     const partial = holded?.status === 'partial';
+                    // Bron-bepalend: 'compleet' status zonder verstuurde betaallink ⇒
+                    // klant heeft via de website betaald. Met betaallink ⇒ admin
+                    // heeft handmatig verstuurd. We tonen dat zodat je niet hoeft
+                    // te raden of de klant zelf via /koelkast heeft geboekt.
+                    const paidViaWebsite = b.status === 'compleet' && !b.payment_link_sent_at;
+                    const paidViaLink = b.status === 'compleet' && b.payment_link_sent_at;
+                    const linkSentNotPaid = !!b.payment_link_sent_at && b.status !== 'compleet';
+                    // Holded URL kan komen uit live-status (publicUrl) of uit
+                    // de gecachte holded_invoice_url kolom — beide tonen we als
+                    // klikbare link.
+                    const holdedUrl = holded?.publicUrl || b.holded_invoice_url || null;
                     return (
                     <li key={b.id} className="bg-surface border border-border rounded-[var(--radius-md)] p-3 space-y-2">
                       <div className="flex items-start justify-between gap-2">
@@ -641,20 +769,15 @@ function KoelkastenContent() {
                             {b.holded_invoice_number && (
                               <Badge tone="accent"><Receipt size={10} /> {b.holded_invoice_number}</Badge>
                             )}
-                            {paid && <Badge tone="success">Betaald</Badge>}
+                            {paidViaWebsite && <Badge tone="success">Betaald via website</Badge>}
+                            {paidViaLink && <Badge tone="success">Betaald via link</Badge>}
+                            {paid && !paidViaWebsite && !paidViaLink && <Badge tone="success">Betaald</Badge>}
                             {partial && <Badge tone="warning">Deels betaald</Badge>}
-                            {b.holded_invoice_number && !paid && !partial && holded?.status === 'unpaid' && (
-                              <Badge tone="warning">Open</Badge>
+                            {linkSentNotPaid && (
+                              <Badge tone="accent">Link verstuurd · wacht op betaling</Badge>
                             )}
-                            {holded?.publicUrl && (
-                              <a
-                                href={holded.publicUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-[10px] font-medium text-text-muted hover:text-text transition-colors"
-                              >
-                                <ExternalLink size={10} /> Open
-                              </a>
+                            {b.holded_invoice_number && !paid && !partial && !linkSentNotPaid && holded?.status === 'unpaid' && (
+                              <Badge tone="warning">Open</Badge>
                             )}
                           </div>
                           <div className="grid grid-cols-2 gap-2 text-xs text-text">
@@ -662,6 +785,12 @@ function KoelkastenContent() {
                             <span className="flex items-center gap-1.5"><Calendar size={11} className="text-text-subtle" />{fmtPeriod(b)}</span>
                             {b.spot_number && <span className="flex items-center gap-1.5"><Tag size={11} className="text-text-subtle" />{b.spot_number}</span>}
                           </div>
+                          {b.payment_link_sent_at && (
+                            <p className="text-[11px] text-text-muted">
+                              Betaallink verzonden naar {b.payment_link_email || '—'} op {new Date(b.payment_link_sent_at).toLocaleString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                              {b.payment_link_amount_cents != null && ` · €${(b.payment_link_amount_cents / 100).toFixed(2)}`}
+                            </p>
+                          )}
                           {b.notes && <p className="text-xs text-text-muted italic">{b.notes}</p>}
                         </div>
                         <div className="flex items-center gap-0.5 shrink-0">
@@ -681,13 +810,42 @@ function KoelkastenContent() {
                           </button>
                         </div>
                       </div>
-                      {!b.holded_invoice_number && (
-                        <div className="pt-2 border-t border-border">
+                      <div className="pt-2 border-t border-border flex flex-wrap gap-2">
+                        {!b.holded_invoice_number && (
                           <Button size="sm" variant="secondary" onClick={() => openInvoice(b)}>
-                            <Receipt size={12} /> Pro forma in Holded
+                            <Receipt size={12} /> Pro forma handmatig
                           </Button>
-                        </div>
-                      )}
+                        )}
+                        {!b.payment_link_sent_at ? (
+                          <Button size="sm" onClick={() => openPayLink(b)}>
+                            <Send size={12} /> Stuur betaallink
+                          </Button>
+                        ) : !paid && (
+                          <Button size="sm" variant="secondary" onClick={() => openPayLink(b)}>
+                            <RefreshCw size={12} /> Opnieuw versturen
+                          </Button>
+                        )}
+                        {b.payment_link_url && (
+                          <a
+                            href={b.payment_link_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-[12px] font-medium text-text-muted hover:text-text underline-offset-4 hover:underline transition-colors px-2 self-center"
+                          >
+                            <ExternalLink size={11} /> Open betaallink
+                          </a>
+                        )}
+                        {holdedUrl && (
+                          <a
+                            href={holdedUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-[12px] font-medium text-accent hover:underline underline-offset-4 px-2 self-center"
+                          >
+                            <Receipt size={11} /> Open pro forma in Holded
+                          </a>
+                        )}
+                      </div>
                     </li>
                     );
                   })}
@@ -776,6 +934,73 @@ function KoelkastenContent() {
                 <div className="flex justify-end gap-2 pt-2">
                   <Button type="button" variant="ghost" onClick={() => setInvoiceDialog({ open: false, booking: null })}>Annuleren</Button>
                   <Button type="submit" loading={creatingInvoice}><Receipt size={14} /> Verstuur naar Holded</Button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ─── Stuur betaallink dialog ─── */}
+      <AnimatePresence>
+        {payLinkDialog.open && payLinkDialog.booking && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setPayLinkDialog({ open: false, booking: null })}
+              className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 8 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+              className="relative bg-bg border border-border rounded-[var(--radius-xl)] shadow-lg max-w-md w-full p-6"
+            >
+              <h2 className="text-base font-medium text-text mb-1 inline-flex items-center gap-2">
+                <Mail size={16} /> Betaallink versturen
+              </h2>
+              <p className="text-xs text-text-muted mb-4">
+                We maken direct een pro forma in Holded met het lokaal bekende adres en btw-nummer, en mailen de klant een Stripe-betaallink. Hij blijft 30 dagen geldig.
+              </p>
+              <form onSubmit={sendPayLink} className="space-y-4">
+                <Input
+                  label="Omschrijving"
+                  required
+                  value={payLinkForm.description}
+                  onChange={e => setPayLinkForm({ ...payLinkForm, description: e.target.value })}
+                />
+                <div className="grid grid-cols-2 gap-3">
+                  <Input
+                    label="Bedrag (€)"
+                    required
+                    inputMode="decimal"
+                    placeholder="0,00"
+                    value={payLinkForm.amount}
+                    onChange={e => setPayLinkForm({ ...payLinkForm, amount: e.target.value })}
+                  />
+                  <Input
+                    label="Btw (%)"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value={payLinkForm.tax}
+                    onChange={e => setPayLinkForm({ ...payLinkForm, tax: e.target.value })}
+                  />
+                </div>
+                <Input
+                  label="E-mail klant"
+                  type="email"
+                  required
+                  value={payLinkForm.email}
+                  onChange={e => setPayLinkForm({ ...payLinkForm, email: e.target.value })}
+                />
+                <div className="flex justify-end gap-2 pt-2">
+                  <Button type="button" variant="ghost" onClick={() => setPayLinkDialog({ open: false, booking: null })}>Annuleren</Button>
+                  <Button type="submit" loading={sendingPayLink}><Send size={14} /> Verstuur betaallink</Button>
                 </div>
               </form>
             </motion.div>

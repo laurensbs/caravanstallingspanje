@@ -58,6 +58,13 @@ export async function POST(req: NextRequest) {
         ref,
         originalAmountCents: String(Math.round(priceEur * 100)),
         description,
+        billing_name: d.name,
+        billing_phone: d.phone,
+        billing_address: d.address,
+        billing_postal_code: d.postal_code,
+        billing_city: d.city,
+        billing_country: d.country,
+        billing_vat: d.vat_number || '',
       },
     });
 

@@ -130,13 +130,44 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
   let customerName = session.customer_details?.name || '';
   let customerEmail = session.customer_details?.email || session.customer_email || '';
   let customerPhone = session.customer_details?.phone || '';
+  // Adresvelden meegegeven door de order-route in metadata. Reizen mee
+  // naar invoiceForCustomer zodat de Holded-pro forma compleet is voor
+  // onze boekhouding (anders missen straat/postcode/btw).
+  const billing = {
+    address: typeof md.billing_address === 'string' ? md.billing_address : null,
+    city: typeof md.billing_city === 'string' ? md.billing_city : null,
+    postal_code: typeof md.billing_postal_code === 'string' ? md.billing_postal_code : null,
+    country: typeof md.billing_country === 'string' ? md.billing_country : null,
+    vat_number: typeof md.billing_vat === 'string' && md.billing_vat ? md.billing_vat : null,
+  };
   let invoiceDescription = (typeof md.description === 'string' ? md.description : '') || kind;
   const paidAmountEur = (session.amount_total ?? 0) / 100;
   // Voor Holded gebruiken we altijd het oorspronkelijke bedrag (echte prijs),
   // niet de €0.50 test-betaling. Voor klant-mail/receipt is dat ook netter.
   const amountEur = originalAmountEur ?? paidAmountEur;
 
-  if (kind === 'fridge_booking' && refId) {
+  // Handmatig vanuit /admin/koelkasten verstuurde betaallink. Pro forma is al
+  // bij verzenden van de mail aangemaakt; we hoeven nu alleen de booking als
+  // betaald te markeren en de standaard bevestigingsmail uit te sturen
+  // (dezelfde flow als reguliere fridge_booking, alleen geen pro-forma-creatie).
+  if (kind === 'fridge_booking_manual' && refId) {
+    const id = Number(refId);
+    if (Number.isFinite(id) && id > 0) {
+      await markBookingPaid(id, session.id);
+      const fridge = await getFridgeById(id).catch(() => null);
+      if (fridge) {
+        customerName = customerName || fridge.name;
+        customerEmail = customerEmail || fridge.email || '';
+      }
+      await logActivity({
+        action: 'Betaling ontvangen via verstuurde betaallink',
+        entityType: 'fridge_booking',
+        entityId: refId,
+        entityLabel: customerEmail || undefined,
+        details: `${amountEur.toFixed(2)} EUR`,
+      });
+    }
+  } else if (kind === 'fridge_booking' && refId) {
     const id = Number(refId);
     if (Number.isFinite(id) && id > 0) {
       await markBookingPaid(id, session.id);
@@ -153,7 +184,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
       if (customerEmail && !booking?.holded_invoice_id) {
         try {
           const inv = await invoiceForCustomer({
-            customer: { name: customerName || customerEmail, email: customerEmail, phone: customerPhone || null },
+            customer: { name: customerName || customerEmail, email: customerEmail, phone: customerPhone || null, ...billing },
             description: invoiceDescription,
             amountEur,
           });
@@ -180,7 +211,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
         if (customerEmail && !r.holded_invoice_id) {
           try {
             const inv = await invoiceForCustomer({
-              customer: { name: customerName, email: customerEmail, phone: customerPhone || null },
+              customer: { name: customerName, email: customerEmail, phone: customerPhone || null, ...billing },
               description: invoiceDescription,
               amountEur,
             });
@@ -211,7 +242,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
         if (customerEmail && !r.holded_invoice_id) {
           try {
             const inv = await invoiceForCustomer({
-              customer: { name: customerName, email: customerEmail, phone: customerPhone || null },
+              customer: { name: customerName, email: customerEmail, phone: customerPhone || null, ...billing },
               description: invoiceDescription,
               amountEur,
             });

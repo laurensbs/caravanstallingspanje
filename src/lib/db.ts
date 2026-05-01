@@ -269,12 +269,38 @@ export async function getAdminById(id: number) {
   return rows[0] || null;
 }
 
+// Self-healing seed voor Helen — voorkomt dat we /api/admin/seed-helen
+// handmatig moeten triggeren op productie. Idempotent: doet alleen wat als
+// het account er nog niet is. Mislukt-mag-stilletjes: eerstvolgende call
+// probeert opnieuw, en de login-lijst werkt sowieso voor de andere admins.
+let _helenSeedAttempted = false;
+async function ensureHelenSeed(): Promise<void> {
+  if (_helenSeedAttempted) return;
+  _helenSeedAttempted = true;
+  try {
+    const email = 'helen@caravanstalling-spanje.com';
+    const existing = await sql`SELECT id FROM admin_users WHERE email = ${email} LIMIT 1`;
+    if ((existing as { id: number }[]).length > 0) return;
+    // Bcrypt-hash van 'admin1234' (vaste waarde, kost één seed; bij eerste
+    // login wordt 'm vervangen door must_change_password=true).
+    const { hashPassword } = await import('./passwords');
+    const hash = await hashPassword('admin1234');
+    await sql`INSERT INTO admin_users (name, email, password_hash, role, must_change_password)
+      VALUES ('Helen', ${email}, ${hash}, 'admin', true)`;
+  } catch {
+    // Volgende request mag opnieuw proberen.
+    _helenSeedAttempted = false;
+  }
+}
+
 export async function getActiveAdmins() {
+  await ensureHelenSeed();
   return sql`SELECT id, name, role FROM admin_users WHERE is_active = true ORDER BY name`;
 }
 
-export async function createAdmin(name: string, email: string, hash: string, role = 'admin') {
-  await sql`INSERT INTO admin_users (name, email, password_hash, role) VALUES (${name}, ${email}, ${hash}, ${role})`;
+export async function createAdmin(name: string, email: string, hash: string, role = 'admin', mustChangePassword = false) {
+  await sql`INSERT INTO admin_users (name, email, password_hash, role, must_change_password)
+    VALUES (${name}, ${email}, ${hash}, ${role}, ${mustChangePassword})`;
 }
 
 export async function recordLoginSuccess(id: number) {
@@ -336,7 +362,10 @@ export async function getAllFridges(year?: number, status?: string, search?: str
           COALESCE(json_agg(json_build_object(
             'id', b.id, 'camping', b.camping, 'start_date', b.start_date, 'end_date', b.end_date,
             'spot_number', b.spot_number, 'status', b.status, 'notes', b.notes,
-            'holded_invoice_id', b.holded_invoice_id, 'holded_invoice_number', b.holded_invoice_number
+            'holded_invoice_id', b.holded_invoice_id, 'holded_invoice_number', b.holded_invoice_number,
+            'holded_invoice_url', b.holded_invoice_url, 'holded_invoice_status', b.holded_invoice_status,
+            'payment_link_url', b.payment_link_url, 'payment_link_sent_at', b.payment_link_sent_at,
+            'payment_link_email', b.payment_link_email, 'payment_link_amount_cents', b.payment_link_amount_cents
           ) ORDER BY b.start_date NULLS LAST) FILTER (WHERE b.id IS NOT NULL), '[]') AS bookings
         FROM fridges f
         INNER JOIN fridge_bookings b ON b.fridge_id = f.id
@@ -353,7 +382,10 @@ export async function getAllFridges(year?: number, status?: string, search?: str
           COALESCE(json_agg(json_build_object(
             'id', b.id, 'camping', b.camping, 'start_date', b.start_date, 'end_date', b.end_date,
             'spot_number', b.spot_number, 'status', b.status, 'notes', b.notes,
-            'holded_invoice_id', b.holded_invoice_id, 'holded_invoice_number', b.holded_invoice_number
+            'holded_invoice_id', b.holded_invoice_id, 'holded_invoice_number', b.holded_invoice_number,
+            'holded_invoice_url', b.holded_invoice_url, 'holded_invoice_status', b.holded_invoice_status,
+            'payment_link_url', b.payment_link_url, 'payment_link_sent_at', b.payment_link_sent_at,
+            'payment_link_email', b.payment_link_email, 'payment_link_amount_cents', b.payment_link_amount_cents
           ) ORDER BY b.start_date NULLS LAST) FILTER (WHERE b.id IS NOT NULL), '[]') AS bookings
         FROM fridges f
         LEFT JOIN fridge_bookings b ON b.fridge_id = f.id
@@ -450,6 +482,22 @@ export async function updateFridgeBooking(id: number, data: { camping?: string |
 
 export async function setBookingHoldedInvoice(id: number, holdedInvoiceId: string, holdedInvoiceNumber: string) {
   await sql`UPDATE fridge_bookings SET holded_invoice_id = ${holdedInvoiceId}, holded_invoice_number = ${holdedInvoiceNumber}, updated_at = NOW() WHERE id = ${id}`;
+}
+
+export async function setBookingPaymentLink(
+  id: number,
+  url: string,
+  email: string,
+  amountCents: number,
+) {
+  await ensureMiscSchema();
+  await sql`UPDATE fridge_bookings
+    SET payment_link_url = ${url},
+        payment_link_email = ${email},
+        payment_link_amount_cents = ${amountCents},
+        payment_link_sent_at = NOW(),
+        updated_at = NOW()
+    WHERE id = ${id}`;
 }
 
 export async function getBookingById(id: number) {
@@ -858,6 +906,13 @@ async function ensureMiscSchema(): Promise<void> {
     await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_status TEXT`;
     await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_synced_at TIMESTAMP`;
     await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_url TEXT`;
+    // Handmatige betaallink-flow: admin verstuurt een Stripe Checkout link
+    // per mail naar klanten die we eerder zelf in het systeem zetten.
+    // Bewaren we zodat we kunnen herversturen + zien aan wie/wanneer.
+    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_url TEXT`;
+    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_sent_at TIMESTAMP`;
+    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_email TEXT`;
+    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_amount_cents INTEGER`;
     await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS holded_invoice_status TEXT`;
     await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS holded_invoice_synced_at TIMESTAMP`;
     await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS holded_invoice_url TEXT`;
@@ -1419,6 +1474,26 @@ export async function deleteIdea(id: number) {
 // gesorteerd op enthousiasme. Niet alle inzendingen zijn publiek.
 export async function listFeaturedIdeas() {
   await ensureMiscSchema();
+  // Self-healing seed: als de pilot-watermachine nog niet in de DB staat
+  // (bv. omdat ensureMiscSchema op deze instance al gedraaid had vóór de
+  // seed-code werd toegevoegd), insert hem nu. Idempotent dankzij
+  // WHERE NOT EXISTS — kost één lege round-trip als ie er al staat.
+  await sql`INSERT INTO ideas (category, title, message, status, featured)
+    SELECT 'verhuur',
+      'Interesse in een watermachine?',
+      'We onderzoeken of er interesse is in het huren van een watermachine voor op de camping. Met een watermachine heb je altijd koud drinkwater bij de hand, zonder steeds te hoeven sjouwen met zware flessen.
+
+De verhuur zou bestaan uit:
+• Een watermachine
+• Een hervulbare fles
+• Schoonmaaktabletten voor goed onderhoud
+
+Altijd koud en schoon drinkwater — makkelijk en praktisch tijdens de vakantie.',
+      'shortlist', true
+    WHERE NOT EXISTS (SELECT 1 FROM ideas WHERE title ILIKE '%watermachine%')`.catch(() => null);
+  // Bestaande, niet-featured watermachine-rij alsnog promoveren.
+  await sql`UPDATE ideas SET featured = true, status = 'shortlist'
+    WHERE title ILIKE '%watermachine%' AND featured IS NOT TRUE`.catch(() => null);
   const rows = await sql`SELECT id, category, title, message, votes_up, votes_down, featured
     FROM ideas
     WHERE featured = true

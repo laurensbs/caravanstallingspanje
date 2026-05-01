@@ -86,6 +86,14 @@ export async function POST(req: NextRequest) {
           ref,
           originalAmountCents: String(Math.round(price.total * 100)),
           description,
+          // Adresgegevens reizen mee naar de webhook → Holded pro forma.
+          billing_name: data.name,
+          billing_phone: data.phone,
+          billing_address: data.address,
+          billing_postal_code: data.postal_code,
+          billing_city: data.city,
+          billing_country: data.country,
+          billing_vat: data.vat_number || '',
         },
       });
       checkoutUrl = session.url;

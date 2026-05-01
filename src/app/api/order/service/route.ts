@@ -51,7 +51,17 @@ export async function POST(req: NextRequest) {
 
     const intakePayload: IntakePayload = {
       type: 'service',
-      customer: { name: d.name, email: d.email, phone: d.phone },
+      customer: {
+        name: d.name,
+        email: d.email,
+        phone: d.phone,
+        // Adres reist mee zodat de reparatiepanel óók de volledige
+        // boekhoudgegevens binnenkrijgt.
+        address: d.address,
+        postalCode: d.postal_code,
+        city: d.city,
+        country: d.country,
+      },
       unit: d.registration
         ? { registration: d.registration, brand: d.brand || undefined, model: d.model || undefined }
         : undefined,
@@ -83,6 +93,13 @@ export async function POST(req: NextRequest) {
           ref,
           originalAmountCents: String(Math.round(priceEur * 100)),
           serviceSlug: service.slug,
+          billing_name: d.name,
+          billing_phone: d.phone,
+          billing_address: d.address,
+          billing_postal_code: d.postal_code,
+          billing_city: d.city,
+          billing_country: d.country,
+          billing_vat: d.vat_number || '',
         },
       });
     } catch (err) {

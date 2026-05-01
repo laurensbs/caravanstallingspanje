@@ -84,6 +84,10 @@ export async function GET() {
   await ran('fridge_bookings.holded_invoice_status', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_status TEXT`);
   await ran('fridge_bookings.holded_invoice_synced_at', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_synced_at TIMESTAMP`);
   await ran('fridge_bookings.holded_invoice_url', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_url TEXT`);
+  await ran('fridge_bookings.payment_link_url', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_url TEXT`);
+  await ran('fridge_bookings.payment_link_sent_at', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_sent_at TIMESTAMP`);
+  await ran('fridge_bookings.payment_link_email', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_email TEXT`);
+  await ran('fridge_bookings.payment_link_amount_cents', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_amount_cents INTEGER`);
 
   // ─── Stalling requests ───
   await ran('stalling_requests.customer_id', () => sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL`);

@@ -80,11 +80,20 @@ h1{font-size:20px;line-height:1.3;margin:0 0 12px;font-weight:600;letter-spacing
 .ref{font-family:ui-monospace,monospace;font-size:11px;color:#6B7280;margin-top:14px;letter-spacing:.04em}
 `;
 
+// Absolute URL voor het logo in mails — Outlook/Gmail kunnen geen relatieve
+// paden laden. Default is productie-domein; APP_URL kan 'm overriden voor
+// staging.
+function logoUrl(): string {
+  const base = (process.env.APP_URL || 'https://caravanstalling-spanje.com').replace(/\/$/, '');
+  return `${base}/images/logo.png`;
+}
+
 function shell(content: string, opts?: { eyebrow?: string; heading?: string; subline?: string }): string {
   const eyebrow = opts?.eyebrow || 'Caravanstalling Spanje';
   const heading = opts?.heading || 'Bedankt voor je bestelling';
   const subline = opts?.subline || 'We gaan voor je aan de slag.';
-  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${STYLES}</style></head><body><div class="wrap"><div class="hero" style="border-radius:16px 16px 0 0"><div class="hero-eyebrow">${escapeHtml(eyebrow)}</div><h1>${escapeHtml(heading)}</h1><p>${escapeHtml(subline)}</p></div><div class="body body-top">${content}</div><div class="footer">Caravanstalling Spanje · Costa Brava<br/>Vragen? <a href="https://caravanstalling-spanje.com/contact">Stuur ons een bericht →</a></div></div></body></html>`;
+  const logo = `<img src="${logoUrl()}" alt="Caravanstalling Spanje" width="180" style="display:block;margin:0 auto 14px;max-width:180px;height:auto" />`;
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${STYLES}</style></head><body><div class="wrap"><div class="hero" style="border-radius:16px 16px 0 0">${logo}<div class="hero-eyebrow">${escapeHtml(eyebrow)}</div><h1>${escapeHtml(heading)}</h1><p>${escapeHtml(subline)}</p></div><div class="body body-top">${content}</div><div class="footer">Caravanstalling Spanje · Costa Brava<br/>Vragen? <a href="https://caravanstalling-spanje.com/contact">Stuur ons een bericht →</a></div></div></body></html>`;
 }
 
 function fmtEur(eur: number): string {
@@ -142,6 +151,55 @@ export function paymentReceivedHtml(input: {
     subline: 'We hebben je betaling ontvangen — we gaan voor je aan de slag.',
   });
   const text = `Bedankt ${input.name},\n\nWe hebben je betaling van ${fmtEur(input.amountEur)} ontvangen voor: ${input.service}.\n\n${nextStep}\n\nReferentie: ${input.reference}\n\nVragen? https://caravanstalling-spanje.com/contact`;
+  return { subject, html, text };
+}
+
+// Mail die admin handmatig verstuurt vanuit /admin/koelkasten naar klanten
+// die we eerder zelf in het systeem zetten — voorheen kregen die nooit
+// een betaal-uitnodiging. Bevat een grote "Nu betalen" knop met de
+// Stripe Checkout URL en samenvattende details.
+export function paymentLinkHtml(input: {
+  name: string;
+  description: string;
+  amountEur: number;
+  checkoutUrl: string;
+  invoiceNumber?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  camping?: string | null;
+}): { subject: string; html: string; text: string } {
+  const subject = `Je betaallink — ${input.description}`;
+  const periodLine = input.startDate && input.endDate
+    ? `${fmtDate(input.startDate)} → ${fmtDate(input.endDate)}`
+    : (input.startDate ? `vanaf ${fmtDate(input.startDate)}` : null);
+
+  const detailRows = [
+    `<div class="row"><span class="muted">Wat</span><strong>${escapeHtml(input.description)}</strong></div>`,
+    input.camping ? `<div class="row"><span class="muted">Locatie</span><strong>${escapeHtml(input.camping)}</strong></div>` : '',
+    periodLine ? `<div class="row"><span class="muted">Periode</span><strong>${escapeHtml(periodLine)}</strong></div>` : '',
+    `<div class="row"><span class="muted">Bedrag</span><strong>${fmtEur(input.amountEur)}</strong></div>`,
+  ].filter(Boolean).join('');
+
+  const card = `
+    <p>Hi ${escapeHtml(input.name)},</p>
+    <p>We hebben je in ons systeem staan voor onderstaande dienst, maar je hebt nog geen betaallink van ons gehad. Bij deze — je kunt direct online afrekenen via de knop hieronder. Het kost je maar een minuutje.</p>
+    <div class="summary">${detailRows}</div>
+    <p style="text-align:center;margin:18px 0 6px">
+      <a class="btn" href="${input.checkoutUrl}" style="font-size:15px;padding:14px 26px">Nu veilig betalen →</a>
+    </p>
+    <p style="font-size:12px;color:#6B7280;text-align:center;margin:0 0 14px">
+      Werkt de knop niet? Plak deze link in je browser:<br/>
+      <a href="${input.checkoutUrl}" style="color:#142F4D;word-break:break-all">${input.checkoutUrl}</a>
+    </p>
+    <div class="next"><strong>Veilig betalen via iDEAL, kaart of Bancontact.</strong><br/>Na de betaling sturen we je automatisch een bevestiging. Heb je in de tussentijd een vraag? Mail ons gewoon op <a href="mailto:info@caravanstalling-spanje.com" style="color:#142F4D">info@caravanstalling-spanje.com</a>.</div>
+    ${input.invoiceNumber ? `<p class="ref">Referentie: ${escapeHtml(input.invoiceNumber)}</p>` : ''}
+  `;
+  const html = shell(card, {
+    eyebrow: 'Caravanstalling Spanje',
+    heading: 'Je betaallink staat klaar',
+    subline: `${fmtEur(input.amountEur)} · ${input.description}`,
+  });
+  const text = `Hi ${input.name},\n\nHier is je betaallink voor: ${input.description}\nBedrag: ${fmtEur(input.amountEur)}\n${periodLine ? `Periode: ${periodLine}\n` : ''}${input.camping ? `Locatie: ${input.camping}\n` : ''}\nBetaal hier: ${input.checkoutUrl}\n\nVragen? info@caravanstalling-spanje.com`;
   return { subject, html, text };
 }
 
