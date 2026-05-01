@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
-  Lightbulb, Mail, Trash2, Check, RotateCcw, Star,
+  Lightbulb, Mail, Trash2, Check, RotateCcw, Star, ThumbsUp, ThumbsDown,
 } from 'lucide-react';
 import { Button, Badge, Skeleton, Select } from '@/components/ui';
 import PageHeader from '@/components/admin/PageHeader';
@@ -17,6 +17,9 @@ type Idea = {
   title: string;
   message: string;
   status: string;
+  votes_up: number;
+  votes_down: number;
+  featured: boolean;
   created_at: string;
 };
 
@@ -59,6 +62,18 @@ export default function IdeasInboxPage() {
     });
     if (!res.ok) { toast.error('Status wijzigen mislukt'); return; }
     toast.success('Bijgewerkt');
+    load();
+  };
+
+  const toggleFeatured = async (id: number, featured: boolean) => {
+    const res = await fetch(`/api/admin/ideas/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ featured }),
+      credentials: 'include',
+    });
+    if (!res.ok) { toast.error('Wijzigen mislukt'); return; }
+    toast.success(featured ? 'Idee staat nu publiek op /ideeen' : 'Idee verborgen voor publiek');
     load();
   };
 
@@ -120,13 +135,31 @@ export default function IdeasInboxPage() {
                         <h3 className="font-semibold text-text">{m.title}</h3>
                         <Badge tone={tone}>{label}</Badge>
                         {m.category && <Badge tone="neutral">{m.category}</Badge>}
+                        {m.featured && <Badge tone="warning"><Star size={10} /> Featured</Badge>}
                       </div>
                       <p className="text-[11px] text-text-muted">
                         {fmtDate(m.created_at)} · van {m.name || 'anoniem'}
                         {m.email ? ` · ${m.email}` : ''}
                       </p>
+                      {((m.votes_up || 0) + (m.votes_down || 0)) > 0 && (
+                        <p className="text-[12px] mt-1 inline-flex items-center gap-2">
+                          <span className="inline-flex items-center gap-1 text-success">
+                            <ThumbsUp size={11} /> {m.votes_up || 0}
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-danger">
+                            <ThumbsDown size={11} /> {m.votes_down || 0}
+                          </span>
+                        </p>
+                      )}
                     </div>
                     <div className="flex gap-1 shrink-0 items-center">
+                      <Button
+                        size="sm"
+                        variant={m.featured ? 'secondary' : 'ghost'}
+                        onClick={() => toggleFeatured(m.id, !m.featured)}
+                      >
+                        <Star size={12} /> {m.featured ? 'Niet meer publiek' : 'Publiek tonen'}
+                      </Button>
                       <Select value={m.status} onChange={(e) => setStatus(m.id, e.target.value)} className="min-w-[140px]">
                         {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
                       </Select>

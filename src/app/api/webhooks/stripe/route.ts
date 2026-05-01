@@ -421,24 +421,30 @@ async function ensureLocalCustomer(
   try {
     const existing = await getCustomerByEmail(email);
     if (existing) {
-      // Als bestaande rij geen Holded-id had, vul deze nu aan.
+      // Bestaande rij — zorg dat Holded-id en eventuele ontbrekende velden
+      // worden bijgevuld zodat het admin-paneel klantgegevens compleet ziet.
       if (!existing.holded_contact_id && holdedContactId) {
         await updateCustomerHoldedId(existing.id, holdedContactId);
       }
       return existing;
     }
-    // Match Holded-side first om dubbele contact_ids te voorkomen.
-    let finalHoldedId = holdedContactId;
-    if (!finalHoldedId) {
-      const match = await findContactByEmail(email).catch(() => null);
-      if (match) finalHoldedId = match.id;
-    }
+    // Geen lokale klant — haal volledig contact uit Holded op zodat we
+    // adres / btw-nummer / mobiel ook lokaal kennen voor klant-360°.
+    const holdedHit = await findContactByEmail(email).catch(() => null);
+    const finalHoldedId = holdedContactId || holdedHit?.id || null;
+    const addr = holdedHit?.address;
     return await createCustomer({
-      name: name || email,
+      name: name || holdedHit?.name || email,
       email,
-      phone: phone || null,
-      holded_contact_id: finalHoldedId || null,
-      source: 'stripe',
+      phone: phone || holdedHit?.phone || null,
+      mobile: holdedHit?.mobile || null,
+      address: addr?.address || null,
+      city: addr?.city || null,
+      postal_code: addr?.postalCode || null,
+      country: addr?.country || 'ES',
+      vat_number: holdedHit?.vatnumber || null,
+      holded_contact_id: finalHoldedId,
+      source: holdedHit ? 'holded_import' : 'stripe',
     });
   } catch (err) {
     console.error('[webhook] ensureLocalCustomer failed:', err);

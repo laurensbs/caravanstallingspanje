@@ -886,11 +886,31 @@ async function ensureMiscSchema(): Promise<void> {
       title TEXT NOT NULL,
       message TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'new',
+      votes_up INTEGER DEFAULT 0,
+      votes_down INTEGER DEFAULT 0,
+      featured BOOLEAN DEFAULT false,
       created_at TIMESTAMP DEFAULT NOW(),
       updated_at TIMESTAMP DEFAULT NOW()
     )`;
+    await sql`ALTER TABLE ideas ADD COLUMN IF NOT EXISTS votes_up INTEGER DEFAULT 0`;
+    await sql`ALTER TABLE ideas ADD COLUMN IF NOT EXISTS votes_down INTEGER DEFAULT 0`;
+    await sql`ALTER TABLE ideas ADD COLUMN IF NOT EXISTS featured BOOLEAN DEFAULT false`;
     await sql`CREATE INDEX IF NOT EXISTS idx_ideas_status ON ideas(status)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_ideas_created ON ideas(created_at DESC)`;
+    // Seed featured "watermachine" idee — pilot waar we feedback op willen.
+    await sql`INSERT INTO ideas (category, title, message, status, featured)
+      SELECT 'verhuur',
+        'Interesse in een watermachine?',
+        'We onderzoeken of er interesse is in het huren van een watermachine voor op de camping. Met een watermachine heb je altijd koud drinkwater bij de hand, zonder steeds te hoeven sjouwen met zware flessen.
+
+De verhuur zou bestaan uit:
+• Een watermachine
+• Een hervulbare fles
+• Schoonmaaktabletten voor goed onderhoud
+
+Altijd koud en schoon drinkwater — makkelijk en praktisch tijdens de vakantie.',
+        'shortlist', true
+      WHERE NOT EXISTS (SELECT 1 FROM ideas WHERE featured = true AND title ILIKE '%watermachine%')`;
   })().catch((err) => {
     console.error('[misc migrations] failed:', err);
     _miscMigrationsApplied = null;
@@ -1393,6 +1413,41 @@ export async function setIdeaStatus(id: number, status: string) {
 export async function deleteIdea(id: number) {
   await ensureMiscSchema();
   await sql`DELETE FROM ideas WHERE id = ${id}`;
+}
+
+// Voor de publieke ideeën-pagina: alleen featured + shortlist tonen,
+// gesorteerd op enthousiasme. Niet alle inzendingen zijn publiek.
+export async function listFeaturedIdeas() {
+  await ensureMiscSchema();
+  const rows = await sql`SELECT id, category, title, message, votes_up, votes_down, featured
+    FROM ideas
+    WHERE featured = true
+       OR status = 'shortlist'
+       OR status = 'in_progress'
+    ORDER BY featured DESC, votes_up DESC, created_at DESC`;
+  return rows as unknown as Array<{
+    id: number;
+    category: string | null;
+    title: string;
+    message: string;
+    votes_up: number;
+    votes_down: number;
+    featured: boolean;
+  }>;
+}
+
+export async function voteOnIdea(id: number, direction: 'up' | 'down') {
+  await ensureMiscSchema();
+  if (direction === 'up') {
+    await sql`UPDATE ideas SET votes_up = COALESCE(votes_up, 0) + 1, updated_at = NOW() WHERE id = ${id}`;
+  } else {
+    await sql`UPDATE ideas SET votes_down = COALESCE(votes_down, 0) + 1, updated_at = NOW() WHERE id = ${id}`;
+  }
+}
+
+export async function setIdeaFeatured(id: number, featured: boolean) {
+  await ensureMiscSchema();
+  await sql`UPDATE ideas SET featured = ${featured}, updated_at = NOW() WHERE id = ${id}`;
 }
 
 // ─── Holded invoice-status sync ─────────────────────────

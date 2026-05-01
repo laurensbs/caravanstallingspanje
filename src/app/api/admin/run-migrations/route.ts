@@ -122,8 +122,24 @@ export async function GET() {
       updated_at TIMESTAMP DEFAULT NOW()
     )`;
   });
+  await ran('ideas.votes_up', () => sql`ALTER TABLE ideas ADD COLUMN IF NOT EXISTS votes_up INTEGER DEFAULT 0`);
+  await ran('ideas.votes_down', () => sql`ALTER TABLE ideas ADD COLUMN IF NOT EXISTS votes_down INTEGER DEFAULT 0`);
+  await ran('ideas.featured', () => sql`ALTER TABLE ideas ADD COLUMN IF NOT EXISTS featured BOOLEAN DEFAULT false`);
   await ran('idx_ideas_status', () => sql`CREATE INDEX IF NOT EXISTS idx_ideas_status ON ideas(status)`);
   await ran('idx_ideas_created', () => sql`CREATE INDEX IF NOT EXISTS idx_ideas_created ON ideas(created_at DESC)`);
+  await ran('seed watermachine featured idea', () => sql`INSERT INTO ideas (category, title, message, status, featured)
+    SELECT 'verhuur',
+      'Interesse in een watermachine?',
+      'We onderzoeken of er interesse is in het huren van een watermachine voor op de camping. Met een watermachine heb je altijd koud drinkwater bij de hand, zonder steeds te hoeven sjouwen met zware flessen.
+
+De verhuur zou bestaan uit:
+• Een watermachine
+• Een hervulbare fles
+• Schoonmaaktabletten voor goed onderhoud
+
+Altijd koud en schoon drinkwater — makkelijk en praktisch tijdens de vakantie.',
+      'shortlist', true
+    WHERE NOT EXISTS (SELECT 1 FROM ideas WHERE featured = true AND title ILIKE '%watermachine%')`);
 
   // ─── Contact messages ───
   await ran('contact_messages table', async () => {

@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import {
   Lightbulb, Send, Loader2, Check, ArrowRight, Sparkles,
-  Wrench, Tent, Coffee, Bike, Sun, Wind,
+  Wrench, Tent, Coffee, Bike, Sun, Wind, ThumbsUp, ThumbsDown, Star,
 } from 'lucide-react';
 import PublicHero from '@/components/PublicHero';
 import { Field, fieldCls, Section } from '@/components/ServiceForm';
@@ -147,6 +147,8 @@ export default function IdeeenPage() {
         accent="amber"
       />
       <div className="max-w-2xl mx-auto px-5 sm:px-6 py-8 sm:py-14">
+        <FeaturedIdeas />
+
         <motion.form
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -282,5 +284,135 @@ export default function IdeeenPage() {
         </motion.form>
       </div>
     </main>
+  );
+}
+
+type PublicIdea = {
+  id: number;
+  category: string | null;
+  title: string;
+  message: string;
+  votes_up: number;
+  votes_down: number;
+  featured: boolean;
+};
+
+function FeaturedIdeas() {
+  const [ideas, setIdeas] = useState<PublicIdea[] | null>(null);
+  const [voting, setVoting] = useState<number | null>(null);
+  const [voted, setVoted] = useState<Record<number, 'up' | 'down'>>({});
+
+  useEffect(() => {
+    fetch('/api/order/idea/list')
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => setIdeas(Array.isArray(d?.ideas) ? d.ideas : []))
+      .catch(() => setIdeas([]));
+  }, []);
+
+  const vote = async (id: number, direction: 'up' | 'down') => {
+    if (voted[id]) return;
+    setVoting(id);
+    try {
+      const res = await fetch(`/api/order/idea/${id}/vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ direction }),
+      });
+      const data = await res.json();
+      if (res.ok || data.alreadyVoted) {
+        setVoted((m) => ({ ...m, [id]: direction }));
+        // Optimistic increment in UI
+        setIdeas((curr) => curr?.map((i) =>
+          i.id === id
+            ? { ...i, [`votes_${direction}`]: (direction === 'up' ? i.votes_up : i.votes_down) + 1 }
+            : i
+        ) ?? null);
+      }
+    } finally {
+      setVoting(null);
+    }
+  };
+
+  if (!ideas || ideas.length === 0) return null;
+
+  return (
+    <div className="mb-10 space-y-3">
+      <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted flex items-center gap-2">
+        <Star size={12} /> Wij denken aan…
+      </h2>
+      {ideas.map((idea) => {
+        const userVote = voted[idea.id];
+        const totalVotes = idea.votes_up + idea.votes_down;
+        const upPct = totalVotes > 0 ? Math.round((idea.votes_up / totalVotes) * 100) : 0;
+        return (
+          <motion.div
+            key={idea.id}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`card-surface p-5 ${idea.featured ? 'ring-1 ring-warning/40' : ''}`}
+          >
+            {idea.featured && (
+              <div className="inline-flex items-center gap-1.5 mb-2 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-[0.18em]"
+                style={{ background: 'var(--color-warning-soft)', color: 'var(--color-warning)' }}>
+                <Star size={10} /> We willen graag jouw mening
+              </div>
+            )}
+            <h3 className="text-[16px] font-semibold mb-2">{idea.title}</h3>
+            <p className="text-[14px] text-text-muted leading-relaxed whitespace-pre-wrap mb-4">
+              {idea.message}
+            </p>
+
+            {/* Vote-rij */}
+            <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-border">
+              <p className="text-[12px] text-text-muted mr-auto">
+                Wat vind jij?
+              </p>
+              <button
+                type="button"
+                disabled={!!userVote || voting === idea.id}
+                onClick={() => vote(idea.id, 'up')}
+                className={`press-spring inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-[13px] font-medium transition-all ${
+                  userVote === 'up'
+                    ? 'bg-success-soft text-success border-2 border-success'
+                    : 'border border-border bg-surface hover:border-success hover:text-success disabled:opacity-50'
+                }`}
+              >
+                <ThumbsUp size={13} fill={userVote === 'up' ? 'currentColor' : 'none'} />
+                Goed idee
+                <span className="tabular-nums opacity-70">{idea.votes_up}</span>
+              </button>
+              <button
+                type="button"
+                disabled={!!userVote || voting === idea.id}
+                onClick={() => vote(idea.id, 'down')}
+                className={`press-spring inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-[13px] font-medium transition-all ${
+                  userVote === 'down'
+                    ? 'bg-danger-soft text-danger border-2 border-danger'
+                    : 'border border-border bg-surface hover:border-danger hover:text-danger disabled:opacity-50'
+                }`}
+              >
+                <ThumbsDown size={13} fill={userVote === 'down' ? 'currentColor' : 'none'} />
+                Niet voor mij
+                <span className="tabular-nums opacity-70">{idea.votes_down}</span>
+              </button>
+            </div>
+            {totalVotes >= 5 && (
+              <p className="text-[11px] text-text-subtle mt-2">
+                {totalVotes} stemmen · {upPct}% positief
+              </p>
+            )}
+            {userVote && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-[12px] text-text-muted mt-2 inline-flex items-center gap-1"
+              >
+                <Check size={11} /> Bedankt voor je stem!
+              </motion.p>
+            )}
+          </motion.div>
+        );
+      })}
+    </div>
   );
 }
