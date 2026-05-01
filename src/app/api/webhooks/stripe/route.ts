@@ -243,6 +243,29 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
         customerEmail = customerEmail || payload.customer?.email || '';
         customerPhone = customerPhone || payload.customer?.phone || '';
         invoiceDescription = invoiceDescription || payload.title || 'Service';
+
+        // Notificatie naar werkplaats-mailbox (info@) — handig zodat
+        // er meteen iemand het oppakt zonder dat ze het reparatiepaneel
+        // hoeven te checken.
+        const notifyHtml = `
+          <h2 style="font-family:sans-serif;color:#0A1929">Nieuwe service-aanvraag</h2>
+          <p style="font-family:sans-serif">Er is een nieuwe service-bestelling binnengekomen na betaling:</p>
+          <table style="font-family:sans-serif;font-size:14px;border-collapse:collapse">
+            <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Klant</td><td style="padding:6px 0"><strong>${customerName || '—'}</strong></td></tr>
+            <tr><td style="padding:6px 14px 6px 0;color:#6B7280">E-mail</td><td style="padding:6px 0">${customerEmail || '—'}</td></tr>
+            <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Telefoon</td><td style="padding:6px 0">${customerPhone || '—'}</td></tr>
+            <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Service</td><td style="padding:6px 0"><strong>${payload.title || '—'}</strong></td></tr>
+            <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Bedrag</td><td style="padding:6px 0">€${(amountEur || 0).toFixed(2)}</td></tr>
+            <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Werkbon-code</td><td style="padding:6px 0;font-family:monospace">${result.publicCode}</td></tr>
+          </table>
+          <p style="font-family:sans-serif;font-size:13px;color:#6B7280;margin-top:18px">De aanvraag staat klaar in het reparatiepaneel onder code <strong>${result.publicCode}</strong>.</p>
+        `;
+        await sendMail({
+          to: 'info@caravanstalling-spanje.com',
+          subject: `🔧 Nieuwe service-bestelling: ${payload.title || 'service'} (${result.publicCode})`,
+          html: notifyHtml,
+          text: `Nieuwe service-bestelling van ${customerName} — ${payload.title}. Werkbon-code: ${result.publicCode}.`,
+        }).catch((err) => console.error('[stripe-webhook] werkplaats-mail mislukt:', err));
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'forward failed';
         console.error('[stripe-webhook] forward to reparatiepanel failed:', msg);

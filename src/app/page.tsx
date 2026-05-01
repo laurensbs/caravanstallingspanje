@@ -188,6 +188,16 @@ export default function LandingPage() {
             delay={0.19}
             accent="violet"
           />
+          <ServiceCard
+            href="/diensten/service"
+            icon={Sparkles}
+            tag="Onderhoud & verzorging"
+            title="Service & onderhoud"
+            desc="Waxen, schoonmaak, ozon-behandeling en meer — onze werkplaats pakt het op."
+            price="op aanvraag"
+            delay={0.26}
+            accent="cyan"
+          />
         </div>
 
         {/* Reassurance + contact */}
