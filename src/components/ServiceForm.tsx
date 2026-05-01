@@ -283,7 +283,19 @@ export function MultiStepShell({
           </InfoBanner>
         </motion.div>
 
-        <form onSubmit={onSubmit} className="mt-8">
+        <form
+          onSubmit={(e) => {
+            // Voorkom dat een per ongeluk-submit (bv. enter in date-input)
+            // op step 1 de échte submit triggert. Alleen step 2 mag.
+            if (step !== 1) {
+              e.preventDefault();
+              if (step1Valid) goNext();
+              return;
+            }
+            onSubmit(e);
+          }}
+          className="mt-8"
+        >
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
