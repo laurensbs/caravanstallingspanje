@@ -34,6 +34,26 @@ async function holdedFetch<T>(path: string, init: RequestInit = {}): Promise<T> 
   return body as T;
 }
 
+// Volledige Holded-contact-shape. Holded geeft veel meer terug dan we
+// historisch gebruikt hebben — kenteken zit bv. in customFields. We halen
+// nu alles en bewaren de raw payload voor admin-detail.
+export type HoldedCustomField = {
+  field?: string;
+  value?: string;
+  // Holded varieert hier in oudere/nieuwere accounts.
+  name?: string;
+  id?: string;
+};
+
+export type HoldedAddress = {
+  address?: string;
+  city?: string;
+  postalCode?: string;
+  province?: string;
+  country?: string;
+  countryCode?: string;
+};
+
 export type HoldedContact = {
   id: string;
   name?: string;
@@ -41,7 +61,27 @@ export type HoldedContact = {
   phone?: string;
   mobile?: string;
   vatnumber?: string;
-  address?: { address?: string; city?: string; postalCode?: string; country?: string };
+  // Identificatie / classificatie
+  code?: string;          // intern code-veld in Holded
+  type?: string;          // 'client' | 'supplier' | 'lead'
+  isperson?: number | boolean;
+  // Adressen
+  address?: HoldedAddress;
+  billAddress?: HoldedAddress;
+  shippingAddress?: HoldedAddress;
+  // Aanvullend
+  web?: string;
+  secondaryEmail?: string;
+  iban?: string;
+  swift?: string;
+  defaultCurrency?: string;
+  notes?: string;
+  // Custom fields — kenteken, klantnummer, locatie, etc.
+  customFields?: HoldedCustomField[];
+  // Tags voor filtering in Holded
+  tags?: string[];
+  // Onbekende velden willen we niet kwijt zijn — de raw-snapshot bewaart 'm.
+  [key: string]: unknown;
 };
 
 // Holded paginatie. Default page-size is 50; we vragen max op om import-tempo
@@ -174,6 +214,18 @@ export async function findContactByEmail(email: string): Promise<HoldedContact |
   if (!email) return null;
   const data = await holdedFetch<HoldedContact[]>(`/invoicing/v1/contacts?email=${encodeURIComponent(email)}`);
   return Array.isArray(data) && data.length > 0 ? data[0] : null;
+}
+
+// Direct ophalen via id — geeft de volledige contact-detail incl. custom
+// fields. Niet alle Holded-tenants ondersteunen dit endpoint, dus we vangen
+// 'm netjes af bij 404.
+export async function getContactById(holdedId: string): Promise<HoldedContact | null> {
+  if (!holdedId) return null;
+  try {
+    return await holdedFetch<HoldedContact>(`/invoicing/v1/contacts/${holdedId}`);
+  } catch {
+    return null;
+  }
 }
 
 // Holded has no ?phone= query, so we scan the first page of contacts and

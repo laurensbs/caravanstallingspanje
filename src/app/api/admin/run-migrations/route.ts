@@ -94,6 +94,20 @@ export async function GET() {
   await ran('fridge_bookings.payment_link_email', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_email TEXT`);
   await ran('fridge_bookings.payment_link_amount_cents', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_amount_cents INTEGER`);
   await ran('fridge_bookings.device_type', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS device_type TEXT`);
+  // Holded full snapshot — alle Holded-velden inclusief custom fields zoals
+  // kenteken/registratie. JSONB zodat we nieuwe velden kunnen toevoegen
+  // zonder schema-wijzigingen.
+  await ran('customers.holded_raw', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_raw JSONB`);
+  await ran('customers.holded_custom_fields', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_custom_fields JSONB`);
+  await ran('customers.holded_tags', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_tags JSONB`);
+  await ran('customers.holded_code', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_code TEXT`);
+  await ran('customers.holded_type', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_type TEXT`);
+  await ran('customers.holded_iban', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_iban TEXT`);
+  await ran('customers.holded_web', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_web TEXT`);
+  await ran('customers.holded_secondary_email', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_secondary_email TEXT`);
+  await ran('customers.holded_default_currency', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_default_currency TEXT`);
+  await ran('customers.holded_billing_address', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_billing_address JSONB`);
+  await ran('customers.holded_shipping_address', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_shipping_address JSONB`);
   await ran('fridge_bookings.paid_at', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP`);
   await ran('fridge_bookings.stripe_payment_intent_id', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS stripe_payment_intent_id TEXT`);
   await ran('fridge_bookings.sales_invoice_converted_at', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS sales_invoice_converted_at TIMESTAMP`);

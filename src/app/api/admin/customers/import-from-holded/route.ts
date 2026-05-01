@@ -4,7 +4,7 @@ import {
 } from '@/lib/holded';
 import {
   getCustomerByEmail, getCustomerByHoldedId, createCustomer, updateCustomer,
-  logActivity, getAdminInfo,
+  logActivity, getAdminInfo, setCustomerHoldedSnapshot,
 } from '@/lib/db';
 
 export const maxDuration = 60;
@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
 
       const addr = c.address;
       try {
+        let customerId: number | null = null;
         if (existing) {
           await updateCustomer(existing.id, {
             name: c.name,
@@ -45,9 +46,10 @@ export async function POST(req: NextRequest) {
             vat_number: c.vatnumber || null,
             holded_contact_id: c.id,
           });
+          customerId = existing.id;
           updated++;
         } else {
-          await createCustomer({
+          const created = await createCustomer({
             name: c.name,
             email: c.email || null,
             phone: c.phone || null,
@@ -60,7 +62,13 @@ export async function POST(req: NextRequest) {
             holded_contact_id: c.id,
             source: 'holded_import',
           });
+          customerId = (created as { id?: number })?.id ?? null;
           imported++;
+        }
+        // Bewaar de complete Holded-snapshot voor de admin-detail-pagina.
+        // Mislukt mag — de basisvelden zijn al opgeslagen.
+        if (customerId) {
+          await setCustomerHoldedSnapshot(customerId, c as unknown as Record<string, unknown>).catch(() => {});
         }
       } catch (err) {
         // Duplicate-key (bv. dubbele email in Holded zelf) of andere

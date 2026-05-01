@@ -1021,6 +1021,21 @@ async function ensureMiscSchema(): Promise<void> {
     // airco bij ons hetzelfde fridge-record delen, maar per booking zien wat
     // 'm precies is. Als 't veld leeg is fallt UI terug op fridges.device_type.
     await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS device_type TEXT`;
+    // Holded-snapshot — bewaart de complete contact-payload zodat we alle
+    // velden die Holded heeft (kenteken in customFields, tags, internal code,
+    // bill/shipping addresses, IBAN, etc.) lokaal kunnen tonen zonder elke
+    // keer een API-call. Wordt ververst bij sync.
+    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_raw JSONB`;
+    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_custom_fields JSONB`;
+    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_tags JSONB`;
+    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_code TEXT`;
+    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_type TEXT`;
+    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_iban TEXT`;
+    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_web TEXT`;
+    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_secondary_email TEXT`;
+    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_default_currency TEXT`;
+    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_billing_address JSONB`;
+    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_shipping_address JSONB`;
     // Handmatige betaallink-flow: admin verstuurt een Stripe Checkout link
     // per mail naar klanten die we eerder zelf in het systeem zetten.
     // Bewaren we zodat we kunnen herversturen + zien aan wie/wanneer.
@@ -1173,6 +1188,19 @@ export type CustomerRow = {
   source: string;
   created_at: string;
   updated_at: string;
+  // Holded-snapshot velden (zie setCustomerHoldedSnapshot).
+  holded_raw?: Record<string, unknown> | null;
+  holded_custom_fields?: Array<{ field?: string; value?: string; name?: string; id?: string }> | null;
+  holded_tags?: string[] | null;
+  holded_code?: string | null;
+  holded_type?: string | null;
+  holded_iban?: string | null;
+  holded_web?: string | null;
+  holded_secondary_email?: string | null;
+  holded_default_currency?: string | null;
+  holded_billing_address?: { address?: string; city?: string; postalCode?: string; country?: string } | null;
+  holded_shipping_address?: { address?: string; city?: string; postalCode?: string; country?: string } | null;
+  holded_synced_at?: string | null;
 };
 
 export async function searchCustomers(q: string, limit = 10): Promise<CustomerRow[]> {
@@ -1294,6 +1322,34 @@ export async function setCustomerHoldedId(id: number, holdedId: string | null, f
   await ensureCustomerSchema();
   await sql`UPDATE customers
     SET holded_contact_id = ${holdedId}, holded_sync_failed = ${failed}, updated_at = NOW()
+    WHERE id = ${id}`;
+}
+
+// Bewaart de complete Holded-payload + losse handige kolommen voor snel
+// filteren. Wordt aangeroepen tijdens import en bij elke handmatige sync.
+export async function setCustomerHoldedSnapshot(
+  id: number,
+  raw: Record<string, unknown>,
+) {
+  await ensureMiscSchema();
+  const customFields = raw.customFields ?? null;
+  const tags = raw.tags ?? null;
+  const billing = raw.billAddress ?? null;
+  const shipping = raw.shippingAddress ?? null;
+  await sql`UPDATE customers SET
+    holded_raw = ${JSON.stringify(raw)}::jsonb,
+    holded_custom_fields = ${customFields ? JSON.stringify(customFields) : null}::jsonb,
+    holded_tags = ${tags ? JSON.stringify(tags) : null}::jsonb,
+    holded_code = ${(raw.code as string) ?? null},
+    holded_type = ${(raw.type as string) ?? null},
+    holded_iban = ${(raw.iban as string) ?? null},
+    holded_web = ${(raw.web as string) ?? null},
+    holded_secondary_email = ${(raw.secondaryEmail as string) ?? null},
+    holded_default_currency = ${(raw.defaultCurrency as string) ?? null},
+    holded_billing_address = ${billing ? JSON.stringify(billing) : null}::jsonb,
+    holded_shipping_address = ${shipping ? JSON.stringify(shipping) : null}::jsonb,
+    holded_synced_at = NOW(),
+    updated_at = NOW()
     WHERE id = ${id}`;
 }
 

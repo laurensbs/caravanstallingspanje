@@ -49,6 +49,22 @@ type Transport = {
   created_via: string;
 };
 
+export type HoldedCustomFieldRow = {
+  field?: string;
+  value?: string;
+  name?: string;
+  id?: string;
+};
+
+export type HoldedSnapshotAddress = {
+  address?: string;
+  city?: string;
+  postalCode?: string;
+  province?: string;
+  country?: string;
+  countryCode?: string;
+};
+
 export type Customer = {
   id: number;
   name: string;
@@ -66,6 +82,18 @@ export type Customer = {
   holded_synced_at: string | null;
   source: string;
   created_at: string;
+  // Holded snapshot — alle Holded-velden, opgehaald bij sync.
+  holded_raw?: Record<string, unknown> | null;
+  holded_custom_fields?: HoldedCustomFieldRow[] | null;
+  holded_tags?: string[] | null;
+  holded_code?: string | null;
+  holded_type?: string | null;
+  holded_iban?: string | null;
+  holded_web?: string | null;
+  holded_secondary_email?: string | null;
+  holded_default_currency?: string | null;
+  holded_billing_address?: HoldedSnapshotAddress | null;
+  holded_shipping_address?: HoldedSnapshotAddress | null;
 };
 
 type ActivityEvent = {
@@ -154,6 +182,31 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
     }
   };
 
+  // Live snapshot ophalen — vult holded_raw + alle holded_* kolommen met
+  // de complete contact-payload zoals die nu in Holded staat. Roept daarna
+  // de detail-load opnieuw zodat de UI direct de nieuwe velden ziet.
+  const refreshHoldedSnapshot = async () => {
+    setSyncing(true);
+    try {
+      const res = await fetch(`/api/admin/customers/${customer.id}/holded-snapshot`, {
+        method: 'POST', credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'fetch failed');
+      // Re-fetch customer-detail zodat we de nieuwste DB-state hebben.
+      const detail = await fetch(`/api/admin/customers/${customer.id}`, { credentials: 'include' });
+      if (detail.ok) {
+        const d = await detail.json();
+        if (d.customer) setCustomer(d.customer);
+      }
+      toast.success('Holded data refreshed');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not refresh Holded data');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const deleteCustomer = async () => {
     const res = await fetch(`/api/admin/customers/${customer.id}`, {
       method: 'DELETE', credentials: 'include',
@@ -199,9 +252,12 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
           </div>
         </div>
         <div className="flex gap-2 shrink-0">
-          <Button variant="secondary" onClick={syncToHolded} disabled={syncing}>
+          <Button variant="secondary" onClick={refreshHoldedSnapshot} disabled={syncing}>
             {syncing ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
-            Sync Holded
+            Pull Holded data
+          </Button>
+          <Button variant="secondary" onClick={syncToHolded} disabled={syncing}>
+            <RefreshCw size={14} /> Push to Holded
           </Button>
           <Button variant="ghost" onClick={() => setConfirmingDelete(true)}>
             <Trash2 size={14} /> Delete
@@ -211,21 +267,25 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-6">
         {/* Contact */}
-        <section className="card-surface p-5 space-y-5 self-start">
-          <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
-            Contact details
-          </h2>
-          <InlineField label="Email" value={customer.email} type="email" onSave={(v) => updateField('email', v)} />
-          <InlineField label="Phone" value={customer.phone} type="tel" onSave={(v) => updateField('phone', v)} />
-          <InlineField label="Mobile" value={customer.mobile} type="tel" onSave={(v) => updateField('mobile', v)} />
-          <InlineField label="Address" value={customer.address} onSave={(v) => updateField('address', v)} />
-          <div className="grid grid-cols-3 gap-3">
-            <InlineField label="Postal code" value={customer.postal_code} onSave={(v) => updateField('postal_code', v)} />
-            <InlineField label="City" value={customer.city} onSave={(v) => updateField('city', v)} />
-            <InlineField label="Country" value={customer.country} onSave={(v) => updateField('country', v)} />
+        <section className="space-y-6 self-start">
+          <div className="card-surface p-5 space-y-5">
+            <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+              Contact details
+            </h2>
+            <InlineField label="Email" value={customer.email} type="email" onSave={(v) => updateField('email', v)} />
+            <InlineField label="Phone" value={customer.phone} type="tel" onSave={(v) => updateField('phone', v)} />
+            <InlineField label="Mobile" value={customer.mobile} type="tel" onSave={(v) => updateField('mobile', v)} />
+            <InlineField label="Address" value={customer.address} onSave={(v) => updateField('address', v)} />
+            <div className="grid grid-cols-3 gap-3">
+              <InlineField label="Postal code" value={customer.postal_code} onSave={(v) => updateField('postal_code', v)} />
+              <InlineField label="City" value={customer.city} onSave={(v) => updateField('city', v)} />
+              <InlineField label="Country" value={customer.country} onSave={(v) => updateField('country', v)} />
+            </div>
+            <InlineField label="VAT number" value={customer.vat_number} onSave={(v) => updateField('vat_number', v)} />
+            <InlineField label="Notes" value={customer.notes} type="textarea" onSave={(v) => updateField('notes', v)} />
           </div>
-          <InlineField label="VAT number" value={customer.vat_number} onSave={(v) => updateField('vat_number', v)} />
-          <InlineField label="Notes" value={customer.notes} type="textarea" onSave={(v) => updateField('notes', v)} />
+
+          <HoldedDataSection customer={customer} />
         </section>
 
         <div className="space-y-6">
@@ -392,5 +452,151 @@ function RelatedSection({
         <div className="divide-y divide-border">{children}</div>
       )}
     </section>
+  );
+}
+
+// ─── Holded data sectie ────────────────────────────────────────────────
+// Toont alle Holded-specifieke velden — custom fields (kenteken!), tags,
+// billing/shipping adres, IBAN, web, secondary email. Wordt automatisch
+// gevuld bij Holded-import en bijgewerkt via 'Pull Holded data'.
+function HoldedDataSection({ customer }: { customer: Customer }) {
+  const cf = customer.holded_custom_fields || [];
+  const tags = customer.holded_tags || [];
+  const billing = customer.holded_billing_address;
+  const shipping = customer.holded_shipping_address;
+  const hasAnything =
+    cf.length > 0 || tags.length > 0 ||
+    !!billing || !!shipping ||
+    !!customer.holded_code || !!customer.holded_type ||
+    !!customer.holded_iban || !!customer.holded_web ||
+    !!customer.holded_secondary_email;
+
+  if (!hasAnything) {
+    return (
+      <div className="card-surface p-5">
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted mb-3">
+          Holded data
+        </h2>
+        <p className="text-[13px] text-text-muted">
+          {customer.holded_contact_id
+            ? 'No additional Holded fields stored yet — click "Pull Holded data" to fetch the latest.'
+            : 'Customer is not linked to a Holded contact.'}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card-surface p-5 space-y-4">
+      <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+        Holded data
+      </h2>
+
+      {/* Identificatie */}
+      <div className="grid grid-cols-2 gap-3 text-[13px]">
+        {customer.holded_code && (
+          <Row label="Internal code" value={customer.holded_code} />
+        )}
+        {customer.holded_type && (
+          <Row label="Type" value={customer.holded_type} />
+        )}
+        {customer.holded_default_currency && (
+          <Row label="Currency" value={customer.holded_default_currency} />
+        )}
+        {customer.holded_secondary_email && (
+          <Row label="Secondary email" value={customer.holded_secondary_email} />
+        )}
+        {customer.holded_web && (
+          <Row label="Website" value={customer.holded_web} />
+        )}
+        {customer.holded_iban && (
+          <Row label="IBAN" value={customer.holded_iban} mono />
+        )}
+      </div>
+
+      {/* Custom fields — kenteken etc. */}
+      {cf.length > 0 && (
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted mb-2">
+            Custom fields
+          </p>
+          <div className="grid grid-cols-1 gap-1.5">
+            {cf.map((f, i) => (
+              <Row
+                key={i}
+                label={f.field || f.name || f.id || `Field ${i + 1}`}
+                value={f.value || '—'}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Tags */}
+      {tags.length > 0 && (
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted mb-2">
+            Tags
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {tags.map((t, i) => (
+              <span
+                key={i}
+                className="inline-flex items-center text-[11px] font-medium text-accent bg-accent-soft border border-accent/30 rounded-full px-2 py-0.5"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Billing address */}
+      {billing && (
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted mb-2">
+            Billing address
+          </p>
+          <p className="text-[13px] text-text whitespace-pre-line">
+            {[
+              billing.address,
+              [billing.postalCode, billing.city, billing.province].filter(Boolean).join(' '),
+              billing.country,
+            ].filter(Boolean).join('\n') || '—'}
+          </p>
+        </div>
+      )}
+
+      {/* Shipping address */}
+      {shipping && (
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted mb-2">
+            Shipping address
+          </p>
+          <p className="text-[13px] text-text whitespace-pre-line">
+            {[
+              shipping.address,
+              [shipping.postalCode, shipping.city, shipping.province].filter(Boolean).join(' '),
+              shipping.country,
+            ].filter(Boolean).join('\n') || '—'}
+          </p>
+        </div>
+      )}
+
+      {customer.holded_synced_at && (
+        <p className="text-[11px] text-text-subtle pt-2 border-t border-border">
+          Last refreshed {new Date(customer.holded_synced_at).toLocaleString('en-GB')}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3 text-[13px]">
+      <span className="text-text-muted text-[12px]">{label}</span>
+      <span className={`text-text text-right ${mono ? 'font-mono text-[12px]' : ''}`}>{value}</span>
+    </div>
   );
 }
