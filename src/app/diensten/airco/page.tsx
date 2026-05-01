@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, AlertTriangle } from 'lucide-react';
+import { Check, AlertTriangle, Wind } from 'lucide-react';
 import AnimatedServiceIcon from '@/components/AnimatedServiceIcon';
 import { calculatePriceWith, PRICES, MIN_DAYS } from '@/lib/pricing';
 import {
@@ -252,6 +252,9 @@ export default function AircoPage() {
     <MultiStepShell
       title={t('airco.heading')}
       intro={t('airco.intro')}
+      eyebrow="Direct verkoeling"
+      eyebrowIcon={<Wind size={11} />}
+      accent="amber"
       step1={step1}
       step2={step2}
       step1Valid={step1Valid}

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Loader2, AlertTriangle } from 'lucide-react';
+import { Check, Loader2, AlertTriangle, Refrigerator } from 'lucide-react';
 import AnimatedServiceIcon from '@/components/AnimatedServiceIcon';
 import { calculatePriceWith, PRICES, MIN_DAYS, type DeviceType } from '@/lib/pricing';
 import {
@@ -405,6 +405,9 @@ export default function KoelkastBestelPagina() {
     <MultiStepShell
       title={t('fridge.heading')}
       intro={t('fridge.intro')}
+      eyebrow="Vanaf één week"
+      eyebrowIcon={<Refrigerator size={11} />}
+      accent="cyan"
       step1={step1}
       step2={step2}
       step1Valid={step1Valid}

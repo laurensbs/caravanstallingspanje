@@ -176,6 +176,9 @@ export default function TransportPage() {
       paid
       title={t('transport.heading')}
       intro={t('transport.intro')}
+      eyebrow="Stalling ↔ camping"
+      eyebrowIcon={<Truck size={11} />}
+      accent="violet"
       step1={step1}
       step2={step2}
       step1Valid={step1Valid}

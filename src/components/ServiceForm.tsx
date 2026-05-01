@@ -150,7 +150,7 @@ export function ServicePageShell({
   return (
     <main className="min-h-screen bg-bg page-public">
       <PublicHero
-        back={{ href: '/diensten', label: t('common.services-link') }}
+        back={{ href: '/', label: t('common.brand') }}
         title={title}
         intro={intro}
       />
@@ -236,12 +236,18 @@ interface MultiStepProps {
   paid?: boolean;
   /** Optional sticky summary that shows on the right side on desktop. */
   summary?: ReactNode;
+  /** Eyebrow boven de hero-titel, bv. "Vanaf één week". */
+  eyebrow?: string;
+  /** Lucide-icoon vóór de eyebrow. */
+  eyebrowIcon?: ReactNode;
+  /** Kleur-accent voor hero glow + tag. */
+  accent?: 'cyan' | 'amber' | 'violet' | 'default';
 }
 
 export function MultiStepShell({
   title, intro, step1, step2, step1Valid,
   onSubmit, submitting, error, done, doneTitle, doneBody, publicCode,
-  paid = false, summary,
+  paid = false, summary, eyebrow, eyebrowIcon, accent = 'default',
 }: MultiStepProps) {
   const { t } = useLocale();
   const [step, setStep] = useState(0);
@@ -266,9 +272,12 @@ export function MultiStepShell({
   return (
     <main className="min-h-screen bg-bg page-public">
       <PublicHero
-        back={{ href: '/diensten', label: t('common.services-link') }}
+        back={{ href: '/', label: t('common.brand') }}
         title={title}
         intro={intro}
+        eyebrow={eyebrow}
+        eyebrowIcon={eyebrowIcon}
+        accent={accent}
       />
       <div className="max-w-2xl mx-auto px-5 sm:px-6 py-8 sm:py-14">
         <Stepper current={step} steps={stepLabels} />
