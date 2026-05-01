@@ -84,6 +84,7 @@ function KoelkastenContent() {
 
   const [year, setYear] = useState(0);
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '');
+  const [deviceFilter, setDeviceFilter] = useState(searchParams.get('device') || '');
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
@@ -451,6 +452,13 @@ function KoelkastenContent() {
     await refresh();
   };
 
+  // Client-side device-type filter (capacity-cards in /admin/koelkasten en
+  // /admin/dashboard linken hier naartoe via ?device=…). Match op substring
+  // zodat 'Grote koelkast' óók 'Grote koelkast + airco' meeneemt.
+  const visibleFridges = deviceFilter
+    ? fridges.filter(f => (f.device_type || '').toLowerCase().includes(deviceFilter.toLowerCase()))
+    : fridges;
+
   return (
     <>
       <PageHeader
@@ -482,7 +490,7 @@ function KoelkastenContent() {
         }
       />
 
-      <ActiveBookingsOverview />
+      <ActiveBookingsOverview onFilterDevice={setDeviceFilter} activeFilter={deviceFilter} />
 
       <div className="flex flex-wrap gap-2 mb-6">
         <div className="relative flex-1 min-w-[220px] max-w-md">
@@ -511,6 +519,16 @@ function KoelkastenContent() {
           <option value="compleet">Compleet</option>
           <option value="controleren">Controleren</option>
         </select>
+        {deviceFilter && (
+          <button
+            type="button"
+            onClick={() => setDeviceFilter('')}
+            className="inline-flex items-center gap-1.5 h-10 px-3 text-sm bg-accent-soft text-accent border border-accent/30 rounded-[var(--radius-md)] hover:bg-accent-soft/70 transition-colors"
+            title="Filter wissen"
+          >
+            {deviceFilter} ×
+          </button>
+        )}
       </div>
 
       <div className="bg-surface border border-border rounded-[var(--radius-xl)] overflow-hidden">
@@ -524,12 +542,14 @@ function KoelkastenContent() {
               </div>
             ))}
           </div>
-        ) : fridges.length === 0 ? (
-          <div className="py-16 text-center text-sm text-text-muted">Geen klanten gevonden</div>
+        ) : visibleFridges.length === 0 ? (
+          <div className="py-16 text-center text-sm text-text-muted">
+            {deviceFilter ? `Geen klanten met "${deviceFilter}"` : 'Geen klanten gevonden'}
+          </div>
         ) : (
           <ul className="divide-y divide-border">
             <AnimatePresence initial={false}>
-              {fridges.map(f => {
+              {visibleFridges.map(f => {
                 // Defensief: een vers aangemaakte of gecorrumpeerde fridge
                 // kan zonder bookings-array door de UI komen.
                 const bookings = Array.isArray(f.bookings) ? f.bookings : [];
@@ -1133,7 +1153,10 @@ type ActiveStats = {
   airco: { current: number; capacity: number };
 };
 
-function ActiveBookingsOverview() {
+function ActiveBookingsOverview({ onFilterDevice, activeFilter }: {
+  onFilterDevice: (device: string) => void;
+  activeFilter: string;
+}) {
   const [data, setData] = useState<{ bookings: ActiveBooking[]; stats: ActiveStats } | null>(null);
 
   useEffect(() => {
@@ -1151,10 +1174,13 @@ function ActiveBookingsOverview() {
     );
   }
 
+  // filterValue = wat we als deviceFilter zetten als de card geklikt wordt;
+  // we matchen substring zodat 'Grote koelkast' óók 'Grote koelkast + airco'
+  // pakt zonder dat we hier alle varianten hoeven te kennen.
   const cards = [
-    { label: 'Grote koelkast', ...data.stats.large },
-    { label: 'Tafelmodel', ...data.stats.table },
-    { label: 'Airco', ...data.stats.airco },
+    { label: 'Grote koelkast', filterValue: 'Grote koelkast', ...data.stats.large },
+    { label: 'Tafelmodel', filterValue: 'Tafelmodel', ...data.stats.table },
+    { label: 'Airco', filterValue: 'Airco', ...data.stats.airco },
   ];
 
   return (
@@ -1163,15 +1189,40 @@ function ActiveBookingsOverview() {
         <Truck size={13} /> Op dit moment uit ({data.bookings.length})
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        {cards.map((c) => (
-          <div key={c.label} className="card-surface p-5">
-            <div className="text-[12px] uppercase tracking-[0.18em] text-text-muted font-medium">{c.label}</div>
-            <div className="flex items-baseline gap-2 mt-2">
-              <span className="text-3xl font-semibold tabular-nums">{c.current}</span>
-              <span className="text-[13px] text-text-muted">/ {c.capacity}</span>
-            </div>
-          </div>
-        ))}
+        {cards.map((c) => {
+          const active = activeFilter && c.filterValue.toLowerCase().includes(activeFilter.toLowerCase());
+          const pct = c.capacity > 0 ? Math.min(100, Math.round((c.current / c.capacity) * 100)) : 0;
+          const barColor =
+            pct >= 90 ? 'var(--color-danger)' :
+            pct >= 70 ? 'var(--color-warning)' :
+            'var(--color-accent)';
+          return (
+            <button
+              key={c.label}
+              type="button"
+              onClick={() => onFilterDevice(active ? '' : c.filterValue)}
+              className={`card-surface p-5 text-left transition-all hover:border-accent/40 ${
+                active ? 'ring-2 ring-accent/40 border-accent/40' : ''
+              }`}
+              title={active ? 'Filter uitzetten' : `Filter op ${c.label}`}
+            >
+              <div className="flex items-center justify-between">
+                <div className="text-[12px] uppercase tracking-[0.18em] text-text-muted font-medium">{c.label}</div>
+                {active && <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-accent">Actief ✓</span>}
+              </div>
+              <div className="flex items-baseline gap-2 mt-2 mb-3">
+                <span className="text-3xl font-semibold tabular-nums">{c.current}</span>
+                <span className="text-[13px] text-text-muted">/ {c.capacity} bezet</span>
+              </div>
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--color-surface-2)' }}>
+                <div style={{ width: `${pct}%`, background: barColor, height: '100%' }} />
+              </div>
+              <p className="text-[11px] text-text-muted mt-2">
+                {Math.max(0, c.capacity - c.current)} beschikbaar · {pct}%
+              </p>
+            </button>
+          );
+        })}
       </div>
       {data.bookings.length > 0 && (
         <div className="card-surface divide-y divide-border">

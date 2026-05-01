@@ -141,11 +141,14 @@ export default function DashboardPage() {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <StockBar label="Grote koelkast" current={inUseLarge}
-            capacity={stats?.inUse?.large.capacity ?? 110} loading={stats === null} />
+            capacity={stats?.inUse?.large.capacity ?? 110} loading={stats === null}
+            href="/admin/koelkasten?device=Grote%20koelkast" />
           <StockBar label="Tafelmodel koelkast" current={inUseTable}
-            capacity={stats?.inUse?.table.capacity ?? 20} loading={stats === null} />
+            capacity={stats?.inUse?.table.capacity ?? 20} loading={stats === null}
+            href="/admin/koelkasten?device=Tafelmodel" />
           <StockBar label="Airco" current={inUseAirco}
-            capacity={stats?.inUse?.airco.capacity ?? 10} loading={stats === null} />
+            capacity={stats?.inUse?.airco.capacity ?? 10} loading={stats === null}
+            href="/admin/koelkasten?device=Airco" />
         </div>
       </section>
 
@@ -234,16 +237,22 @@ function InvoiceTile({ label, status, rows, tone }: {
   );
 }
 
-function StockBar({ label, current, capacity, loading }: {
-  label: string; current: number; capacity: number; loading: boolean;
+function StockBar({ label, current, capacity, loading, href }: {
+  label: string; current: number; capacity: number; loading: boolean; href?: string;
 }) {
   const pct = capacity > 0 ? Math.min(100, Math.round((current / capacity) * 100)) : 0;
   const barColor =
     pct >= 90 ? 'var(--color-danger)' :
     pct >= 70 ? 'var(--color-warning)' :
     'var(--color-accent)';
+  // Wrap in Link als 'r een href is — anders gewoon een div zodat we niet
+  // een lege link renderen.
+  const Wrapper: React.ElementType = href ? Link : 'div';
+  const wrapperProps = href
+    ? { href, className: 'card-surface p-6 block hover:border-accent/40 transition-all group cursor-pointer' }
+    : { className: 'card-surface p-6' };
   return (
-    <div className="card-surface p-6">
+    <Wrapper {...wrapperProps}>
       <div className="flex items-center justify-between mb-3">
         <span className="text-[14px] font-semibold">{label}</span>
         {loading ? (
@@ -263,10 +272,11 @@ function StockBar({ label, current, capacity, loading }: {
         />
       </div>
       {!loading && (
-        <p className="text-[12px] text-text-muted mt-2.5">
-          {capacity - current} beschikbaar · {pct}% bezet
+        <p className="text-[12px] text-text-muted mt-2.5 flex items-center gap-1">
+          <span>{capacity - current} beschikbaar · {pct}% bezet</span>
+          {href && <ArrowUpRight size={11} className="text-text-subtle group-hover:text-accent ml-auto transition-colors" />}
         </p>
       )}
-    </div>
+    </Wrapper>
   );
 }
