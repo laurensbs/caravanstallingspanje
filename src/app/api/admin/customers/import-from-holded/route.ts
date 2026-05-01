@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { listContactsPaginated, type HoldedContact } from '@/lib/holded';
+import { listContactsPaginated, getContactById, type HoldedContact } from '@/lib/holded';
 import {
   getCustomerByEmail, getCustomerByHoldedId, createCustomer, updateCustomer,
   setCustomerHoldedSnapshot, logActivity, getAdminInfo,
@@ -22,9 +22,23 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const url = new URL(req.url);
     const page = Math.max(1, Number(body.page ?? url.searchParams.get('page') ?? 1));
-    const pageSize = Math.min(100, Math.max(10, Number(body.pageSize ?? url.searchParams.get('pageSize') ?? 25)));
+    // Smaller default — we doen nu per contact een extra detail-call voor
+    // customFields, dus minder per page om timeouts te voorkomen.
+    const pageSize = Math.min(50, Math.max(5, Number(body.pageSize ?? url.searchParams.get('pageSize') ?? 15)));
 
-    const contacts: HoldedContact[] = await listContactsPaginated(page, pageSize);
+    const summaries: HoldedContact[] = await listContactsPaginated(page, pageSize);
+
+    // BELANGRIJK: Holded's /v1/contacts list-endpoint geeft alleen summaries
+    // terug — customFields, billAddress en shippingAddress zitten alléén in
+    // de detail-call /v1/contacts/{id}. Reparatiepanel doet dat ook.
+    // Daarom per contact parallel een detail-fetch.
+    const contacts: HoldedContact[] = await Promise.all(
+      summaries.map(async (s) => {
+        if (!s.id) return s;
+        const detail = await getContactById(s.id);
+        return detail || s;
+      }),
+    );
 
     // Stap 1 — sequentiële update/insert (Neon mag geen 25 inserts parallel
     // op dezelfde unique-index doen zonder race-conflicten).
@@ -35,7 +49,9 @@ export async function POST(req: NextRequest) {
         let existing = await getCustomerByHoldedId(c.id);
         if (!existing && c.email) existing = await getCustomerByEmail(c.email);
 
-        const addr = c.address;
+        // Holded varieert: sommige tenants vullen `address` direct, andere
+        // alleen billAddress. Pak wat 'r is.
+        const addr = c.address || c.billAddress || c.shippingAddress;
         if (existing) {
           await updateCustomer(existing.id, {
             name: c.name,

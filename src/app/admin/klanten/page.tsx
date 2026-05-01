@@ -73,9 +73,9 @@ export default function KlantenPage() {
     let totalSkipped = 0;
     let totalErrors = 0;
     let page = 1;
-    // Houdt 'm laag — Vercel hobby/pro kan timeout-en op grote batches.
-    // 25 per page = doorgaans <5s, dus we kunnen rustig 50+ pages doen.
-    const pageSize = 25;
+    // Klein houden: per contact halen we ook nog een detail-call voor
+    // customFields (kenteken etc), dus 15 per page = ~30 Holded-calls.
+    const pageSize = 15;
     try {
       // Pagineer tot hasMore=false. Per page max 100 contacten zodat we
       // ruim onder de 60s Vercel timeout blijven, ook met snapshot-write
