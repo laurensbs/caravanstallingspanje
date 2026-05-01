@@ -82,6 +82,16 @@ function fmtPeriod(b: Booking): string {
 
 // Beschrijving die uiteindelijk in de Holded pro forma + Stripe Checkout
 // product-titel terechtkomt — bewust in het NL want klanten zien dit.
+// Map een vrij-tekst device_type (uit DB) naar de canonieke prijs-key.
+// Oude bookings hebben "Grote koelkast + airco" e.d. — die matchen we
+// op substring zodat 'r altijd een prijs uit komt.
+function resolveDeviceType(raw: string | null | undefined): DeviceType {
+  const s = (raw || '').toLowerCase();
+  if (s.includes('airco')) return 'Airco';
+  if (s.includes('tafel')) return 'Tafelmodel koelkast';
+  return 'Grote koelkast';
+}
+
 // Holded pro forma deep-link. publicUrl is voor klanten, app-URL is voor
 // ons (admin) — opent direct het document in Holded waar we 'm kunnen
 // bewerken / converteren naar sales invoice.
@@ -452,10 +462,13 @@ function KoelkastenContent() {
   const openPayLink = (b: Booking, fridgeContext?: Fridge) => {
     const f = fridgeContext || drawerFridge;
     if (!f) return;
+    // BELANGRIJK: zet drawerFridge zodat ook de breakdown-block in het
+    // dialog (die op drawerFridge.device_type leunt) z'n context heeft.
+    if (!drawerFridge) setDrawerFridge(f);
     // Auto-bereken het bedrag op basis van booking-period + week-prijzen.
-    // Admin hoeft niet meer zelf te rekenen. Veld blijft editable als je
-    // een afwijkend bedrag wilt sturen.
-    const dt = (b.device_type || f.device_type || '') as DeviceType;
+    // resolveDeviceType matcht ook "Grote koelkast + airco" → 'Airco' zodat
+    // oude bookings met afwijkende device_type-strings ook werken.
+    const dt = resolveDeviceType(b.device_type || f.device_type);
     const wp = weekPrices?.[dt] ?? null;
     const calc = priceForDates(dt, wp, b.start_date || '', b.end_date || '');
     setPayLinkForm({
@@ -475,7 +488,7 @@ function KoelkastenContent() {
     if (payLinkForm.amount.trim()) return;
     const b = payLinkDialog.booking;
     const f = drawerFridge;
-    const dt = (b.device_type || f?.device_type || '') as DeviceType;
+    const dt = resolveDeviceType(b.device_type || f?.device_type);
     const wp = weekPrices[dt] ?? null;
     const calc = priceForDates(dt, wp, b.start_date || '', b.end_date || '');
     if (calc) {
@@ -798,7 +811,7 @@ function KoelkastenContent() {
                                     <span className="tabular-nums">{period}</span>
                                     {b.camping && <span className="opacity-70">· {b.camping}</span>}
                                     {(() => {
-                                      const dt = (b.device_type || f.device_type || '') as DeviceType;
+                                      const dt = resolveDeviceType(b.device_type || f.device_type);
                                       const wp = weekPrices?.[dt] ?? null;
                                       const price = priceForDates(dt, wp, b.start_date || '', b.end_date || '');
                                       return price ? (
@@ -1386,8 +1399,8 @@ function KoelkastenContent() {
                     is berekend en kan 't toch handmatig overrulen. */}
                 {(() => {
                   const b = payLinkDialog.booking;
-                  if (!b || !drawerFridge) return null;
-                  const dt = (b.device_type || drawerFridge.device_type || '') as DeviceType;
+                  if (!b) return null;
+                  const dt = resolveDeviceType(b.device_type || drawerFridge?.device_type);
                   const wp = weekPrices?.[dt] ?? null;
                   const calc = priceForDates(dt, wp, b.start_date || '', b.end_date || '');
                   if (!calc) return null;
