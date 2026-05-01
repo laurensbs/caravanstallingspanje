@@ -87,10 +87,18 @@ export default function KoelkastenPage() {
 
 function KoelkastenContent() {
   const searchParams = useSearchParams();
+  const urlDevice = searchParams.get('device') || '';
+  const urlStatus = searchParams.get('status') || '';
 
   const [year, setYear] = useState(0);
-  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '');
-  const [deviceFilter, setDeviceFilter] = useState(searchParams.get('device') || '');
+  const [statusFilter, setStatusFilter] = useState(urlStatus);
+  const [deviceFilter, setDeviceFilter] = useState(urlDevice);
+  // Sync filter-state met query-string. useState-initial wordt alleen op
+  // de eerste mount uitgelezen; sidebar-navigatie tussen ?device=Airco en
+  // ?device=… verandert niet de pathname dus zonder deze sync zou de
+  // filter blijven hangen op z'n initiële waarde.
+  useEffect(() => { setDeviceFilter(urlDevice); }, [urlDevice]);
+  useEffect(() => { setStatusFilter(urlStatus); }, [urlStatus]);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
