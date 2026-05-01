@@ -15,6 +15,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import PageHeader from '@/components/admin/PageHeader';
 import CustomerPicker, { type CustomerLite } from '@/components/CustomerPicker';
 import NewCustomerDialog from '@/components/NewCustomerDialog';
+import CampingPicker from '@/components/CampingPicker';
 
 type Booking = {
   id: number;
@@ -50,6 +51,13 @@ type Fridge = {
   customer_id: number | null;
   bookings: Booking[];
 };
+
+const DEVICE_TYPES = [
+  { value: 'Grote koelkast', label: 'Large fridge', icon: Refrigerator },
+  { value: 'Tafelmodel koelkast', label: 'Table fridge', icon: Refrigerator },
+  { value: 'Airco', label: 'AC unit', icon: Wind },
+] as const;
+const DEVICE_VALUES: string[] = DEVICE_TYPES.map(d => d.value);
 
 const emptyFridge: { name: string; email: string; extra_email: string; device_type: string; notes: string; customer_id: number | null } = {
   name: '', email: '', extra_email: '', device_type: 'Grote koelkast', notes: '', customer_id: null,
@@ -129,6 +137,30 @@ function KoelkastenContent() {
   const [sendingPayLink, setSendingPayLink] = useState(false);
 
   const [confirmDelete, setConfirmDelete] = useState<{ type: 'fridge' | 'booking'; id: number } | null>(null);
+
+  // Inline-expand voor klant-rij — toont alle Holded data + adres in een
+  // slide-down direct in de lijst, geen drawer nodig om de basis te zien.
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [holdedSnapshots, setHoldedSnapshots] = useState<Record<number, Record<string, unknown> | null>>({});
+  const [snapshotLoading, setSnapshotLoading] = useState<number | null>(null);
+
+  const toggleExpand = async (f: Fridge) => {
+    if (expandedId === f.id) { setExpandedId(null); return; }
+    setExpandedId(f.id);
+    // Lazy: haal customer-detail op als 'r één gekoppeld is, alleen als
+    // we 'm nog niet hebben gecached.
+    if (f.customer_id && holdedSnapshots[f.id] === undefined) {
+      setSnapshotLoading(f.id);
+      try {
+        const res = await fetch(`/api/admin/customers/${f.customer_id}`, { credentials: 'include' });
+        if (res.ok) {
+          const d = await res.json();
+          setHoldedSnapshots((m) => ({ ...m, [f.id]: d.customer || null }));
+        }
+      } catch { /* silent */ }
+      finally { setSnapshotLoading(null); }
+    }
+  };
 
   // ─── Debounced search ───
   useEffect(() => {
@@ -623,7 +655,8 @@ function KoelkastenContent() {
                         type="button"
                         onClick={() => { setDrawerFridge(f); openEdit(f); }}
                         className="w-9 h-9 rounded-full bg-surface-2 text-text flex items-center justify-center text-xs font-medium shrink-0 border border-border mt-0.5 hover:border-border-strong"
-                        aria-label="Open customer"
+                        aria-label="Open customer for editing"
+                        title="Open for editing"
                       >
                         {f.name.split(/\s+/).slice(0, 2).map(p => p[0]?.toUpperCase()).join('')}
                       </button>
@@ -631,9 +664,17 @@ function KoelkastenContent() {
                         <div className="flex items-start justify-between gap-2 flex-wrap">
                           <button
                             type="button"
-                            onClick={() => openEdit(f)}
+                            onClick={() => toggleExpand(f)}
                             className="flex items-center gap-2 flex-wrap min-w-0 text-left hover:underline underline-offset-2 decoration-text-subtle"
+                            title={expandedId === f.id ? 'Hide details' : 'Show all details'}
                           >
+                            <motion.span
+                              animate={{ rotate: expandedId === f.id ? 90 : 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="inline-flex"
+                            >
+                              <ChevronRight size={12} className="text-text-subtle" />
+                            </motion.span>
                             <span className="text-sm font-medium text-text">{f.name}</span>
                             {f.holded_contact_id && (
                               <span title="Linked to Holded">
@@ -777,6 +818,26 @@ function KoelkastenContent() {
                         )}
                       </div>
                     </div>
+                    {/* Slide-down customer panel — Holded data + alle periodes
+                        + adres in één blik. Geen drawer-roundtrip nodig. */}
+                    <AnimatePresence initial={false}>
+                      {expandedId === f.id && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                          className="overflow-hidden"
+                        >
+                          <CustomerInlinePanel
+                            fridge={f}
+                            customer={holdedSnapshots[f.id] as InlineCustomer | null | undefined}
+                            loading={snapshotLoading === f.id}
+                            onOpenDrawer={() => openEdit(f)}
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </motion.li>
                 );
               })}
@@ -873,17 +934,50 @@ function KoelkastenContent() {
             </>
           )}
           <div>
-            <label className="block text-xs font-medium text-text mb-1.5">Device type</label>
+            <label className="block text-xs font-medium text-text mb-2">Device type</label>
+            <div className="grid grid-cols-3 gap-2">
+              {DEVICE_TYPES.map((opt) => {
+                const Icon = opt.icon;
+                const selected = fridgeForm.device_type === opt.value;
+                return (
+                  <motion.button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setFridgeForm({ ...fridgeForm, device_type: opt.value })}
+                    whileTap={{ scale: 0.96 }}
+                    transition={{ type: 'spring', stiffness: 380, damping: 26 }}
+                    className={`relative flex flex-col items-center gap-1.5 p-3 rounded-[var(--radius-md)] border-2 transition-all ${
+                      selected
+                        ? 'border-accent bg-accent-soft'
+                        : 'border-border bg-surface hover:border-border-strong'
+                    }`}
+                  >
+                    {selected && (
+                      <motion.span
+                        layoutId="device-tick"
+                        className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-accent text-accent-fg flex items-center justify-center"
+                        transition={{ type: 'spring', stiffness: 380, damping: 24 }}
+                      >
+                        <CheckCircle2 size={11} strokeWidth={3} />
+                      </motion.span>
+                    )}
+                    <Icon size={20} className={selected ? 'text-accent' : 'text-text-muted'} />
+                    <span className={`text-[11px] font-medium leading-tight text-center ${selected ? 'text-text' : 'text-text-muted'}`}>
+                      {opt.label}
+                    </span>
+                  </motion.button>
+                );
+              })}
+            </div>
+            {/* Vrije tekst-veld als de klant een afwijkende setup heeft. */}
             <input
               list="device-types"
-              value={fridgeForm.device_type ?? ''}
+              placeholder="Or type a custom value…"
+              value={DEVICE_VALUES.includes(fridgeForm.device_type ?? '') ? '' : (fridgeForm.device_type ?? '')}
               onChange={e => setFridgeForm({ ...fridgeForm, device_type: e.target.value })}
-              className="w-full h-10 px-3 text-sm bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors"
+              className="mt-2 w-full h-9 px-3 text-[13px] bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors text-text-muted"
             />
             <datalist id="device-types">
-              <option value="Grote koelkast" />
-              <option value="Tafelmodel koelkast" />
-              <option value="Airco" />
               <option value="Grote koelkast + airco" />
               <option value="Grote koelkast + airco unit" />
             </datalist>
@@ -1065,27 +1159,62 @@ function KoelkastenContent() {
               transition={{ type: 'spring', stiffness: 380, damping: 30 }}
               className="relative bg-bg border border-border rounded-[var(--radius-xl)] shadow-lg max-w-md w-full p-6"
             >
-              <h2 className="text-base font-medium text-text mb-4">
-                {bookingDialog.mode === 'edit' ? 'Edit period' : 'New period'}
-              </h2>
+              <div className="flex items-center gap-2 mb-1">
+                <span
+                  className="w-8 h-8 rounded-full bg-accent-soft text-accent flex items-center justify-center"
+                  aria-hidden
+                >
+                  <Calendar size={15} />
+                </span>
+                <h2 className="text-base font-medium text-text">
+                  {bookingDialog.mode === 'edit' ? 'Edit period' : 'New period'}
+                </h2>
+              </div>
+              <p className="text-[12px] text-text-muted mb-5">
+                When does the rental start, and where is it standing?
+              </p>
               <form onSubmit={saveBooking} className="space-y-4">
-                <Input label="Campsite" value={bookingForm.camping} onChange={e => setBookingForm({ ...bookingForm, camping: e.target.value })} />
+                {/* Locatie-blok — camping + spot prominent met iconen. */}
+                <div className="rounded-[var(--radius-md)] border border-border bg-surface-2 p-3 space-y-3">
+                  <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+                    <MapPin size={12} /> Location
+                  </div>
+                  <div>
+                    <label className="block text-[12px] font-medium text-text mb-1">Campsite</label>
+                    <CampingPicker
+                      value={bookingForm.camping}
+                      onChange={(name) => setBookingForm({ ...bookingForm, camping: name })}
+                      placeholder="Search or pick a campsite…"
+                      ariaLabel="Campsite"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[12px] font-medium text-text mb-1 flex items-center gap-1.5">
+                      <Tag size={11} className="text-text-subtle" /> Spot number
+                    </label>
+                    <input
+                      value={bookingForm.spot_number}
+                      onChange={e => setBookingForm({ ...bookingForm, spot_number: e.target.value })}
+                      placeholder="e.g. A12"
+                      className="w-full h-9 px-3 text-[13px] bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors"
+                    />
+                  </div>
+                </div>
+
+                {/* Periode + status */}
                 <div className="grid grid-cols-2 gap-3">
                   <Input label="Start date" type="date" value={bookingForm.start_date} onChange={e => setBookingForm({ ...bookingForm, start_date: e.target.value })} />
                   <Input label="End date" type="date" value={bookingForm.end_date} onChange={e => setBookingForm({ ...bookingForm, end_date: e.target.value })} />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <Input label="Spot number" value={bookingForm.spot_number} onChange={e => setBookingForm({ ...bookingForm, spot_number: e.target.value })} />
-                  <Select label="Status" value={bookingForm.status} onChange={e => setBookingForm({ ...bookingForm, status: e.target.value as 'compleet' | 'controleren' })}>
-                    <option value="compleet">Complete</option>
-                    <option value="controleren">Review</option>
-                  </Select>
-                </div>
+                <Select label="Status" value={bookingForm.status} onChange={e => setBookingForm({ ...bookingForm, status: e.target.value as 'compleet' | 'controleren' })}>
+                  <option value="compleet">Complete</option>
+                  <option value="controleren">Review</option>
+                </Select>
                 <Textarea label="Notes" value={bookingForm.notes} onChange={e => setBookingForm({ ...bookingForm, notes: e.target.value })} />
                 <div className="flex justify-end gap-2 pt-2">
                   <Button type="button" variant="ghost" onClick={() => setBookingDialog({ open: false, mode: 'create' })}>Cancel</Button>
                   <Button type="submit" loading={savingBooking}>
-                    {bookingDialog.mode === 'edit' ? 'Save' : 'Add'}
+                    {bookingDialog.mode === 'edit' ? 'Save' : 'Add period'}
                   </Button>
                 </div>
               </form>
@@ -1398,5 +1527,194 @@ function SalesInvoiceStrip({
         </div>
       </div>
     </div>
+  );
+}
+
+// ─── Inline customer panel ────────────────────────────────────────────
+// Slide-down met alle Holded-info — kenteken (uit customFields), adres,
+// custom fields, tags, plus alle periodes. Klik op "Edit" opent de
+// volledige drawer voor wijzigingen.
+type InlineCustomer = {
+  id: number;
+  email: string | null;
+  phone: string | null;
+  mobile: string | null;
+  address: string | null;
+  city: string | null;
+  postal_code: string | null;
+  country: string | null;
+  vat_number: string | null;
+  notes: string | null;
+  holded_contact_id: string | null;
+  holded_synced_at: string | null;
+  holded_custom_fields?: Array<{ field?: string; value?: string; name?: string; id?: string }> | null;
+  holded_tags?: string[] | null;
+  holded_code?: string | null;
+  holded_iban?: string | null;
+  holded_secondary_email?: string | null;
+};
+
+function CustomerInlinePanel({
+  fridge,
+  customer,
+  loading,
+  onOpenDrawer,
+}: {
+  fridge: Fridge;
+  customer: InlineCustomer | null | undefined;
+  loading: boolean;
+  onOpenDrawer: () => void;
+}) {
+  const cf = customer?.holded_custom_fields || [];
+  const tags = customer?.holded_tags || [];
+  // Vaak interessant kenteken als string: zoek 'm in custom fields op naam.
+  const plate = cf.find((f) =>
+    /kenteken|plate|registration/i.test(f.field || f.name || '')
+  )?.value;
+
+  return (
+    <div
+      className="mt-3 ml-13 mr-2 mb-1 rounded-[var(--radius-lg)] border bg-surface-2 p-4 space-y-3"
+      style={{ borderColor: 'var(--color-border)' }}
+    >
+      {loading ? (
+        <div className="flex items-center gap-2 text-[12px] text-text-muted">
+          <Spinner size={14} /> Loading customer details…
+        </div>
+      ) : !customer ? (
+        <div className="text-[12px] text-text-muted">
+          {fridge.customer_id
+            ? 'Customer linked but no Holded snapshot yet — open the drawer and click "Pull Holded data".'
+            : 'No central customer linked yet. Open the drawer to link or create one.'}
+        </div>
+      ) : (
+        <>
+          {/* Quick-row: kenteken + IBAN + intern code als ze er zijn */}
+          {(plate || customer.holded_code || customer.holded_iban) && (
+            <div className="flex flex-wrap gap-3 text-[12px]">
+              {plate && (
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-accent/30 bg-accent-soft text-accent font-medium">
+                  <Tag size={11} /> {plate}
+                </span>
+              )}
+              {customer.holded_code && (
+                <span className="inline-flex items-center gap-1.5 text-text-muted">
+                  <span className="text-text-subtle">Code:</span>
+                  <span className="font-mono text-text">{customer.holded_code}</span>
+                </span>
+              )}
+              {customer.holded_iban && (
+                <span className="inline-flex items-center gap-1.5 text-text-muted">
+                  <span className="text-text-subtle">IBAN:</span>
+                  <span className="font-mono text-text">{customer.holded_iban}</span>
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Contact-info grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-[12px]">
+            {customer.email && (
+              <InlineRow icon={Mail} label="Email" value={customer.email} />
+            )}
+            {customer.phone && (
+              <InlineRow label="Phone" value={customer.phone} />
+            )}
+            {customer.mobile && (
+              <InlineRow label="Mobile" value={customer.mobile} />
+            )}
+            {customer.holded_secondary_email && (
+              <InlineRow label="Secondary email" value={customer.holded_secondary_email} />
+            )}
+            {customer.vat_number && (
+              <InlineRow label="VAT" value={customer.vat_number} />
+            )}
+          </div>
+
+          {/* Adres — als hele blok */}
+          {(customer.address || customer.city || customer.country) && (
+            <div className="text-[12px]">
+              <span className="text-text-subtle text-[11px] uppercase tracking-[0.14em] block mb-0.5">Address</span>
+              <span className="text-text">
+                {[
+                  customer.address,
+                  [customer.postal_code, customer.city].filter(Boolean).join(' '),
+                  customer.country,
+                ].filter(Boolean).join(' · ') || '—'}
+              </span>
+            </div>
+          )}
+
+          {/* Custom fields (alle, ook andere dan kenteken) */}
+          {cf.length > 0 && (
+            <div>
+              <span className="text-text-subtle text-[11px] uppercase tracking-[0.14em] block mb-1.5">
+                Holded custom fields
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-[12px]">
+                {cf.map((f, i) => (
+                  <InlineRow
+                    key={i}
+                    label={f.field || f.name || f.id || `Field ${i + 1}`}
+                    value={f.value || '—'}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Tags */}
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {tags.map((t, i) => (
+                <span
+                  key={i}
+                  className="inline-flex items-center text-[10px] font-medium text-accent bg-accent-soft border border-accent/30 rounded-full px-2 py-0.5"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Notes */}
+          {customer.notes && (
+            <p className="text-[12px] text-text-muted italic pt-2 border-t border-border whitespace-pre-line">
+              {customer.notes}
+            </p>
+          )}
+
+          {/* Actions */}
+          <div className="flex items-center gap-2 pt-2 border-t border-border">
+            <Button size="sm" variant="secondary" onClick={onOpenDrawer}>
+              <Pencil size={12} /> Edit customer
+            </Button>
+            {customer.holded_contact_id && (
+              <a
+                href={`/admin/klanten/${customer.id}`}
+                className="inline-flex items-center gap-1 text-[12px] font-medium text-text-muted hover:text-text underline-offset-4 hover:underline"
+              >
+                <ExternalLink size={11} /> Open full profile
+              </a>
+            )}
+            {customer.holded_synced_at && (
+              <span className="text-[11px] text-text-subtle ml-auto">
+                Synced {new Date(customer.holded_synced_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+              </span>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function InlineRow({ icon: Icon, label, value }: { icon?: typeof Mail; label: string; value: string }) {
+  return (
+    <span className="flex items-baseline gap-1.5 min-w-0">
+      <span className="text-text-subtle text-[11px] shrink-0">{label}:</span>
+      {Icon && <Icon size={11} className="text-text-subtle shrink-0" />}
+      <span className="text-text truncate">{value}</span>
+    </span>
   );
 }
