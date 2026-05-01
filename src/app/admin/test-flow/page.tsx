@@ -5,13 +5,13 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
-  Refrigerator, Wind, Truck, Loader2, ExternalLink, Mail, Check, AlertTriangle,
+  Refrigerator, Wind, Truck, Sparkles, Loader2, ExternalLink, Mail, Check, AlertTriangle,
   PlayCircle, RefreshCw,
 } from 'lucide-react';
 import { Button, Input, Badge } from '@/components/ui';
 import PageHeader from '@/components/admin/PageHeader';
 
-type Kind = 'koelkast' | 'airco' | 'transport';
+type Kind = 'koelkast' | 'airco' | 'transport' | 'service';
 
 type RunResult = {
   ok: boolean;
@@ -99,7 +99,7 @@ export default function TestFlowPage() {
         </label>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 max-w-2xl">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8 max-w-2xl">
         <TestButton
           kind="koelkast"
           icon={Refrigerator}
@@ -129,6 +129,16 @@ export default function TestFlowPage() {
           running={running === 'transport'}
           disabled={running !== null}
           onClick={() => run('transport')}
+        />
+        <TestButton
+          kind="service"
+          icon={Sparkles}
+          label="Service"
+          desc="€95 · waxen"
+          color="cyan"
+          running={running === 'service'}
+          disabled={running !== null}
+          onClick={() => run('service')}
         />
       </div>
 

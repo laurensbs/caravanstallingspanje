@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import {
   createFridge, createFridgeBooking, markBookingPaid, setBookingHoldedInvoice,
   createTransportRequest, markTransportRequestPaid, setTransportHoldedInvoice,
+  createPendingIntakeReturningId, attachStripeSessionToPendingIntake, markPendingIntakeForwarded,
   getCustomerByEmail, createCustomer, linkFridgeToCustomer, linkTransportToCustomer,
   logActivity, getAdminInfo,
 } from '@/lib/db';
 import { invoiceForCustomer, findContactByEmail } from '@/lib/holded';
 import { sendMail, paymentReceivedHtml } from '@/lib/email';
+import { sendIntake, type IntakePayload } from '@/lib/work-order-hub';
 import { formatRef } from '@/lib/refs';
 import { getEffectivePrices } from '@/lib/pricing';
 
@@ -17,7 +19,7 @@ import { getEffectivePrices } from '@/lib/pricing';
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
-type TestKind = 'koelkast' | 'airco' | 'transport';
+type TestKind = 'koelkast' | 'airco' | 'transport' | 'service';
 
 const isAdmin = (req: NextRequest) => {
   const id = req.headers.get('x-admin-id');
@@ -34,8 +36,8 @@ export async function POST(req: NextRequest) {
   const name = String(body.name || 'Test Klant').trim();
   const skipMail = body.skipMail === true;
 
-  if (!kind || !['koelkast', 'airco', 'transport'].includes(kind)) {
-    return NextResponse.json({ error: 'kind moet koelkast/airco/transport zijn' }, { status: 400 });
+  if (!kind || !['koelkast', 'airco', 'transport', 'service'].includes(kind)) {
+    return NextResponse.json({ error: 'kind moet koelkast/airco/transport/service zijn' }, { status: 400 });
   }
   if (!email || !email.includes('@')) {
     return NextResponse.json({ error: 'geldig e-mailadres vereist' }, { status: 400 });
@@ -53,6 +55,9 @@ export async function POST(req: NextRequest) {
     bookingId?: number;
     fridgeId?: number;
     transportId?: number;
+    intakeId?: number;
+    workshopJobId?: string;
+    workshopPublicCode?: string;
     customerId?: number;
     holdedInvoiceId?: string;
     holdedInvoiceNum?: string;
@@ -127,6 +132,36 @@ export async function POST(req: NextRequest) {
 
       await markTransportRequestPaid(transport.id);
       log.push('✓ Transport status → betaald');
+    } else if (kind === 'service') {
+      amountEur = 95;
+      description = `Service: Wax-behandeling (TEST)`;
+      const intakePayload: IntakePayload = {
+        type: 'service',
+        customer: { name: `${name} (TEST)`, email, phone: '+34 600 000 000' },
+        title: 'Service: Wax-behandeling (TEST)',
+        description: 'TEST-flow vanuit admin — automatisch aangemaakt',
+        serviceCategory: 'Wax-behandeling',
+      };
+      const intakeId = await createPendingIntakeReturningId(intakePayload);
+      result.intakeId = intakeId;
+      ref = formatRef('service', intakeId);
+      result.ref = ref;
+      log.push(`✓ Pending intake aangemaakt: id=${intakeId} ref=${ref}`);
+
+      // Simuleer Stripe session-id koppeling
+      await attachStripeSessionToPendingIntake(intakeId, `test_session_${Date.now()}`);
+      log.push('✓ Stripe-session gekoppeld');
+
+      // Stuur door naar reparatiepaneel (echte API-call)
+      try {
+        const intakeResult = await sendIntake(intakePayload);
+        await markPendingIntakeForwarded(intakeId, intakeResult.repairJobId);
+        result.workshopJobId = intakeResult.repairJobId;
+        result.workshopPublicCode = intakeResult.publicCode;
+        log.push(`✓ Doorgezet naar reparatiepaneel: jobId=${intakeResult.repairJobId} code=${intakeResult.publicCode}`);
+      } catch (err) {
+        log.push(`✗ Reparatiepaneel-doorzet mislukt: ${err instanceof Error ? err.message : 'unknown'}`);
+      }
     }
 
     // 4. Customer-record
@@ -191,20 +226,28 @@ export async function POST(req: NextRequest) {
     }
 
     // 8. Activity-log
+    const entityTypeMap: Record<TestKind, string> = {
+      koelkast: 'fridge_booking',
+      airco: 'fridge_booking',
+      transport: 'transport_request',
+      service: 'pending_intake',
+    };
     await logActivity({
       actor: admin.name, role: admin.role,
       action: 'TEST-flow uitgevoerd',
-      entityType: kind === 'transport' ? 'transport_request' : 'fridge_booking',
-      entityId: String(result.bookingId || result.transportId),
+      entityType: entityTypeMap[kind],
+      entityId: String(result.bookingId || result.transportId || result.intakeId || ''),
       entityLabel: ref,
       details: `email=${email} bedrag=${amountEur}`,
     });
 
     // 9. URLs voor admin om te checken
     const origin = req.nextUrl.origin;
-    result.receiptUrl = `${origin}${kind === 'transport' ? '/diensten' : '/koelkast'}/bedankt?ref=${ref}`;
+    result.receiptUrl = `${origin}${(kind === 'transport' || kind === 'service') ? '/diensten' : '/koelkast'}/bedankt?ref=${ref}`;
     if (kind === 'transport') {
       result.adminUrl = `${origin}/admin/transport`;
+    } else if (kind === 'service') {
+      result.adminUrl = `${origin}/admin/dashboard`;
     } else {
       result.adminUrl = `${origin}/admin/koelkasten?focus=${result.fridgeId}`;
     }
