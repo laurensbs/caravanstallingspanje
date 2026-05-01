@@ -33,13 +33,16 @@ export async function createCheckoutSession(input: {
   customerEmail?: string;
   metadata: Record<string, string>; // { kind: 'fridge_booking', refId: '12' }
   /** Override expiry. Default 30 minuten (web-flow); admin-betaallinks
-   *  zetten dit op 24*30 zodat klant 'm in alle rust kan betalen.
-   *  Stripe staat min 30 min tot max ~30 dagen toe. */
+   *  zetten dit op ~23 uur zodat klant 'm dezelfde dag kan betalen.
+   *  BELANGRIJK: Stripe Checkout Sessions staan max 24 uur expiry toe.
+   *  Voor langere termijn moet je Payment Links gebruiken (andere API). */
   expiresInHours?: number;
 }): Promise<Stripe.Checkout.Session> {
   const expSec = Math.max(
     30 * 60,
-    Math.min(30 * 24 * 3600, Math.round((input.expiresInHours ?? 0.5) * 3600)),
+    // Stripe-maximum is exact 24u — we capen op 23h59m om timing-races te
+    // vermijden ("must be less than 24 hours").
+    Math.min(23.9 * 3600, Math.round((input.expiresInHours ?? 0.5) * 3600)),
   );
   return stripe().checkout.sessions.create({
     mode: 'payment',

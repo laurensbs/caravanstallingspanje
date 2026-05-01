@@ -13,6 +13,8 @@ import {
   ensureContact,
   createProforma,
   getInvoice,
+  getContactById,
+  updateContactInHolded,
   type ContactInput,
 } from '@/lib/holded';
 import { sendMail, paymentLinkHtml } from '@/lib/email';
@@ -70,8 +72,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
     }
 
     // ── Verzamel ALLE bekende klantdata voor Holded ──
-    // Volgorde: lokale customers-record (nieuwste, met adres) → fridge-record
-    // (alleen naam/email) → Holded zelf (via ensureContact).
+    // Holded vult de pro forma met de data van het CONTACT zelf, niet wat
+    // we in de proforma-create meegeven. Dus we moeten zorgen dat 't
+    // contact volledig is gevuld vóór we 'r een pro forma op maken.
     const linked = fridge.customer_id ? await getCustomerById(fridge.customer_id) : null;
     const contactInput: ContactInput = {
       name: linked?.name || fridge.name,
@@ -87,6 +90,27 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
     if (!fridge.holded_contact_id) {
       await setFridgeHoldedContact(fridge.id, holdedContact.id).catch(() => {});
     }
+
+    // Patch Holded-contact met onze meest complete data zodat de pro forma
+    // alle velden krijgt. We respecteren bestaande Holded-data: alleen leeg
+    // → vullen, nooit overschrijven.
+    try {
+      const fullContact = await getContactById(holdedContact.id);
+      if (fullContact) {
+        const patch: Parameters<typeof updateContactInHolded>[1] = {};
+        let needsPatch = false;
+        if (linked?.phone && !fullContact.phone) { patch.phone = linked.phone; needsPatch = true; }
+        if (linked?.mobile && !fullContact.mobile) { patch.mobile = linked.mobile; needsPatch = true; }
+        if (linked?.address && !fullContact.address?.address) { patch.address = linked.address; needsPatch = true; }
+        if (linked?.city && !fullContact.address?.city) { patch.city = linked.city; needsPatch = true; }
+        if (linked?.postal_code && !fullContact.address?.postalCode) { patch.postal_code = linked.postal_code; needsPatch = true; }
+        if (linked?.country && !fullContact.address?.country) { patch.country = linked.country; needsPatch = true; }
+        if (linked?.vat_number && !fullContact.vatnumber) { patch.vat_number = linked.vat_number; needsPatch = true; }
+        if (needsPatch) {
+          await updateContactInHolded(holdedContact.id, patch).catch(() => {});
+        }
+      }
+    } catch { /* niet kritisch — pro forma kan ook met bestaande data */ }
 
     // ── Pro forma — hergebruik bestaande als die er al is ──
     let holdedInvoiceId = booking.holded_invoice_id;
@@ -119,7 +143,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
       successUrl: `${origin}/koelkast/bedankt?ref=${ref}&session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl: `${origin}/koelkast?cancelled=1`,
       customerEmail,
-      expiresInHours: 24 * 30,
+      // Stripe Checkout Sessions zijn max 24u geldig. Klant betaalt
+      // doorgaans dezelfde dag; admin kan altijd opnieuw versturen.
+      expiresInHours: 23,
       metadata: {
         kind: 'fridge_booking_manual',
         refId: String(id),

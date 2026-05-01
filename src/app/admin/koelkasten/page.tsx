@@ -457,6 +457,22 @@ function KoelkastenContent() {
     setPayLinkDialog({ open: true, booking: b });
   };
 
+  // Als weekPrices nog niet geladen was bij openPayLink, vul amount alsnog
+  // in zodra de prijzen binnenkomen. Alleen als 't veld leeg is (admin heeft
+  // 'm dan nog niet handmatig ingevuld).
+  useEffect(() => {
+    if (!payLinkDialog.open || !payLinkDialog.booking || !weekPrices) return;
+    if (payLinkForm.amount.trim()) return;
+    const b = payLinkDialog.booking;
+    const f = drawerFridge;
+    const dt = (b.device_type || f?.device_type || '') as DeviceType;
+    const wp = weekPrices[dt] ?? null;
+    const calc = priceForDates(dt, wp, b.start_date || '', b.end_date || '');
+    if (calc) {
+      setPayLinkForm((prev) => ({ ...prev, amount: calc.total.toFixed(2).replace('.', ',') }));
+    }
+  }, [weekPrices, payLinkDialog.open, payLinkDialog.booking, payLinkForm.amount, drawerFridge]);
+
   const sendPayLink = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!payLinkDialog.booking) return;
@@ -1332,7 +1348,7 @@ function KoelkastenContent() {
                 <Mail size={16} /> Send payment link
               </h2>
               <p className="text-xs text-text-muted mb-4">
-                We immediately create a pro forma in Holded with the locally known address and VAT number, and email the customer a Stripe payment link. It stays valid for 30 days.
+                We immediately create a pro forma in Holded with the locally known address and VAT number, and email the customer a Stripe payment link. It stays valid for 24 hours — resend any time.
               </p>
               <form onSubmit={sendPayLink} className="space-y-4">
                 <Input
@@ -1341,6 +1357,37 @@ function KoelkastenContent() {
                   value={payLinkForm.description}
                   onChange={e => setPayLinkForm({ ...payLinkForm, description: e.target.value })}
                 />
+                {/* Auto-prijs breakdown — zo ziet admin direct hoe het bedrag
+                    is berekend en kan 't toch handmatig overrulen. */}
+                {(() => {
+                  const b = payLinkDialog.booking;
+                  if (!b || !drawerFridge) return null;
+                  const dt = (b.device_type || drawerFridge.device_type || '') as DeviceType;
+                  const wp = weekPrices?.[dt] ?? null;
+                  const calc = priceForDates(dt, wp, b.start_date || '', b.end_date || '');
+                  if (!calc) return null;
+                  return (
+                    <div className="rounded-[var(--radius-md)] bg-surface-2 border border-border p-3 text-[12px] space-y-1">
+                      <div className="flex items-baseline justify-between">
+                        <span className="text-text-muted">First week</span>
+                        <span className="tabular-nums">€ {calc.weekPrice.toFixed(2)}</span>
+                      </div>
+                      {calc.extraDays > 0 && (
+                        <div className="flex items-baseline justify-between">
+                          <span className="text-text-muted">{calc.extraDays} extra day{calc.extraDays === 1 ? '' : 's'} × € {calc.dayPrice.toFixed(2)}</span>
+                          <span className="tabular-nums">€ {calc.extraTotal.toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className="flex items-baseline justify-between pt-1.5 border-t border-border">
+                        <span className="font-semibold text-text">Total ({calc.days} days)</span>
+                        <span className="font-semibold tabular-nums text-text">€ {calc.total.toFixed(2)}</span>
+                      </div>
+                      <p className="text-[11px] text-text-muted pt-1">
+                        The amount field is editable below if you need a different total.
+                      </p>
+                    </div>
+                  );
+                })()}
                 <div className="grid grid-cols-2 gap-3">
                   <Input
                     label="Amount (€)"
