@@ -18,23 +18,23 @@ type NavGroup = {
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    label: 'Operatie',
+    label: 'Operations',
     items: [
       { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-      { href: '/admin/klanten', label: 'Klanten', icon: Users },
-      { href: '/admin/koelkasten', label: 'Koelkasten', icon: Refrigerator },
-      { href: '/admin/stalling', label: 'Stalling', icon: Warehouse },
+      { href: '/admin/klanten', label: 'Customers', icon: Users },
+      { href: '/admin/koelkasten', label: 'Fridges', icon: Refrigerator },
+      { href: '/admin/stalling', label: 'Storage', icon: Warehouse },
       { href: '/admin/transport', label: 'Transport', icon: Truck },
-      { href: '/admin/contact', label: 'Berichten', icon: MessageSquare },
-      { href: '/admin/ideeen', label: 'Ideeënbus', icon: Lightbulb },
-      { href: '/admin/wachtlijst', label: 'Wachtlijst', icon: Bell },
+      { href: '/admin/contact', label: 'Messages', icon: MessageSquare },
+      { href: '/admin/ideeen', label: 'Ideas inbox', icon: Lightbulb },
+      { href: '/admin/wachtlijst', label: 'Waitlist', icon: Bell },
     ],
   },
   {
-    label: 'Beheer',
+    label: 'Admin',
     items: [
-      { href: '/admin/test-flow', label: 'Test-flow', icon: PlayCircle },
-      { href: '/admin/instellingen', label: 'Instellingen', icon: Settings },
+      { href: '/admin/test-flow', label: 'Test flow', icon: PlayCircle },
+      { href: '/admin/instellingen', label: 'Settings', icon: Settings },
     ],
   },
 ];
@@ -78,7 +78,7 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
           <Link
             href="/admin"
             className="flex items-center justify-between group"
-            title="Naar portaal-keuze"
+            title="Back to portal selection"
           >
             <Image
               src="/images/logo.png"
@@ -103,7 +103,7 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
           style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)' }}
         >
           <Search size={14} />
-          <span className="flex-1 text-left">Snel zoeken…</span>
+          <span className="flex-1 text-left">Quick search…</span>
           <kbd className="text-[10px] tabular-nums px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.55)' }}>⌘K</kbd>
         </button>
 
@@ -163,7 +163,7 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 h-8 rounded-[var(--radius-md)] text-[12px] text-white/55 hover:text-white hover:bg-white/5 transition-colors"
           >
-            <LogOut size={14} /> Uitloggen
+            <LogOut size={14} /> Sign out
           </button>
         </div>
       </aside>

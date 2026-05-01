@@ -28,10 +28,10 @@ type Entry = {
 };
 
 const STATUS_OPTIONS = [
-  { value: 'controleren', label: 'Controleren', tone: 'warning' as const },
-  { value: 'akkoord',     label: 'Akkoord',     tone: 'accent'  as const },
-  { value: 'betaald',     label: 'Betaald',     tone: 'success' as const },
-  { value: 'afgewezen',   label: 'Afgewezen',   tone: 'danger'  as const },
+  { value: 'controleren', label: 'Review',   tone: 'warning' as const },
+  { value: 'akkoord',     label: 'Approved', tone: 'accent'  as const },
+  { value: 'betaald',     label: 'Paid',     tone: 'success' as const },
+  { value: 'afgewezen',   label: 'Rejected', tone: 'danger'  as const },
 ];
 
 const empty = {
@@ -111,10 +111,10 @@ export default function StallingAdminPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error || 'Opslaan mislukt');
+        toast.error(data.error || 'Save failed');
         return;
       }
-      toast.success(editingId ? 'Stalling bijgewerkt' : 'Stalling toegevoegd');
+      toast.success(editingId ? 'Storage updated' : 'Storage added');
       setDrawerOpen(false);
       load();
     } finally {
@@ -123,10 +123,10 @@ export default function StallingAdminPage() {
   };
 
   const remove = async (id: number) => {
-    if (!confirm('Stalling-aanvraag verwijderen?')) return;
+    if (!confirm('Delete storage request?')) return;
     const res = await fetch(`/api/admin/stalling/${id}`, { method: 'DELETE', credentials: 'include' });
-    if (!res.ok) { toast.error('Verwijderen mislukt'); return; }
-    toast.success('Verwijderd');
+    if (!res.ok) { toast.error('Delete failed'); return; }
+    toast.success('Deleted');
     load();
   };
 
@@ -137,25 +137,25 @@ export default function StallingAdminPage() {
       credentials: 'include',
       body: JSON.stringify({ status }),
     });
-    if (!res.ok) { toast.error('Status wijzigen mislukt'); return; }
-    toast.success('Status bijgewerkt');
+    if (!res.ok) { toast.error('Status change failed'); return; }
+    toast.success('Status updated');
     load();
   };
 
   return (
     <>
       <PageHeader
-        eyebrow="Operatie"
-        title="Stalling"
-        description="Stalling-aanvragen — binnen en buiten."
+        eyebrow="Operations"
+        title="Storage"
+        description="Storage requests — indoor and outdoor."
         actions={
           <div className="flex gap-2 items-center">
             <Select value={filter} onChange={(e) => setFilter(e.target.value)} className="min-w-[160px]">
-              <option value="">Alle statussen</option>
+              <option value="">All statuses</option>
               {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
             </Select>
             <Button onClick={openCreate}>
-              <Plus size={14} /> Stalling toevoegen
+              <Plus size={14} /> Add storage
             </Button>
           </div>
         }
@@ -171,7 +171,7 @@ export default function StallingAdminPage() {
             <Warehouse size={18} className="text-text-subtle" />
           </div>
           <p className="text-sm text-text">
-            {filter ? `Geen stalling-aanvragen met status "${filter}"` : 'Nog geen stalling-aanvragen'}
+            {filter ? `No storage requests with status "${filter}"` : 'No storage requests yet'}
           </p>
         </div>
       ) : (
@@ -196,7 +196,7 @@ export default function StallingAdminPage() {
                       <Badge tone="neutral" className="capitalize">{e.type}</Badge>
                     </div>
                     <p className="text-[11px] text-text-muted mt-1">
-                      Aangemeld op {fmtDate(e.created_at)}
+                      Submitted on {fmtDate(e.created_at)}
                     </p>
                   </div>
                   <div className="flex gap-1 shrink-0 items-center">
@@ -206,14 +206,14 @@ export default function StallingAdminPage() {
                     <button
                       onClick={() => openEdit(e)}
                       className="w-8 h-8 inline-flex items-center justify-center rounded-[var(--radius-md)] text-text-muted hover:text-text hover:bg-surface-2 transition-colors"
-                      aria-label="Bewerken"
+                      aria-label="Edit"
                     >
                       <Pencil size={13} />
                     </button>
                     <button
                       onClick={() => remove(e.id)}
                       className="w-8 h-8 inline-flex items-center justify-center rounded-[var(--radius-md)] text-text-muted hover:text-danger hover:bg-danger-soft transition-colors"
-                      aria-label="Verwijderen"
+                      aria-label="Delete"
                     >
                       <Trash2 size={13} />
                     </button>
@@ -222,7 +222,7 @@ export default function StallingAdminPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[13px]">
                   <span className="flex items-center gap-1.5 text-text">
                     <Calendar size={12} className="text-text-subtle shrink-0" />
-                    Vanaf {fmtDate(e.start_date)}{e.end_date ? ` · t/m ${fmtDate(e.end_date)}` : ''}
+                    From {fmtDate(e.start_date)}{e.end_date ? ` · until ${fmtDate(e.end_date)}` : ''}
                   </span>
                   <a href={`mailto:${e.email}`} className="flex items-center gap-1.5 text-text hover:text-text">
                     <Mail size={12} className="text-text-subtle shrink-0" /> {e.email}
@@ -247,14 +247,14 @@ export default function StallingAdminPage() {
         </ul>
       )}
 
-      <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} title={editingId ? 'Stalling bewerken' : 'Nieuwe stalling'} width={560}>
+      <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} title={editingId ? 'Edit storage' : 'New storage'} width={560}>
         <form onSubmit={save} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-text mb-1.5">Type <span className="text-text-subtle">*</span></label>
               <Select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as 'binnen' | 'buiten' })}>
-                <option value="binnen">Binnen</option>
-                <option value="buiten">Buiten</option>
+                <option value="binnen">Indoor</option>
+                <option value="buiten">Outdoor</option>
               </Select>
             </div>
             <div>
@@ -263,18 +263,18 @@ export default function StallingAdminPage() {
                 {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
               </Select>
             </div>
-            <Input label="Naam" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-            <Input label="E-mail" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-            <Input label="Telefoon" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-            <Input label="Startdatum" type="date" required value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })} />
-            <Input label="Einddatum" type="date" value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })} />
-            <Input label="Kenteken" value={form.registration} onChange={(e) => setForm({ ...form, registration: e.target.value })} />
-            <Input label="Merk" value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} />
+            <Input label="Name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <Input label="Email" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+            <Input label="Phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+            <Input label="Start date" type="date" required value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })} />
+            <Input label="End date" type="date" value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })} />
+            <Input label="Registration" value={form.registration} onChange={(e) => setForm({ ...form, registration: e.target.value })} />
+            <Input label="Brand" value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} />
             <Input label="Model" value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} />
-            <Input label="Lengte (m)" value={form.length} onChange={(e) => setForm({ ...form, length: e.target.value })} />
+            <Input label="Length (m)" value={form.length} onChange={(e) => setForm({ ...form, length: e.target.value })} />
           </div>
           <div>
-            <label className="block text-xs font-medium text-text mb-1.5">Notities</label>
+            <label className="block text-xs font-medium text-text mb-1.5">Notes</label>
             <textarea
               value={form.notes}
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
@@ -283,8 +283,8 @@ export default function StallingAdminPage() {
             />
           </div>
           <div className="flex gap-2 justify-end pt-2">
-            <Button type="button" variant="ghost" onClick={() => setDrawerOpen(false)}>Annuleren</Button>
-            <Button type="submit" disabled={saving}>{saving ? 'Bezig…' : (editingId ? 'Opslaan' : 'Toevoegen')}</Button>
+            <Button type="button" variant="ghost" onClick={() => setDrawerOpen(false)}>Cancel</Button>
+            <Button type="submit" disabled={saving}>{saving ? 'Saving…' : (editingId ? 'Save' : 'Add')}</Button>
           </div>
         </form>
       </Drawer>

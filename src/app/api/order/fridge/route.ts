@@ -5,11 +5,14 @@ import {
   createFridgeBooking,
   logActivity,
   countOverlappingBookings,
+  setFridgeHoldedContact,
 } from '@/lib/db';
 import { validateBody, fridgeOrderSchema } from '@/lib/validations';
 import { calculatePriceWithSettings, formatEur, getEffectiveStock, effectiveAmountEur, type DeviceType } from '@/lib/pricing';
 import { createCheckoutSession } from '@/lib/stripe';
 import { formatRef, refKindForFridge } from '@/lib/refs';
+import { ensureContact } from '@/lib/holded';
+import { sendMail } from '@/lib/email';
 
 export async function POST(req: NextRequest) {
   try {
@@ -66,6 +69,56 @@ export async function POST(req: NextRequest) {
       entityLabel: `${data.name} — ${data.camping}`,
       details: `${data.device_type} · ${formatEur(price.total)}`,
     });
+
+    // ── Direct Holded-contact koppelen + admin notificatie ──
+    // Best-effort: faalt het, dan blijft de Stripe-flow gewoon werken; de
+    // webhook na betaling vult 'm alsnog. Maar normaal hebben we 'm meteen
+    // gekoppeld zodat 'r in admin/koelkasten al een Holded-icoon naast staat.
+    (async () => {
+      try {
+        const contact = await ensureContact({
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          address: data.address,
+          city: data.city,
+          postal_code: data.postal_code,
+          country: data.country,
+          vat_number: data.vat_number || null,
+        });
+        if (fridge && !fridge.holded_contact_id && contact.id) {
+          await setFridgeHoldedContact(fridge.id, contact.id);
+        }
+      } catch (err) {
+        console.warn('[fridge order] Holded contact link failed (non-fatal):', err instanceof Error ? err.message : err);
+      }
+    })();
+
+    // Notificatie naar admin-mailbox zodat we direct zien dat 'r een nieuwe
+    // online aanvraag binnen is — onafhankelijk van of de klant de Stripe-
+    // flow afmaakt of niet. .catch zodat een mail-storing de bestelling
+    // niet kapotmaakt.
+    const adminNotifyHtml = `
+      <h2 style="font-family:sans-serif;color:#0A1929">Nieuwe online ${data.device_type}-aanvraag</h2>
+      <p style="font-family:sans-serif">Een klant heeft zojuist via de website een aanvraag gedaan:</p>
+      <table style="font-family:sans-serif;font-size:14px;border-collapse:collapse">
+        <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Klant</td><td style="padding:6px 0"><strong>${data.name}</strong></td></tr>
+        <tr><td style="padding:6px 14px 6px 0;color:#6B7280">E-mail</td><td style="padding:6px 0">${data.email}</td></tr>
+        <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Telefoon</td><td style="padding:6px 0">${data.phone}</td></tr>
+        <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Adres</td><td style="padding:6px 0">${data.address}, ${data.postal_code} ${data.city}, ${data.country}</td></tr>
+        <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Apparaat</td><td style="padding:6px 0"><strong>${data.device_type}</strong></td></tr>
+        <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Camping</td><td style="padding:6px 0">${data.camping}${data.spot_number ? ` (${data.spot_number})` : ''}</td></tr>
+        <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Periode</td><td style="padding:6px 0">${data.start_date} → ${data.end_date}</td></tr>
+        <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Bedrag</td><td style="padding:6px 0"><strong>${formatEur(price.total)}</strong></td></tr>
+      </table>
+      <p style="font-family:sans-serif;font-size:13px;color:#6B7280;margin-top:18px">Klant doorgelinkt naar Stripe Checkout. Status volgt automatisch zodra betaling binnen is.</p>
+    `;
+    sendMail({
+      to: 'laurens@caravanstalling-spanje.com',
+      subject: `🆕 Nieuwe ${data.device_type}-aanvraag: ${data.name}`,
+      html: adminNotifyHtml,
+      text: `Nieuwe online aanvraag van ${data.name} (${data.email}, ${data.phone}). Apparaat: ${data.device_type}. Camping: ${data.camping}. Periode: ${data.start_date} → ${data.end_date}. Bedrag: ${formatEur(price.total)}.`,
+    }).catch((err) => console.warn('[fridge order] admin notify mail failed:', err));
 
     // Stripe Checkout — booking is reserved on 'controleren' until the
     // webhook flips it to 'compleet' on payment.

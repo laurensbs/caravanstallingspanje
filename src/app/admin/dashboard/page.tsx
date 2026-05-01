@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
   Refrigerator, ArrowUpRight, AlertCircle, CheckCircle2, Truck, Package,
-  Activity, Receipt, RefreshCw, Loader2,
+  Activity, Receipt, RefreshCw, Loader2, Sparkles,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import PageHeader from '@/components/admin/PageHeader';
@@ -33,11 +33,24 @@ type ActivityEvent = {
 
 type HoldedRow = { kind: string; status: string | null; count: string | number };
 
+type RecentOrder = {
+  id: number;
+  created_at: string;
+  status: string;
+  customer_name: string;
+  device_type?: string;
+  camping?: string | null;
+  type?: string;
+  start_date?: string | null;
+};
+type RecentOrders = { fridge: RecentOrder[]; stalling: RecentOrder[]; transport: RecentOrder[]; total: number };
+
 export default function DashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [events, setEvents] = useState<ActivityEvent[] | null>(null);
   const [holded, setHolded] = useState<HoldedRow[] | null>(null);
   const [syncing, setSyncing] = useState(false);
+  const [recent, setRecent] = useState<RecentOrders | null>(null);
 
   const loadHolded = () => {
     fetch('/api/admin/holded-status', { credentials: 'include' })
@@ -62,6 +75,10 @@ export default function DashboardPage() {
       .then((d) => setEvents(d.events || []))
       .catch(() => setEvents([]));
     loadHolded();
+    fetch('/api/admin/recent-orders', { credentials: 'include' })
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => setRecent(d || { fridge: [], stalling: [], transport: [], total: 0 }))
+      .catch(() => setRecent({ fridge: [], stalling: [], transport: [], total: 0 }));
   }, []);
 
   const triggerSync = async () => {
@@ -70,10 +87,10 @@ export default function DashboardPage() {
       const res = await fetch('/api/cron/holded-sync', { method: 'POST', credentials: 'include' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'sync failed');
-      toast.success(`Synchroniseerd: ${data.bookings + data.stalling + data.transport} facturen`);
+      toast.success(`Synced: ${data.bookings + data.stalling + data.transport} invoices`);
       loadHolded();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Sync mislukt');
+      toast.error(err instanceof Error ? err.message : 'Sync failed');
     } finally {
       setSyncing(false);
     }
@@ -89,19 +106,61 @@ export default function DashboardPage() {
   const inUseTotal = inUseLarge + inUseTable + inUseAirco;
 
   const tiles = [
-    { label: 'Klanten', value: stats?.totalFridges, href: '/admin/koelkasten', icon: Refrigerator },
-    { label: 'Nu in omloop', value: inUseTotal, href: '/admin/koelkasten', icon: Truck },
-    { label: 'Aandachtspunten', value: controleren, href: '/admin/koelkasten?status=controleren', icon: AlertCircle, tone: 'warning' as const },
-    { label: 'Periodes compleet', value: compleet, href: '/admin/koelkasten?status=compleet', icon: CheckCircle2, tone: 'success' as const },
+    { label: 'Customers', value: stats?.totalFridges, href: '/admin/koelkasten', icon: Refrigerator },
+    { label: 'Currently out', value: inUseTotal, href: '/admin/koelkasten', icon: Truck },
+    { label: 'Needs review', value: controleren, href: '/admin/koelkasten?status=controleren', icon: AlertCircle, tone: 'warning' as const },
+    { label: 'Periods complete', value: compleet, href: '/admin/koelkasten?status=compleet', icon: CheckCircle2, tone: 'success' as const },
   ];
 
   return (
     <>
       <PageHeader
-        eyebrow="Operatie"
+        eyebrow="Operations"
         title="Dashboard"
-        description="Live overzicht van koelkasten, airco, voorraad en aandachtspunten."
+        description="Live overview of fridges, AC units, stock and items needing attention."
       />
+
+      {recent && recent.total > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mb-6 rounded-[var(--radius-lg)] border p-4 flex items-start gap-3"
+          style={{ background: 'var(--color-warning-soft)', borderColor: 'rgba(244,185,66,0.3)' }}
+        >
+          <span
+            aria-hidden
+            className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+            style={{ background: 'rgba(244,185,66,0.25)', color: 'var(--color-warning)' }}
+          >
+            <Sparkles size={16} />
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="text-[13px] font-semibold text-text">
+              {recent.total} new {recent.total === 1 ? 'order' : 'orders'} in the last 24 hours
+            </p>
+            <div className="text-[12px] text-text-muted mt-1 flex flex-wrap gap-x-4 gap-y-0.5">
+              {recent.fridge.length > 0 && <span>{recent.fridge.length} fridge/AC</span>}
+              {recent.stalling.length > 0 && <span>{recent.stalling.length} storage</span>}
+              {recent.transport.length > 0 && <span>{recent.transport.length} transport</span>}
+            </div>
+            {recent.fridge.slice(0, 3).map((o) => (
+              <div key={`f-${o.id}`} className="text-[12px] text-text mt-1.5">
+                <span className="font-medium">{o.customer_name}</span>
+                {o.device_type && <span className="text-text-muted"> · {o.device_type}</span>}
+                {o.camping && <span className="text-text-muted"> · {o.camping}</span>}
+                <span className="text-text-subtle ml-2">{new Date(o.created_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+              </div>
+            ))}
+          </div>
+          <Link
+            href="/admin/koelkasten?status=controleren"
+            className="text-[12px] font-medium text-warning hover:underline underline-offset-4 shrink-0 mt-0.5"
+          >
+            Review →
+          </Link>
+        </motion.div>
+      )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {tiles.map((t, i) => {
@@ -137,16 +196,16 @@ export default function DashboardPage() {
 
       <section className="mt-12">
         <h2 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-text-muted mb-4 flex items-center gap-2">
-          <Package size={13} /> Voorraad-bezetting vandaag
+          <Package size={13} /> Stock occupancy today
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <StockBar label="Grote koelkast" current={inUseLarge}
+          <StockBar label="Large fridge" current={inUseLarge}
             capacity={stats?.inUse?.large.capacity ?? 110} loading={stats === null}
             href="/admin/koelkasten?device=Grote%20koelkast" />
-          <StockBar label="Tafelmodel koelkast" current={inUseTable}
+          <StockBar label="Table fridge" current={inUseTable}
             capacity={stats?.inUse?.table.capacity ?? 20} loading={stats === null}
             href="/admin/koelkasten?device=Tafelmodel" />
-          <StockBar label="Airco" current={inUseAirco}
+          <StockBar label="AC" current={inUseAirco}
             capacity={stats?.inUse?.airco.capacity ?? 10} loading={stats === null}
             href="/admin/koelkasten?device=Airco" />
         </div>
@@ -155,24 +214,24 @@ export default function DashboardPage() {
       <section className="mt-12">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-text-muted flex items-center gap-2">
-            <Receipt size={13} /> Pro forma's in Holded
+            <Receipt size={13} /> Pro formas in Holded
           </h2>
           <Button size="sm" variant="secondary" onClick={triggerSync} disabled={syncing}>
             {syncing ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
-            Sync nu
+            Sync now
           </Button>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <InvoiceTile label="Betaald" status="paid" rows={holded} tone="success" />
+          <InvoiceTile label="Paid" status="paid" rows={holded} tone="success" />
           <InvoiceTile label="Open" status="unpaid" rows={holded} tone="warning" />
-          <InvoiceTile label="Deels" status="partial" rows={holded} tone="warning" />
-          <InvoiceTile label="Onbekend" status="unknown" rows={holded} tone="neutral" />
+          <InvoiceTile label="Partial" status="partial" rows={holded} tone="warning" />
+          <InvoiceTile label="Unknown" status="unknown" rows={holded} tone="neutral" />
         </div>
       </section>
 
       <section className="mt-12">
         <h2 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-text-muted mb-4 flex items-center gap-2">
-          <Activity size={13} /> Recente activiteit
+          <Activity size={13} /> Recent activity
         </h2>
         <div className="card-surface divide-y divide-border">
           {events === null ? (
@@ -180,7 +239,7 @@ export default function DashboardPage() {
               {[0, 1, 2].map((i) => <Skeleton key={i} className="h-4 w-full" />)}
             </div>
           ) : events.length === 0 ? (
-            <p className="p-6 text-[13px] text-text-muted">Nog geen activiteit.</p>
+            <p className="p-6 text-[13px] text-text-muted">No activity yet.</p>
           ) : (
             events.map((e) => (
               <div key={e.id} className="px-5 py-3 flex items-center justify-between gap-4">
@@ -229,7 +288,7 @@ function InvoiceTile({ label, status, rows, tone }: {
               ))}
             </div>
           ) : (
-            <div className="text-[11px] text-text-muted mt-2">geen</div>
+            <div className="text-[11px] text-text-muted mt-2">none</div>
           )}
         </>
       )}
@@ -273,7 +332,7 @@ function StockBar({ label, current, capacity, loading, href }: {
       </div>
       {!loading && (
         <p className="text-[12px] text-text-muted mt-2.5 flex items-center gap-1">
-          <span>{capacity - current} beschikbaar · {pct}% bezet</span>
+          <span>{capacity - current} available · {pct}% occupied</span>
           {href && <ArrowUpRight size={11} className="text-text-subtle group-hover:text-accent ml-auto transition-colors" />}
         </p>
       )}

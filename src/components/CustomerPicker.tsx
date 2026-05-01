@@ -52,7 +52,7 @@ export default function CustomerPicker({ value, onSelect, onClear, onCreateNew, 
       } catch {
         setResults([]);
         setHoldedResults([]);
-        setHoldedError('Verbinding met server mislukt');
+        setHoldedError('Connection to server failed');
       } finally {
         setLoading(false);
       }
@@ -80,15 +80,15 @@ export default function CustomerPicker({ value, onSelect, onClear, onCreateNew, 
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error || 'Koppelen mislukt');
+        toast.error(data.error || 'Linking failed');
         return;
       }
-      toast.success(data.alreadyLinked ? 'Klant al gekoppeld' : 'Klant uit Holded gekoppeld');
+      toast.success(data.alreadyLinked ? 'Customer already linked' : 'Customer linked from Holded');
       onSelect(data.customer);
       setOpen(false);
       setQuery('');
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Koppelen mislukt');
+      toast.error(err instanceof Error ? err.message : 'Linking failed');
     } finally {
       setAdoptingId(null);
     }
@@ -114,7 +114,7 @@ export default function CustomerPicker({ value, onSelect, onClear, onCreateNew, 
           onClick={onClear}
           className="text-[12px] text-text-muted hover:text-text underline-offset-2 hover:underline"
         >
-          Wijzigen
+          Change
         </button>
       </div>
     );
@@ -130,7 +130,7 @@ export default function CustomerPicker({ value, onSelect, onClear, onCreateNew, 
           value={query}
           onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
           onFocus={() => setOpen(true)}
-          placeholder={placeholder || 'Zoek op naam, e-mail of telefoon…'}
+          placeholder={placeholder || 'Search by name, email or phone…'}
           className="w-full h-10 pl-9 pr-9 text-sm bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors placeholder:text-text-subtle"
         />
         {loading && (
@@ -144,7 +144,7 @@ export default function CustomerPicker({ value, onSelect, onClear, onCreateNew, 
             {results.length > 0 && (
               <>
                 <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-text-muted bg-surface-2/50 border-b border-border">
-                  Onze klanten
+                  Our customers
                 </div>
                 <ul className="divide-y divide-border">
                   {results.map((c) => (
@@ -171,7 +171,7 @@ export default function CustomerPicker({ value, onSelect, onClear, onCreateNew, 
             {holdedResults.length > 0 && (
               <>
                 <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-text-muted bg-surface-2/50 border-b border-t border-border flex items-center gap-1.5">
-                  <Cloud size={11} /> Uit Holded — nog niet lokaal gekoppeld
+                  <Cloud size={11} /> From Holded — not yet linked locally
                 </div>
                 <ul className="divide-y divide-border">
                   {holdedResults.map((h) => {
@@ -187,14 +187,14 @@ export default function CustomerPicker({ value, onSelect, onClear, onCreateNew, 
                           <div className="min-w-0 flex-1">
                             <div className="text-sm font-medium truncate">{h.name}</div>
                             <div className="text-[12px] text-text-muted truncate">
-                              {[h.email, h.phone].filter(Boolean).join(' · ') || 'Holded-contact'}
+                              {[h.email, h.phone].filter(Boolean).join(' · ') || 'Holded contact'}
                             </div>
                           </div>
                           {adopting ? (
                             <Loader2 size={13} className="animate-spin text-text-muted shrink-0" />
                           ) : (
                             <span className="inline-flex items-center gap-1 text-[11px] text-text-muted shrink-0">
-                              <Link2 size={11} /> Koppel
+                              <Link2 size={11} /> Link
                             </span>
                           )}
                         </button>
@@ -207,12 +207,12 @@ export default function CustomerPicker({ value, onSelect, onClear, onCreateNew, 
 
             {!loading && !hasResults && query.trim().length >= 2 && (
               <p className="px-3 py-4 text-[13px] text-text-muted">
-                Geen klanten gevonden voor &quot;{query}&quot;{holdedError ? ' lokaal' : ' — niet lokaal en niet in Holded'}.
+                No customers found for &quot;{query}&quot;{holdedError ? ' locally' : ' — not locally and not in Holded'}.
               </p>
             )}
             {holdedError && (
               <div className="px-3 py-2.5 text-[12px] border-t border-border bg-warning-soft text-text">
-                <strong className="block">Holded-zoek mislukt:</strong>
+                <strong className="block">Holded search failed:</strong>
                 <span className="text-text-muted">{holdedError}</span>
               </div>
             )}
@@ -222,7 +222,7 @@ export default function CustomerPicker({ value, onSelect, onClear, onCreateNew, 
             onClick={() => { onCreateNew(query); setOpen(false); }}
             className="w-full px-3 py-2.5 text-[13px] font-medium border-t border-border bg-surface-2 hover:bg-surface transition-colors flex items-center gap-2 text-text"
           >
-            <Plus size={14} /> Nieuwe klant aanmaken{query ? ` "${query}"` : ''}
+            <Plus size={14} /> Create new customer{query ? ` "${query}"` : ''}
           </button>
         </div>
       )}

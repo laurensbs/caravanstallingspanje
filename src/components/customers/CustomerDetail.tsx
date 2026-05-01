@@ -115,7 +115,7 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
     });
     if (!res.ok) {
       const j = await res.json().catch(() => ({}));
-      toast.error(j.error || 'Opslaan mislukt');
+      toast.error(j.error || 'Save failed');
       throw new Error('save failed');
     }
     const data = await res.json();
@@ -131,9 +131,9 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'sync failed');
       setCustomer(data.customer);
-      toast.success('Klant gesynchroniseerd met Holded');
+      toast.success('Customer synced with Holded');
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Sync mislukt');
+      toast.error(err instanceof Error ? err.message : 'Sync failed');
     } finally {
       setSyncing(false);
     }
@@ -143,8 +143,8 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
     const res = await fetch(`/api/admin/customers/${customer.id}`, {
       method: 'DELETE', credentials: 'include',
     });
-    if (!res.ok) { toast.error('Verwijderen mislukt'); return; }
-    toast.success('Klant verwijderd');
+    if (!res.ok) { toast.error('Delete failed'); return; }
+    toast.success('Customer deleted');
     router.push('/admin/klanten');
   };
 
@@ -155,14 +155,14 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
           href="/admin/klanten"
           className="inline-flex items-center gap-1.5 text-[13px] text-text-muted hover:text-text transition-colors"
         >
-          <ArrowLeft size={13} /> Terug naar klanten
+          <ArrowLeft size={13} /> Back to customers
         </Link>
       </div>
 
       <header className="mb-8 flex flex-wrap gap-4 items-start justify-between">
         <div className="min-w-0 flex-1">
           <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-text-muted mb-2">
-            Klant
+            Customer
           </div>
           <InlineField
             value={customer.name}
@@ -172,13 +172,13 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
           <div className="mt-2 flex flex-wrap items-center gap-2">
             {customer.holded_contact_id && <Badge tone="success">Holded</Badge>}
             {customer.holded_sync_failed && (
-              <Badge tone="warning"><AlertTriangle size={10} /> Sync mislukt</Badge>
+              <Badge tone="warning"><AlertTriangle size={10} /> Sync failed</Badge>
             )}
-            {customer.source === 'holded_import' && <Badge tone="neutral">Geïmporteerd</Badge>}
-            {customer.source === 'stripe' && <Badge tone="accent">Via betaling</Badge>}
+            {customer.source === 'holded_import' && <Badge tone="neutral">Imported</Badge>}
+            {customer.source === 'stripe' && <Badge tone="accent">Via payment</Badge>}
             {customer.holded_synced_at && (
               <span className="text-[11px] text-text-muted tabular-nums">
-                Laatst gesynced: {new Date(customer.holded_synced_at).toLocaleString('nl-NL')}
+                Last synced: {new Date(customer.holded_synced_at).toLocaleString('nl-NL')}
               </span>
             )}
           </div>
@@ -189,7 +189,7 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
             Sync Holded
           </Button>
           <Button variant="ghost" onClick={() => setConfirmingDelete(true)}>
-            <Trash2 size={14} /> Verwijderen
+            <Trash2 size={14} /> Delete
           </Button>
         </div>
       </header>
@@ -198,30 +198,30 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
         {/* Contact */}
         <section className="card-surface p-5 space-y-5 self-start">
           <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
-            Contactgegevens
+            Contact details
           </h2>
-          <InlineField label="E-mail" value={customer.email} type="email" onSave={(v) => updateField('email', v)} />
-          <InlineField label="Telefoon" value={customer.phone} type="tel" onSave={(v) => updateField('phone', v)} />
-          <InlineField label="Mobiel" value={customer.mobile} type="tel" onSave={(v) => updateField('mobile', v)} />
-          <InlineField label="Adres" value={customer.address} onSave={(v) => updateField('address', v)} />
+          <InlineField label="Email" value={customer.email} type="email" onSave={(v) => updateField('email', v)} />
+          <InlineField label="Phone" value={customer.phone} type="tel" onSave={(v) => updateField('phone', v)} />
+          <InlineField label="Mobile" value={customer.mobile} type="tel" onSave={(v) => updateField('mobile', v)} />
+          <InlineField label="Address" value={customer.address} onSave={(v) => updateField('address', v)} />
           <div className="grid grid-cols-3 gap-3">
-            <InlineField label="Postcode" value={customer.postal_code} onSave={(v) => updateField('postal_code', v)} />
-            <InlineField label="Plaats" value={customer.city} onSave={(v) => updateField('city', v)} />
-            <InlineField label="Land" value={customer.country} onSave={(v) => updateField('country', v)} />
+            <InlineField label="Postal code" value={customer.postal_code} onSave={(v) => updateField('postal_code', v)} />
+            <InlineField label="City" value={customer.city} onSave={(v) => updateField('city', v)} />
+            <InlineField label="Country" value={customer.country} onSave={(v) => updateField('country', v)} />
           </div>
-          <InlineField label="BTW-nummer" value={customer.vat_number} onSave={(v) => updateField('vat_number', v)} />
-          <InlineField label="Notities" value={customer.notes} type="textarea" onSave={(v) => updateField('notes', v)} />
+          <InlineField label="VAT number" value={customer.vat_number} onSave={(v) => updateField('vat_number', v)} />
+          <InlineField label="Notes" value={customer.notes} type="textarea" onSave={(v) => updateField('notes', v)} />
         </section>
 
         <div className="space-y-6">
           <RelatedSection
             icon={Refrigerator}
-            title="Koelkasten & airco's"
+            title="Fridges & ACs"
             count={fridges.length}
-            empty="Nog geen koelkast of airco gekoppeld."
+            empty="No fridge or AC linked yet."
             action={
               <Link href={`/admin/koelkasten?customer_id=${customer.id}`}>
-                <Button size="sm" variant="secondary">+ Toevoegen</Button>
+                <Button size="sm" variant="secondary">+ Add</Button>
               </Link>
             }
           >
@@ -231,14 +231,14 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
                   <div className="min-w-0 flex-1">
                     <div className="text-[14px] font-medium">{f.device_type}</div>
                     <div className="text-[12px] text-text-muted">
-                      {f.bookings.length} {f.bookings.length === 1 ? 'periode' : 'periodes'}
+                      {f.bookings.length} {f.bookings.length === 1 ? 'period' : 'periods'}
                     </div>
                   </div>
                   <Link
                     href={`/admin/koelkasten?focus=${f.id}`}
                     className="text-[12px] text-text-muted hover:text-text underline-offset-4 hover:underline inline-flex items-center gap-1"
                   >
-                    Openen <ExternalLink size={11} />
+                    Open <ExternalLink size={11} />
                   </Link>
                 </div>
                 {f.bookings.length > 0 && (
@@ -261,12 +261,12 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
 
           <RelatedSection
             icon={Warehouse}
-            title="Stalling"
+            title="Storage"
             count={stalling.length}
-            empty="Geen stalling-aanvragen."
+            empty="No storage requests."
             action={
               <Link href={`/admin/stalling?customer_id=${customer.id}`}>
-                <Button size="sm" variant="secondary">+ Toevoegen</Button>
+                <Button size="sm" variant="secondary">+ Add</Button>
               </Link>
             }
           >
@@ -275,7 +275,7 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
                 <div className="min-w-0 flex-1">
                   <div className="text-[14px] font-medium capitalize">{s.type}</div>
                   <div className="text-[12px] text-text-muted">
-                    Start {s.start_date}{s.registration ? ` · ${s.registration}` : ''}
+                    From {s.start_date}{s.registration ? ` · ${s.registration}` : ''}
                   </div>
                 </div>
                 <Badge tone={s.status === 'akkoord' || s.status === 'betaald' ? 'success' : 'warning'}>{s.status}</Badge>
@@ -285,12 +285,12 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
 
           <RelatedSection
             icon={Truck}
-            title="Transporten"
+            title="Transports"
             count={transports.length}
-            empty="Geen transporten."
+            empty="No transports."
             action={
               <Link href="/admin/transport">
-                <Button size="sm" variant="secondary">Beheer</Button>
+                <Button size="sm" variant="secondary">Manage</Button>
               </Link>
             }
           >
@@ -299,8 +299,8 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
                 <div className="min-w-0 flex-1">
                   <div className="text-[14px] font-medium truncate">{t.camping || '—'}</div>
                   <div className="text-[12px] text-text-muted">
-                    {t.preferred_date ? `Heen ${t.preferred_date}` : '—'}
-                    {t.return_date ? ` · Terug ${t.return_date}` : ''}
+                    {t.preferred_date ? `Outbound ${t.preferred_date}` : '—'}
+                    {t.return_date ? ` · Return ${t.return_date}` : ''}
                   </div>
                 </div>
                 <Badge tone={t.status === 'uitgevoerd' ? 'success' : t.status === 'afgewezen' ? 'danger' : 'warning'}>{t.status}</Badge>
@@ -312,13 +312,13 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
           <section className="card-surface overflow-hidden">
             <div className="px-5 py-3 border-b border-border flex items-center justify-between">
               <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted flex items-center gap-2">
-                <Activity size={12} /> Activiteit
+                <Activity size={12} /> Activity
               </h2>
             </div>
             {activity === null ? (
-              <div className="p-5 text-[13px] text-text-muted">Laden…</div>
+              <div className="p-5 text-[13px] text-text-muted">Loading…</div>
             ) : activity.length === 0 ? (
-              <div className="p-5 text-[13px] text-text-muted">Nog geen activiteit voor deze klant.</div>
+              <div className="p-5 text-[13px] text-text-muted">No activity yet for this customer.</div>
             ) : (
               <ul className="divide-y divide-border">
                 {activity.map((e) => (
@@ -342,9 +342,9 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
 
       <ConfirmDialog
         open={confirmingDelete}
-        title="Klant verwijderen?"
-        description={`${customer.name} wordt soft-deleted. Gerelateerde koelkasten en stallingen blijven bestaan maar worden ontkoppeld.`}
-        confirmLabel="Verwijderen"
+        title="Delete customer?"
+        description={`${customer.name} will be soft-deleted. Related fridges and storage entries remain but are unlinked.`}
+        confirmLabel="Delete"
         destructive
         onConfirm={async () => { await deleteCustomer(); }}
         onCancel={() => setConfirmingDelete(false)}

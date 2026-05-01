@@ -62,18 +62,18 @@ export default function KlantenPage() {
   useEffect(() => { load(); }, [load]);
 
   const importHolded = async () => {
-    if (!confirm('Alle Holded-contacten importeren / synchroniseren met de lokale klantentabel?')) return;
+    if (!confirm('Import / sync all Holded contacts with the local customer table?')) return;
     setImporting(true);
     try {
       const res = await fetch('/api/admin/customers/import-from-holded', {
         method: 'POST', credentials: 'include',
       });
       const j = await res.json();
-      if (!res.ok) throw new Error(j.error || 'import mislukt');
-      toast.success(`${j.imported} nieuw, ${j.updated} bijgewerkt (${j.total} totaal)`);
+      if (!res.ok) throw new Error(j.error || 'import failed');
+      toast.success(`${j.imported} new, ${j.updated} updated (${j.total} total)`);
       load();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Import mislukt');
+      toast.error(err instanceof Error ? err.message : 'Import failed');
     } finally {
       setImporting(false);
     }
@@ -84,17 +84,17 @@ export default function KlantenPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Beheer"
-        title="Klanten"
-        description={data ? `${data.total} klanten in beheer.` : 'Klantenregister — gekoppeld aan Holded.'}
+        eyebrow="Admin"
+        title="Customers"
+        description={data ? `${data.total} customers managed.` : 'Customer register — linked to Holded.'}
         actions={
           <div className="flex gap-2 items-center">
             <Button variant="secondary" onClick={importHolded} disabled={importing}>
               {importing ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
-              Importeer uit Holded
+              Import from Holded
             </Button>
             <Button onClick={() => setCreating(true)}>
-              <Plus size={14} /> Nieuwe klant
+              <Plus size={14} /> New customer
             </Button>
           </div>
         }
@@ -106,7 +106,7 @@ export default function KlantenPage() {
           <input
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            placeholder="Zoek op naam, e-mail of telefoon…"
+            placeholder="Search by name, email or phone…"
             className="w-full h-10 pl-9 pr-3 text-sm bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors placeholder:text-text-subtle"
           />
         </div>
@@ -125,7 +125,7 @@ export default function KlantenPage() {
           </div>
         ) : !data || data.customers.length === 0 ? (
           <div className="py-16 text-center text-sm text-text-muted">
-            {debounced ? `Geen resultaten voor "${debounced}"` : 'Nog geen klanten — importeer uit Holded of maak handmatig aan.'}
+            {debounced ? `No results for "${debounced}"` : 'No customers yet — import from Holded or create manually.'}
           </div>
         ) : (
           <ul className="divide-y divide-border">
@@ -154,8 +154,8 @@ export default function KlantenPage() {
                             <AlertTriangle size={10} /> Sync
                           </Badge>
                         )}
-                        {c.source === 'holded_import' && <Badge tone="neutral">geïmporteerd</Badge>}
-                        {c.source === 'stripe' && <Badge tone="accent">na betaling</Badge>}
+                        {c.source === 'holded_import' && <Badge tone="neutral">imported</Badge>}
+                        {c.source === 'stripe' && <Badge tone="accent">via payment</Badge>}
                       </div>
                       <div className="text-[12px] text-text-muted mt-0.5 flex flex-wrap gap-x-3 gap-y-1">
                         {c.email && (
@@ -171,10 +171,10 @@ export default function KlantenPage() {
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0 text-[11px] text-text-muted tabular-nums">
                       {c.counts.fridges > 0 && (
-                        <Badge tone="neutral">{c.counts.fridges}× koelkast/airco</Badge>
+                        <Badge tone="neutral">{c.counts.fridges}× fridge/AC</Badge>
                       )}
                       {c.counts.stalling > 0 && (
-                        <Badge tone="neutral">{c.counts.stalling}× stalling</Badge>
+                        <Badge tone="neutral">{c.counts.stalling}× storage</Badge>
                       )}
                       {c.counts.transport > 0 && (
                         <Badge tone="neutral">{c.counts.transport}× transport</Badge>
@@ -194,13 +194,13 @@ export default function KlantenPage() {
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
             className="px-3 py-1.5 rounded-[var(--radius-md)] border border-border bg-surface hover:border-border-strong disabled:opacity-50"
-          >Vorige</button>
+          >Previous</button>
           <span className="text-text-muted tabular-nums">{page} / {totalPages}</span>
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
             className="px-3 py-1.5 rounded-[var(--radius-md)] border border-border bg-surface hover:border-border-strong disabled:opacity-50"
-          >Volgende</button>
+          >Next</button>
         </div>
       )}
 

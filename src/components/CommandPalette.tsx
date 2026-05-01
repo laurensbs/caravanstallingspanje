@@ -125,21 +125,21 @@ export default function CommandPalette() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 onKeyDown={onResultsKey}
-                placeholder="Zoek klant, ref-code, kenteken, camping…"
+                placeholder="Search customer, ref code, registration, campsite…"
                 className="w-full h-14 pl-11 pr-12 bg-transparent text-[15px] focus:outline-none placeholder:text-text-subtle"
               />
             </div>
             <div className="max-h-[60vh] overflow-y-auto">
               {results.length === 0 && q.trim().length >= 2 && !loading && (
-                <p className="p-6 text-[13px] text-text-muted text-center">Geen resultaten voor &quot;{q}&quot;.</p>
+                <p className="p-6 text-[13px] text-text-muted text-center">No results for &quot;{q}&quot;.</p>
               )}
               {results.length === 0 && q.trim().length < 2 && (
                 <div className="p-5 space-y-2 text-[12px] text-text-muted">
-                  <p>Type minstens 2 tekens. Voorbeelden:</p>
+                  <p>Type at least 2 characters. Examples:</p>
                   <ul className="space-y-1 ml-3 list-disc list-inside">
-                    <li>Klant-naam, e-mail of telefoon</li>
-                    <li>Ref-code: KK-12, ST-7, TR-3, CT-5</li>
-                    <li>Kenteken of camping-naam</li>
+                    <li>Customer name, email or phone</li>
+                    <li>Ref code: KK-12, ST-7, TR-3, CT-5</li>
+                    <li>Registration plate or campsite name</li>
                   </ul>
                 </div>
               )}
@@ -171,9 +171,9 @@ export default function CommandPalette() {
               })}
             </div>
             <div className="flex items-center justify-between px-4 py-2 border-t border-border text-[11px] text-text-muted">
-              <span><kbd className="px-1.5 py-0.5 rounded bg-surface-2 border border-border">↑↓</kbd> navigeren</span>
-              <span><kbd className="px-1.5 py-0.5 rounded bg-surface-2 border border-border">↵</kbd> openen</span>
-              <span><kbd className="px-1.5 py-0.5 rounded bg-surface-2 border border-border">Esc</kbd> sluiten</span>
+              <span><kbd className="px-1.5 py-0.5 rounded bg-surface-2 border border-border">↑↓</kbd> navigate</span>
+              <span><kbd className="px-1.5 py-0.5 rounded bg-surface-2 border border-border">↵</kbd> open</span>
+              <span><kbd className="px-1.5 py-0.5 rounded bg-surface-2 border border-border">Esc</kbd> close</span>
             </div>
           </motion.div>
         </>

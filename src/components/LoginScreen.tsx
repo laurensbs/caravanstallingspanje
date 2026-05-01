@@ -46,7 +46,7 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
           if (match) { setSelected(match); setStep('password'); }
         }
       })
-      .catch(() => setError('Kon gebruikers niet laden'))
+      .catch(() => setError('Could not load users'))
       .finally(() => setLoadingAdmins(false));
   }, []);
 
@@ -80,20 +80,19 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        setError(data.error || 'Inloggen mislukt');
+        setError(data.error || 'Sign-in failed');
         setShake(s => s + 1);
         setPassword('');
         return;
       }
       if (data.mustChangePassword) {
-        // Keep current password in state — backend re-checks it on set-password.
         setStep('set-password');
         return;
       }
       localStorage.setItem(STORAGE_KEY, String(selected.id));
       onSuccess({ name: data.name, role: data.role });
     } catch {
-      setError('Verbindingsfout');
+      setError('Connection error');
       setShake(s => s + 1);
     } finally {
       setSubmitting(false);
@@ -105,12 +104,12 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
     if (!selected) return;
     setError('');
     if (newPassword.length < 10) {
-      setError('Minimaal 10 tekens');
+      setError('Use at least 10 characters');
       setShake(s => s + 1);
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError('Wachtwoorden komen niet overeen');
+      setError('Passwords do not match');
       setShake(s => s + 1);
       return;
     }
@@ -124,14 +123,14 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        setError(data.error || 'Wachtwoord instellen mislukt');
+        setError(data.error || 'Could not set password');
         setShake(s => s + 1);
         return;
       }
       localStorage.setItem(STORAGE_KEY, String(selected.id));
       onSuccess({ name: data.name, role: data.role });
     } catch {
-      setError('Verbindingsfout');
+      setError('Connection error');
       setShake(s => s + 1);
     } finally {
       setSubmitting(false);
@@ -139,8 +138,19 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-bg px-6 py-12">
-      <div className="w-full max-w-sm">
+    <main
+      className="min-h-screen flex items-center justify-center px-6 py-12 relative overflow-hidden"
+      style={{ background: 'linear-gradient(160deg, #142F4D 0%, #0A1929 100%)' }}
+    >
+      {/* Subtle radial glow voor diepte. */}
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'radial-gradient(80% 60% at 50% 0%, rgba(96,165,250,0.12) 0%, transparent 60%)',
+        }}
+      />
+      <div className="w-full max-w-sm relative">
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -153,10 +163,11 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
             width={220}
             height={50}
             priority
-            className="mx-auto h-9 w-auto opacity-90 mb-5"
+            className="mx-auto h-9 w-auto opacity-95 mb-5"
+            style={{ filter: 'brightness(0) invert(1)' }}
           />
-          <p className="text-[10px] font-medium tracking-[0.25em] uppercase text-text-muted">
-            Beheerportaal
+          <p className="text-[10px] font-medium tracking-[0.25em] uppercase" style={{ color: 'rgba(241,245,249,0.55)' }}>
+            Admin portal
           </p>
         </motion.div>
 
@@ -170,11 +181,11 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
               transition={{ duration: 0.25 }}
               className="space-y-2"
             >
-              <p className="text-xs text-text-muted text-center mb-4">Wie ben jij?</p>
+              <p className="text-xs text-center mb-4" style={{ color: 'rgba(241,245,249,0.6)' }}>Who are you?</p>
               {loadingAdmins ? (
-                <div className="flex justify-center py-8 text-text-muted"><Spinner size={20} /></div>
+                <div className="flex justify-center py-8" style={{ color: 'rgba(241,245,249,0.55)' }}><Spinner size={20} /></div>
               ) : admins.length === 0 ? (
-                <p className="text-center text-sm text-text-muted py-8">{error || 'Geen gebruikers gevonden'}</p>
+                <p className="text-center text-sm py-8" style={{ color: 'rgba(241,245,249,0.55)' }}>{error || 'No users found'}</p>
               ) : (
                 admins.map((a, i) => (
                   <motion.button
@@ -183,13 +194,29 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05, duration: 0.2 }}
                     onClick={() => pickUser(a)}
-                    className="w-full flex items-center gap-3 p-3 bg-surface border border-border rounded-[var(--radius-lg)] hover:border-border-strong hover:shadow-sm transition-all group"
+                    className="w-full flex items-center gap-3 p-3 rounded-[var(--radius-lg)] transition-all group"
+                    style={{
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      color: '#F1F5F9',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                    }}
                   >
-                    <div className="w-10 h-10 rounded-full bg-accent text-accent-fg flex items-center justify-center text-sm font-medium shrink-0">
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium shrink-0"
+                      style={{ background: '#3B82F6', color: '#FFFFFF' }}
+                    >
                       {initials(a.name)}
                     </div>
-                    <span className="flex-1 text-sm font-medium text-text text-left">{a.name}</span>
-                    <ArrowRight size={14} className="text-text-subtle group-hover:text-text transition-colors" />
+                    <span className="flex-1 text-sm font-medium text-left">{a.name}</span>
+                    <ArrowRight size={14} style={{ color: 'rgba(241,245,249,0.5)' }} />
                   </motion.button>
                 ))
               )}
@@ -209,7 +236,7 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
               <UserCard user={selected} onSwitch={reset} />
               <Input
                 type="password"
-                placeholder="Wachtwoord"
+                placeholder="Password"
                 value={password}
                 onChange={e => { setPassword(e.target.value); setError(''); }}
                 autoFocus
@@ -217,7 +244,7 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
                 error={error}
               />
               <Button type="submit" className="w-full" loading={submitting} disabled={!password}>
-                <Lock size={14} /> Inloggen
+                <Lock size={14} /> Sign in
               </Button>
             </motion.form>
           )}
@@ -233,12 +260,19 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
               className="space-y-4"
             >
               <UserCard user={selected} onSwitch={reset} />
-              <div className="rounded-[var(--radius-lg)] border border-border bg-surface-2 p-3 text-xs text-text-muted leading-relaxed">
-                <strong className="text-text">Eerste keer inloggen.</strong> Kies een eigen wachtwoord van minimaal 10 tekens.
+              <div
+                className="rounded-[var(--radius-lg)] p-3 text-xs leading-relaxed"
+                style={{
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  color: 'rgba(241,245,249,0.7)',
+                }}
+              >
+                <strong style={{ color: '#FFFFFF' }}>First sign-in.</strong> Choose a personal password of at least 10 characters.
               </div>
               <Input
                 type="password"
-                placeholder="Nieuw wachtwoord (min. 10 tekens)"
+                placeholder="New password (min. 10 characters)"
                 value={newPassword}
                 onChange={e => { setNewPassword(e.target.value); setError(''); }}
                 autoFocus
@@ -246,7 +280,7 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
               />
               <Input
                 type="password"
-                placeholder="Bevestig nieuw wachtwoord"
+                placeholder="Confirm new password"
                 value={confirmPassword}
                 onChange={e => { setConfirmPassword(e.target.value); setError(''); }}
                 autoComplete="new-password"
@@ -258,7 +292,7 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
                 loading={submitting}
                 disabled={!newPassword || !confirmPassword}
               >
-                <KeyRound size={14} /> Wachtwoord instellen
+                <KeyRound size={14} /> Set password
               </Button>
             </motion.form>
           )}
@@ -270,17 +304,30 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
 
 function UserCard({ user, onSwitch }: { user: AdminUser; onSwitch: () => void }) {
   return (
-    <div className="flex items-center gap-3 p-3 bg-surface border border-border rounded-[var(--radius-lg)]">
-      <div className="w-10 h-10 rounded-full bg-accent text-accent-fg flex items-center justify-center text-sm font-medium shrink-0">
+    <div
+      className="flex items-center gap-3 p-3 rounded-[var(--radius-lg)]"
+      style={{
+        background: 'rgba(255,255,255,0.05)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        color: '#F1F5F9',
+      }}
+    >
+      <div
+        className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium shrink-0"
+        style={{ background: '#3B82F6', color: '#FFFFFF' }}
+      >
         {initials(user.name)}
       </div>
-      <span className="flex-1 text-sm font-medium text-text">{user.name}</span>
+      <span className="flex-1 text-sm font-medium">{user.name}</span>
       <button
         type="button"
         onClick={onSwitch}
-        className="text-xs text-text-muted hover:text-text inline-flex items-center gap-1 transition-colors"
+        className="text-xs inline-flex items-center gap-1 transition-colors"
+        style={{ color: 'rgba(241,245,249,0.55)' }}
+        onMouseEnter={(e) => { e.currentTarget.style.color = '#FFFFFF'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(241,245,249,0.55)'; }}
       >
-        <ArrowLeft size={12} /> Wisselen
+        <ArrowLeft size={12} /> Switch
       </button>
     </div>
   );

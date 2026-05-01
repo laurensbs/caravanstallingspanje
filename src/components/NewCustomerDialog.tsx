@@ -38,7 +38,7 @@ export default function NewCustomerDialog({ open, onClose, onCreated, initialQue
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name.trim()) { toast.error('Naam is verplicht'); return; }
+    if (!form.name.trim()) { toast.error('Name is required'); return; }
     setSaving(true);
     try {
       const res = await fetch('/api/admin/customers', {
@@ -49,22 +49,22 @@ export default function NewCustomerDialog({ open, onClose, onCreated, initialQue
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error || 'Kon klant niet aanmaken');
+        toast.error(data.error || 'Could not create customer');
         return;
       }
       if (data.alreadyExisted) {
-        toast.success('Bestaande klant gekoppeld');
+        toast.success('Existing customer linked');
       } else if (data.holdedSource === 'created') {
-        toast.success('Klant aangemaakt en gepushed naar Holded');
+        toast.success('Customer created and pushed to Holded');
       } else if (data.holdedSource === 'matched-email' || data.holdedSource === 'matched-phone') {
-        toast.success('Klant aangemaakt en gekoppeld aan bestaand Holded-contact');
+        toast.success('Customer created and linked to existing Holded contact');
       } else if (data.holdedSource === 'no-key') {
-        toast.error('Klant aangemaakt — Holded API-key ontbreekt op de server.');
+        toast.error('Customer created — Holded API key missing on the server.');
       } else {
-        toast.error(`Klant aangemaakt — Holded sync mislukt: ${data.holdedSyncError || 'onbekende fout'}`);
+        toast.error(`Customer created — Holded sync failed: ${data.holdedSyncError || 'unknown error'}`);
       }
       if (!data.customer || typeof data.customer.id !== 'number') {
-        toast.error('Onverwacht serverantwoord — refresh de pagina.');
+        toast.error('Unexpected server response — please refresh the page.');
         console.error('[new-customer] missing customer in response:', data);
         return;
       }
@@ -76,23 +76,23 @@ export default function NewCustomerDialog({ open, onClose, onCreated, initialQue
   };
 
   return (
-    <Drawer open={open} onClose={onClose} title="Nieuwe klant" subtitle="We zoeken eerst in Holded en linken bestaand contact. Anders maken we een nieuwe aan." width={560}>
+    <Drawer open={open} onClose={onClose} title="New customer" subtitle="We first search in Holded and link an existing contact. Otherwise we create a new one." width={560}>
       <form onSubmit={submit} className="space-y-4">
-        <Input label="Naam" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+        <Input label="Name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <Input label="E-mail" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-          <Input label="Telefoon" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-          <Input label="Mobiel" value={form.mobile} onChange={(e) => setForm({ ...form, mobile: e.target.value })} />
-          <Input label="BTW-nummer" value={form.vat_number} onChange={(e) => setForm({ ...form, vat_number: e.target.value })} />
+          <Input label="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+          <Input label="Phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+          <Input label="Mobile" value={form.mobile} onChange={(e) => setForm({ ...form, mobile: e.target.value })} />
+          <Input label="VAT number" value={form.vat_number} onChange={(e) => setForm({ ...form, vat_number: e.target.value })} />
         </div>
-        <Input label="Adres" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+        <Input label="Address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
         <div className="grid grid-cols-3 gap-3">
-          <Input label="Postcode" value={form.postal_code} onChange={(e) => setForm({ ...form, postal_code: e.target.value })} />
-          <Input label="Plaats" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
-          <Input label="Land" value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} />
+          <Input label="Postal code" value={form.postal_code} onChange={(e) => setForm({ ...form, postal_code: e.target.value })} />
+          <Input label="City" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+          <Input label="Country" value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} />
         </div>
         <div>
-          <label className="block text-xs font-medium text-text mb-1.5">Notities</label>
+          <label className="block text-xs font-medium text-text mb-1.5">Notes</label>
           <textarea
             value={form.notes}
             onChange={(e) => setForm({ ...form, notes: e.target.value })}
@@ -101,8 +101,8 @@ export default function NewCustomerDialog({ open, onClose, onCreated, initialQue
           />
         </div>
         <div className="flex gap-2 justify-end pt-2">
-          <Button type="button" variant="ghost" onClick={onClose}>Annuleren</Button>
-          <Button type="submit" disabled={saving}>{saving ? 'Bezig…' : 'Aanmaken'}</Button>
+          <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+          <Button type="submit" disabled={saving}>{saving ? 'Saving…' : 'Create'}</Button>
         </div>
       </form>
     </Drawer>

@@ -38,23 +38,40 @@ export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
     const validated = validateBody(settingsUpdateSchema, body);
-    if (!validated.success) return NextResponse.json({ error: validated.error }, { status: 400 });
+    if (!validated.success) {
+      return NextResponse.json({ error: `Validation: ${validated.error}` }, { status: 400 });
+    }
     const admin = getAdminInfo(req);
+
+    // Zorg dat de tabel bestaat — op een verse DB die niet via /api/setup is
+    // geïnitialiseerd zou setSetting anders crashen op 'relation does not exist'.
+    const { sql } = await import('@/lib/db');
+    await sql`CREATE TABLE IF NOT EXISTS app_settings (
+      key TEXT PRIMARY KEY,
+      value JSONB NOT NULL,
+      updated_at TIMESTAMP DEFAULT NOW()
+    )`;
 
     const updates = Object.entries(validated.data).filter(([, v]) => v !== undefined);
     for (const [key, value] of updates) {
-      await setSetting(key, value);
+      try {
+        await setSetting(key, value);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'unknown';
+        return NextResponse.json({ error: `Could not save ${key}: ${msg}` }, { status: 500 });
+      }
     }
     await logActivity({
       actor: admin.name, role: admin.role,
-      action: 'Prijsinstellingen bijgewerkt',
+      action: 'Settings updated',
       entityType: 'settings',
       details: updates.map(([k, v]) => `${k}=${v}`).join(', '),
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Settings PATCH error:', error);
-    return NextResponse.json({ error: 'Opslaan mislukt' }, { status: 500 });
+    const msg = error instanceof Error ? error.message : 'unknown';
+    console.error('Settings PATCH error:', msg);
+    return NextResponse.json({ error: `Save failed: ${msg}` }, { status: 500 });
   }
 }

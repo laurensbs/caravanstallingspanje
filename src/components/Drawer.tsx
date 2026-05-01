@@ -53,7 +53,7 @@ export default function Drawer({ open, onClose, title, subtitle, children, width
               </div>
               <button
                 onClick={onClose}
-                aria-label="Sluiten"
+                aria-label="Close"
                 className="shrink-0 w-8 h-8 inline-flex items-center justify-center rounded-[var(--radius-md)] text-text-muted hover:bg-surface-2 hover:text-text transition-colors"
               >
                 <X size={16} />

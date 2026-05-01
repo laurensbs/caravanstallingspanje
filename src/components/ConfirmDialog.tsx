@@ -16,7 +16,7 @@ interface ConfirmDialogProps {
 }
 
 export default function ConfirmDialog({
-  open, title, description, confirmLabel = 'Bevestigen', cancelLabel = 'Annuleren',
+  open, title, description, confirmLabel = 'Confirm', cancelLabel = 'Cancel',
   destructive, onConfirm, onCancel, loading,
 }: ConfirmDialogProps) {
   return (

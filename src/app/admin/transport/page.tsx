@@ -69,11 +69,11 @@ type CustomerOverview = {
 };
 
 const STATUS_OPTIONS = [
-  { value: 'controleren', label: 'Controleren', tone: 'warning' as const },
-  { value: 'betaald', label: 'Betaald', tone: 'success' as const },
-  { value: 'gepland', label: 'Gepland', tone: 'accent' as const },
-  { value: 'uitgevoerd', label: 'Uitgevoerd', tone: 'success' as const },
-  { value: 'afgewezen', label: 'Afgewezen', tone: 'danger' as const },
+  { value: 'controleren', label: 'Review',    tone: 'warning' as const },
+  { value: 'betaald',     label: 'Paid',      tone: 'success' as const },
+  { value: 'gepland',     label: 'Scheduled', tone: 'accent'  as const },
+  { value: 'uitgevoerd',  label: 'Completed', tone: 'success' as const },
+  { value: 'afgewezen',   label: 'Rejected',  tone: 'danger'  as const },
 ];
 
 function fmtDate(s: string | null | undefined, opts?: Intl.DateTimeFormatOptions): string {
@@ -123,7 +123,7 @@ export default function TransportPage() {
       body: JSON.stringify({ id, ...body }),
       credentials: 'include',
     });
-    if (!res.ok) { toast.error('Kon actie niet uitvoeren'); return; }
+    if (!res.ok) { toast.error('Could not perform action'); return; }
     toast.success(msg);
     load();
   };
@@ -175,10 +175,10 @@ export default function TransportPage() {
       }
       const data = await res.json();
       if (!res.ok || data.error) {
-        toast.error(data.error || 'Opslaan mislukt');
+        toast.error(data.error || 'Save failed');
         return;
       }
-      toast.success(editingId ? 'Transport bijgewerkt' : 'Transport toegevoegd');
+      toast.success(editingId ? 'Transport updated' : 'Transport added');
       setForm(emptyForm);
       setEditingId(null);
       setDrawerOpen(false);
@@ -203,17 +203,17 @@ export default function TransportPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Operatie"
+        eyebrow="Operations"
         title="Transport"
-        description="Aanvragen voor ophalen of brengen van caravans."
+        description="Requests for caravan pickup or delivery."
         actions={
           <div className="flex gap-2 items-center">
             <Select value={filter} onChange={(e) => setFilter(e.target.value)} className="min-w-[160px]">
-              <option value="">Alle statussen</option>
+              <option value="">All statuses</option>
               {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
             </Select>
             <Button onClick={openCreate}>
-              <Plus size={14} /> Transport toevoegen
+              <Plus size={14} /> Add transport
             </Button>
           </div>
         }
@@ -229,7 +229,7 @@ export default function TransportPage() {
             <Truck size={18} className="text-text-subtle" />
           </div>
           <p className="text-sm text-text">
-            {filter ? `Geen transport-aanvragen met status "${filter}"` : 'Nog geen transport-aanvragen'}
+            {filter ? `No transport requests with status "${filter}"` : 'No transport requests yet'}
           </p>
         </div>
       ) : (
@@ -255,17 +255,17 @@ export default function TransportPage() {
                           {STATUS_OPTIONS.find((s) => s.value === e.status)?.label || e.status}
                         </Badge>
                         {e.created_via === 'admin' && (
-                          <Badge tone="neutral">Handmatig</Badge>
+                          <Badge tone="neutral">Manual</Badge>
                         )}
                         {e.transport_mode === 'wij_rijden' && (
-                          <Badge tone="accent">Wij rijden</Badge>
+                          <Badge tone="accent">We drive</Badge>
                         )}
                         {e.transport_mode === 'zelf' && (
-                          <Badge tone="accent">Zelf</Badge>
+                          <Badge tone="accent">Self</Badge>
                         )}
                       </div>
                       <p className="text-[11px] text-text-muted mt-1">
-                        Aangemeld op {fmtDate(e.created_at)}
+                        Submitted on {fmtDate(e.created_at)}
                       </p>
                     </div>
 
@@ -273,32 +273,32 @@ export default function TransportPage() {
                       {e.status === 'controleren' && (
                         <>
                           <Button size="sm" variant="secondary"
-                            onClick={() => action(e.id, { action: 'set-status', status: 'gepland' }, 'Ingepland')}>
-                            <CheckCircle2 size={12} /> Inplannen
+                            onClick={() => action(e.id, { action: 'set-status', status: 'gepland' }, 'Scheduled')}>
+                            <CheckCircle2 size={12} /> Schedule
                           </Button>
                           <Button size="sm" variant="ghost"
-                            onClick={() => action(e.id, { action: 'set-status', status: 'afgewezen' }, 'Afgewezen')}>
-                            <Ban size={12} /> Afwijzen
+                            onClick={() => action(e.id, { action: 'set-status', status: 'afgewezen' }, 'Rejected')}>
+                            <Ban size={12} /> Reject
                           </Button>
                         </>
                       )}
                       {e.status === 'gepland' && (
                         <Button size="sm" variant="secondary"
-                          onClick={() => action(e.id, { action: 'set-status', status: 'uitgevoerd' }, 'Voltooid')}>
-                          <CheckCircle2 size={12} /> Voltooid
+                          onClick={() => action(e.id, { action: 'set-status', status: 'uitgevoerd' }, 'Completed')}>
+                          <CheckCircle2 size={12} /> Complete
                         </Button>
                       )}
                       <button
                         onClick={() => openEdit(e)}
                         className="w-8 h-8 inline-flex items-center justify-center rounded-[var(--radius-md)] text-text-muted hover:text-text hover:bg-surface-2 transition-colors"
-                        aria-label="Bewerken"
+                        aria-label="Edit"
                       >
                         <Pencil size={13} />
                       </button>
                       <button
-                        onClick={() => action(e.id, { action: 'delete' }, 'Verwijderd')}
+                        onClick={() => action(e.id, { action: 'delete' }, 'Deleted')}
                         className="w-8 h-8 inline-flex items-center justify-center rounded-[var(--radius-md)] text-text-muted hover:text-danger hover:bg-danger-soft transition-colors"
-                        aria-label="Verwijderen"
+                        aria-label="Delete"
                       >
                         <Trash2 size={13} />
                       </button>
@@ -310,7 +310,7 @@ export default function TransportPage() {
                       <span className="flex items-center gap-2 text-text">
                         <MapPin size={12} className="text-text-subtle shrink-0" />
                         <span className="truncate">
-                          <strong>Klant haalt zelf op uit Stalling</strong>
+                          <strong>Customer picks up from storage themselves</strong>
                           {e.camping ? ` → ${e.camping}` : ''}
                         </span>
                       </span>
@@ -318,16 +318,16 @@ export default function TransportPage() {
                       <span className="flex items-center gap-2 text-text">
                         <MapPin size={12} className="text-text-subtle shrink-0" />
                         <span className="truncate">
-                          <strong>Wij halen op:</strong> {e.pickup_location || e.camping || e.from_location}
+                          <strong>We pick up:</strong> {e.pickup_location || e.camping || e.from_location}
                           <ArrowRight size={11} className="inline mx-1 text-text-subtle" />
-                          Stalling
+                          Storage
                         </span>
                       </span>
                     )}
                     <span className="flex items-center gap-1.5 text-text">
                       <Calendar size={12} className="text-text-subtle shrink-0" />
-                      {e.transport_mode === 'zelf' ? 'Komt langs:' : 'Wij rijden:'} {fmtDate(e.preferred_date)}{e.outbound_time ? ` ${e.outbound_time}` : ''}
-                      {e.return_date ? ` · Terug: ${fmtDate(e.return_date)}${e.return_time ? ` ${e.return_time}` : ''}` : ''}
+                      {e.transport_mode === 'zelf' ? 'Visiting:' : 'We drive:'} {fmtDate(e.preferred_date)}{e.outbound_time ? ` ${e.outbound_time}` : ''}
+                      {e.return_date ? ` · Return: ${fmtDate(e.return_date)}${e.return_time ? ` ${e.return_time}` : ''}` : ''}
                     </span>
                     <a href={`mailto:${e.email}`} className="flex items-center gap-1.5 text-text hover:text-text">
                       <Mail size={12} className="text-text-subtle shrink-0" />
@@ -358,7 +358,7 @@ export default function TransportPage() {
                     className="mt-4 inline-flex items-center gap-1.5 text-[12px] text-text-muted hover:text-text transition-colors"
                   >
                     <ChevronDown size={13} className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                    Klant 360°{overview ? ` (${overview.fridges.reduce((a, f) => a + f.bookings.length, 0)} koelkast/airco · ${overview.stalling.length} stalling · ${overview.otherTransports.length - 1 >= 0 ? overview.otherTransports.length - 1 : 0} andere transporten)` : ''}
+                    Customer 360°{overview ? ` (${overview.fridges.reduce((a, f) => a + f.bookings.length, 0)} fridge/AC · ${overview.stalling.length} storage · ${overview.otherTransports.length - 1 >= 0 ? overview.otherTransports.length - 1 : 0} other transports)` : ''}
                   </button>
 
                   <AnimatePresence>
@@ -381,43 +381,43 @@ export default function TransportPage() {
         </ul>
       )}
 
-      <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} title={editingId ? 'Transport bewerken' : 'Nieuw transport'} width={580}>
+      <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} title={editingId ? 'Edit transport' : 'New transport'} width={580}>
         <form onSubmit={submitNew} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <Input label="Naam" required value={form.name}
+            <Input label="Name" required value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })} />
-            <Input label="E-mail" type="email" required value={form.email}
+            <Input label="Email" type="email" required value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })} />
-            <Input label="Telefoon" value={form.phone}
+            <Input label="Phone" value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })} />
             <div>
-              <label className="block text-xs font-medium text-text mb-1.5">Camping <span className="text-text-subtle">*</span></label>
+              <label className="block text-xs font-medium text-text mb-1.5">Campsite <span className="text-text-subtle">*</span></label>
               <CampingPicker value={form.camping} onChange={(v) => setForm({ ...form, camping: v })}
-                placeholder="Bijv. Eurocamping" required ariaLabel="Camping" />
+                placeholder="e.g. Eurocamping" required ariaLabel="Campsite" />
             </div>
-            <Input label="Heen-datum" type="date" required value={form.outbound_date}
+            <Input label="Outbound date" type="date" required value={form.outbound_date}
               onChange={(e) => setForm({ ...form, outbound_date: e.target.value })} />
-            <Input label="Heen-tijd" type="time" value={form.outbound_time}
+            <Input label="Outbound time" type="time" value={form.outbound_time}
               onChange={(e) => setForm({ ...form, outbound_time: e.target.value })} />
-            <Input label="Terug-datum" type="date" required value={form.return_date}
+            <Input label="Return date" type="date" required value={form.return_date}
               onChange={(e) => setForm({ ...form, return_date: e.target.value })} />
-            <Input label="Terug-tijd" type="time" value={form.return_time}
+            <Input label="Return time" type="time" value={form.return_time}
               onChange={(e) => setForm({ ...form, return_time: e.target.value })} />
-            <Input label="Kenteken" value={form.registration}
+            <Input label="Registration" value={form.registration}
               onChange={(e) => setForm({ ...form, registration: e.target.value })} />
-            <Input label="Merk" value={form.brand}
+            <Input label="Brand" value={form.brand}
               onChange={(e) => setForm({ ...form, brand: e.target.value })} />
             <Input label="Model" value={form.model}
               onChange={(e) => setForm({ ...form, model: e.target.value })} />
           </div>
           <div>
-            <label className="block text-xs font-medium text-text mb-1.5">Notities</label>
+            <label className="block text-xs font-medium text-text mb-1.5">Notes</label>
             <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3}
               className="w-full px-3 py-2 text-sm bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors" />
           </div>
           <div className="flex gap-2 justify-end pt-2">
-            <Button type="button" variant="ghost" onClick={() => setDrawerOpen(false)}>Annuleren</Button>
-            <Button type="submit" disabled={saving}>{saving ? 'Bezig…' : 'Opslaan'}</Button>
+            <Button type="button" variant="ghost" onClick={() => setDrawerOpen(false)}>Cancel</Button>
+            <Button type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save'}</Button>
           </div>
         </form>
       </Drawer>
@@ -431,14 +431,14 @@ function CustomerOverviewView({ overview, currentTransportId }: { overview?: Cus
   }
   const totalBookings = overview.fridges.reduce((acc, f) => acc + f.bookings.length, 0);
   if (overview.fridges.length === 0 && overview.stalling.length === 0 && overview.otherTransports.length <= 1) {
-    return <p className="text-[12px] text-text-muted">Geen andere diensten gekoppeld aan dit e-mailadres.</p>;
+    return <p className="text-[12px] text-text-muted">No other services linked to this email address.</p>;
   }
   return (
     <div className="space-y-4">
       {totalBookings > 0 && (
         <div>
           <h4 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted mb-2 flex items-center gap-1.5">
-            <Refrigerator size={12} /> Koelkast / Airco
+            <Refrigerator size={12} /> Fridge / AC
           </h4>
           <div className="space-y-1.5">
             {overview.fridges.flatMap((f) =>
@@ -459,7 +459,7 @@ function CustomerOverviewView({ overview, currentTransportId }: { overview?: Cus
       {overview.stalling.length > 0 && (
         <div>
           <h4 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted mb-2 flex items-center gap-1.5">
-            <Warehouse size={12} /> Stalling
+            <Warehouse size={12} /> Storage
           </h4>
           <div className="space-y-1.5">
             {overview.stalling.map((s) => (
@@ -467,7 +467,7 @@ function CustomerOverviewView({ overview, currentTransportId }: { overview?: Cus
                 <span className="font-medium capitalize">{s.type}</span>
                 <span className="text-text-muted">·</span>
                 <span className="text-text-muted truncate flex-1">
-                  Start {fmtDate(s.start_date)}{s.registration ? ` · ${s.registration}` : ''}
+                  From {fmtDate(s.start_date)}{s.registration ? ` · ${s.registration}` : ''}
                 </span>
                 <Badge tone={s.status === 'akkoord' || s.status === 'betaald' ? 'success' : 'warning'}>{s.status}</Badge>
               </div>
@@ -478,7 +478,7 @@ function CustomerOverviewView({ overview, currentTransportId }: { overview?: Cus
       {overview.otherTransports.filter((t) => t.id !== currentTransportId).length > 0 && (
         <div>
           <h4 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted mb-2 flex items-center gap-1.5">
-            <Truck size={12} /> Andere transporten
+            <Truck size={12} /> Other transports
           </h4>
           <div className="space-y-1.5">
             {overview.otherTransports

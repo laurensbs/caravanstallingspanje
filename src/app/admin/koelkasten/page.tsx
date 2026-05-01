@@ -618,16 +618,18 @@ function KoelkastenContent() {
                         ) : (
                           <div className="space-y-1.5">
                             {previewBookings.map(b => {
-                              const paid = b.status === 'compleet' || b.holded_invoice_status === 'paid';
-                              const linkSent = !!b.payment_link_sent_at && !paid;
+                              // 'compleet' = onze werk-status (intake klaar), NIET hetzelfde
+                              // als betaald. Alleen Holded's invoice-status mag tot 'Paid' leiden.
                               const live = holdedStatuses[b.id];
+                              const holdedPaid = live?.status === 'paid' || b.holded_invoice_status === 'paid';
+                              const linkSent = !!b.payment_link_sent_at && !holdedPaid;
                               const holdedUrl = live?.publicUrl || b.holded_invoice_url || null;
                               const period = fmtPeriod(b);
                               return (
                                 <div key={b.id} className="flex items-center gap-2 flex-wrap">
                                   <span
                                     className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] border ${
-                                      paid
+                                      holdedPaid
                                         ? 'bg-success-soft text-success border-success/30'
                                         : linkSent
                                           ? 'bg-accent-soft text-accent border-accent/30'
@@ -637,33 +639,29 @@ function KoelkastenContent() {
                                     }`}
                                     title={`${period} · ${b.status}${b.holded_invoice_number ? ` · ${b.holded_invoice_number}` : ''}`}
                                   >
-                                    {paid && <CheckCircle2 size={9} />}
-                                    {linkSent && <Send size={9} />}
-                                    {!paid && !linkSent && b.status === 'controleren' && <AlertCircle size={9} />}
+                                    {holdedPaid && <CheckCircle2 size={9} />}
+                                    {!holdedPaid && linkSent && <Send size={9} />}
+                                    {!holdedPaid && !linkSent && b.status === 'controleren' && <AlertCircle size={9} />}
                                     <span className="tabular-nums">{period}</span>
                                     {b.camping && <span className="opacity-70">· {b.camping}</span>}
                                   </span>
-                                  {/* Action-knoppen per periode, direct in het overzicht. */}
-                                  {!b.payment_link_sent_at && !paid && (
-                                    <button
-                                      type="button"
-                                      onClick={() => openPayLink(b, f)}
-                                      className="inline-flex items-center gap-1 text-[11px] font-medium text-text hover:text-accent transition-colors px-1.5 py-0.5 rounded border border-border bg-surface hover:border-accent"
-                                      title="Stuur betaallink"
-                                    >
-                                      <Send size={10} /> Stuur betaallink
-                                    </button>
-                                  )}
-                                  {b.payment_link_sent_at && !paid && (
-                                    <button
-                                      type="button"
-                                      onClick={() => openPayLink(b, f)}
-                                      className="inline-flex items-center gap-1 text-[11px] font-medium text-text-muted hover:text-text transition-colors px-1.5 py-0.5 rounded border border-border bg-surface"
-                                      title="Opnieuw versturen"
-                                    >
-                                      <RefreshCw size={10} /> Opnieuw versturen
-                                    </button>
-                                  )}
+                                  {/* Stuur-betaallink-knop is altijd zichtbaar — ook bij betaalde
+                                      periodes voor vervolg-/extra-betalingen. Label past zich aan op de status. */}
+                                  <button
+                                    type="button"
+                                    onClick={() => openPayLink(b, f)}
+                                    className={`inline-flex items-center gap-1 text-[11px] font-medium px-1.5 py-0.5 rounded border transition-colors ${
+                                      holdedPaid
+                                        ? 'text-text-muted border-border bg-surface hover:text-text hover:border-text-muted'
+                                        : b.payment_link_sent_at
+                                          ? 'text-text-muted border-border bg-surface hover:text-text'
+                                          : 'text-text border-border bg-surface hover:text-accent hover:border-accent'
+                                    }`}
+                                    title={holdedPaid ? 'Send another payment link' : b.payment_link_sent_at ? 'Resend payment link' : 'Send payment link'}
+                                  >
+                                    {b.payment_link_sent_at ? <RefreshCw size={10} /> : <Send size={10} />}
+                                    {holdedPaid ? 'New link' : b.payment_link_sent_at ? 'Resend link' : 'Send payment link'}
+                                  </button>
                                   {holdedUrl && (
                                     <a
                                       href={holdedUrl}
@@ -842,15 +840,11 @@ function KoelkastenContent() {
                 <ul className="space-y-2">
                   {(drawerFridge.bookings || []).map(b => {
                     const holded = holdedStatuses[b.id];
-                    const paid = holded?.status === 'paid' || b.status === 'compleet';
+                    // 'paid' is enkel waar als Holded zegt dat de pro forma is voldaan.
+                    // Onze interne 'compleet' status betekent intake-klaar, niet betaald.
+                    const holdedPaid = holded?.status === 'paid' || b.holded_invoice_status === 'paid';
                     const partial = holded?.status === 'partial';
-                    // Bron-bepalend: 'compleet' status zonder verstuurde betaallink ⇒
-                    // klant heeft via de website betaald. Met betaallink ⇒ admin
-                    // heeft handmatig verstuurd. We tonen dat zodat je niet hoeft
-                    // te raden of de klant zelf via /koelkast heeft geboekt.
-                    const paidViaWebsite = b.status === 'compleet' && !b.payment_link_sent_at;
-                    const paidViaLink = b.status === 'compleet' && b.payment_link_sent_at;
-                    const linkSentNotPaid = !!b.payment_link_sent_at && b.status !== 'compleet';
+                    const linkSent = !!b.payment_link_sent_at;
                     // Holded URL kan komen uit live-status (publicUrl) of uit
                     // de gecachte holded_invoice_url kolom — beide tonen we als
                     // klikbare link.
@@ -860,21 +854,19 @@ function KoelkastenContent() {
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0 space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <Badge tone={b.status === 'compleet' ? 'success' : 'warning'}>
+                            <Badge tone={b.status === 'compleet' ? 'accent' : 'warning'}>
                               {b.status === 'compleet' ? <CheckCircle2 size={10} /> : <AlertCircle size={10} />}
-                              {b.status}
+                              {b.status === 'compleet' ? 'Intake complete' : 'Review'}
                             </Badge>
                             {b.holded_invoice_number && (
                               <Badge tone="accent"><Receipt size={10} /> {b.holded_invoice_number}</Badge>
                             )}
-                            {paidViaWebsite && <Badge tone="success">Betaald via website</Badge>}
-                            {paidViaLink && <Badge tone="success">Betaald via link</Badge>}
-                            {paid && !paidViaWebsite && !paidViaLink && <Badge tone="success">Betaald</Badge>}
-                            {partial && <Badge tone="warning">Deels betaald</Badge>}
-                            {linkSentNotPaid && (
-                              <Badge tone="accent">Link verstuurd · wacht op betaling</Badge>
+                            {holdedPaid && <Badge tone="success">Paid</Badge>}
+                            {partial && <Badge tone="warning">Partially paid</Badge>}
+                            {linkSent && !holdedPaid && (
+                              <Badge tone="accent">Link sent · awaiting payment</Badge>
                             )}
-                            {b.holded_invoice_number && !paid && !partial && !linkSentNotPaid && holded?.status === 'unpaid' && (
+                            {b.holded_invoice_number && !holdedPaid && !partial && !linkSent && holded?.status === 'unpaid' && (
                               <Badge tone="warning">Open</Badge>
                             )}
                           </div>
@@ -885,7 +877,7 @@ function KoelkastenContent() {
                           </div>
                           {b.payment_link_sent_at && (
                             <p className="text-[11px] text-text-muted">
-                              Betaallink verzonden naar {b.payment_link_email || '—'} op {new Date(b.payment_link_sent_at).toLocaleString('nl-NL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                              Payment link sent to {b.payment_link_email || '—'} on {new Date(b.payment_link_sent_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                               {b.payment_link_amount_cents != null && ` · €${(b.payment_link_amount_cents / 100).toFixed(2)}`}
                             </p>
                           )}
@@ -895,14 +887,14 @@ function KoelkastenContent() {
                           <button
                             onClick={() => openEditBooking(b)}
                             className="w-7 h-7 inline-flex items-center justify-center rounded-[var(--radius-sm)] text-text-muted hover:text-text hover:bg-surface-2 transition-colors"
-                            aria-label="Bewerken"
+                            aria-label="Edit"
                           >
                             <Pencil size={12} />
                           </button>
                           <button
                             onClick={() => setConfirmDelete({ type: 'booking', id: b.id })}
                             className="w-7 h-7 inline-flex items-center justify-center rounded-[var(--radius-sm)] text-text-muted hover:text-danger hover:bg-danger-soft transition-colors"
-                            aria-label="Verwijderen"
+                            aria-label="Delete"
                           >
                             <Trash2 size={12} />
                           </button>
@@ -911,18 +903,17 @@ function KoelkastenContent() {
                       <div className="pt-2 border-t border-border flex flex-wrap gap-2">
                         {!b.holded_invoice_number && (
                           <Button size="sm" variant="secondary" onClick={() => openInvoice(b)}>
-                            <Receipt size={12} /> Pro forma handmatig
+                            <Receipt size={12} /> Manual pro forma
                           </Button>
                         )}
-                        {!b.payment_link_sent_at ? (
-                          <Button size="sm" onClick={() => openPayLink(b)}>
-                            <Send size={12} /> Stuur betaallink
-                          </Button>
-                        ) : !paid && (
-                          <Button size="sm" variant="secondary" onClick={() => openPayLink(b)}>
-                            <RefreshCw size={12} /> Opnieuw versturen
-                          </Button>
-                        )}
+                        <Button
+                          size="sm"
+                          variant={b.payment_link_sent_at ? 'secondary' : 'primary'}
+                          onClick={() => openPayLink(b)}
+                        >
+                          {b.payment_link_sent_at ? <RefreshCw size={12} /> : <Send size={12} />}
+                          {holdedPaid ? 'New payment link' : b.payment_link_sent_at ? 'Resend payment link' : 'Send payment link'}
+                        </Button>
                         {b.payment_link_url && (
                           <a
                             href={b.payment_link_url}
