@@ -73,7 +73,9 @@ export default function KlantenPage() {
     let totalSkipped = 0;
     let totalErrors = 0;
     let page = 1;
-    const pageSize = 100;
+    // Houdt 'm laag — Vercel hobby/pro kan timeout-en op grote batches.
+    // 25 per page = doorgaans <5s, dus we kunnen rustig 50+ pages doen.
+    const pageSize = 25;
     try {
       // Pagineer tot hasMore=false. Per page max 100 contacten zodat we
       // ruim onder de 60s Vercel timeout blijven, ook met snapshot-write
@@ -99,7 +101,7 @@ export default function KlantenPage() {
         page = j.nextPage || page + 1;
         // Veiligheid: stop na 50 pages (5000 contacten) om infinite loops
         // te voorkomen mocht Holded de count niet decrementeren.
-        if (page > 50) break;
+        if (page > 200) break;
       }
       toast.success(`Done — ${totalImported} new, ${totalUpdated} updated, ${totalSkipped} skipped${totalErrors ? `, ${totalErrors} errors` : ''}`);
       load();

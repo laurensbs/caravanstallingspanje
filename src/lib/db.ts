@@ -596,6 +596,85 @@ export async function setTransportSalesInvoice(id: number, converted: boolean, a
   }
 }
 
+// Bulk-snapshot in 1 multi-value UPDATE via VALUES-tabel — veel sneller
+// dan 1 query per klant.
+export async function bulkUpdateCustomerHoldedSnapshots(
+  rows: Array<{ id: number; raw: Record<string, unknown> }>,
+): Promise<void> {
+  if (rows.length === 0) return;
+  await ensureMiscSchema();
+  // Per rij parallel uitvoeren — Neon kan parallelle queries aan en het
+  // is veel sneller dan sequentieel awaiten.
+  await Promise.all(rows.map(({ id, raw }) => setCustomerHoldedSnapshot(id, raw).catch(() => {})));
+}
+
+// Bulk upsert voor de Holded-import — 1 round-trip ipv 3-4 per klant.
+// Match op holded_contact_id (uniek), anders email; UPDATE bestaat al,
+// INSERT als nieuw. Returnt de id zodat we daarna in 1 batch de snapshot
+// kunnen schrijven.
+export async function bulkUpsertCustomersFromHolded(
+  rows: Array<{
+    holded_id: string;
+    name: string;
+    email: string | null;
+    phone: string | null;
+    mobile: string | null;
+    address: string | null;
+    city: string | null;
+    postal_code: string | null;
+    country: string | null;
+    vat_number: string | null;
+  }>,
+): Promise<Array<{ id: number; holded_id: string; was_new: boolean }>> {
+  if (rows.length === 0) return [];
+  await ensureCustomerSchema();
+  const out: Array<{ id: number; holded_id: string; was_new: boolean }> = [];
+  // Postgres ON CONFLICT vereist een unique-constraint. We hebben:
+  //  - idx_customers_holded_id (unique partial)
+  //  - idx_customers_email_lower_alive (unique partial)
+  // De partial indices breken ON CONFLICT inferentie, dus we doen 't per
+  // rij in 1 enkele Query (CTE). Nog steeds veel sneller dan 4 round-trips.
+  for (const r of rows) {
+    const result = await sql`
+      WITH existing AS (
+        SELECT id FROM customers
+        WHERE deleted_at IS NULL
+          AND (holded_contact_id = ${r.holded_id}
+               OR (${r.email}::text IS NOT NULL AND LOWER(email) = LOWER(${r.email})))
+        LIMIT 1
+      ),
+      upserted AS (
+        UPDATE customers SET
+          name = ${r.name},
+          email = COALESCE(${r.email}, email),
+          phone = COALESCE(${r.phone}, phone),
+          mobile = COALESCE(${r.mobile}, mobile),
+          address = COALESCE(${r.address}, address),
+          city = COALESCE(${r.city}, city),
+          postal_code = COALESCE(${r.postal_code}, postal_code),
+          country = COALESCE(${r.country}, country),
+          vat_number = COALESCE(${r.vat_number}, vat_number),
+          holded_contact_id = ${r.holded_id},
+          updated_at = NOW()
+        WHERE id = (SELECT id FROM existing)
+        RETURNING id, false AS was_new
+      ),
+      inserted AS (
+        INSERT INTO customers (name, email, phone, mobile, address, city, postal_code, country, vat_number, holded_contact_id, source)
+        SELECT ${r.name}, ${r.email}, ${r.phone}, ${r.mobile}, ${r.address}, ${r.city}, ${r.postal_code}, COALESCE(${r.country}, 'ES'), ${r.vat_number}, ${r.holded_id}, 'holded_import'
+        WHERE NOT EXISTS (SELECT 1 FROM existing)
+        RETURNING id, true AS was_new
+      )
+      SELECT id, was_new FROM upserted
+      UNION ALL
+      SELECT id, was_new FROM inserted
+      LIMIT 1`;
+    const row = (result as Array<{ id: number; was_new: boolean }>)[0];
+    if (row) out.push({ id: row.id, holded_id: r.holded_id, was_new: row.was_new });
+  }
+  return out;
+}
+
 // Voor het dashboard: hoeveel betaalde pro-forma's wachten nog op handmatige
 // sales-invoice-conversie? Telt alle drie de bronnen.
 export async function getNeedsSalesInvoiceCount() {
