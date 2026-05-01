@@ -453,9 +453,27 @@ function KoelkastenContent() {
         title="Koelkasten"
         description={`${fridges.length} klanten in beheer.`}
         actions={
-          <Button onClick={openCreate}>
-            <Plus size={14} /> Nieuwe klant
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={async () => {
+              try {
+                const res = await fetch('/api/admin/customers/auto-link', { method: 'POST', credentials: 'include' });
+                const d = await res.json();
+                if (!res.ok) {
+                  toast.error(d.error || 'Auto-koppelen mislukt');
+                  return;
+                }
+                toast.success(`Gekoppeld: ${d.fridges} koelkasten · ${d.stalling} stalling · ${d.transport} transport (overgeslagen: ${d.skipped})`);
+                load();
+              } catch {
+                toast.error('Auto-koppelen mislukt');
+              }
+            }}>
+              <LinkIcon size={14} /> Auto-koppel klanten
+            </Button>
+            <Button onClick={openCreate}>
+              <Plus size={14} /> Nieuwe klant
+            </Button>
+          </div>
         }
       />
 
