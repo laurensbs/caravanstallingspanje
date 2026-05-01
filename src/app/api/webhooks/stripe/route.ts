@@ -261,7 +261,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
           <p style="font-family:sans-serif;font-size:13px;color:#6B7280;margin-top:18px">De aanvraag staat klaar in het reparatiepaneel onder code <strong>${result.publicCode}</strong>.</p>
         `;
         await sendMail({
-          to: 'info@caravanstalling-spanje.com',
+          to: 'laurens@caravanstalling-spanje.com',
           subject: `🔧 Nieuwe service-bestelling: ${payload.title || 'service'} (${result.publicCode})`,
           html: notifyHtml,
           text: `Nieuwe service-bestelling van ${customerName} — ${payload.title}. Werkbon-code: ${result.publicCode}.`,

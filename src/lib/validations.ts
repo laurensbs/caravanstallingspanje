@@ -118,6 +118,15 @@ export const transportOrderSchema = z.object({
   path: ['returnDate'],
 });
 
+// Publieke ideeënbus — anoniem mag, e-mail mag, naam mag.
+export const ideaSchema = z.object({
+  name: z.string().max(200).optional().or(z.literal('')),
+  email: z.string().email('Vul een geldig e-mailadres in').optional().or(z.literal('')),
+  category: z.string().max(80).optional().or(z.literal('')),
+  title: z.string().min(3, 'Een korte samenvatting graag').max(200),
+  message: z.string().min(10, 'Vertel iets meer (10+ tekens)').max(5000),
+});
+
 // Publiek contact-formulier — landen in admin-inbox + mail naar info@.
 export const contactMessageSchema = z.object({
   name: z.string().min(2, 'Vul je naam in').max(200),

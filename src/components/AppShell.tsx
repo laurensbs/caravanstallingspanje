@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Refrigerator, Bell, Truck, LogOut, ChevronLeft,
-  Settings, Users, Warehouse, MessageSquare, Search, PlayCircle,
+  Settings, Users, Warehouse, MessageSquare, Search, PlayCircle, Lightbulb,
 } from 'lucide-react';
 import { ReactNode } from 'react';
 import CommandPalette from './CommandPalette';
@@ -26,6 +26,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: '/admin/stalling', label: 'Stalling', icon: Warehouse },
       { href: '/admin/transport', label: 'Transport', icon: Truck },
       { href: '/admin/contact', label: 'Berichten', icon: MessageSquare },
+      { href: '/admin/ideeen', label: 'Ideeënbus', icon: Lightbulb },
       { href: '/admin/wachtlijst', label: 'Wachtlijst', icon: Bell },
     ],
   },

@@ -878,6 +878,19 @@ async function ensureMiscSchema(): Promise<void> {
     )`;
     await sql`CREATE INDEX IF NOT EXISTS idx_contact_messages_status ON contact_messages(status)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_contact_messages_created ON contact_messages(created_at DESC)`;
+    await sql`CREATE TABLE IF NOT EXISTS ideas (
+      id SERIAL PRIMARY KEY,
+      name TEXT,
+      email TEXT,
+      category TEXT,
+      title TEXT NOT NULL,
+      message TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'new',
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_ideas_status ON ideas(status)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_ideas_created ON ideas(created_at DESC)`;
   })().catch((err) => {
     console.error('[misc migrations] failed:', err);
     _miscMigrationsApplied = null;
@@ -1333,6 +1346,53 @@ export async function markContactMessageOpen(id: number) {
 export async function deleteContactMessage(id: number) {
   await ensureMiscSchema();
   await sql`DELETE FROM contact_messages WHERE id = ${id}`;
+}
+
+// ─── Ideas (publieke ideeënbus) ──────────────────────────
+export type IdeaRow = {
+  id: number;
+  name: string | null;
+  email: string | null;
+  category: string | null;
+  title: string;
+  message: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export async function createIdea(data: {
+  name?: string | null;
+  email?: string | null;
+  category?: string | null;
+  title: string;
+  message: string;
+}): Promise<IdeaRow> {
+  await ensureMiscSchema();
+  const rows = await sql`INSERT INTO ideas
+    (name, email, category, title, message)
+    VALUES (${data.name || null}, ${data.email || null},
+      ${data.category || null}, ${data.title}, ${data.message})
+    RETURNING *`;
+  return rows[0] as IdeaRow;
+}
+
+export async function listIdeas(status?: string) {
+  await ensureMiscSchema();
+  if (status) {
+    return sql`SELECT * FROM ideas WHERE status = ${status} ORDER BY created_at DESC`;
+  }
+  return sql`SELECT * FROM ideas ORDER BY created_at DESC`;
+}
+
+export async function setIdeaStatus(id: number, status: string) {
+  await ensureMiscSchema();
+  await sql`UPDATE ideas SET status = ${status}, updated_at = NOW() WHERE id = ${id}`;
+}
+
+export async function deleteIdea(id: number) {
+  await ensureMiscSchema();
+  await sql`DELETE FROM ideas WHERE id = ${id}`;
 }
 
 // ─── Holded invoice-status sync ─────────────────────────

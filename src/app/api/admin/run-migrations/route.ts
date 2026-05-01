@@ -108,6 +108,23 @@ export async function GET() {
   await ran('transport_requests.holded_invoice_synced_at', () => sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_synced_at TIMESTAMP`);
   await ran('transport_requests.holded_invoice_url', () => sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_url TEXT`);
 
+  // ─── Ideas (ideeënbus) ───
+  await ran('ideas table', async () => {
+    await sql`CREATE TABLE IF NOT EXISTS ideas (
+      id SERIAL PRIMARY KEY,
+      name TEXT,
+      email TEXT,
+      category TEXT,
+      title TEXT NOT NULL,
+      message TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'new',
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )`;
+  });
+  await ran('idx_ideas_status', () => sql`CREATE INDEX IF NOT EXISTS idx_ideas_status ON ideas(status)`);
+  await ran('idx_ideas_created', () => sql`CREATE INDEX IF NOT EXISTS idx_ideas_created ON ideas(created_at DESC)`);
+
   // ─── Contact messages ───
   await ran('contact_messages table', async () => {
     await sql`CREATE TABLE IF NOT EXISTS contact_messages (
