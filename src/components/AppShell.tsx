@@ -2,11 +2,11 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Refrigerator, Bell, Truck, LogOut, ChevronLeft,
-  Settings, Users, Warehouse, MessageSquare, Search, PlayCircle, Lightbulb,
+  Settings, Users, Warehouse, MessageSquare, Search, PlayCircle, Lightbulb, Wind,
 } from 'lucide-react';
 import { ReactNode, useState } from 'react';
 import CommandPalette from './CommandPalette';
@@ -24,6 +24,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard, exact: true },
       { href: '/admin/klanten', label: 'Customers', icon: Users },
       { href: '/admin/koelkasten', label: 'Fridges', icon: Refrigerator },
+      { href: '/admin/koelkasten?device=Airco', label: 'AC units', icon: Wind },
       { href: '/admin/stalling', label: 'Storage', icon: Warehouse },
       { href: '/admin/transport', label: 'Transport', icon: Truck },
       { href: '/admin/contact', label: 'Messages', icon: MessageSquare },
@@ -57,6 +58,8 @@ const EXPANDED_WIDTH = 280;
 export default function AppShell({ userName, children, onLogout }: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentDevice = searchParams.get('device') || '';
   // Hover-state — sidebar opent zodra de muis erover komt en sluit weer
   // wanneer 'm de zone verlaat. De main-content krijgt een vaste linker
   // padding van COLLAPSED_WIDTH zodat hij niet schuift bij hovering.
@@ -175,9 +178,17 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
               )}
               <div className="space-y-0.5">
                 {group.items.map((item) => {
-                  const active = item.exact
-                    ? pathname === item.href
-                    : pathname === item.href || pathname.startsWith(item.href + '/');
+                  // Splits href in pathname-deel en query zodat we de device-param
+                  // mee kunnen vergelijken — anders zouden 'Fridges' en 'AC units'
+                  // beide actief zijn op /admin/koelkasten.
+                  const [hrefPath, hrefQuery = ''] = item.href.split('?');
+                  const hrefDevice = new URLSearchParams(hrefQuery).get('device') || '';
+                  const pathMatch = item.exact
+                    ? pathname === hrefPath
+                    : pathname === hrefPath || pathname.startsWith(hrefPath + '/');
+                  // Op /admin/koelkasten: actief als pathname klopt EN device-filter
+                  // overeenkomt (beide leeg = Fridges; 'Airco' = AC units).
+                  const active = pathMatch && hrefDevice === currentDevice;
                   const Icon = item.icon;
                   return (
                     <Link
