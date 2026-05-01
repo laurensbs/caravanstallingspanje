@@ -373,12 +373,17 @@ function KoelkastenContent() {
   };
 
   // ─── Stuur betaallink ───
-  const openPayLink = (b: Booking) => {
-    if (!drawerFridge) return;
+  // fridgeContext is optioneel — bij aanroep vanuit het lijst-overzicht geven
+  // we expliciet de fridge mee zodat we niet hoeven te wachten op
+  // setDrawerFridge (state-update is async). Vanuit de drawer pakken we 'm
+  // uit drawerFridge.
+  const openPayLink = (b: Booking, fridgeContext?: Fridge) => {
+    const f = fridgeContext || drawerFridge;
+    if (!f) return;
     setPayLinkForm({
-      description: bookingDescription(b, drawerFridge.name),
+      description: bookingDescription(b, f.name),
       amount: '',
-      email: drawerFridge.email || '',
+      email: f.email || '',
       tax: '21',
     });
     setPayLinkDialog({ open: true, booking: b });
@@ -544,17 +549,24 @@ function KoelkastenContent() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
+                    className="px-5 py-3.5 hover:bg-surface-2 transition-colors"
                   >
-                    <button
-                      onClick={() => openEdit(f)}
-                      className="w-full flex items-start gap-4 px-5 py-3.5 hover:bg-surface-2 transition-colors text-left group"
-                    >
-                      <div className="w-9 h-9 rounded-full bg-surface-2 text-text flex items-center justify-center text-xs font-medium shrink-0 border border-border mt-0.5">
+                    <div className="flex items-start gap-4">
+                      <button
+                        type="button"
+                        onClick={() => { setDrawerFridge(f); openEdit(f); }}
+                        className="w-9 h-9 rounded-full bg-surface-2 text-text flex items-center justify-center text-xs font-medium shrink-0 border border-border mt-0.5 hover:border-border-strong"
+                        aria-label="Klant openen"
+                      >
                         {f.name.split(/\s+/).slice(0, 2).map(p => p[0]?.toUpperCase()).join('')}
-                      </div>
-                      <div className="flex-1 min-w-0 space-y-1.5">
+                      </button>
+                      <div className="flex-1 min-w-0 space-y-2">
                         <div className="flex items-start justify-between gap-2 flex-wrap">
-                          <div className="flex items-center gap-2 flex-wrap min-w-0">
+                          <button
+                            type="button"
+                            onClick={() => openEdit(f)}
+                            className="flex items-center gap-2 flex-wrap min-w-0 text-left hover:underline underline-offset-2 decoration-text-subtle"
+                          >
                             <span className="text-sm font-medium text-text">{f.name}</span>
                             {f.holded_contact_id && (
                               <span title="Gekoppeld aan Holded">
@@ -564,57 +576,104 @@ function KoelkastenContent() {
                             <span className="text-xs text-text-muted">
                               · {f.device_type}{f.email ? ` · ${f.email}` : ''}
                             </span>
-                          </div>
+                          </button>
                           <div className="flex items-center gap-2 shrink-0">
                             {hasInvoice && <Badge tone="success"><Receipt size={10} /> Pro forma</Badge>}
                             {hasCheck && <Badge tone="warning"><AlertCircle size={10} /> Controleren</Badge>}
-                            <ChevronRight size={14} className="text-text-subtle group-hover:text-text transition-colors" />
+                            <button
+                              type="button"
+                              onClick={() => openEdit(f)}
+                              className="text-text-subtle hover:text-text transition-colors"
+                              aria-label="Details openen"
+                            >
+                              <ChevronRight size={14} />
+                            </button>
                           </div>
                         </div>
                         {previewBookings.length === 0 ? (
                           <p className="text-[11px] text-text-subtle italic">Nog geen periodes</p>
                         ) : (
-                          <div className="flex flex-wrap gap-1.5">
+                          <div className="space-y-1.5">
                             {previewBookings.map(b => {
                               const paid = b.status === 'compleet' || b.holded_invoice_status === 'paid';
                               const linkSent = !!b.payment_link_sent_at && !paid;
+                              const live = holdedStatuses[b.id];
+                              const holdedUrl = live?.publicUrl || b.holded_invoice_url || null;
                               const period = fmtPeriod(b);
-                              const camping = b.camping ? ` · ${b.camping}` : '';
-                              const spot = b.spot_number ? ` (${b.spot_number})` : '';
                               return (
-                                <span
-                                  key={b.id}
-                                  className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] border ${
-                                    paid
-                                      ? 'bg-success-soft text-success border-success/30'
-                                      : linkSent
-                                        ? 'bg-accent-soft text-accent border-accent/30'
-                                        : b.status === 'controleren'
-                                          ? 'bg-warning-soft text-warning border-warning/30'
-                                          : 'bg-surface-2 text-text-muted border-border'
-                                  }`}
-                                  title={`${period}${camping}${spot} · ${b.status}${b.holded_invoice_number ? ` · ${b.holded_invoice_number}` : ''}`}
-                                >
-                                  {paid && <CheckCircle2 size={9} />}
-                                  {linkSent && <Send size={9} />}
-                                  {!paid && !linkSent && b.status === 'controleren' && <AlertCircle size={9} />}
-                                  <span className="tabular-nums">{period}</span>
-                                  {b.camping && <span className="opacity-70">· {b.camping}</span>}
-                                  {b.holded_invoice_number && (
-                                    <span className="opacity-70 font-mono">· {b.holded_invoice_number}</span>
+                                <div key={b.id} className="flex items-center gap-2 flex-wrap">
+                                  <span
+                                    className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] border ${
+                                      paid
+                                        ? 'bg-success-soft text-success border-success/30'
+                                        : linkSent
+                                          ? 'bg-accent-soft text-accent border-accent/30'
+                                          : b.status === 'controleren'
+                                            ? 'bg-warning-soft text-warning border-warning/30'
+                                            : 'bg-surface-2 text-text-muted border-border'
+                                    }`}
+                                    title={`${period} · ${b.status}${b.holded_invoice_number ? ` · ${b.holded_invoice_number}` : ''}`}
+                                  >
+                                    {paid && <CheckCircle2 size={9} />}
+                                    {linkSent && <Send size={9} />}
+                                    {!paid && !linkSent && b.status === 'controleren' && <AlertCircle size={9} />}
+                                    <span className="tabular-nums">{period}</span>
+                                    {b.camping && <span className="opacity-70">· {b.camping}</span>}
+                                  </span>
+                                  {/* Action-knoppen per periode, direct in het overzicht. */}
+                                  {!b.payment_link_sent_at && !paid && (
+                                    <button
+                                      type="button"
+                                      onClick={() => openPayLink(b, f)}
+                                      className="inline-flex items-center gap-1 text-[11px] font-medium text-text hover:text-accent transition-colors px-1.5 py-0.5 rounded border border-border bg-surface hover:border-accent"
+                                      title="Stuur betaallink"
+                                    >
+                                      <Send size={10} /> Stuur betaallink
+                                    </button>
                                   )}
-                                </span>
+                                  {b.payment_link_sent_at && !paid && (
+                                    <button
+                                      type="button"
+                                      onClick={() => openPayLink(b, f)}
+                                      className="inline-flex items-center gap-1 text-[11px] font-medium text-text-muted hover:text-text transition-colors px-1.5 py-0.5 rounded border border-border bg-surface"
+                                      title="Opnieuw versturen"
+                                    >
+                                      <RefreshCw size={10} /> Opnieuw versturen
+                                    </button>
+                                  )}
+                                  {holdedUrl && (
+                                    <a
+                                      href={holdedUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="inline-flex items-center gap-1 text-[11px] font-medium text-accent hover:underline underline-offset-2"
+                                      title="Open pro forma in Holded"
+                                    >
+                                      <Receipt size={10} /> {b.holded_invoice_number || 'Pro forma'}
+                                    </a>
+                                  )}
+                                  {b.holded_invoice_number && !holdedUrl && (
+                                    <span className="inline-flex items-center gap-1 text-[11px] font-mono text-text-muted">
+                                      <Receipt size={10} /> {b.holded_invoice_number}
+                                    </span>
+                                  )}
+                                </div>
                               );
                             })}
                             {extraBookings > 0 && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] bg-surface-2 text-text-muted border border-border">
-                                +{extraBookings} meer
-                              </span>
+                              <button
+                                type="button"
+                                onClick={() => openEdit(f)}
+                                className="text-[11px] text-text-muted hover:text-text underline-offset-2 hover:underline"
+                              >
+                                +{extraBookings} meer periode{extraBookings === 1 ? '' : 's'} bekijken
+                              </button>
                             )}
                           </div>
                         )}
                       </div>
-                    </button>
+                    </div>
                   </motion.li>
                 );
               })}
