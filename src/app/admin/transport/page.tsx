@@ -31,6 +31,7 @@ type Entry = {
   status: string;
   created_via?: string;
   transport_mode?: string | null;
+  pickup_location?: string | null;
   created_at: string;
 };
 
@@ -305,15 +306,27 @@ export default function TransportPage() {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[13px]">
-                    <span className="flex items-center gap-2 text-text">
-                      <MapPin size={12} className="text-text-subtle shrink-0" />
-                      <span className="truncate">{e.from_location}</span>
-                      <ArrowRight size={11} className="text-text-subtle shrink-0" />
-                      <span className="truncate">{e.to_location}</span>
-                    </span>
+                    {e.transport_mode === 'zelf' ? (
+                      <span className="flex items-center gap-2 text-text">
+                        <MapPin size={12} className="text-text-subtle shrink-0" />
+                        <span className="truncate">
+                          <strong>Klant haalt zelf op uit Stalling</strong>
+                          {e.camping ? ` → ${e.camping}` : ''}
+                        </span>
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2 text-text">
+                        <MapPin size={12} className="text-text-subtle shrink-0" />
+                        <span className="truncate">
+                          <strong>Wij halen op:</strong> {e.pickup_location || e.camping || e.from_location}
+                          <ArrowRight size={11} className="inline mx-1 text-text-subtle" />
+                          Stalling
+                        </span>
+                      </span>
+                    )}
                     <span className="flex items-center gap-1.5 text-text">
                       <Calendar size={12} className="text-text-subtle shrink-0" />
-                      Heen: {fmtDate(e.preferred_date)}{e.outbound_time ? ` ${e.outbound_time}` : ''}
+                      {e.transport_mode === 'zelf' ? 'Komt langs:' : 'Wij rijden:'} {fmtDate(e.preferred_date)}{e.outbound_time ? ` ${e.outbound_time}` : ''}
                       {e.return_date ? ` · Terug: ${fmtDate(e.return_date)}${e.return_time ? ` ${e.return_time}` : ''}` : ''}
                     </span>
                     <a href={`mailto:${e.email}`} className="flex items-center gap-1.5 text-text hover:text-text">

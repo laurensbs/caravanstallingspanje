@@ -98,6 +98,7 @@ export async function GET() {
   // ─── Transport requests ───
   await ran('transport_requests.customer_id', () => sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL`);
   await ran('transport_requests.transport_mode', () => sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS transport_mode TEXT`);
+  await ran('transport_requests.pickup_location', () => sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS pickup_location TEXT`);
   await ran('transport_requests.outbound_time', () => sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS outbound_time TEXT`);
   await ran('transport_requests.return_time', () => sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS return_time TEXT`);
   await ran('transport_requests.created_via', () => sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS created_via TEXT NOT NULL DEFAULT 'public'`);

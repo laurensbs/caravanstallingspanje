@@ -149,6 +149,9 @@ export async function initDatabase() {
   await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS created_via TEXT NOT NULL DEFAULT 'public'`;
   await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS outbound_time TEXT`;
   await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS return_time TEXT`;
+  // Pickup-locatie: voor 'zelf'-mode is dit "Stalling" (klant komt naar ons),
+  // voor 'wij_rijden'-mode is dit de camping waar wij hem ophalen.
+  await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS pickup_location TEXT`;
   await sql`CREATE INDEX IF NOT EXISTS idx_transport_requests_status ON transport_requests(status)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_transport_requests_created ON transport_requests(created_at DESC)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_transport_requests_date ON transport_requests(preferred_date)`;
@@ -746,19 +749,22 @@ export async function createTransportRequest(data: {
   /** 'wij_rijden' (€100) of 'zelf' (€50). NULL voor oude rijen vóór de
    *  betaalde-flow live ging. */
   mode?: 'wij_rijden' | 'zelf' | null;
+  /** Bij 'wij_rijden': adres of camping waar wij de caravan komen halen.
+   *  Bij 'zelf': altijd 'Stalling' (klant komt zelf langs). */
+  pickup_location?: string | null;
 }) {
   await ensureMiscSchema();
   const res = await sql`INSERT INTO transport_requests
     (name, email, phone, from_location, to_location,
      camping, preferred_date, return_date, outbound_time, return_time,
-     registration, brand, model, notes, created_via, status, transport_mode)
+     registration, brand, model, notes, created_via, status, transport_mode, pickup_location)
     VALUES (${data.name}, ${data.email}, ${data.phone || null},
       'Stalling Cruïlles', ${data.camping},
       ${data.camping}, ${data.outbound_date}::date, ${data.return_date}::date,
       ${data.outbound_time || null}, ${data.return_time || null},
       ${data.registration || null}, ${data.brand || null}, ${data.model || null},
       ${data.notes || null}, ${data.created_via || 'public'}, ${data.status || 'controleren'},
-      ${data.mode || null})
+      ${data.mode || null}, ${data.pickup_location || null})
     RETURNING *`;
   return res[0];
 }
@@ -843,6 +849,7 @@ async function ensureMiscSchema(): Promise<void> {
   if (_miscMigrationsApplied) return _miscMigrationsApplied;
   _miscMigrationsApplied = (async () => {
     await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS transport_mode TEXT`;
+    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS pickup_location TEXT`;
     await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS customer_notified_at TIMESTAMP`;
     await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS notified_status TEXT`;
     // Holded-factuurstatus cache: paid / partial / unpaid / unknown.
@@ -1240,6 +1247,8 @@ export async function updateTransportRequest(id: number, data: Partial<{
   notes: string | null;
   status: string;
   customer_id: number | null;
+  pickup_location: string | null;
+  transport_mode: string | null;
 }>) {
   await sql`UPDATE transport_requests SET
     name = COALESCE(${data.name ?? null}, name),
@@ -1257,6 +1266,8 @@ export async function updateTransportRequest(id: number, data: Partial<{
     notes = COALESCE(${data.notes ?? null}, notes),
     status = COALESCE(${data.status ?? null}, status),
     customer_id = COALESCE(${data.customer_id ?? null}, customer_id),
+    pickup_location = COALESCE(${data.pickup_location ?? null}, pickup_location),
+    transport_mode = COALESCE(${data.transport_mode ?? null}, transport_mode),
     updated_at = NOW()
     WHERE id = ${id}`;
 }

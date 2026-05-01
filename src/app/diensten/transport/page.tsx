@@ -51,30 +51,40 @@ export default function TransportPage() {
   const step1Valid = !!(camping && outboundDate && returnDate);
   const currentPrice = mode === 'wij_rijden' ? prices.wij_rijden : prices.zelf;
 
+  // Mode-afhankelijke labels — voor 'zelf' draait alles om "ophalen uit
+  // stalling", voor 'wij_rijden' om "wij komen langs op de camping".
+  const isZelf = mode === 'zelf';
+  const pickupLabel = isZelf ? 'Ophaal-datum (uit stalling)' : 'Ophaal-datum (op camping)';
+  const returnLabel = isZelf ? 'Terugbreng-datum (naar stalling)' : 'Terug-datum (terug naar stalling)';
+  const campingHelperText = isZelf
+    ? 'De camping waar je naartoe gaat — wij weten dan voor de terugrit waar de caravan staat als jij hem zelf later weer brengt.'
+    : 'De camping waar wij je caravan komen halen.';
+
   const step1 = (
     <>
-      <Section title={t('transport.section-route')}>
+      <Section title="Hoe wil je het regelen?">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <ModeCard
             selected={mode === 'wij_rijden'}
             onClick={() => setMode('wij_rijden')}
             icon={Truck}
-            title="Wij rijden voor je"
-            desc="We halen je caravan op bij de camping en brengen 'm na de stalling-periode terug."
+            title="Wij halen op"
+            desc="Wij komen je caravan ophalen bij de camping en brengen 'm na de vakantie terug naar de stalling."
             price={formatEur(prices.wij_rijden)}
           />
           <ModeCard
             selected={mode === 'zelf'}
             onClick={() => setMode('zelf')}
             icon={KeyRound}
-            title="Ik breng/haal zelf"
-            desc="Jij rijdt zelf van/naar de stalling — wij verzorgen sleuteloverdracht en administratie."
+            title="Ik haal zelf op"
+            desc="Je komt zelf langs onze stalling om je caravan op te halen — wij verzorgen sleuteloverdracht."
             price={formatEur(prices.zelf)}
           />
         </div>
       </Section>
 
-      <Section title={t('transport.camping-label')}>
+      <Section title={isZelf ? 'Ophalen bij stalling' : 'Ophalen op camping'}>
+        {/* Visuele route-indicator: voor 'zelf' = jij rijdt; voor 'wij_rijden' = wij rijden */}
         <div className="rounded-[var(--radius-lg)] border border-border bg-surface-2 p-3 flex items-center justify-between text-[12px] text-text-muted gap-3">
           <span className="inline-flex items-center gap-1.5">
             <AnimatedServiceIcon kind="transport" size={14} loop /> Stalling
@@ -87,18 +97,18 @@ export default function TransportPage() {
           </span>
         </div>
 
-        <Field label={t('transport.camping-label')} required>
+        <Field label="Camping" required hint={campingHelperText}>
           <CampingPicker
             value={camping}
             onChange={setCamping}
             placeholder={t('fridge.camping-placeholder')}
             required
-            ariaLabel={t('transport.camping-label')}
+            ariaLabel="Camping"
           />
         </Field>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Field label={t('transport.outbound-date')} required>
+          <Field label={pickupLabel} required hint={isZelf ? 'Wanneer kom je langs?' : 'Wanneer mogen wij komen?'}>
             <div className="grid grid-cols-[1fr_110px] gap-2">
               <input
                 type="date"
@@ -117,11 +127,11 @@ export default function TransportPage() {
                 value={outboundTime}
                 onChange={(e) => setOutboundTime(e.target.value)}
                 className={fieldCls}
-                aria-label="Tijd heen"
+                aria-label={isZelf ? 'Ongeveer hoe laat' : 'Ongeveer hoe laat'}
               />
             </div>
           </Field>
-          <Field label={t('transport.return-date')} required>
+          <Field label={returnLabel} required hint="Ongeveer wanneer komt hij terug?">
             <div className="grid grid-cols-[1fr_110px] gap-2">
               <input
                 type="date"
@@ -136,7 +146,7 @@ export default function TransportPage() {
                 value={returnTime}
                 onChange={(e) => setReturnTime(e.target.value)}
                 className={fieldCls}
-                aria-label="Tijd terug"
+                aria-label="Ongeveer hoe laat"
               />
             </div>
           </Field>
@@ -147,7 +157,9 @@ export default function TransportPage() {
             rows={3}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder={t('transport.note-placeholder')}
+            placeholder={isZelf
+              ? 'Bv. tijd kan flexibel, ik bel je dezelfde ochtend nog'
+              : 'Bv. caravan staat op plek 12, achterzijde'}
             className={`${fieldCls} min-h-[80px] py-2 resize-none`}
           />
         </Field>
@@ -162,10 +174,11 @@ export default function TransportPage() {
       </Section>
 
       <Section title={t('common.summary')}>
-        <SummaryRow label="Optie" value={mode === 'wij_rijden' ? 'Wij rijden voor je' : 'Ik breng/haal zelf'} />
-        <SummaryRow label={t('transport.camping-label')} value={camping} />
-        <SummaryRow label={t('transport.outbound-date')} value={`${outboundDate}${outboundTime ? ` · ${outboundTime}` : ''}`} />
-        <SummaryRow label={t('transport.return-date')} value={`${returnDate}${returnTime ? ` · ${returnTime}` : ''}`} />
+        <SummaryRow label="Optie" value={isZelf ? 'Ik haal zelf op uit Stalling' : 'Wij komen ophalen op camping'} />
+        <SummaryRow label="Camping" value={camping} />
+        <SummaryRow label={isZelf ? 'Ophaal-locatie' : 'Wij halen op bij'} value={isZelf ? 'Stalling' : camping || '—'} />
+        <SummaryRow label={isZelf ? 'Ophaal-moment' : 'Wij komen langs'} value={`${outboundDate}${outboundTime ? ` · ${outboundTime}` : ''}`} />
+        <SummaryRow label={isZelf ? 'Terugbreng-moment' : 'Terug-rit'} value={`${returnDate}${returnTime ? ` · ${returnTime}` : ''}`} />
         <SummaryRow label="Totaal" value={formatEur(currentPrice)} bold />
       </Section>
     </>

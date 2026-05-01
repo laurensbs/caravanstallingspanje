@@ -30,6 +30,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Pickup-locatie:
+    //  - wij_rijden: wij komen ophalen op de camping → pickup = camping
+    //  - zelf:       klant haalt zelf op uit onze stalling → pickup = 'Stalling'
+    const pickupLocation = d.mode === 'wij_rijden' ? d.camping : 'Stalling';
+
     const entry = await createTransportRequest({
       name: d.name,
       email: d.email,
@@ -44,14 +49,15 @@ export async function POST(req: NextRequest) {
       model: d.model || null,
       notes: d.description || null,
       mode: d.mode,
+      pickup_location: pickupLocation,
       status: 'controleren',
     });
 
     const ref = formatRef('transport', entry.id);
     const origin = req.nextUrl.origin;
     const description = d.mode === 'wij_rijden'
-      ? `Transport heen-en-terug — ${d.camping}`
-      : `Transport zelf-rijden (sleuteloverdracht) — ${d.camping}`;
+      ? `Transport — wij halen op bij ${d.camping}`
+      : `Transport — klant haalt zelf op uit Stalling`;
 
     const session = await createCheckoutSession({
       description,

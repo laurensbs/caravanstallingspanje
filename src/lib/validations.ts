@@ -95,15 +95,18 @@ export const inspectionOrderSchema = z.object({
   description: z.string().max(2000).optional().or(z.literal('')),
 });
 
-// Transport = aanvraag, geen betaling. Klant geeft één camping op (heen
-// vanuit stalling, terug vanaf diezelfde camping) en twee voorkeursdatums.
+// Transport = betaalde dienst met twee modes:
+//   - 'wij_rijden': wij halen op vanaf de camping (€100, heen + terug)
+//   - 'zelf':       klant haalt zelf op uit de stalling (€50, sleuteloverdracht)
+// Beide modes hebben een ophaal-datum + tijd nodig. pickup_location wordt
+// server-side gezet op basis van mode (camping of "Stalling").
 export const transportOrderSchema = z.object({
   ...contactBase,
   mode: z.enum(['wij_rijden', 'zelf']),
   camping: knownCamping,
   outboundDate: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Heen-datum is verplicht'),
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Ophaal-datum is verplicht'),
   outboundTime: z.string().regex(/^\d{2}:\d{2}$/).optional().or(z.literal('')),
   returnDate: z
     .string()
@@ -111,7 +114,7 @@ export const transportOrderSchema = z.object({
   returnTime: z.string().regex(/^\d{2}:\d{2}$/).optional().or(z.literal('')),
   description: z.string().max(2000).optional().or(z.literal('')),
 }).refine((d) => new Date(d.returnDate) >= new Date(d.outboundDate), {
-  message: 'Terug-datum moet op of na heen-datum liggen',
+  message: 'Terug-datum moet op of na ophaal-datum liggen',
   path: ['returnDate'],
 });
 
