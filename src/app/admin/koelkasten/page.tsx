@@ -16,6 +16,7 @@ import PageHeader from '@/components/admin/PageHeader';
 import CustomerPicker, { type CustomerLite } from '@/components/CustomerPicker';
 import NewCustomerDialog from '@/components/NewCustomerDialog';
 import CampingPicker from '@/components/CampingPicker';
+import { calculatePriceWith, MIN_DAYS, type DeviceType } from '@/lib/pricing';
 
 type Booking = {
   id: number;
@@ -113,6 +114,15 @@ function KoelkastenContent() {
   const [fridges, setFridges] = useState<Fridge[]>([]);
   const [loading, setLoading] = useState(true);
   const [holdedStatuses, setHoldedStatuses] = useState<Record<number, { status: string; publicUrl?: string }>>({});
+  // Live weekprijzen uit settings — voor bedrag-display in de lijst en de
+  // booking-dialog. Eén fetch, gedeeld door alle componenten.
+  const [weekPrices, setWeekPrices] = useState<Record<string, number> | null>(null);
+  useEffect(() => {
+    fetch('/api/order/prices')
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => { if (d?.fridge) setWeekPrices(d.fridge); })
+      .catch(() => { /* silent */ });
+  }, []);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<'create' | 'edit'>('create');
@@ -750,6 +760,14 @@ function KoelkastenContent() {
                                     {!holdedPaid && !linkSent && b.status === 'controleren' && <AlertCircle size={9} />}
                                     <span className="tabular-nums">{period}</span>
                                     {b.camping && <span className="opacity-70">· {b.camping}</span>}
+                                    {(() => {
+                                      const dt = (b.device_type || f.device_type || '') as DeviceType;
+                                      const wp = weekPrices?.[dt] ?? null;
+                                      const price = priceForDates(dt, wp, b.start_date || '', b.end_date || '');
+                                      return price ? (
+                                        <span className="opacity-80 tabular-nums">· € {price.total.toFixed(2)}</span>
+                                      ) : null;
+                                    })()}
                                   </span>
                                   {/* Stuur-betaallink-knop is altijd zichtbaar — ook bij betaalde
                                       periodes voor vervolg-/extra-betalingen. Label past zich aan op de status. */}
@@ -1201,11 +1219,31 @@ function KoelkastenContent() {
                   </div>
                 </div>
 
-                {/* Periode + status */}
+                {/* Periode + status. End date heeft min = start + 7 dagen
+                    zodat admin niet per ongeluk een te korte huur invoert. */}
                 <div className="grid grid-cols-2 gap-3">
-                  <Input label="Start date" type="date" value={bookingForm.start_date} onChange={e => setBookingForm({ ...bookingForm, start_date: e.target.value })} />
-                  <Input label="End date" type="date" value={bookingForm.end_date} onChange={e => setBookingForm({ ...bookingForm, end_date: e.target.value })} />
+                  <Input
+                    label="Start date"
+                    type="date"
+                    value={bookingForm.start_date}
+                    onChange={e => setBookingForm({ ...bookingForm, start_date: e.target.value })}
+                  />
+                  <Input
+                    label="End date"
+                    type="date"
+                    value={bookingForm.end_date}
+                    min={minBookingEndDate(bookingForm.start_date)}
+                    onChange={e => setBookingForm({ ...bookingForm, end_date: e.target.value })}
+                  />
                 </div>
+                {/* Live prijsindicatie — toont aan admin wat de klant zou
+                    betalen op basis van de huidige instellingen. */}
+                <BookingPricePreview
+                  fridge={drawerFridge}
+                  start={bookingForm.start_date}
+                  end={bookingForm.end_date}
+                  weekPrices={weekPrices}
+                />
                 <Select label="Status" value={bookingForm.status} onChange={e => setBookingForm({ ...bookingForm, status: e.target.value as 'compleet' | 'controleren' })}>
                   <option value="compleet">Complete</option>
                   <option value="controleren">Review</option>
@@ -1716,5 +1754,66 @@ function InlineRow({ icon: Icon, label, value }: { icon?: typeof Mail; label: st
       {Icon && <Icon size={11} className="text-text-subtle shrink-0" />}
       <span className="text-text truncate">{value}</span>
     </span>
+  );
+}
+
+// Vroegste geldige eind-datum: start + minimum-aantal-dagen. Gebruikt
+// voor het `min` attribuut van de date-input in de booking-dialog.
+function minBookingEndDate(startDate: string): string | undefined {
+  if (!startDate) return undefined;
+  const t = new Date(startDate).getTime();
+  if (!Number.isFinite(t)) return undefined;
+  const min = new Date(t + MIN_DAYS * 24 * 60 * 60 * 1000);
+  return min.toISOString().slice(0, 10);
+}
+
+function priceForDates(deviceType: string | null | undefined, weekPrice: number | null, start: string, end: string) {
+  if (!deviceType || !start || !end || weekPrice == null) return null;
+  try {
+    return calculatePriceWith(weekPrice, start, end);
+  } catch {
+    return null;
+  }
+}
+
+// Kleine prijs-preview onder de date-pickers in het booking-dialog.
+function BookingPricePreview({ fridge, start, end, weekPrices }: {
+  fridge: Fridge | null;
+  start: string;
+  end: string;
+  weekPrices: Record<string, number> | null;
+}) {
+  if (!fridge || !start || !end) return null;
+  const dt = (fridge.device_type || '') as DeviceType;
+  const weekPrice = weekPrices ? weekPrices[dt] : null;
+  const result = priceForDates(dt, weekPrice ?? null, start, end);
+  if (!result) {
+    return (
+      <div className="rounded-[var(--radius-md)] bg-surface-2 border border-border p-3 text-[12px] text-text-muted">
+        {start && end
+          ? new Date(end) <= new Date(start)
+            ? 'End date must be after start date.'
+            : `Minimum rental is ${MIN_DAYS} days.`
+          : 'Pick a start and end date to see the price.'}
+      </div>
+    );
+  }
+  return (
+    <div className="rounded-[var(--radius-md)] bg-surface-2 border border-border p-3 space-y-1.5">
+      <div className="flex items-baseline justify-between text-[12px]">
+        <span className="text-text-muted">First week</span>
+        <span className="tabular-nums">€ {result.weekPrice.toFixed(2)}</span>
+      </div>
+      {result.extraDays > 0 && (
+        <div className="flex items-baseline justify-between text-[12px]">
+          <span className="text-text-muted">{result.extraDays} extra day{result.extraDays === 1 ? '' : 's'} × € {result.dayPrice.toFixed(2)}</span>
+          <span className="tabular-nums">€ {result.extraTotal.toFixed(2)}</span>
+        </div>
+      )}
+      <div className="flex items-baseline justify-between pt-1.5 border-t border-border">
+        <span className="text-[12px] font-semibold text-text">Total ({result.days} days)</span>
+        <span className="text-[15px] font-semibold tabular-nums text-text">€ {result.total.toFixed(2)}</span>
+      </div>
+    </div>
   );
 }
