@@ -22,12 +22,13 @@
   /* Quiet amber: focus rings, link emphasis, occasional badge */
   --color-ring: oklch(0.72 0.13 60);
 
-  /* Dark sidebar */
-  --color-sidebar: oklch(0.16 0.005 75);
-  --color-sidebar-fg: oklch(0.86 0.005 75);
-  --color-sidebar-accent: oklch(0.23 0.006 75);
-  --color-sidebar-active: oklch(0.32 0.008 75);
-  --color-sidebar-border: oklch(0.24 0.005 75);
+  /* Navy admin-portal sidebar — matcht de homepage hero (#142F4D → #0A1929)
+     en het login-scherm. Eén consistent visuele identiteit. */
+  --color-sidebar: #0A1929;
+  --color-sidebar-fg: #F1F5F9;
+  --color-sidebar-accent: #1E3A5F;
+  --color-sidebar-active: #2A4A75;
+  --color-sidebar-border: rgba(255, 255, 255, 0.08);
 
   --color-success: oklch(0.62 0.14 145);
   --color-success-soft: oklch(0.94 0.05 145);

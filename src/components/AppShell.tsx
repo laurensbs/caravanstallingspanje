@@ -80,15 +80,20 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
             className="flex items-center justify-between group"
             title="Back to portal selection"
           >
-            <Image
-              src="/images/logo.png"
-              alt="Caravanstalling"
-              width={420}
-              height={95}
-              priority
-              quality={100}
-              className="h-12 w-auto"
-            />
+            <div
+              className="inline-flex items-center justify-center px-3 py-2 rounded-[var(--radius-md)]"
+              style={{ background: '#FFFFFF' }}
+            >
+              <Image
+                src="/images/logo.png"
+                alt="Caravanstalling"
+                width={420}
+                height={95}
+                priority
+                quality={100}
+                className="h-9 w-auto"
+              />
+            </div>
             <ChevronLeft size={14} className="text-white/30 group-hover:text-white/60 transition-colors shrink-0" />
           </Link>
         </div>
