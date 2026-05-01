@@ -6,7 +6,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Refrigerator, Bell, Truck, LogOut, ChevronLeft,
-  Settings, Users, Warehouse, MessageSquare, Search, PlayCircle, Lightbulb, Wind,
+  Settings, Users, Warehouse, MessageSquare, Search, PlayCircle, Lightbulb, Wind, CalendarRange,
 } from 'lucide-react';
 import { ReactNode, useState } from 'react';
 import CommandPalette from './CommandPalette';
@@ -25,6 +25,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: '/admin/klanten', label: 'Customers', icon: Users },
       { href: '/admin/koelkasten', label: 'Fridges', icon: Refrigerator },
       { href: '/admin/koelkasten?device=Airco', label: 'AC units', icon: Wind },
+      { href: '/admin/planning', label: 'Planning', icon: CalendarRange },
       { href: '/admin/stalling', label: 'Storage', icon: Warehouse },
       { href: '/admin/transport', label: 'Transport', icon: Truck },
       { href: '/admin/contact', label: 'Messages', icon: MessageSquare },

@@ -769,6 +769,55 @@ export async function getActiveBookings(): Promise<Array<{
   return rows as never;
 }
 
+// Bookings die overlappen met de gegeven datum-range, voor de planning-view.
+// Een booking telt als 'overlap' als z'n periode (start..end) snijdt met de
+// range (from..to). LEFT JOIN customers voor telefoon — fridge.email blijft
+// canonical voor de mail. Booking.device_type heeft voorrang op fridge.device_type.
+export async function getBookingsInRange(from: string, to: string): Promise<Array<{
+  id: number;
+  fridge_id: number;
+  customer_name: string;
+  email: string | null;
+  phone: string | null;
+  device_type: string;
+  camping: string | null;
+  spot_number: string | null;
+  start_date: string;
+  end_date: string;
+  status: string;
+  holded_invoice_status: string | null;
+  paid_at: string | null;
+}>> {
+  const rows = await sql`
+    SELECT b.id, b.fridge_id, f.name AS customer_name, f.email,
+      COALESCE(c.phone, c.mobile) AS phone,
+      COALESCE(b.device_type, f.device_type) AS device_type,
+      b.camping, b.spot_number, b.start_date, b.end_date, b.status,
+      b.holded_invoice_status, b.paid_at
+    FROM fridge_bookings b
+    JOIN fridges f ON f.id = b.fridge_id
+    LEFT JOIN customers c ON c.id = f.customer_id
+    WHERE b.start_date IS NOT NULL
+      AND b.end_date IS NOT NULL
+      AND b.start_date <= ${to}::date
+      AND b.end_date >= ${from}::date
+    ORDER BY b.start_date ASC, f.name ASC`;
+  return rows as never;
+}
+
+// Schuift een booking naar een nieuwe start_date. Behoudt periode-duur door
+// end_date evenredig mee te schuiven. Gebruikt door drag-to-replan op de
+// planning-view. Returnt de nieuwe rij voor optimistische UI-rollback.
+export async function shiftBookingDates(id: number, newStartDate: string, newEndDate: string) {
+  const res = await sql`UPDATE fridge_bookings
+    SET start_date = ${newStartDate}::date,
+        end_date = ${newEndDate}::date,
+        updated_at = NOW()
+    WHERE id = ${id}
+    RETURNING *`;
+  return res[0] || null;
+}
+
 // Klant 360°: zoek alle diensten op basis van email (case-insensitive).
 // Gebruikt door /admin/transport om te zien of een klant ook een koelkast
 // of stalling heeft lopen.
