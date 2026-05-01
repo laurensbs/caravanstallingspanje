@@ -351,10 +351,10 @@ function KoelkastenContent() {
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error || 'Factuur mislukt');
+        toast.error(data.error || 'Pro forma mislukt');
         return;
       }
-      toast.success(`Factuur ${data.holdedInvoiceNumber || 'aangemaakt'}`);
+      toast.success(`Pro forma ${data.holdedInvoiceNumber || 'aangemaakt'}`);
       setInvoiceDialog({ open: false, booking: null });
       await refresh();
     } finally {
@@ -475,7 +475,7 @@ function KoelkastenContent() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        {hasInvoice && <Badge tone="success"><Receipt size={10} /> Factuur</Badge>}
+                        {hasInvoice && <Badge tone="success"><Receipt size={10} /> Pro forma</Badge>}
                         {hasCheck && <Badge tone="warning"><AlertCircle size={10} /> Controleren</Badge>}
                         <ChevronRight size={14} className="text-text-subtle group-hover:text-text transition-colors" />
                       </div>
@@ -684,7 +684,7 @@ function KoelkastenContent() {
                       {!b.holded_invoice_number && (
                         <div className="pt-2 border-t border-border">
                           <Button size="sm" variant="secondary" onClick={() => openInvoice(b)}>
-                            <Receipt size={12} /> Factuur in Holded
+                            <Receipt size={12} /> Pro forma in Holded
                           </Button>
                         </div>
                       )}
@@ -763,7 +763,7 @@ function KoelkastenContent() {
               transition={{ type: 'spring', stiffness: 380, damping: 30 }}
               className="relative bg-bg border border-border rounded-[var(--radius-xl)] shadow-lg max-w-md w-full p-6"
             >
-              <h2 className="text-base font-medium text-text mb-1">Factuur in Holded</h2>
+              <h2 className="text-base font-medium text-text mb-1">Pro forma in Holded</h2>
               <p className="text-xs text-text-muted mb-4">Controleer en pas aan voor verzenden.</p>
               <form onSubmit={submitInvoice} className="space-y-4">
                 <Input label="Omschrijving" required value={invoiceForm.description} onChange={e => setInvoiceForm({ ...invoiceForm, description: e.target.value })} />

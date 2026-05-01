@@ -69,7 +69,7 @@ export default function TestFlowPage() {
       <PageHeader
         eyebrow="Beheer"
         title="Test-flow"
-        description="Doorloop volledig wat een klant ziet — booking aanmaken, status op betaald zetten, Holded-factuur, bevestigingsmail. Geen Stripe-betaling vereist."
+        description="Doorloop volledig wat een klant ziet — booking aanmaken, status op betaald zetten, Holded pro forma, bevestigingsmail. Geen Stripe-betaling vereist."
       />
 
       <div className="card-surface p-6 mb-6 space-y-4 max-w-2xl">
@@ -204,7 +204,7 @@ export default function TestFlowPage() {
           <li>Open <strong>Klant-receipt</strong> in nieuwe tab → check wat klant ziet.</li>
           <li>Open je inbox → check de bevestigingsmail in caravanstalling-stijl.</li>
           <li>Open <strong>Admin</strong> → check of de booking netjes binnenkomt.</li>
-          <li>Open Holded → check of de factuur is aangemaakt.</li>
+          <li>Open Holded → check of de pro forma is aangemaakt (geen echte factuur).</li>
         </ol>
         <p className="text-[12px] text-text-muted mt-3 italic">
           Test-bookings worden gemarkeerd met &quot;(TEST)&quot; in de naam zodat je ze later kunt

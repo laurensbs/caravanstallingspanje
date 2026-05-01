@@ -108,10 +108,10 @@ export function paymentReceivedHtml(input: {
 }): { subject: string; html: string; text: string } {
   const subject = `Bedankt voor je bestelling — ${input.service}`;
   const invoiceBlock = input.invoiceNumber
-    ? `<div class="row"><span class="muted">Factuur</span><strong>${escapeHtml(input.invoiceNumber)}</strong></div>`
+    ? `<div class="row"><span class="muted">Pro forma</span><strong>${escapeHtml(input.invoiceNumber)}</strong></div>`
     : '';
   const linkBlock = input.publicUrl
-    ? `<a class="btn" href="${input.publicUrl}">Factuur bekijken</a>`
+    ? `<a class="btn" href="${input.publicUrl}">Pro forma bekijken</a>`
     : '';
 
   // Vriendelijke kind-specifieke vervolgtekst, automatisch gekozen op
@@ -145,7 +145,7 @@ export function paymentReceivedHtml(input: {
     heading: 'Bedankt voor je bestelling!',
     subline: 'We hebben je betaling ontvangen — we gaan voor je aan de slag.',
   });
-  const text = `Bedankt ${input.name},\n\nWe hebben je betaling van ${fmtEur(input.amountEur)} ontvangen voor: ${input.service}.${input.invoiceNumber ? `\nFactuur: ${input.invoiceNumber}` : ''}\n\n${nextStep}\n\nReferentie: ${input.reference}\n\nVragen? https://caravanstalling-spanje.com/contact`;
+  const text = `Bedankt ${input.name},\n\nWe hebben je betaling van ${fmtEur(input.amountEur)} ontvangen voor: ${input.service}.${input.invoiceNumber ? `\nPro forma: ${input.invoiceNumber}` : ''}\n\n${nextStep}\n\nReferentie: ${input.reference}\n\nVragen? https://caravanstalling-spanje.com/contact`;
   return { subject, html, text };
 }
 

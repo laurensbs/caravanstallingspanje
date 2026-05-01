@@ -152,7 +152,7 @@ export default function DashboardPage() {
       <section className="mt-12">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-text-muted flex items-center gap-2">
-            <Receipt size={13} /> Facturen in Holded
+            <Receipt size={13} /> Pro forma's in Holded
           </h2>
           <Button size="sm" variant="secondary" onClick={triggerSync} disabled={syncing}>
             {syncing ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}

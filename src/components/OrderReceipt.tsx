@@ -142,7 +142,7 @@ export default function OrderReceipt({ refCode, fallbackTitle, fallbackBody }: P
               {data.customerName && <DetailRow label="Naam" value={data.customerName} />}
               {data.customerEmail && <DetailRow label="E-mail" value={data.customerEmail} />}
               {data.invoiceNumber && (
-                <DetailRow label="Factuur" value={data.invoiceNumber} />
+                <DetailRow label="Pro forma" value={data.invoiceNumber} />
               )}
             </div>
           </motion.div>
@@ -268,10 +268,10 @@ function buildSteps(data: Lookup | null, _t: TFn): Step[] {
     done: !!data.customerEmail,
   });
 
-  // 3. Factuur — alle betaalde kinds (incl. transport)
+  // 3. Pro forma — alle betaalde kinds (incl. transport)
   if (data.kind === 'koelkast' || data.kind === 'airco' || data.kind === 'stalling' || data.kind === 'service' || data.kind === 'transport') {
     steps.push({
-      label: 'Factuur aangemaakt in Holded',
+      label: 'Pro forma aangemaakt in Holded',
       detail: data.invoiceNumber ? `nr. ${data.invoiceNumber}` : undefined,
       done: data.invoiceCreated,
     });

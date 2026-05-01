@@ -163,7 +163,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
           const linkedCustomer = await ensureLocalCustomer(customerName, customerEmail, customerPhone, inv.contactId);
           if (linkedCustomer) await linkFridgeToCustomer(id, linkedCustomer.id);
         } catch (err) {
-          await logActivity({ action: 'Holded factuur mislukt (koelkast)', entityType: kind, entityId: refId, details: err instanceof Error ? err.message : 'unknown' });
+          await logActivity({ action: 'Holded pro forma mislukt (koelkast)', entityType: kind, entityId: refId, details: err instanceof Error ? err.message : 'unknown' });
         }
       }
     }
@@ -188,7 +188,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
             const linkedCustomer = await ensureLocalCustomer(customerName, customerEmail, customerPhone, inv.contactId);
             if (linkedCustomer) await linkStallingToCustomer(id, linkedCustomer.id);
           } catch (err) {
-            await logActivity({ action: 'Holded factuur mislukt (stalling)', entityType: kind, entityId: refId, details: err instanceof Error ? err.message : 'unknown' });
+            await logActivity({ action: 'Holded pro forma mislukt (stalling)', entityType: kind, entityId: refId, details: err instanceof Error ? err.message : 'unknown' });
           }
         }
       }
@@ -219,7 +219,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
             const linkedCustomer = await ensureLocalCustomer(customerName, customerEmail, customerPhone, inv.contactId);
             if (linkedCustomer) await linkTransportToCustomer(id, linkedCustomer.id);
           } catch (err) {
-            await logActivity({ action: 'Holded factuur mislukt (transport)', entityType: kind, entityId: refId, details: err instanceof Error ? err.message : 'unknown' });
+            await logActivity({ action: 'Holded pro forma mislukt (transport)', entityType: kind, entityId: refId, details: err instanceof Error ? err.message : 'unknown' });
           }
         }
       }
@@ -281,7 +281,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
           amountEur,
         });
       } catch (err) {
-        await logActivity({ action: 'Holded factuur mislukt (service)', entityType: kind, entityId: session.id, details: err instanceof Error ? err.message : 'unknown' });
+        await logActivity({ action: 'Holded pro forma mislukt (service)', entityType: kind, entityId: session.id, details: err instanceof Error ? err.message : 'unknown' });
       }
     }
   }

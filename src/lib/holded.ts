@@ -267,36 +267,46 @@ export type HoldedInvoiceSummary = {
 
 export async function getInvoice(id: string): Promise<HoldedInvoiceSummary | null> {
   if (!id) return null;
-  try {
-    const data = await holdedFetch<{
-      id: string;
-      docNumber?: string;
-      status?: number | string;
-      total?: number;
-      pending?: number;
-      publicUrl?: string;
-    }>(`/invoicing/v1/documents/invoice/${id}`);
-    // Holded uses status: 0 = draft, 1 = unpaid, 2 = partial, 3 = paid (codes vary;
-    // also a paid invoice has pending = 0). We treat both signals.
-    let status: HoldedInvoiceStatus = 'unknown';
-    if (data.pending === 0 && data.total && data.total > 0) status = 'paid';
-    else if (data.pending != null && data.total != null && data.pending < data.total) status = 'partial';
-    else if (data.pending != null) status = 'unpaid';
-    return {
-      id: data.id,
-      docNumber: data.docNumber,
-      status,
-      total: data.total,
-      pending: data.pending,
-      publicUrl: data.publicUrl,
-    };
-  } catch {
-    return null;
-  }
+  // Proforma endpoint eerst (sinds we alleen pro forma's maken). Bij niet
+  // gevonden valt 'unknown' status terug. Echte invoice-endpoint als fallback
+  // voor historische records van vóór deze switch.
+  const tryFetch = async (path: string) => {
+    try {
+      return await holdedFetch<{
+        id: string;
+        docNumber?: string;
+        status?: number | string;
+        total?: number;
+        pending?: number;
+        publicUrl?: string;
+      }>(path);
+    } catch {
+      return null;
+    }
+  };
+  const data = await tryFetch(`/invoicing/v1/documents/proform/${id}`)
+    ?? await tryFetch(`/invoicing/v1/documents/invoice/${id}`);
+  if (!data) return null;
+  let status: HoldedInvoiceStatus = 'unknown';
+  if (data.pending === 0 && data.total && data.total > 0) status = 'paid';
+  else if (data.pending != null && data.total != null && data.pending < data.total) status = 'partial';
+  else if (data.pending != null) status = 'unpaid';
+  return {
+    id: data.id,
+    docNumber: data.docNumber,
+    status,
+    total: data.total,
+    pending: data.pending,
+    publicUrl: data.publicUrl,
+  };
 }
 
-// One-shot: find-or-create a contact by email, then create an invoice.
-// Used by the Stripe webhook after a successful payment.
+// One-shot: find-or-create a contact by email, then create a PROFORMA.
+// Holded ondersteunt zowel 'invoice' als 'proform' als document-type;
+// wij willen ALTIJD een proforma — geen echte facturen — zodat het
+// boekhoudteam handmatig kan controleren en pas dan de echte factuur
+// uitschrijft. Klant ziet er niets van: betaling werkt gewoon, mail en
+// admin tonen de pro-forma-koppeling als bewijsstuk.
 export async function invoiceForCustomer(input: {
   customer: { name: string; email: string; phone?: string | null };
   description: string;
@@ -304,7 +314,7 @@ export async function invoiceForCustomer(input: {
   taxPercent?: number;
 }): Promise<{ id: string; invoiceNum: string; contactId: string }> {
   const contact = await ensureContact(input.customer);
-  const invoice = await createInvoice({
+  const proforma = await createProforma({
     contactId: contact.id,
     desc: input.description,
     items: [{
@@ -314,10 +324,12 @@ export async function invoiceForCustomer(input: {
       tax: input.taxPercent ?? 21,
     }],
   });
-  return { id: invoice.id, invoiceNum: invoice.invoiceNum, contactId: contact.id };
+  return { id: proforma.id, invoiceNum: proforma.invoiceNum, contactId: contact.id };
 }
 
-export async function createInvoice(input: CreateInvoiceInput): Promise<{ id: string; invoiceNum: string }> {
+// Maakt een Holded pro forma. NIET een echte factuur.
+// Endpoint: POST /invoicing/v1/documents/proform
+export async function createProforma(input: CreateInvoiceInput): Promise<{ id: string; invoiceNum: string }> {
   const body = {
     contactId: input.contactId,
     desc: input.desc || '',
@@ -325,9 +337,15 @@ export async function createInvoice(input: CreateInvoiceInput): Promise<{ id: st
     notes: input.notes || '',
     items: input.items,
   };
-  const data = await holdedFetch<{ status: number; id: string; invoiceNum?: string }>(
-    '/invoicing/v1/documents/invoice',
+  const data = await holdedFetch<{ status: number; id: string; invoiceNum?: string; docNumber?: string }>(
+    '/invoicing/v1/documents/proform',
     { method: 'POST', body: JSON.stringify(body) }
   );
-  return { id: data.id, invoiceNum: data.invoiceNum || '' };
+  return { id: data.id, invoiceNum: data.invoiceNum || data.docNumber || '' };
+}
+
+// Behouden voor backwards-compat (bv. admin manual-invoice). Roept nu ook
+// de proforma-endpoint aan — geen echte facturen meer in Holded.
+export async function createInvoice(input: CreateInvoiceInput): Promise<{ id: string; invoiceNum: string }> {
+  return createProforma(input);
 }
