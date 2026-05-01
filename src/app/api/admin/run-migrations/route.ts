@@ -97,6 +97,7 @@ export async function GET() {
   // Holded full snapshot — alle Holded-velden inclusief custom fields zoals
   // kenteken/registratie. JSONB zodat we nieuwe velden kunnen toevoegen
   // zonder schema-wijzigingen.
+  await ran('customers.is_company', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS is_company BOOLEAN DEFAULT false`);
   await ran('customers.holded_raw', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_raw JSONB`);
   await ran('customers.holded_custom_fields', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_custom_fields JSONB`);
   await ran('customers.holded_tags', () => sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_tags JSONB`);

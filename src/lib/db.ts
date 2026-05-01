@@ -1025,6 +1025,7 @@ async function ensureMiscSchema(): Promise<void> {
     // velden die Holded heeft (kenteken in customFields, tags, internal code,
     // bill/shipping addresses, IBAN, etc.) lokaal kunnen tonen zonder elke
     // keer een API-call. Wordt ververst bij sync.
+    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS is_company BOOLEAN DEFAULT false`;
     await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_raw JSONB`;
     await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_custom_fields JSONB`;
     await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_tags JSONB`;
@@ -1189,6 +1190,7 @@ export type CustomerRow = {
   created_at: string;
   updated_at: string;
   // Holded-snapshot velden (zie setCustomerHoldedSnapshot).
+  is_company?: boolean;
   holded_raw?: Record<string, unknown> | null;
   holded_custom_fields?: Array<{ field?: string; value?: string; name?: string; id?: string }> | null;
   holded_tags?: string[] | null;
@@ -1327,6 +1329,8 @@ export async function setCustomerHoldedId(id: number, holdedId: string | null, f
 
 // Bewaart de complete Holded-payload + losse handige kolommen voor snel
 // filteren. Wordt aangeroepen tijdens import en bij elke handmatige sync.
+// isperson: 0 = bedrijf, 1 = persoon. We slaan 'm omgekeerd op (is_company)
+// zodat het default-gedrag (false) overeenkomt met "persoon" — meeste klanten.
 export async function setCustomerHoldedSnapshot(
   id: number,
   raw: Record<string, unknown>,
@@ -1336,7 +1340,11 @@ export async function setCustomerHoldedSnapshot(
   const tags = raw.tags ?? null;
   const billing = raw.billAddress ?? null;
   const shipping = raw.shippingAddress ?? null;
+  const isperson = raw.isperson;
+  // Holded geeft soms 0/1, soms true/false, soms '0'/'1'.
+  const isCompany = isperson === 0 || isperson === false || isperson === '0';
   await sql`UPDATE customers SET
+    is_company = ${isCompany},
     holded_raw = ${JSON.stringify(raw)}::jsonb,
     holded_custom_fields = ${customFields ? JSON.stringify(customFields) : null}::jsonb,
     holded_tags = ${tags ? JSON.stringify(tags) : null}::jsonb,

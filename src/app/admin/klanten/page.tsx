@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
-  Search, Plus, Download, Loader2, Mail, Phone, MapPin, ExternalLink, AlertTriangle,
+  Search, Plus, Download, Loader2, Mail, Phone, MapPin, ExternalLink, AlertTriangle, User, Building2,
 } from 'lucide-react';
 import { Button, Skeleton, Badge } from '@/components/ui';
 import PageHeader from '@/components/admin/PageHeader';
@@ -20,10 +20,13 @@ type CustomerRow = CustomerLite & {
   country: string | null;
   vat_number: string | null;
   notes: string | null;
+  is_company?: boolean;
   holded_sync_failed: boolean;
   source: string;
   counts: { fridges: number; stalling: number; transport: number };
 };
+
+type TypeFilter = '' | 'person' | 'company';
 
 export default function KlantenPage() {
   const [data, setData] = useState<{ customers: CustomerRow[]; total: number; page: number; pageSize: number } | null>(null);
@@ -33,6 +36,7 @@ export default function KlantenPage() {
   const [page, setPage] = useState(1);
   const [creating, setCreating] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>('');
 
   useEffect(() => {
     const t = setTimeout(() => setDebounced(search), 250);
@@ -64,13 +68,40 @@ export default function KlantenPage() {
   const importHolded = async () => {
     if (!confirm('Import / sync all Holded contacts with the local customer table?')) return;
     setImporting(true);
+    let totalImported = 0;
+    let totalUpdated = 0;
+    let totalSkipped = 0;
+    let totalErrors = 0;
+    let page = 1;
+    const pageSize = 100;
     try {
-      const res = await fetch('/api/admin/customers/import-from-holded', {
-        method: 'POST', credentials: 'include',
-      });
-      const j = await res.json();
-      if (!res.ok) throw new Error(j.error || 'import failed');
-      toast.success(`${j.imported} new, ${j.updated} updated (${j.total} total)`);
+      // Pagineer tot hasMore=false. Per page max 100 contacten zodat we
+      // ruim onder de 60s Vercel timeout blijven, ook met snapshot-write
+      // per klant. UI toont voortgang via toast.
+      while (true) {
+        const res = await fetch('/api/admin/customers/import-from-holded', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ page, pageSize }),
+        });
+        if (!res.ok) {
+          const j = await res.json().catch(() => ({}));
+          throw new Error(j.error || `Page ${page} failed (${res.status})`);
+        }
+        const j = await res.json();
+        totalImported += j.imported || 0;
+        totalUpdated += j.updated || 0;
+        totalSkipped += j.skipped || 0;
+        totalErrors += (j.errors?.length || 0);
+        toast.message(`Page ${page}: +${j.imported} new, ${j.updated} updated`, { duration: 1500 });
+        if (!j.hasMore) break;
+        page = j.nextPage || page + 1;
+        // Veiligheid: stop na 50 pages (5000 contacten) om infinite loops
+        // te voorkomen mocht Holded de count niet decrementeren.
+        if (page > 50) break;
+      }
+      toast.success(`Done — ${totalImported} new, ${totalUpdated} updated, ${totalSkipped} skipped${totalErrors ? `, ${totalErrors} errors` : ''}`);
       load();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Import failed');
@@ -100,7 +131,7 @@ export default function KlantenPage() {
         }
       />
 
-      <div className="flex flex-wrap gap-2 mb-6">
+      <div className="flex flex-wrap gap-2 mb-6 items-center">
         <div className="relative flex-1 min-w-[260px] max-w-md">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle" />
           <input
@@ -109,6 +140,31 @@ export default function KlantenPage() {
             placeholder="Search by name, email or phone…"
             className="w-full h-10 pl-9 pr-3 text-sm bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors placeholder:text-text-subtle"
           />
+        </div>
+        {/* Type-filter — segmented pills met dezelfde stijl als de
+            Fridges/AC tabs in de sidebar. */}
+        <div className="inline-flex items-center rounded-[var(--radius-md)] border border-border bg-surface p-0.5 text-[12px] font-medium">
+          {[
+            { value: '', label: 'All' },
+            { value: 'person', label: 'Persons', icon: User },
+            { value: 'company', label: 'Companies', icon: Building2 },
+          ].map((opt) => {
+            const Icon = opt.icon;
+            const active = typeFilter === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => { setTypeFilter(opt.value as TypeFilter); setPage(1); }}
+                className={`px-3 h-8 inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] transition-colors ${
+                  active ? 'bg-accent text-accent-fg' : 'text-text-muted hover:text-text'
+                }`}
+              >
+                {Icon && <Icon size={12} />}
+                {opt.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -130,7 +186,13 @@ export default function KlantenPage() {
         ) : (
           <ul className="divide-y divide-border">
             <AnimatePresence initial={false}>
-              {data.customers.map((c) => (
+              {data.customers
+                .filter((c) => {
+                  if (typeFilter === 'person') return !c.is_company;
+                  if (typeFilter === 'company') return !!c.is_company;
+                  return true;
+                })
+                .map((c) => (
                 <motion.li
                   key={c.id}
                   layout
@@ -142,12 +204,22 @@ export default function KlantenPage() {
                     href={`/admin/klanten/${c.id}`}
                     className="px-5 py-3.5 flex items-start gap-4 hover:bg-surface-2 transition-colors"
                   >
-                    <div className="w-9 h-9 rounded-full bg-surface-2 text-text flex items-center justify-center text-xs font-medium shrink-0 border border-border">
-                      {initials(c.name)}
+                    <div
+                      className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium shrink-0 border ${
+                        c.is_company
+                          ? 'bg-accent-soft text-accent border-accent/30'
+                          : 'bg-surface-2 text-text border-border'
+                      }`}
+                      title={c.is_company ? 'Company' : 'Person'}
+                    >
+                      {c.is_company ? <Building2 size={14} /> : <User size={14} />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-sm font-medium text-text">{c.name}</span>
+                        <Badge tone={c.is_company ? 'accent' : 'neutral'}>
+                          {c.is_company ? 'Company' : 'Person'}
+                        </Badge>
                         {c.holded_contact_id && <Badge tone="success">Holded</Badge>}
                         {c.holded_sync_failed && (
                           <Badge tone="warning">
