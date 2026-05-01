@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Refrigerator, Bell, Truck, LogOut, ChevronLeft,
   Settings, Users, Warehouse, MessageSquare, Search, PlayCircle, Lightbulb,
 } from 'lucide-react';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import CommandPalette from './CommandPalette';
 import LocaleSwitch from './LocaleSwitch';
 
@@ -51,9 +51,17 @@ function initials(name: string): string {
   return parts.slice(0, 2).map((p) => p[0]?.toUpperCase() || '').join('');
 }
 
+const COLLAPSED_WIDTH = 76;
+const EXPANDED_WIDTH = 280;
+
 export default function AppShell({ userName, children, onLogout }: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
+  // Hover-state — sidebar opent zodra de muis erover komt en sluit weer
+  // wanneer 'm de zone verlaat. De main-content krijgt een vaste linker
+  // padding van COLLAPSED_WIDTH zodat hij niet schuift bij hovering.
+  const [hovered, setHovered] = useState(false);
+  const expanded = hovered;
 
   const handleLogout = async () => {
     try {
@@ -66,24 +74,43 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
   };
 
   return (
-    <div className="min-h-screen flex bg-bg">
-      {/* Donkere sidebar — reparatiepanel-stijl */}
+    <div className="min-h-screen bg-bg" style={{ paddingLeft: COLLAPSED_WIDTH }}>
+      {/* Navy sidebar — auto-collapse naar 76px, expand op hover naar 280px.
+          Sticky+fixed positioning zodat 'm boven de main-content schuift
+          tijdens expand i.p.v. de content opzij te duwen. */}
       <aside
-        className="w-64 shrink-0 flex flex-col h-screen sticky top-0"
-        style={{ background: 'var(--color-sidebar)', color: 'var(--color-sidebar-fg)' }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        className="fixed top-0 left-0 h-screen flex flex-col z-40 overflow-hidden"
+        style={{
+          width: expanded ? EXPANDED_WIDTH : COLLAPSED_WIDTH,
+          background: 'var(--color-sidebar)',
+          color: 'var(--color-sidebar-fg)',
+          boxShadow: expanded ? '0 12px 40px rgba(0,0,0,0.35)' : 'none',
+          transition: 'width 220ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 220ms ease',
+        }}
       >
+        {/* Logo-blok */}
         <div
-          className="px-5 py-5 border-b"
-          style={{ borderColor: 'var(--color-sidebar-border)' }}
+          className="border-b flex items-center"
+          style={{
+            borderColor: 'var(--color-sidebar-border)',
+            height: 80,
+            paddingLeft: 14,
+            paddingRight: 14,
+          }}
         >
-          <Link
-            href="/admin"
-            className="flex items-center justify-between group"
-            title="Back to portal selection"
-          >
+          <Link href="/admin" className="flex items-center gap-3 group w-full" title="Back to portal selection">
+            {/* Witte chip rond het logo. Bij collapsed = compacte 48×48 vierkant
+                (toont een uitsnede van het logo); bij expanded = full-width chip. */}
             <div
-              className="inline-flex items-center justify-center px-3 py-2 rounded-[var(--radius-md)]"
-              style={{ background: '#FFFFFF' }}
+              className="inline-flex items-center justify-center rounded-[var(--radius-md)] shrink-0 overflow-hidden"
+              style={{
+                background: '#FFFFFF',
+                width: expanded ? 200 : 48,
+                height: 48,
+                transition: 'width 220ms cubic-bezier(0.16, 1, 0.3, 1)',
+              }}
             >
               <Image
                 src="/images/logo.png"
@@ -92,33 +119,60 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
                 height={95}
                 priority
                 quality={100}
-                className="h-9 w-auto"
+                style={{
+                  height: 32,
+                  width: 'auto',
+                  maxWidth: 'none',
+                  objectFit: 'contain',
+                  objectPosition: 'left center',
+                }}
               />
             </div>
-            <ChevronLeft size={14} className="text-white/30 group-hover:text-white/60 transition-colors shrink-0" />
+            {expanded && (
+              <ChevronLeft
+                size={14}
+                className="text-white/30 group-hover:text-white/60 transition-colors shrink-0 ml-auto"
+              />
+            )}
           </Link>
         </div>
 
+        {/* Search-trigger */}
         <button
           type="button"
           onClick={() => {
-            // Trigger Cmd+K palette via een synthetisch keyboard event
             window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
           }}
-          className="mx-3 mt-3 flex items-center gap-2.5 px-3 h-9 rounded-[var(--radius-md)] text-[13px] transition-colors group"
-          style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)' }}
+          className="mx-3 mt-3 flex items-center gap-2.5 px-3 h-9 rounded-[var(--radius-md)] text-[13px] transition-colors shrink-0"
+          style={{
+            background: 'rgba(255,255,255,0.06)',
+            color: 'rgba(255,255,255,0.7)',
+            border: '1px solid rgba(255,255,255,0.1)',
+          }}
+          title="Quick search (⌘K)"
         >
-          <Search size={14} />
-          <span className="flex-1 text-left">Quick search…</span>
-          <kbd className="text-[10px] tabular-nums px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.55)' }}>⌘K</kbd>
+          <Search size={14} className="shrink-0" />
+          {expanded && (
+            <>
+              <span className="flex-1 text-left whitespace-nowrap">Quick search…</span>
+              <kbd
+                className="text-[10px] tabular-nums px-1.5 py-0.5 rounded"
+                style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.55)' }}
+              >
+                ⌘K
+              </kbd>
+            </>
+          )}
         </button>
 
-        <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto">
+        <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto overflow-x-hidden">
           {NAV_GROUPS.map((group) => (
             <div key={group.label}>
-              <div className="px-3 mb-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-white/35">
-                {group.label}
-              </div>
+              {expanded && (
+                <div className="px-3 mb-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-white/35 whitespace-nowrap">
+                  {group.label}
+                </div>
+              )}
               <div className="space-y-0.5">
                 {group.items.map((item) => {
                   const active = item.exact
@@ -129,10 +183,9 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="relative flex items-center gap-3 px-3 h-10 rounded-[var(--radius-md)] text-[14px] transition-colors group"
-                      style={{
-                        color: active ? 'white' : 'rgba(255,255,255,0.7)',
-                      }}
+                      title={!expanded ? item.label : undefined}
+                      className="relative flex items-center gap-3 px-3 h-10 rounded-[var(--radius-md)] text-[14px] transition-colors"
+                      style={{ color: active ? 'white' : 'rgba(255,255,255,0.7)' }}
                     >
                       {active && (
                         <motion.div
@@ -142,8 +195,10 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
                           transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                         />
                       )}
-                      <Icon size={16} className="relative z-10 shrink-0" />
-                      <span className="relative z-10">{item.label}</span>
+                      <Icon size={18} className="relative z-10 shrink-0" />
+                      {expanded && (
+                        <span className="relative z-10 whitespace-nowrap">{item.label}</span>
+                      )}
                     </Link>
                   );
                 })}
@@ -152,45 +207,48 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
           ))}
         </nav>
 
-        <div
-          className="p-3 border-t"
-          style={{ borderColor: 'var(--color-sidebar-border)' }}
-        >
-          <div className="flex items-center gap-2.5 px-3 py-2 mb-1">
+        {/* Onderkant — user, taal-toggle, sign out */}
+        <div className="p-3 border-t shrink-0" style={{ borderColor: 'var(--color-sidebar-border)' }}>
+          <div className="flex items-center gap-2.5 px-2 py-2 mb-1">
             <div
-              className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-medium shrink-0"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-medium shrink-0"
               style={{ background: 'var(--color-sidebar-accent)', color: 'white' }}
+              title={!expanded ? userName : undefined}
             >
               {initials(userName)}
             </div>
-            <span className="flex-1 text-[12px] font-medium text-white truncate">{userName}</span>
-            <LocaleSwitch variant="dark" />
+            {expanded && (
+              <>
+                <span className="flex-1 text-[12px] font-medium text-white truncate">{userName}</span>
+                <LocaleSwitch variant="dark" />
+              </>
+            )}
           </div>
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 h-8 rounded-[var(--radius-md)] text-[12px] text-white/55 hover:text-white hover:bg-white/5 transition-colors"
+            title={!expanded ? 'Sign out' : undefined}
           >
-            <LogOut size={14} /> Sign out
+            <LogOut size={14} className="shrink-0" />
+            {expanded && <span className="whitespace-nowrap">Sign out</span>}
           </button>
         </div>
       </aside>
 
-      <div className="flex-1 min-w-0 flex flex-col">
-        <main className="flex-1 min-w-0">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={pathname}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-              className="page-admin max-w-7xl mx-auto px-8 lg:px-12 py-10 lg:py-12"
-            >
-              {children}
-            </motion.div>
-          </AnimatePresence>
-        </main>
-      </div>
+      <main className="min-w-0">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+            className="page-admin max-w-7xl mx-auto px-8 lg:px-12 py-10 lg:py-12"
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
+      </main>
       <CommandPalette />
     </div>
   );
