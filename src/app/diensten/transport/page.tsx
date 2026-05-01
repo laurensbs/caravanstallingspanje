@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Truck, KeyRound } from 'lucide-react';
 import {
   ContactFields, MultiStepShell, Section, Field, fieldCls,
@@ -22,7 +22,7 @@ export default function TransportPage() {
       currency: 'EUR',
     }).format(eur);
 
-  const [mode, setMode] = useState<Mode>('wij_rijden');
+  const [mode, setMode] = useState<Mode | null>(null);
   const [contact, setContact] = useState(emptyContact);
   const [camping, setCamping] = useState('');
   const [outboundDate, setOutboundDate] = useState('');
@@ -48,11 +48,16 @@ export default function TransportPage() {
 
   const { submit, submitting, error, done, publicCode } = useServiceSubmit('/api/order/transport');
 
-  const step1Valid = !!(camping && outboundDate && returnDate);
-  const currentPrice = mode === 'wij_rijden' ? prices.wij_rijden : prices.zelf;
+  const step1Valid = !!(mode && camping && outboundDate && returnDate);
+  const currentPrice = mode === 'wij_rijden'
+    ? prices.wij_rijden
+    : mode === 'zelf'
+      ? prices.zelf
+      : 0;
 
   // Mode-afhankelijke labels — voor 'zelf' draait alles om "ophalen uit
   // stalling", voor 'wij_rijden' om "wij komen langs op de camping".
+  // Default leesbaarheid als mode nog null is: behandel als 'wij_rijden'.
   const isZelf = mode === 'zelf';
   const pickupLabel = isZelf ? 'Ophaal-datum (uit stalling)' : 'Ophaal-datum (op camping)';
   const returnLabel = isZelf ? 'Terugbreng-datum (naar stalling)' : 'Terug-datum (terug naar stalling)';
@@ -83,87 +88,114 @@ export default function TransportPage() {
         </div>
       </Section>
 
-      <Section title={isZelf ? 'Ophalen bij stalling' : 'Ophalen op camping'}>
-        {/* Visuele route-indicator: voor 'zelf' = jij rijdt; voor 'wij_rijden' = wij rijden */}
-        <div className="rounded-[var(--radius-lg)] border border-border bg-surface-2 p-3 flex items-center justify-between text-[12px] text-text-muted gap-3">
-          <span className="inline-flex items-center gap-1.5">
-            <AnimatedServiceIcon kind="transport" size={14} loop /> Stalling
-          </span>
-          <ArrowRightIcon size={12} className="text-text-subtle" />
-          <span className="truncate text-text">{camping || '—'}</span>
-          <ArrowRightIcon size={12} className="text-text-subtle rotate-180" />
-          <span className="inline-flex items-center gap-1.5">
-            <AnimatedServiceIcon kind="transport" size={14} loop /> Stalling
-          </span>
-        </div>
+      <AnimatePresence initial={false}>
+        {mode && (
+          <motion.div
+            key={mode}
+            initial={{ opacity: 0, y: 10, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: -8, height: 0 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div className="pt-2">
+              <Section title={isZelf ? 'Ophalen bij Stalling' : 'Ophalen op camping'}>
+                {/* Visuele route-indicator */}
+                <div className="rounded-[var(--radius-lg)] border border-border bg-surface-2 p-3 flex items-center justify-between text-[12px] text-text-muted gap-3">
+                  <span className="inline-flex items-center gap-1.5">
+                    <AnimatedServiceIcon kind="transport" size={14} loop /> Stalling
+                  </span>
+                  <ArrowRightIcon size={12} className="text-text-subtle" />
+                  <span className="truncate text-text">{camping || '—'}</span>
+                  <ArrowRightIcon size={12} className="text-text-subtle rotate-180" />
+                  <span className="inline-flex items-center gap-1.5">
+                    <AnimatedServiceIcon kind="transport" size={14} loop /> Stalling
+                  </span>
+                </div>
 
-        <Field label="Camping" required hint={campingHelperText}>
-          <CampingPicker
-            value={camping}
-            onChange={setCamping}
-            placeholder={t('fridge.camping-placeholder')}
-            required
-            ariaLabel="Camping"
-          />
-        </Field>
+                <Field label="Camping" required hint={campingHelperText}>
+                  <CampingPicker
+                    value={camping}
+                    onChange={setCamping}
+                    placeholder={t('fridge.camping-placeholder')}
+                    required
+                    ariaLabel="Camping"
+                  />
+                </Field>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Field label={pickupLabel} required hint={isZelf ? 'Wanneer kom je langs?' : 'Wanneer mogen wij komen?'}>
-            <div className="grid grid-cols-[1fr_110px] gap-2">
-              <input
-                type="date"
-                required
-                value={outboundDate}
-                min={new Date().toISOString().slice(0, 10)}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setOutboundDate(v);
-                  if (!returnDate || returnDate < v) setReturnDate(v);
-                }}
-                className={fieldCls}
-              />
-              <input
-                type="time"
-                value={outboundTime}
-                onChange={(e) => setOutboundTime(e.target.value)}
-                className={fieldCls}
-                aria-label={isZelf ? 'Ongeveer hoe laat' : 'Ongeveer hoe laat'}
-              />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Field label={pickupLabel} required hint={isZelf ? 'Wanneer kom je langs?' : 'Wanneer mogen wij komen?'}>
+                    <div className="grid grid-cols-[1fr_110px] gap-2">
+                      <input
+                        type="date"
+                        required
+                        value={outboundDate}
+                        min={new Date().toISOString().slice(0, 10)}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setOutboundDate(v);
+                          if (!returnDate || returnDate < v) setReturnDate(v);
+                        }}
+                        className={fieldCls}
+                      />
+                      <input
+                        type="time"
+                        value={outboundTime}
+                        onChange={(e) => setOutboundTime(e.target.value)}
+                        className={fieldCls}
+                        aria-label="Ongeveer hoe laat"
+                      />
+                    </div>
+                  </Field>
+                  <Field label={returnLabel} required hint="Ongeveer wanneer komt hij terug?">
+                    <div className="grid grid-cols-[1fr_110px] gap-2">
+                      <input
+                        type="date"
+                        required
+                        value={returnDate}
+                        min={outboundDate || new Date().toISOString().slice(0, 10)}
+                        onChange={(e) => setReturnDate(e.target.value)}
+                        className={fieldCls}
+                      />
+                      <input
+                        type="time"
+                        value={returnTime}
+                        onChange={(e) => setReturnTime(e.target.value)}
+                        className={fieldCls}
+                        aria-label="Ongeveer hoe laat"
+                      />
+                    </div>
+                  </Field>
+                </div>
+
+                <Field label={`${t('contact.note')} ${t('common.optional')}`}>
+                  <textarea
+                    rows={3}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder={isZelf
+                      ? 'Bv. tijd kan flexibel, ik bel je dezelfde ochtend nog'
+                      : 'Bv. caravan staat op plek 12, achterzijde'}
+                    className={`${fieldCls} min-h-[80px] py-2 resize-none`}
+                  />
+                </Field>
+              </Section>
             </div>
-          </Field>
-          <Field label={returnLabel} required hint="Ongeveer wanneer komt hij terug?">
-            <div className="grid grid-cols-[1fr_110px] gap-2">
-              <input
-                type="date"
-                required
-                value={returnDate}
-                min={outboundDate || new Date().toISOString().slice(0, 10)}
-                onChange={(e) => setReturnDate(e.target.value)}
-                className={fieldCls}
-              />
-              <input
-                type="time"
-                value={returnTime}
-                onChange={(e) => setReturnTime(e.target.value)}
-                className={fieldCls}
-                aria-label="Ongeveer hoe laat"
-              />
-            </div>
-          </Field>
-        </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        <Field label={`${t('contact.note')} ${t('common.optional')}`}>
-          <textarea
-            rows={3}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder={isZelf
-              ? 'Bv. tijd kan flexibel, ik bel je dezelfde ochtend nog'
-              : 'Bv. caravan staat op plek 12, achterzijde'}
-            className={`${fieldCls} min-h-[80px] py-2 resize-none`}
-          />
-        </Field>
-      </Section>
+      {/* Hint als nog geen keuze is gemaakt */}
+      {!mode && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+          className="text-[13px] text-text-muted text-center"
+        >
+          ↑ Kies eerst hoe je het wilt regelen
+        </motion.p>
+      )}
     </>
   );
 
