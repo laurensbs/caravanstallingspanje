@@ -36,9 +36,9 @@ export const fridgeBookingSchema = z.object({
 
 export const waitlistSchema = z.object({
   device_type: z.enum(['Grote koelkast', 'Tafelmodel koelkast', 'Airco']),
-  name: z.string().min(2).max(200),
-  email: z.string().email(),
-  phone: z.string().min(5).max(40).optional().or(z.literal('')),
+  name: z.string().min(2, 'Vul je naam in').max(200),
+  email: z.string().email('Vul een geldig e-mailadres in'),
+  phone: z.string().min(5, 'Vul je telefoonnummer in').max(40).optional().or(z.literal('')),
   camping: z.string().max(200).optional().or(z.literal('')),
   spot_number: z.string().max(50).optional().or(z.literal('')),
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -68,10 +68,12 @@ export const fridgeOrderSchema = z.object({
 });
 
 // ─── Public service requests (forwarded to reparatiepanel) ───
+// Vriendelijke meldingen — geen "Too small: expected string to have >=2 chars"
+// achtige rauwe Zod-output meer richting de klant.
 const contactBase = {
-  name: z.string().min(2).max(200),
-  email: z.string().email(),
-  phone: z.string().min(5).max(40),
+  name: z.string().min(2, 'Vul je naam in').max(200),
+  email: z.string().email('Vul een geldig e-mailadres in'),
+  phone: z.string().min(5, 'Vul je telefoonnummer in').max(40),
   registration: z.string().max(40).optional().or(z.literal('')),
   brand: z.string().max(80).optional().or(z.literal('')),
   model: z.string().max(80).optional().or(z.literal('')),
@@ -153,9 +155,9 @@ export const settingsUpdateSchema = z.object({
 
 export const stallingOrderSchema = z.object({
   type: z.enum(['binnen', 'buiten']),
-  name: z.string().min(2).max(200),
-  email: z.string().email(),
-  phone: z.string().min(5).max(40),
+  name: z.string().min(2, 'Vul je naam in').max(200),
+  email: z.string().email('Vul een geldig e-mailadres in'),
+  phone: z.string().min(5, 'Vul je telefoonnummer in').max(40),
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Datum is verplicht'),
   end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().or(z.literal('')),
   registration: z.string().max(40).optional().or(z.literal('')),
