@@ -24,7 +24,7 @@ type Entry = {
 };
 
 function fmtDate(s: string): string {
-  return new Date(s).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
+  return new Date(s).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 export default function WachtlijstPage() {
@@ -50,22 +50,22 @@ export default function WachtlijstPage() {
       credentials: 'include',
     });
     if (!res.ok) {
-      toast.error('Kon actie niet uitvoeren');
+      toast.error('Could not perform action');
       return;
     }
-    toast.success(type === 'notify' ? 'Gemarkeerd als genotificeerd' : 'Verwijderd');
+    toast.success(type === 'notify' ? 'Marked as notified' : 'Deleted');
     load();
   };
 
   return (
     <>
       <PageHeader
-        eyebrow="Operatie"
-        title="Wachtlijst"
+        eyebrow="Operations"
+        title="Waitlist"
         description={
           entries === null
-            ? 'Laden…'
-            : `${entries.length} aanmelding${entries.length === 1 ? '' : 'en'} voor periodes waarvoor de voorraad vol was.`
+            ? 'Loading…'
+            : `${entries.length} ${entries.length === 1 ? 'entry' : 'entries'} for periods where stock was full.`
         }
       />
 
@@ -80,9 +80,9 @@ export default function WachtlijstPage() {
           <div className="w-12 h-12 rounded-[var(--radius-2xl)] bg-surface-2 border border-border flex items-center justify-center mx-auto mb-4">
             <Bell size={18} className="text-text-subtle" />
           </div>
-          <p className="text-sm text-text">Nog geen wachtlijst-aanmeldingen</p>
+          <p className="text-sm text-text">No waitlist entries yet</p>
           <p className="text-xs text-text-muted mt-1">
-            Wanneer iemand zich op de wachtlijst zet, verschijnt het hier.
+            When someone joins the waitlist, it will appear here.
           </p>
         </div>
       ) : (
@@ -104,22 +104,22 @@ export default function WachtlijstPage() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="font-medium text-text">{e.name}</h3>
                         <Badge tone="neutral">{e.device_type}</Badge>
-                        {notified && <Badge tone="success">Gecontacteerd</Badge>}
+                        {notified && <Badge tone="success">Contacted</Badge>}
                       </div>
                       <p className="text-xs text-text-muted mt-1 inline-flex items-center gap-1">
-                        <Clock size={11} /> Aangemeld op {fmtDate(e.created_at)}
+                        <Clock size={11} /> Submitted on {fmtDate(e.created_at)}
                       </p>
                     </div>
                     <div className="flex gap-1 shrink-0">
                       {!notified && (
                         <Button size="sm" variant="secondary" onClick={() => action(e.id, 'notify')}>
-                          <Bell size={12} /> Markeer
+                          <Bell size={12} /> Mark
                         </Button>
                       )}
                       <button
                         onClick={() => action(e.id, 'delete')}
                         className="w-8 h-8 inline-flex items-center justify-center rounded-[var(--radius-md)] text-text-muted hover:text-danger hover:bg-danger-soft transition-colors"
-                        aria-label="Verwijderen"
+                        aria-label="Delete"
                       >
                         <Trash2 size={13} />
                       </button>
@@ -128,7 +128,7 @@ export default function WachtlijstPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-text">
                     <span className="flex items-center gap-1.5">
                       <Calendar size={12} className="text-text-subtle shrink-0" />
-                      {fmtDate(e.start_date)} t/m {fmtDate(e.end_date)}
+                      {fmtDate(e.start_date)} – {fmtDate(e.end_date)}
                     </span>
                     {e.camping && (
                       <span className="flex items-center gap-1.5">

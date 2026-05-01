@@ -23,11 +23,11 @@ type Message = {
 
 const STATUS_OPTIONS = [
   { value: 'open',    label: 'Open',          tone: 'warning' as const },
-  { value: 'handled', label: 'Afgehandeld',   tone: 'success' as const },
+  { value: 'handled', label: 'Handled',       tone: 'success' as const },
 ];
 
 function fmtDate(s: string): string {
-  return new Date(s).toLocaleString('nl-NL', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  return new Date(s).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
 
 export default function ContactInboxPage() {
@@ -55,31 +55,31 @@ export default function ContactInboxPage() {
       body: JSON.stringify(body),
       credentials: 'include',
     });
-    if (!res.ok) { toast.error('Actie mislukt'); return; }
+    if (!res.ok) { toast.error('Action failed'); return; }
     toast.success(msg);
     load();
   };
 
   const remove = async (id: number) => {
-    if (!confirm('Bericht verwijderen?')) return;
+    if (!confirm('Delete message?')) return;
     const res = await fetch(`/api/admin/contact/${id}`, {
       method: 'DELETE',
       credentials: 'include',
     });
-    if (!res.ok) { toast.error('Verwijderen mislukt'); return; }
-    toast.success('Verwijderd');
+    if (!res.ok) { toast.error('Delete failed'); return; }
+    toast.success('Deleted');
     load();
   };
 
   return (
     <>
       <PageHeader
-        eyebrow="Operatie"
-        title="Berichten"
-        description="Inkomende contact-formulier-berichten."
+        eyebrow="Operations"
+        title="Messages"
+        description="Incoming contact form messages."
         actions={
           <Select value={filter} onChange={(e) => setFilter(e.target.value)} className="min-w-[160px]">
-            <option value="">Alles</option>
+            <option value="">All</option>
             {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
           </Select>
         }
@@ -95,7 +95,7 @@ export default function ContactInboxPage() {
             <MessageSquare size={18} className="text-text-subtle" />
           </div>
           <p className="text-sm text-text">
-            {filter ? `Geen berichten met status "${filter}"` : 'Geen berichten'}
+            {filter ? `No messages with status "${filter}"` : 'No messages'}
           </p>
         </div>
       ) : (
@@ -104,7 +104,7 @@ export default function ContactInboxPage() {
             {messages.map((m) => {
               const tone = STATUS_OPTIONS.find((s) => s.value === m.status)?.tone || 'neutral';
               const label = STATUS_OPTIONS.find((s) => s.value === m.status)?.label || m.status;
-              const replyHref = `mailto:${encodeURIComponent(m.email)}?subject=${encodeURIComponent('Re: ' + (m.subject || 'Je bericht'))}&body=${encodeURIComponent('Hi ' + m.name + ',\n\n')}`;
+              const replyHref = `mailto:${encodeURIComponent(m.email)}?subject=${encodeURIComponent('Re: ' + (m.subject || 'Your message'))}&body=${encodeURIComponent('Hi ' + m.name + ',\n\n')}`;
               return (
                 <motion.li
                   key={m.id}
@@ -124,23 +124,23 @@ export default function ContactInboxPage() {
                     </div>
                     <div className="flex gap-1 shrink-0 items-center">
                       <a href={replyHref}>
-                        <Button size="sm" variant="secondary"><Reply size={12} /> Antwoord</Button>
+                        <Button size="sm" variant="secondary"><Reply size={12} /> Reply</Button>
                       </a>
                       {m.status === 'open' ? (
                         <Button size="sm" variant="ghost"
-                          onClick={() => action(m.id, { action: 'handle' }, 'Afgehandeld')}>
-                          <Check size={12} /> Markeer afgehandeld
+                          onClick={() => action(m.id, { action: 'handle' }, 'Handled')}>
+                          <Check size={12} /> Mark as handled
                         </Button>
                       ) : (
                         <Button size="sm" variant="ghost"
-                          onClick={() => action(m.id, { action: 'reopen' }, 'Heropend')}>
-                          <RotateCcw size={12} /> Heropen
+                          onClick={() => action(m.id, { action: 'reopen' }, 'Reopened')}>
+                          <RotateCcw size={12} /> Reopen
                         </Button>
                       )}
                       <button
                         onClick={() => remove(m.id)}
                         className="w-8 h-8 inline-flex items-center justify-center rounded-[var(--radius-md)] text-text-muted hover:text-danger hover:bg-danger-soft transition-colors"
-                        aria-label="Verwijderen"
+                        aria-label="Delete"
                       >
                         <Trash2 size={13} />
                       </button>

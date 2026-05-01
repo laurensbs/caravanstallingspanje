@@ -32,14 +32,14 @@ type RunResult = {
 
 export default function TestFlowPage() {
   const [email, setEmail] = useState('');
-  const [name, setName] = useState('Test Klant');
+  const [name, setName] = useState('Test Customer');
   const [skipMail, setSkipMail] = useState(false);
   const [running, setRunning] = useState<Kind | null>(null);
   const [results, setResults] = useState<RunResult[]>([]);
 
   const run = async (kind: Kind) => {
     if (!email || !email.includes('@')) {
-      toast.error('Vul eerst een geldig e-mailadres in');
+      toast.error('Enter a valid email address first');
       return;
     }
     setRunning(kind);
@@ -53,12 +53,12 @@ export default function TestFlowPage() {
       const data = await res.json();
       setResults((prev) => [{ ...data, kind }, ...prev]);
       if (data.ok) {
-        toast.success(`Test-flow ${kind} doorlopen — check ${email}`);
+        toast.success(`Test flow ${kind} completed — check ${email}`);
       } else {
-        toast.error(`Test mislukt: ${data.error || 'onbekend'}`);
+        toast.error(`Test failed: ${data.error || 'unknown'}`);
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Test mislukt');
+      toast.error(err instanceof Error ? err.message : 'Test failed');
     } finally {
       setRunning(null);
     }
@@ -67,23 +67,23 @@ export default function TestFlowPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Beheer"
-        title="Test-flow"
-        description="Doorloop volledig wat een klant ziet — booking aanmaken, status op betaald zetten, Holded pro forma, bevestigingsmail. Geen Stripe-betaling vereist."
+        eyebrow="Admin"
+        title="Test flow"
+        description="Run through exactly what a customer sees — create booking, set status to paid, Holded pro forma, confirmation email. No Stripe payment required."
       />
 
       <div className="card-surface p-6 mb-6 space-y-4 max-w-2xl">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Input
-            label="Test e-mailadres"
+            label="Test email address"
             type="email"
-            placeholder="jij@voorbeeld.nl"
+            placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            hint="Hier komt de bevestigingsmail aan."
+            hint="The confirmation email will arrive here."
           />
           <Input
-            label="Klantnaam"
+            label="Customer name"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -95,7 +95,7 @@ export default function TestFlowPage() {
             onChange={(e) => setSkipMail(e.target.checked)}
             className="rounded"
           />
-          Geen mail versturen (alleen DB + Holded)
+          Don't send email (DB + Holded only)
         </label>
       </div>
 
@@ -103,8 +103,8 @@ export default function TestFlowPage() {
         <TestButton
           kind="koelkast"
           icon={Refrigerator}
-          label="Koelkast"
-          desc="€40 · 7 dagen"
+          label="Fridge"
+          desc="€40 · 7 days"
           color="cyan"
           running={running === 'koelkast'}
           disabled={running !== null}
@@ -113,8 +113,8 @@ export default function TestFlowPage() {
         <TestButton
           kind="airco"
           icon={Wind}
-          label="Airco"
-          desc="€50 · 7 dagen"
+          label="AC unit"
+          desc="€50 · 7 days"
           color="amber"
           running={running === 'airco'}
           disabled={running !== null}
@@ -124,7 +124,7 @@ export default function TestFlowPage() {
           kind="transport"
           icon={Truck}
           label="Transport"
-          desc="€100 · heen-en-terug"
+          desc="€100 · round trip"
           color="violet"
           running={running === 'transport'}
           disabled={running !== null}
@@ -134,7 +134,7 @@ export default function TestFlowPage() {
           kind="service"
           icon={Sparkles}
           label="Service"
-          desc="€95 · waxen"
+          desc="€95 · waxing"
           color="cyan"
           running={running === 'service'}
           disabled={running !== null}
@@ -158,14 +158,14 @@ export default function TestFlowPage() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-semibold text-text capitalize">{r.kind}</h3>
                     {r.ok
-                      ? <Badge tone="success"><Check size={10} /> Geslaagd</Badge>
-                      : <Badge tone="danger"><AlertTriangle size={10} /> Mislukt</Badge>}
+                      ? <Badge tone="success"><Check size={10} /> Success</Badge>
+                      : <Badge tone="danger"><AlertTriangle size={10} /> Failed</Badge>}
                     {r.ref && <Badge tone="neutral">{r.ref}</Badge>}
                     {r.holdedInvoiceNum && (
                       <Badge tone="success">Holded {r.holdedInvoiceNum}</Badge>
                     )}
                     {r.mailSent && (
-                      <Badge tone="success"><Mail size={10} /> Mail verzonden</Badge>
+                      <Badge tone="success"><Mail size={10} /> Email sent</Badge>
                     )}
                   </div>
                   {r.error && <p className="text-[12px] text-danger mt-1">{r.error}</p>}
@@ -174,7 +174,7 @@ export default function TestFlowPage() {
                   {r.receiptUrl && (
                     <a href={r.receiptUrl} target="_blank" rel="noopener noreferrer">
                       <Button size="sm" variant="secondary">
-                        <ExternalLink size={12} /> Klant-receipt
+                        <ExternalLink size={12} /> Customer receipt
                       </Button>
                     </a>
                   )}
@@ -199,26 +199,26 @@ export default function TestFlowPage() {
             onClick={() => setResults([])}
             className="text-[12px] text-text-muted hover:text-text underline-offset-4 hover:underline inline-flex items-center gap-1.5"
           >
-            <RefreshCw size={11} /> Resultaten wissen
+            <RefreshCw size={11} /> Clear results
           </button>
         )}
       </div>
 
       <div className="mt-10 max-w-2xl card-surface p-5 bg-warning-soft border-warning">
         <h3 className="text-[13px] font-semibold uppercase tracking-[0.18em] mb-2 inline-flex items-center gap-2">
-          <PlayCircle size={14} /> Hoe werkt het?
+          <PlayCircle size={14} /> How does it work?
         </h3>
         <ol className="text-[13px] text-text-muted leading-relaxed space-y-1 list-decimal list-inside">
-          <li>Vul jouw eigen e-mailadres in (zodat je de mail krijgt zoals klant).</li>
-          <li>Klik op een dienst-knop — de complete backend-flow loopt door.</li>
-          <li>Open <strong>Klant-receipt</strong> in nieuwe tab → check wat klant ziet.</li>
-          <li>Open je inbox → check de bevestigingsmail in caravanstalling-stijl.</li>
-          <li>Open <strong>Admin</strong> → check of de booking netjes binnenkomt.</li>
-          <li>Open Holded → check of de pro forma is aangemaakt (geen echte factuur).</li>
+          <li>Enter your own email address (so you receive the email as the customer would).</li>
+          <li>Click a service button — the complete backend flow runs through.</li>
+          <li>Open <strong>Customer receipt</strong> in a new tab to see what the customer sees.</li>
+          <li>Open your inbox to check the confirmation email in the caravan storage style.</li>
+          <li>Open <strong>Admin</strong> to verify the booking is registered correctly.</li>
+          <li>Open Holded to check that the pro forma was created (not a real invoice).</li>
         </ol>
         <p className="text-[12px] text-text-muted mt-3 italic">
-          Test-bookings worden gemarkeerd met &quot;(TEST)&quot; in de naam zodat je ze later kunt
-          herkennen en eventueel verwijderen.
+          Test bookings are marked with &quot;(TEST)&quot; in the name so you can recognise and
+          remove them later if needed.
         </p>
       </div>
     </>

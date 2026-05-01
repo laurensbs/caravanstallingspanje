@@ -90,10 +90,10 @@ export default function SettingsPage() {
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        toast.error(d.error || 'Opslaan mislukt');
+        toast.error(d.error || 'Save failed');
         return;
       }
-      toast.success('Instellingen opgeslagen');
+      toast.success('Settings saved');
     } finally {
       setSaving(false);
     }
@@ -102,15 +102,15 @@ export default function SettingsPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Beheer"
-        title="Instellingen"
-        description="Prijzen en voorraad. Een prijs op 0 € verbergt de optie op de website."
+        eyebrow="Admin"
+        title="Settings"
+        description="Prices and stock. A price of €0 hides the option on the website."
       />
 
       <form onSubmit={save} className="space-y-6 max-w-2xl">
         <div className="card-surface p-6 space-y-4">
           <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
-            Stalling (jaarprijs)
+            Storage (annual price)
           </h2>
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -119,10 +119,10 @@ export default function SettingsPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Input label="Binnen (€ / jaar)" inputMode="decimal"
+              <Input label="Indoor (€ / year)" inputMode="decimal"
                 value={form.stalling_price_binnen}
                 onChange={(e) => set('stalling_price_binnen', e.target.value)} />
-              <Input label="Buiten (€ / jaar)" inputMode="decimal"
+              <Input label="Outdoor (€ / year)" inputMode="decimal"
                 value={form.stalling_price_buiten}
                 onChange={(e) => set('stalling_price_buiten', e.target.value)} />
             </div>
@@ -131,7 +131,7 @@ export default function SettingsPage() {
 
         <div className="card-surface p-6 space-y-4">
           <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
-            Koelkasten & airco — prijs per week
+            Fridges & AC — price per week
           </h2>
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -139,13 +139,13 @@ export default function SettingsPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <Input label="Grote koelkast (€/week)" inputMode="decimal"
+              <Input label="Large fridge (€/week)" inputMode="decimal"
                 value={form.fridge_price_grote}
                 onChange={(e) => set('fridge_price_grote', e.target.value)} />
-              <Input label="Tafelmodel (€/week)" inputMode="decimal"
+              <Input label="Tabletop (€/week)" inputMode="decimal"
                 value={form.fridge_price_tafel}
                 onChange={(e) => set('fridge_price_tafel', e.target.value)} />
-              <Input label="Airco (€/week)" inputMode="decimal"
+              <Input label="AC unit (€/week)" inputMode="decimal"
                 value={form.fridge_price_airco}
                 onChange={(e) => set('fridge_price_airco', e.target.value)} />
             </div>
@@ -154,7 +154,7 @@ export default function SettingsPage() {
 
         <div className="card-surface p-6 space-y-4">
           <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
-            Voorraad (capaciteit)
+            Stock (capacity)
           </h2>
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -162,13 +162,13 @@ export default function SettingsPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <Input label="Grote koelkast (stuks)" inputMode="numeric"
+              <Input label="Large fridge (units)" inputMode="numeric"
                 value={form.fridge_stock_grote}
                 onChange={(e) => set('fridge_stock_grote', e.target.value)} />
-              <Input label="Tafelmodel (stuks)" inputMode="numeric"
+              <Input label="Tabletop (units)" inputMode="numeric"
                 value={form.fridge_stock_tafel}
                 onChange={(e) => set('fridge_stock_tafel', e.target.value)} />
-              <Input label="Airco (stuks)" inputMode="numeric"
+              <Input label="AC unit (units)" inputMode="numeric"
                 value={form.fridge_stock_airco}
                 onChange={(e) => set('fridge_stock_airco', e.target.value)} />
             </div>
@@ -177,7 +177,7 @@ export default function SettingsPage() {
 
         <div className="card-surface p-6 space-y-4">
           <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
-            Transport-tarieven
+            Transport rates
           </h2>
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -185,10 +185,10 @@ export default function SettingsPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Input label="Wij rijden — heen + terug (€)" inputMode="decimal"
+              <Input label="We drive — round trip (€)" inputMode="decimal"
                 value={form.transport_price_wij_rijden}
                 onChange={(e) => set('transport_price_wij_rijden', e.target.value)} />
-              <Input label="Zelf brengen/halen (€)" inputMode="decimal"
+              <Input label="Self pickup/drop-off (€)" inputMode="decimal"
                 value={form.transport_price_zelf}
                 onChange={(e) => set('transport_price_zelf', e.target.value)} />
             </div>
@@ -197,14 +197,14 @@ export default function SettingsPage() {
 
         <div className="card-surface p-6 space-y-4">
           <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
-            Stalling-adres (gebruikt in mails na akkoord)
+            Storage address (used in emails after approval)
           </h2>
           {loading ? (
             <Skeleton className="h-10" />
           ) : (
             <Input
-              label="Adres"
-              placeholder="Stalling Cruïlles, Cruïlles (Girona), Spanje"
+              label="Address"
+              placeholder="Stalling Cruïlles, Cruïlles (Girona), Spain"
               value={form.stalling_address}
               onChange={(e) => set('stalling_address', e.target.value)}
             />
@@ -213,7 +213,7 @@ export default function SettingsPage() {
 
         <div className="pt-2">
           <Button type="submit" loading={saving}>
-            <Save size={14} /> Alles opslaan
+            <Save size={14} /> Save all
           </Button>
         </div>
       </form>

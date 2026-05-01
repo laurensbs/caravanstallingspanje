@@ -24,15 +24,15 @@ type Idea = {
 };
 
 const STATUS_OPTIONS = [
-  { value: 'new',         label: 'Nieuw',          tone: 'warning' as const },
-  { value: 'shortlist',   label: 'Shortlist',      tone: 'accent'  as const },
-  { value: 'in_progress', label: 'In behandeling', tone: 'accent'  as const },
-  { value: 'done',        label: 'Uitgevoerd',     tone: 'success' as const },
-  { value: 'archived',    label: 'Gearchiveerd',   tone: 'neutral' as const },
+  { value: 'new',         label: 'New',         tone: 'warning' as const },
+  { value: 'shortlist',   label: 'Shortlist',   tone: 'accent'  as const },
+  { value: 'in_progress', label: 'In progress', tone: 'accent'  as const },
+  { value: 'done',        label: 'Completed',   tone: 'success' as const },
+  { value: 'archived',    label: 'Archived',    tone: 'neutral' as const },
 ];
 
 function fmtDate(s: string): string {
-  return new Date(s).toLocaleString('nl-NL', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  return new Date(s).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
 
 export default function IdeasInboxPage() {
@@ -60,8 +60,8 @@ export default function IdeasInboxPage() {
       body: JSON.stringify({ status }),
       credentials: 'include',
     });
-    if (!res.ok) { toast.error('Status wijzigen mislukt'); return; }
-    toast.success('Bijgewerkt');
+    if (!res.ok) { toast.error('Status change failed'); return; }
+    toast.success('Updated');
     load();
   };
 
@@ -72,30 +72,30 @@ export default function IdeasInboxPage() {
       body: JSON.stringify({ featured }),
       credentials: 'include',
     });
-    if (!res.ok) { toast.error('Wijzigen mislukt'); return; }
-    toast.success(featured ? 'Idee staat nu publiek op /ideeen' : 'Idee verborgen voor publiek');
+    if (!res.ok) { toast.error('Update failed'); return; }
+    toast.success(featured ? 'Idea is now public on /ideeen' : 'Idea hidden from public');
     load();
   };
 
   const remove = async (id: number) => {
-    if (!confirm('Idee verwijderen?')) return;
+    if (!confirm('Delete idea?')) return;
     const res = await fetch(`/api/admin/ideas/${id}`, {
       method: 'DELETE', credentials: 'include',
     });
-    if (!res.ok) { toast.error('Verwijderen mislukt'); return; }
-    toast.success('Verwijderd');
+    if (!res.ok) { toast.error('Delete failed'); return; }
+    toast.success('Deleted');
     load();
   };
 
   return (
     <>
       <PageHeader
-        eyebrow="Operatie"
-        title="Ideeënbus"
-        description="Ideeën die klanten op /ideeen indienen."
+        eyebrow="Operations"
+        title="Ideas inbox"
+        description="Ideas submitted by customers on /ideeen."
         actions={
           <Select value={filter} onChange={(e) => setFilter(e.target.value)} className="min-w-[160px]">
-            <option value="">Alles</option>
+            <option value="">All</option>
             {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
           </Select>
         }
@@ -111,7 +111,7 @@ export default function IdeasInboxPage() {
             <Lightbulb size={18} className="text-text-subtle" />
           </div>
           <p className="text-sm text-text">
-            {filter ? `Geen ideeën met status "${filter}"` : 'Nog geen ideeën'}
+            {filter ? `No ideas with status "${filter}"` : 'No ideas yet'}
           </p>
         </div>
       ) : (
@@ -138,7 +138,7 @@ export default function IdeasInboxPage() {
                         {m.featured && <Badge tone="warning"><Star size={10} /> Featured</Badge>}
                       </div>
                       <p className="text-[11px] text-text-muted">
-                        {fmtDate(m.created_at)} · van {m.name || 'anoniem'}
+                        {fmtDate(m.created_at)} · from {m.name || 'anonymous'}
                         {m.email ? ` · ${m.email}` : ''}
                       </p>
                       {((m.votes_up || 0) + (m.votes_down || 0)) > 0 && (
@@ -158,20 +158,20 @@ export default function IdeasInboxPage() {
                         variant={m.featured ? 'secondary' : 'ghost'}
                         onClick={() => toggleFeatured(m.id, !m.featured)}
                       >
-                        <Star size={12} /> {m.featured ? 'Niet meer publiek' : 'Publiek tonen'}
+                        <Star size={12} /> {m.featured ? 'Hide from public' : 'Show publicly'}
                       </Button>
                       <Select value={m.status} onChange={(e) => setStatus(m.id, e.target.value)} className="min-w-[140px]">
                         {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
                       </Select>
                       {m.email && (
                         <a href={`mailto:${m.email}?subject=${encodeURIComponent('Re: ' + m.title)}`}>
-                          <Button size="sm" variant="ghost"><Mail size={12} /> Antwoord</Button>
+                          <Button size="sm" variant="ghost"><Mail size={12} /> Reply</Button>
                         </a>
                       )}
                       <button
                         onClick={() => remove(m.id)}
                         className="w-8 h-8 inline-flex items-center justify-center rounded-[var(--radius-md)] text-text-muted hover:text-danger hover:bg-danger-soft transition-colors"
-                        aria-label="Verwijderen"
+                        aria-label="Delete"
                       >
                         <Trash2 size={13} />
                       </button>

@@ -51,7 +51,7 @@ const empty = {
 
 function fmtDate(s: string | null | undefined): string {
   if (!s) return '—';
-  return new Date(s).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
+  return new Date(s).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 function statusTone(status: string): 'warning' | 'success' | 'accent' | 'danger' | 'neutral' {

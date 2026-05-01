@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import {
   Plus, Search, Trash2, Pencil, Calendar, MapPin, Tag, Receipt, Link as LinkIcon,
   AlertCircle, CheckCircle2, ChevronRight, ExternalLink, Truck, Send, Mail, RefreshCw,
-  FileCheck2, Square, CheckSquare,
+  FileCheck2, Square, CheckSquare, Wind, Refrigerator,
 } from 'lucide-react';
 import { Button, Input, Select, Textarea, Badge, Skeleton, Spinner } from '@/components/ui';
 import Drawer from '@/components/Drawer';
@@ -24,6 +24,7 @@ type Booking = {
   spot_number: string | null;
   status: 'compleet' | 'controleren';
   notes: string | null;
+  device_type: string | null;
   holded_invoice_id: string | null;
   holded_invoice_number: string | null;
   holded_invoice_url: string | null;
@@ -59,7 +60,7 @@ const emptyBooking: { camping: string; start_date: string; end_date: string; spo
 
 function fmtDate(s: string | null): string {
   if (!s) return '';
-  return new Date(s).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
+  return new Date(s).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
 function fmtPeriod(b: Booking): string {
@@ -71,9 +72,9 @@ function fmtPeriod(b: Booking): string {
 }
 
 function bookingDescription(b: Booking, fridgeName: string): string {
-  const camping = b.camping || 'Stalling';
+  const camping = b.camping || 'Storage';
   const period = fmtPeriod(b);
-  return `Koelkast huur — ${camping} — ${period} (${fridgeName})`;
+  return `Fridge rental — ${camping} — ${period} (${fridgeName})`;
 }
 
 export default function KoelkastenPage() {
@@ -227,11 +228,11 @@ function KoelkastenContent() {
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        toast.error(d.error || 'Opslaan mislukt');
+        toast.error(d.error || 'Save failed');
         return;
       }
       const data = await res.json().catch(() => ({}));
-      toast.success(drawerMode === 'edit' ? 'Klant bijgewerkt' : 'Klant toegevoegd');
+      toast.success(drawerMode === 'edit' ? 'Customer updated' : 'Customer added');
       if (drawerMode === 'create' && data.fridge) {
         setDrawerMode('edit');
         setDrawerFridge(data.fridge);
@@ -252,10 +253,10 @@ function KoelkastenContent() {
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error || 'Synchronisatie mislukt');
+        toast.error(data.error || 'Sync failed');
         return;
       }
-      toast.success('Gekoppeld aan Holded');
+      toast.success('Linked to Holded');
       await refresh();
     } finally {
       setHoldedSyncing(false);
@@ -297,7 +298,7 @@ function KoelkastenContent() {
       });
       if (res.status === 409) {
         const d = await res.json().catch(() => ({}));
-        if (d.soldOut && confirm(`${d.error}\n\nToch toevoegen (force)?`)) {
+        if (d.soldOut && confirm(`${d.error}\n\nAdd anyway (force)?`)) {
           // Recurse met force=true. Vermijd recursie-loop: nu accepteert backend.
           const forceRes = await fetch(url, {
             method,
@@ -307,10 +308,10 @@ function KoelkastenContent() {
           });
           if (!forceRes.ok) {
             const fd = await forceRes.json().catch(() => ({}));
-            toast.error(fd.error || 'Opslaan mislukt');
+            toast.error(fd.error || 'Save failed');
             return;
           }
-          toast.success('Periode toegevoegd (force)');
+          toast.success('Period added (force)');
           setBookingDialog({ open: false, mode: 'create' });
           await refresh();
           return;
@@ -319,10 +320,10 @@ function KoelkastenContent() {
       }
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        toast.error(d.error || 'Opslaan mislukt');
+        toast.error(d.error || 'Save failed');
         return;
       }
-      toast.success(bookingDialog.mode === 'edit' ? 'Periode bijgewerkt' : 'Periode toegevoegd');
+      toast.success(bookingDialog.mode === 'edit' ? 'Period updated' : 'Period added');
       setBookingDialog({ open: false, mode: 'create' });
       await refresh();
     } finally {
@@ -348,7 +349,7 @@ function KoelkastenContent() {
     if (!invoiceDialog.booking) return;
     const subtotal = parseFloat(invoiceForm.subtotal.replace(',', '.'));
     if (isNaN(subtotal) || subtotal < 0) {
-      toast.error('Vul een geldig bedrag in');
+      toast.error('Enter a valid amount');
       return;
     }
     setCreatingInvoice(true);
@@ -367,10 +368,10 @@ function KoelkastenContent() {
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error || 'Pro forma mislukt');
+        toast.error(data.error || 'Pro forma failed');
         return;
       }
-      toast.success(`Pro forma ${data.holdedInvoiceNumber || 'aangemaakt'}`);
+      toast.success(`Pro forma ${data.holdedInvoiceNumber || 'created'}`);
       setInvoiceDialog({ open: false, booking: null });
       await refresh();
     } finally {
@@ -400,11 +401,11 @@ function KoelkastenContent() {
     if (!payLinkDialog.booking) return;
     const amount = parseFloat(payLinkForm.amount.replace(',', '.'));
     if (!Number.isFinite(amount) || amount <= 0) {
-      toast.error('Vul een geldig bedrag in');
+      toast.error('Enter a valid amount');
       return;
     }
     if (!payLinkForm.email || !payLinkForm.email.includes('@')) {
-      toast.error('Vul een geldig e-mailadres in');
+      toast.error('Enter a valid email address');
       return;
     }
     setSendingPayLink(true);
@@ -422,13 +423,13 @@ function KoelkastenContent() {
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error || 'Verzenden mislukt');
+        toast.error(data.error || 'Sending failed');
         return;
       }
       if (data.mailOk === false) {
-        toast.error(`Pro forma ${data.holdedInvoiceNumber || ''} aangemaakt, maar mail mislukt: ${data.mailError || ''}`);
+        toast.error(`Pro forma ${data.holdedInvoiceNumber || ''} created, but mail failed: ${data.mailError || ''}`);
       } else {
-        toast.success(`Betaallink verstuurd naar ${data.sentTo}`);
+        toast.success(`Payment link sent to ${data.sentTo}`);
       }
       setPayLinkDialog({ open: false, booking: null });
       await refresh();
@@ -468,10 +469,10 @@ function KoelkastenContent() {
       : `/api/admin/fridges/bookings/${confirmDelete.id}`;
     const res = await fetch(url, { method: 'DELETE', credentials: 'include' });
     if (!res.ok) {
-      toast.error('Verwijderen mislukt');
+      toast.error('Delete failed');
       return;
     }
-    toast.success('Verwijderd');
+    toast.success('Deleted');
     if (confirmDelete.type === 'fridge') {
       setDrawerOpen(false);
       setDrawerFridge(null);
@@ -480,19 +481,26 @@ function KoelkastenContent() {
     await refresh();
   };
 
-  // Client-side device-type filter (capacity-cards in /admin/koelkasten en
-  // /admin/dashboard linken hier naartoe via ?device=…). Match op substring
-  // zodat 'Grote koelkast' óók 'Grote koelkast + airco' meeneemt.
+  // Slim device-type filter — match op booking-niveau zodat klanten met
+  // zowel een koelkast als een airco onder de juiste tab verschijnen, met
+  // alleen de matchende periodes uitgelicht. Booking.device_type heeft
+  // voorrang; fallback op fridge.device_type voor pre-migratie data.
+  const matchDevice = (b: Booking, f: Fridge) => {
+    const dt = (b.device_type || f.device_type || '').toLowerCase();
+    return dt.includes(deviceFilter.toLowerCase());
+  };
   const visibleFridges = deviceFilter
-    ? fridges.filter(f => (f.device_type || '').toLowerCase().includes(deviceFilter.toLowerCase()))
+    ? fridges
+        .map(f => ({ ...f, bookings: (f.bookings || []).filter(b => matchDevice(b, f)) }))
+        .filter(f => f.bookings.length > 0)
     : fridges;
 
   return (
     <>
       <PageHeader
-        eyebrow="Operatie"
-        title="Koelkasten"
-        description={`${fridges.length} klanten in beheer.`}
+        eyebrow="Operations"
+        title="Fridges"
+        description={`${fridges.length} customers managed.`}
         actions={
           <div className="flex gap-2">
             <Button variant="secondary" onClick={async () => {
@@ -500,19 +508,19 @@ function KoelkastenContent() {
                 const res = await fetch('/api/admin/customers/auto-link', { method: 'POST', credentials: 'include' });
                 const d = await res.json();
                 if (!res.ok) {
-                  toast.error(d.error || 'Auto-koppelen mislukt');
+                  toast.error(d.error || 'Auto-link failed');
                   return;
                 }
-                toast.success(`Gekoppeld: ${d.fridges} koelkasten · ${d.stalling} stalling · ${d.transport} transport (overgeslagen: ${d.skipped})`);
+                toast.success(`Linked: ${d.fridges} fridges · ${d.stalling} storage · ${d.transport} transport (skipped: ${d.skipped})`);
                 load();
               } catch {
-                toast.error('Auto-koppelen mislukt');
+                toast.error('Auto-link failed');
               }
             }}>
-              <LinkIcon size={14} /> Auto-koppel klanten
+              <LinkIcon size={14} /> Auto-link customers
             </Button>
             <Button onClick={openCreate}>
-              <Plus size={14} /> Nieuwe klant
+              <Plus size={14} /> New customer
             </Button>
           </div>
         }
@@ -526,7 +534,7 @@ function KoelkastenContent() {
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Zoek naam, e-mail of camping..."
+            placeholder="Search name, email or campsite..."
             className="w-full h-10 pl-9 pr-3 text-sm bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors placeholder:text-text-subtle"
           />
         </div>
@@ -535,7 +543,7 @@ function KoelkastenContent() {
           onChange={e => setYear(parseInt(e.target.value))}
           className="h-10 px-3 text-sm bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors"
         >
-          <option value={0}>Alle jaren</option>
+          <option value={0}>All years</option>
           {years.map(y => <option key={y} value={y}>{y}</option>)}
         </select>
         <select
@@ -543,16 +551,16 @@ function KoelkastenContent() {
           onChange={e => setStatusFilter(e.target.value)}
           className="h-10 px-3 text-sm bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors"
         >
-          <option value="">Alle statussen</option>
-          <option value="compleet">Compleet</option>
-          <option value="controleren">Controleren</option>
+          <option value="">All statuses</option>
+          <option value="compleet">Complete</option>
+          <option value="controleren">Review</option>
         </select>
         {deviceFilter && (
           <button
             type="button"
             onClick={() => setDeviceFilter('')}
             className="inline-flex items-center gap-1.5 h-10 px-3 text-sm bg-accent-soft text-accent border border-accent/30 rounded-[var(--radius-md)] hover:bg-accent-soft/70 transition-colors"
-            title="Filter wissen"
+            title="Clear filter"
           >
             {deviceFilter} ×
           </button>
@@ -572,7 +580,7 @@ function KoelkastenContent() {
           </div>
         ) : visibleFridges.length === 0 ? (
           <div className="py-16 text-center text-sm text-text-muted">
-            {deviceFilter ? `Geen klanten met "${deviceFilter}"` : 'Geen klanten gevonden'}
+            {deviceFilter ? `No customers with "${deviceFilter}"` : 'No customers found'}
           </div>
         ) : (
           <ul className="divide-y divide-border">
@@ -607,7 +615,7 @@ function KoelkastenContent() {
                         type="button"
                         onClick={() => { setDrawerFridge(f); openEdit(f); }}
                         className="w-9 h-9 rounded-full bg-surface-2 text-text flex items-center justify-center text-xs font-medium shrink-0 border border-border mt-0.5 hover:border-border-strong"
-                        aria-label="Klant openen"
+                        aria-label="Open customer"
                       >
                         {f.name.split(/\s+/).slice(0, 2).map(p => p[0]?.toUpperCase()).join('')}
                       </button>
@@ -620,29 +628,45 @@ function KoelkastenContent() {
                           >
                             <span className="text-sm font-medium text-text">{f.name}</span>
                             {f.holded_contact_id && (
-                              <span title="Gekoppeld aan Holded">
+                              <span title="Linked to Holded">
                                 <LinkIcon size={11} className="text-text-subtle" />
                               </span>
                             )}
-                            <span className="text-xs text-text-muted">
-                              · {f.device_type}{f.email ? ` · ${f.email}` : ''}
-                            </span>
+                            {/* Toon unieke device-types die deze klant heeft —
+                                bv. een klant met zowel een koelkast als airco
+                                ziet beide chips. */}
+                            {(() => {
+                              const types = Array.from(new Set(
+                                (f.bookings || []).map(b => b.device_type || f.device_type || '').filter(Boolean)
+                              ));
+                              if (types.length === 0 && f.device_type) types.push(f.device_type);
+                              return types.map((t) => {
+                                const isAirco = t.toLowerCase().includes('airco');
+                                const Icon = isAirco ? Wind : Refrigerator;
+                                return (
+                                  <span key={t} className="inline-flex items-center gap-1 text-[11px] text-text-muted">
+                                    <Icon size={10} /> {t}
+                                  </span>
+                                );
+                              });
+                            })()}
+                            {f.email && <span className="text-xs text-text-muted">· {f.email}</span>}
                           </button>
                           <div className="flex items-center gap-2 shrink-0">
                             {hasInvoice && <Badge tone="success"><Receipt size={10} /> Pro forma</Badge>}
-                            {hasCheck && <Badge tone="warning"><AlertCircle size={10} /> Controleren</Badge>}
+                            {hasCheck && <Badge tone="warning"><AlertCircle size={10} /> Review</Badge>}
                             <button
                               type="button"
                               onClick={() => openEdit(f)}
                               className="text-text-subtle hover:text-text transition-colors"
-                              aria-label="Details openen"
+                              aria-label="Open details"
                             >
                               <ChevronRight size={14} />
                             </button>
                           </div>
                         </div>
                         {previewBookings.length === 0 ? (
-                          <p className="text-[11px] text-text-subtle italic">Nog geen periodes</p>
+                          <p className="text-[11px] text-text-subtle italic">No periods yet</p>
                         ) : (
                           <div className="space-y-1.5">
                             {previewBookings.map(b => {
@@ -665,8 +689,13 @@ function KoelkastenContent() {
                                             ? 'bg-warning-soft text-warning border-warning/30'
                                             : 'bg-surface-2 text-text-muted border-border'
                                     }`}
-                                    title={`${period} · ${b.status}${b.holded_invoice_number ? ` · ${b.holded_invoice_number}` : ''}`}
+                                    title={`${period} · ${b.device_type || f.device_type || 'fridge'} · ${b.status}${b.holded_invoice_number ? ` · ${b.holded_invoice_number}` : ''}`}
                                   >
+                                    {(() => {
+                                      const dt = (b.device_type || f.device_type || '').toLowerCase();
+                                      const Icon = dt.includes('airco') ? Wind : Refrigerator;
+                                      return <Icon size={9} className="opacity-80" />;
+                                    })()}
                                     {holdedPaid && <CheckCircle2 size={9} />}
                                     {!holdedPaid && linkSent && <Send size={9} />}
                                     {!holdedPaid && !linkSent && b.status === 'controleren' && <AlertCircle size={9} />}
@@ -733,7 +762,7 @@ function KoelkastenContent() {
                                 onClick={() => openEdit(f)}
                                 className="text-[11px] text-text-muted hover:text-text underline-offset-2 hover:underline"
                               >
-                                +{extraBookings} meer periode{extraBookings === 1 ? '' : 's'} bekijken
+                                +{extraBookings} more period{extraBookings === 1 ? '' : 's'}
                               </button>
                             )}
                           </div>
@@ -752,26 +781,26 @@ function KoelkastenContent() {
       <Drawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        title={drawerMode === 'edit' && drawerFridge ? drawerFridge.name : 'Nieuwe klant'}
+        title={drawerMode === 'edit' && drawerFridge ? drawerFridge.name : 'New customer'}
         subtitle={drawerMode === 'edit' && drawerFridge ? drawerFridge.device_type : undefined}
         footer={drawerMode === 'edit' && drawerFridge ? (
           <>
             <Button variant="ghost" onClick={() => setConfirmDelete({ type: 'fridge', id: drawerFridge.id })}>
-              <Trash2 size={14} /> Verwijderen
+              <Trash2 size={14} /> Delete
             </Button>
-            <Button onClick={() => saveFridge()} loading={savingFridge}>Opslaan</Button>
+            <Button onClick={() => saveFridge()} loading={savingFridge}>Save</Button>
           </>
         ) : (
           <>
-            <Button variant="ghost" onClick={() => setDrawerOpen(false)}>Annuleren</Button>
-            <Button onClick={() => saveFridge()} loading={savingFridge}>Toevoegen</Button>
+            <Button variant="ghost" onClick={() => setDrawerOpen(false)}>Cancel</Button>
+            <Button onClick={() => saveFridge()} loading={savingFridge}>Add</Button>
           </>
         )}
       >
         <form onSubmit={saveFridge} className="space-y-4">
           {drawerMode === 'create' && (
             <div>
-              <label className="block text-xs font-medium text-text mb-1.5">Klant</label>
+              <label className="block text-xs font-medium text-text mb-1.5">Customer</label>
               <CustomerPicker
                 value={pickedCustomer}
                 onSelect={(c) => {
@@ -793,7 +822,7 @@ function KoelkastenContent() {
                 }}
               />
               <p className="text-[11px] text-text-muted mt-1.5">
-                Selecteer een bestaande klant of maak een nieuwe aan — die komt direct ook in Holded.
+                Select an existing customer or create a new one — they will also be added to Holded.
               </p>
             </div>
           )}
@@ -801,7 +830,7 @@ function KoelkastenContent() {
             <>
               <div>
                 <label className="block text-xs font-medium text-text mb-1.5">
-                  Klant {fridgeForm.customer_id ? '· gekoppeld' : '· nog niet gekoppeld'}
+                  Customer {fridgeForm.customer_id ? '· linked' : '· not linked yet'}
                 </label>
                 <CustomerPicker
                   value={pickedCustomer}
@@ -822,21 +851,21 @@ function KoelkastenContent() {
                     setNewCustomerInitial(q);
                     setNewCustomerOpen(true);
                   }}
-                  placeholder="Zoek bestaande klant…"
+                  placeholder="Search existing customer…"
                 />
                 <p className="text-[11px] text-text-muted mt-1.5">
-                  Link deze koelkast/airco aan een centrale klant uit Holded; nieuwe klant hier ook aan te maken.
+                  Link this fridge/AC to a central customer from Holded; new customer can also be created here.
                 </p>
               </div>
-              <Input label="Naam" required value={fridgeForm.name} onChange={e => setFridgeForm({ ...fridgeForm, name: e.target.value })} />
+              <Input label="Name" required value={fridgeForm.name} onChange={e => setFridgeForm({ ...fridgeForm, name: e.target.value })} />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <Input label="E-mail" type="email" value={fridgeForm.email} onChange={e => setFridgeForm({ ...fridgeForm, email: e.target.value })} />
-                <Input label="Extra e-mail" type="email" value={fridgeForm.extra_email} onChange={e => setFridgeForm({ ...fridgeForm, extra_email: e.target.value })} />
+                <Input label="Email" type="email" value={fridgeForm.email} onChange={e => setFridgeForm({ ...fridgeForm, email: e.target.value })} />
+                <Input label="Extra email" type="email" value={fridgeForm.extra_email} onChange={e => setFridgeForm({ ...fridgeForm, extra_email: e.target.value })} />
               </div>
             </>
           )}
           <div>
-            <label className="block text-xs font-medium text-text mb-1.5">Soort apparaat</label>
+            <label className="block text-xs font-medium text-text mb-1.5">Device type</label>
             <input
               list="device-types"
               value={fridgeForm.device_type ?? ''}
@@ -851,7 +880,7 @@ function KoelkastenContent() {
               <option value="Grote koelkast + airco unit" />
             </datalist>
           </div>
-          <Textarea label="Notities" value={fridgeForm.notes} onChange={e => setFridgeForm({ ...fridgeForm, notes: e.target.value })} />
+          <Textarea label="Notes" value={fridgeForm.notes} onChange={e => setFridgeForm({ ...fridgeForm, notes: e.target.value })} />
         </form>
 
         {drawerMode === 'edit' && drawerFridge && (
@@ -864,10 +893,10 @@ function KoelkastenContent() {
                 <div className="flex items-start gap-3">
                   <div className="flex-1">
                     <div className="text-xs font-medium text-text mb-1">Holded</div>
-                    <p className="text-xs text-text-muted">Nog niet gekoppeld</p>
+                    <p className="text-xs text-text-muted">Not linked yet</p>
                   </div>
                   <Button size="sm" variant="secondary" onClick={syncHolded} loading={holdedSyncing}>
-                    Koppelen
+                    Link
                   </Button>
                 </div>
               </div>
@@ -876,11 +905,11 @@ function KoelkastenContent() {
             {/* Bookings */}
             <div className="mt-8">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-medium uppercase tracking-wider text-text-muted">Periodes</h3>
-                <Button size="sm" variant="secondary" onClick={openNewBooking}><Plus size={12} /> Toevoegen</Button>
+                <h3 className="text-xs font-medium uppercase tracking-wider text-text-muted">Periods</h3>
+                <Button size="sm" variant="secondary" onClick={openNewBooking}><Plus size={12} /> Add</Button>
               </div>
               {(drawerFridge.bookings || []).length === 0 ? (
-                <p className="text-xs text-text-muted italic">Nog geen periodes</p>
+                <p className="text-xs text-text-muted italic">No periods yet</p>
               ) : (
                 <ul className="space-y-2">
                   {(drawerFridge.bookings || []).map(b => {
@@ -916,8 +945,16 @@ function KoelkastenContent() {
                             )}
                           </div>
                           <div className="grid grid-cols-2 gap-2 text-xs text-text">
-                            <span className="flex items-center gap-1.5"><MapPin size={11} className="text-text-subtle" />{b.camping || '—'}</span>
+                            <span className="flex items-center gap-1.5">
+                              {(() => {
+                                const dt = (b.device_type || drawerFridge.device_type || '').toLowerCase();
+                                const Icon = dt.includes('airco') ? Wind : Refrigerator;
+                                return <Icon size={11} className="text-text-subtle" />;
+                              })()}
+                              {b.device_type || drawerFridge.device_type || '—'}
+                            </span>
                             <span className="flex items-center gap-1.5"><Calendar size={11} className="text-text-subtle" />{fmtPeriod(b)}</span>
+                            <span className="flex items-center gap-1.5"><MapPin size={11} className="text-text-subtle" />{b.camping || '—'}</span>
                             {b.spot_number && <span className="flex items-center gap-1.5"><Tag size={11} className="text-text-subtle" />{b.spot_number}</span>}
                           </div>
                           {b.payment_link_sent_at && (
@@ -1021,26 +1058,26 @@ function KoelkastenContent() {
               className="relative bg-bg border border-border rounded-[var(--radius-xl)] shadow-lg max-w-md w-full p-6"
             >
               <h2 className="text-base font-medium text-text mb-4">
-                {bookingDialog.mode === 'edit' ? 'Periode bewerken' : 'Nieuwe periode'}
+                {bookingDialog.mode === 'edit' ? 'Edit period' : 'New period'}
               </h2>
               <form onSubmit={saveBooking} className="space-y-4">
-                <Input label="Camping" value={bookingForm.camping} onChange={e => setBookingForm({ ...bookingForm, camping: e.target.value })} />
+                <Input label="Campsite" value={bookingForm.camping} onChange={e => setBookingForm({ ...bookingForm, camping: e.target.value })} />
                 <div className="grid grid-cols-2 gap-3">
-                  <Input label="Startdatum" type="date" value={bookingForm.start_date} onChange={e => setBookingForm({ ...bookingForm, start_date: e.target.value })} />
-                  <Input label="Einddatum" type="date" value={bookingForm.end_date} onChange={e => setBookingForm({ ...bookingForm, end_date: e.target.value })} />
+                  <Input label="Start date" type="date" value={bookingForm.start_date} onChange={e => setBookingForm({ ...bookingForm, start_date: e.target.value })} />
+                  <Input label="End date" type="date" value={bookingForm.end_date} onChange={e => setBookingForm({ ...bookingForm, end_date: e.target.value })} />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <Input label="Pleknummer" value={bookingForm.spot_number} onChange={e => setBookingForm({ ...bookingForm, spot_number: e.target.value })} />
+                  <Input label="Spot number" value={bookingForm.spot_number} onChange={e => setBookingForm({ ...bookingForm, spot_number: e.target.value })} />
                   <Select label="Status" value={bookingForm.status} onChange={e => setBookingForm({ ...bookingForm, status: e.target.value as 'compleet' | 'controleren' })}>
-                    <option value="compleet">Compleet</option>
-                    <option value="controleren">Controleren</option>
+                    <option value="compleet">Complete</option>
+                    <option value="controleren">Review</option>
                   </Select>
                 </div>
-                <Textarea label="Opmerking" value={bookingForm.notes} onChange={e => setBookingForm({ ...bookingForm, notes: e.target.value })} />
+                <Textarea label="Notes" value={bookingForm.notes} onChange={e => setBookingForm({ ...bookingForm, notes: e.target.value })} />
                 <div className="flex justify-end gap-2 pt-2">
-                  <Button type="button" variant="ghost" onClick={() => setBookingDialog({ open: false, mode: 'create' })}>Annuleren</Button>
+                  <Button type="button" variant="ghost" onClick={() => setBookingDialog({ open: false, mode: 'create' })}>Cancel</Button>
                   <Button type="submit" loading={savingBooking}>
-                    {bookingDialog.mode === 'edit' ? 'Opslaan' : 'Toevoegen'}
+                    {bookingDialog.mode === 'edit' ? 'Save' : 'Add'}
                   </Button>
                 </div>
               </form>
@@ -1068,18 +1105,18 @@ function KoelkastenContent() {
               className="relative bg-bg border border-border rounded-[var(--radius-xl)] shadow-lg max-w-md w-full p-6"
             >
               <h2 className="text-base font-medium text-text mb-1">Pro forma in Holded</h2>
-              <p className="text-xs text-text-muted mb-4">Controleer en pas aan voor verzenden.</p>
+              <p className="text-xs text-text-muted mb-4">Review and adjust before sending.</p>
               <form onSubmit={submitInvoice} className="space-y-4">
-                <Input label="Omschrijving" required value={invoiceForm.description} onChange={e => setInvoiceForm({ ...invoiceForm, description: e.target.value })} />
+                <Input label="Description" required value={invoiceForm.description} onChange={e => setInvoiceForm({ ...invoiceForm, description: e.target.value })} />
                 <div className="grid grid-cols-3 gap-3">
-                  <Input label="Aantal" type="number" min="1" step="1" value={invoiceForm.units} onChange={e => setInvoiceForm({ ...invoiceForm, units: e.target.value })} />
-                  <Input label="Bedrag (€)" required inputMode="decimal" placeholder="0,00" value={invoiceForm.subtotal} onChange={e => setInvoiceForm({ ...invoiceForm, subtotal: e.target.value })} />
-                  <Input label="Btw (%)" type="number" min="0" max="100" step="1" value={invoiceForm.tax} onChange={e => setInvoiceForm({ ...invoiceForm, tax: e.target.value })} />
+                  <Input label="Quantity" type="number" min="1" step="1" value={invoiceForm.units} onChange={e => setInvoiceForm({ ...invoiceForm, units: e.target.value })} />
+                  <Input label="Amount (€)" required inputMode="decimal" placeholder="0,00" value={invoiceForm.subtotal} onChange={e => setInvoiceForm({ ...invoiceForm, subtotal: e.target.value })} />
+                  <Input label="VAT (%)" type="number" min="0" max="100" step="1" value={invoiceForm.tax} onChange={e => setInvoiceForm({ ...invoiceForm, tax: e.target.value })} />
                 </div>
-                <Textarea label="Notities" value={invoiceForm.notes} onChange={e => setInvoiceForm({ ...invoiceForm, notes: e.target.value })} />
+                <Textarea label="Notes" value={invoiceForm.notes} onChange={e => setInvoiceForm({ ...invoiceForm, notes: e.target.value })} />
                 <div className="flex justify-end gap-2 pt-2">
-                  <Button type="button" variant="ghost" onClick={() => setInvoiceDialog({ open: false, booking: null })}>Annuleren</Button>
-                  <Button type="submit" loading={creatingInvoice}><Receipt size={14} /> Verstuur naar Holded</Button>
+                  <Button type="button" variant="ghost" onClick={() => setInvoiceDialog({ open: false, booking: null })}>Cancel</Button>
+                  <Button type="submit" loading={creatingInvoice}><Receipt size={14} /> Send to Holded</Button>
                 </div>
               </form>
             </motion.div>
@@ -1106,21 +1143,21 @@ function KoelkastenContent() {
               className="relative bg-bg border border-border rounded-[var(--radius-xl)] shadow-lg max-w-md w-full p-6"
             >
               <h2 className="text-base font-medium text-text mb-1 inline-flex items-center gap-2">
-                <Mail size={16} /> Betaallink versturen
+                <Mail size={16} /> Send payment link
               </h2>
               <p className="text-xs text-text-muted mb-4">
-                We maken direct een pro forma in Holded met het lokaal bekende adres en btw-nummer, en mailen de klant een Stripe-betaallink. Hij blijft 30 dagen geldig.
+                We immediately create a pro forma in Holded with the locally known address and VAT number, and email the customer a Stripe payment link. It stays valid for 30 days.
               </p>
               <form onSubmit={sendPayLink} className="space-y-4">
                 <Input
-                  label="Omschrijving"
+                  label="Description"
                   required
                   value={payLinkForm.description}
                   onChange={e => setPayLinkForm({ ...payLinkForm, description: e.target.value })}
                 />
                 <div className="grid grid-cols-2 gap-3">
                   <Input
-                    label="Bedrag (€)"
+                    label="Amount (€)"
                     required
                     inputMode="decimal"
                     placeholder="0,00"
@@ -1128,7 +1165,7 @@ function KoelkastenContent() {
                     onChange={e => setPayLinkForm({ ...payLinkForm, amount: e.target.value })}
                   />
                   <Input
-                    label="Btw (%)"
+                    label="VAT (%)"
                     type="number"
                     min="0"
                     max="100"
@@ -1138,15 +1175,15 @@ function KoelkastenContent() {
                   />
                 </div>
                 <Input
-                  label="E-mail klant"
+                  label="Customer email"
                   type="email"
                   required
                   value={payLinkForm.email}
                   onChange={e => setPayLinkForm({ ...payLinkForm, email: e.target.value })}
                 />
                 <div className="flex justify-end gap-2 pt-2">
-                  <Button type="button" variant="ghost" onClick={() => setPayLinkDialog({ open: false, booking: null })}>Annuleren</Button>
-                  <Button type="submit" loading={sendingPayLink}><Send size={14} /> Verstuur betaallink</Button>
+                  <Button type="button" variant="ghost" onClick={() => setPayLinkDialog({ open: false, booking: null })}>Cancel</Button>
+                  <Button type="submit" loading={sendingPayLink}><Send size={14} /> Send payment link</Button>
                 </div>
               </form>
             </motion.div>
@@ -1156,9 +1193,9 @@ function KoelkastenContent() {
 
       <ConfirmDialog
         open={!!confirmDelete}
-        title={confirmDelete?.type === 'fridge' ? 'Klant verwijderen?' : 'Periode verwijderen?'}
-        description={confirmDelete?.type === 'fridge' ? 'De klant en alle bijbehorende periodes worden permanent verwijderd.' : 'Deze periode wordt permanent verwijderd.'}
-        confirmLabel="Verwijderen"
+        title={confirmDelete?.type === 'fridge' ? 'Delete customer?' : 'Delete period?'}
+        description={confirmDelete?.type === 'fridge' ? 'The customer and all associated periods will be permanently deleted.' : 'This period will be permanently deleted.'}
+        confirmLabel="Delete"
         destructive
         onConfirm={confirmDeleteAction}
         onCancel={() => setConfirmDelete(null)}
@@ -1226,15 +1263,15 @@ function ActiveBookingsOverview({ onFilterDevice, activeFilter }: {
   // we matchen substring zodat 'Grote koelkast' óók 'Grote koelkast + airco'
   // pakt zonder dat we hier alle varianten hoeven te kennen.
   const cards = [
-    { label: 'Grote koelkast', filterValue: 'Grote koelkast', ...data.stats.large },
-    { label: 'Tafelmodel', filterValue: 'Tafelmodel', ...data.stats.table },
-    { label: 'Airco', filterValue: 'Airco', ...data.stats.airco },
+    { label: 'Large fridge', filterValue: 'Grote koelkast', ...data.stats.large },
+    { label: 'Tabletop', filterValue: 'Tafelmodel', ...data.stats.table },
+    { label: 'AC unit', filterValue: 'Airco', ...data.stats.airco },
   ];
 
   return (
     <section className="mb-10">
       <h2 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-text-muted mb-4 flex items-center gap-2">
-        <Truck size={13} /> Op dit moment uit ({data.bookings.length})
+        <Truck size={13} /> Currently out ({data.bookings.length})
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         {cards.map((c) => {
@@ -1252,21 +1289,21 @@ function ActiveBookingsOverview({ onFilterDevice, activeFilter }: {
               className={`card-surface p-5 text-left transition-all hover:border-accent/40 ${
                 active ? 'ring-2 ring-accent/40 border-accent/40' : ''
               }`}
-              title={active ? 'Filter uitzetten' : `Filter op ${c.label}`}
+              title={active ? 'Clear filter' : `Filter by ${c.label}`}
             >
               <div className="flex items-center justify-between">
                 <div className="text-[12px] uppercase tracking-[0.18em] text-text-muted font-medium">{c.label}</div>
-                {active && <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-accent">Actief ✓</span>}
+                {active && <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-accent">Active ✓</span>}
               </div>
               <div className="flex items-baseline gap-2 mt-2 mb-3">
                 <span className="text-3xl font-semibold tabular-nums">{c.current}</span>
-                <span className="text-[13px] text-text-muted">/ {c.capacity} bezet</span>
+                <span className="text-[13px] text-text-muted">/ {c.capacity} occupied</span>
               </div>
               <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--color-surface-2)' }}>
                 <div style={{ width: `${pct}%`, background: barColor, height: '100%' }} />
               </div>
               <p className="text-[11px] text-text-muted mt-2">
-                {Math.max(0, c.capacity - c.current)} beschikbaar · {pct}%
+                {Math.max(0, c.capacity - c.current)} available · {pct}%
               </p>
             </button>
           );
@@ -1283,7 +1320,7 @@ function ActiveBookingsOverview({ onFilterDevice, activeFilter }: {
                 </div>
               </div>
               <span className="text-[12px] tabular-nums text-text-muted shrink-0">
-                terug {new Date(b.end_date).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' })}
+                back {new Date(b.end_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
               </span>
             </div>
           ))}

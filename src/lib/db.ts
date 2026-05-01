@@ -366,6 +366,7 @@ export async function getAllFridges(year?: number, status?: string, search?: str
           COALESCE(json_agg(json_build_object(
             'id', b.id, 'camping', b.camping, 'start_date', b.start_date, 'end_date', b.end_date,
             'spot_number', b.spot_number, 'status', b.status, 'notes', b.notes,
+            'device_type', b.device_type,
             'holded_invoice_id', b.holded_invoice_id, 'holded_invoice_number', b.holded_invoice_number,
             'holded_invoice_url', b.holded_invoice_url, 'holded_invoice_status', b.holded_invoice_status,
             'payment_link_url', b.payment_link_url, 'payment_link_sent_at', b.payment_link_sent_at,
@@ -389,6 +390,7 @@ export async function getAllFridges(year?: number, status?: string, search?: str
           COALESCE(json_agg(json_build_object(
             'id', b.id, 'camping', b.camping, 'start_date', b.start_date, 'end_date', b.end_date,
             'spot_number', b.spot_number, 'status', b.status, 'notes', b.notes,
+            'device_type', b.device_type,
             'holded_invoice_id', b.holded_invoice_id, 'holded_invoice_number', b.holded_invoice_number,
             'holded_invoice_url', b.holded_invoice_url, 'holded_invoice_status', b.holded_invoice_status,
             'payment_link_url', b.payment_link_url, 'payment_link_sent_at', b.payment_link_sent_at,
@@ -472,9 +474,10 @@ export async function deleteFridge(id: number) {
   await sql`DELETE FROM fridges WHERE id = ${id}`;
 }
 
-export async function createFridgeBooking(fridgeId: number, data: { camping?: string | null; start_date?: string | null; end_date?: string | null; spot_number?: string | null; status?: string; notes?: string | null }) {
-  const res = await sql`INSERT INTO fridge_bookings (fridge_id, camping, start_date, end_date, spot_number, status, notes)
-    VALUES (${fridgeId}, ${data.camping || null}, ${data.start_date || null}::date, ${data.end_date || null}::date, ${data.spot_number || null}, ${data.status || 'compleet'}, ${data.notes || null}) RETURNING *`;
+export async function createFridgeBooking(fridgeId: number, data: { camping?: string | null; start_date?: string | null; end_date?: string | null; spot_number?: string | null; status?: string; notes?: string | null; device_type?: string | null }) {
+  await ensureMiscSchema();
+  const res = await sql`INSERT INTO fridge_bookings (fridge_id, camping, start_date, end_date, spot_number, status, notes, device_type)
+    VALUES (${fridgeId}, ${data.camping || null}, ${data.start_date || null}::date, ${data.end_date || null}::date, ${data.spot_number || null}, ${data.status || 'compleet'}, ${data.notes || null}, ${data.device_type || null}) RETURNING *`;
   return res[0];
 }
 
@@ -1014,6 +1017,10 @@ async function ensureMiscSchema(): Promise<void> {
     await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_status TEXT`;
     await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_synced_at TIMESTAMP`;
     await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_url TEXT`;
+    // Per-period device_type — laat klanten met zowel een koelkast als een
+    // airco bij ons hetzelfde fridge-record delen, maar per booking zien wat
+    // 'm precies is. Als 't veld leeg is fallt UI terug op fridges.device_type.
+    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS device_type TEXT`;
     // Handmatige betaallink-flow: admin verstuurt een Stripe Checkout link
     // per mail naar klanten die we eerder zelf in het systeem zetten.
     // Bewaren we zodat we kunnen herversturen + zien aan wie/wanneer.

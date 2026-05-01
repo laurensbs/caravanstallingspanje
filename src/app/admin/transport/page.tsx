@@ -86,7 +86,7 @@ const STATUS_OPTIONS = [
 
 function fmtDate(s: string | null | undefined, opts?: Intl.DateTimeFormatOptions): string {
   if (!s) return '—';
-  return new Date(s).toLocaleDateString('nl-NL', opts || { day: 'numeric', month: 'short', year: 'numeric' });
+  return new Date(s).toLocaleDateString('en-GB', opts || { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 function statusTone(status: string): 'warning' | 'success' | 'accent' | 'danger' | 'neutral' {

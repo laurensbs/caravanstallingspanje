@@ -55,6 +55,7 @@ export async function POST(req: NextRequest) {
 
     const booking = await createFridgeBooking(fridge.id, {
       camping: data.camping,
+      device_type: data.device_type,
       start_date: data.start_date,
       end_date: data.end_date,
       spot_number: data.spot_number || null,

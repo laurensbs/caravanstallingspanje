@@ -93,6 +93,7 @@ export async function GET() {
   await ran('fridge_bookings.payment_link_sent_at', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_sent_at TIMESTAMP`);
   await ran('fridge_bookings.payment_link_email', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_email TEXT`);
   await ran('fridge_bookings.payment_link_amount_cents', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_amount_cents INTEGER`);
+  await ran('fridge_bookings.device_type', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS device_type TEXT`);
   await ran('fridge_bookings.paid_at', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP`);
   await ran('fridge_bookings.stripe_payment_intent_id', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS stripe_payment_intent_id TEXT`);
   await ran('fridge_bookings.sales_invoice_converted_at', () => sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS sales_invoice_converted_at TIMESTAMP`);

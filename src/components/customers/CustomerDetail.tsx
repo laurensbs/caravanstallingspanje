@@ -178,7 +178,7 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
             {customer.source === 'stripe' && <Badge tone="accent">Via payment</Badge>}
             {customer.holded_synced_at && (
               <span className="text-[11px] text-text-muted tabular-nums">
-                Last synced: {new Date(customer.holded_synced_at).toLocaleString('nl-NL')}
+                Last synced: {new Date(customer.holded_synced_at).toLocaleString('en-GB')}
               </span>
             )}
           </div>
@@ -330,7 +330,7 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
                       )}
                     </div>
                     <span className="text-[11px] text-text-subtle tabular-nums shrink-0">
-                      {new Date(e.created_at).toLocaleString('nl-NL', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                      {new Date(e.created_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </li>
                 ))}
