@@ -275,6 +275,7 @@ export default function StallingAdminPage() {
                     holdedPaid={e.holded_invoice_status === 'paid'}
                     holdedNumber={e.holded_invoice_number ?? null}
                     holdedUrl={e.holded_invoice_url ?? null}
+                    holdedId={e.holded_invoice_id ?? null}
                     convertedAt={e.sales_invoice_converted_at ?? null}
                     convertedBy={e.sales_invoice_converted_by ?? null}
                     onToggle={(c) => toggleSalesInvoice(e.id, c)}
@@ -332,16 +333,22 @@ export default function StallingAdminPage() {
 }
 
 function SalesInvoiceStripStalling({
-  paidAt, holdedPaid, holdedNumber, holdedUrl, convertedAt, convertedBy, onToggle,
+  paidAt, holdedPaid, holdedNumber, holdedUrl, holdedId, convertedAt, convertedBy, onToggle,
 }: {
   paidAt: string | null;
   holdedPaid: boolean;
   holdedNumber: string | null;
   holdedUrl: string | null;
+  holdedId?: string | null;
   convertedAt: string | null;
   convertedBy: string | null;
   onToggle: (converted: boolean) => void;
 }) {
+  // Holded admin-link als publicUrl niet bestaat — opent het document
+  // direct in Holded waar admin het kan converteren naar sales invoice.
+  const linkUrl = holdedUrl
+    ? holdedUrl
+    : holdedId ? `https://app.holded.com/invoicing/proforms/${holdedId}` : null;
   const isConverted = !!convertedAt;
   const canToggle = holdedPaid || isConverted;
   const fmt = (s: string | null) =>
@@ -375,8 +382,8 @@ function SalesInvoiceStripStalling({
             <span className={`font-medium ${isConverted ? 'text-success' : 'text-text'}`}>
               {isConverted ? 'Converted to sales invoice' : holdedPaid ? 'Needs to be made into sales invoice' : 'Awaiting payment before sales invoice'}
             </span>
-            {holdedUrl && (
-              <a href={holdedUrl} target="_blank" rel="noopener noreferrer"
+            {linkUrl && (
+              <a href={linkUrl} target="_blank" rel="noopener noreferrer"
                  className="inline-flex items-center gap-1 text-[11px] font-medium text-accent hover:underline underline-offset-2 ml-auto">
                 <Receipt size={11} /> {holdedNumber || 'Pro forma'}
               </a>

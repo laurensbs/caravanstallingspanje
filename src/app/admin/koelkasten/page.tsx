@@ -82,6 +82,16 @@ function fmtPeriod(b: Booking): string {
 
 // Beschrijving die uiteindelijk in de Holded pro forma + Stripe Checkout
 // product-titel terechtkomt — bewust in het NL want klanten zien dit.
+// Holded pro forma deep-link. publicUrl is voor klanten, app-URL is voor
+// ons (admin) — opent direct het document in Holded waar we 'm kunnen
+// bewerken / converteren naar sales invoice.
+function holdedProformaUrl(idOrUrl: string | null | undefined, fallbackId?: string | null): string | null {
+  if (idOrUrl && idOrUrl.startsWith('http')) return idOrUrl;
+  const id = fallbackId || idOrUrl;
+  if (!id) return null;
+  return `https://app.holded.com/invoicing/proforms/${id}`;
+}
+
 function bookingDescription(b: Booking, fridgeName: string, deviceTypeOverride?: string): string {
   const dt = (deviceTypeOverride || b.device_type || '').toLowerCase();
   const isAirco = dt.includes('airco');
@@ -813,23 +823,24 @@ function KoelkastenContent() {
                                     {b.payment_link_sent_at ? <RefreshCw size={10} /> : <Send size={10} />}
                                     {holdedPaid ? 'New link' : b.payment_link_sent_at ? 'Resend link' : 'Send payment link'}
                                   </button>
-                                  {holdedUrl && (
-                                    <a
-                                      href={holdedUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="inline-flex items-center gap-1 text-[11px] font-medium text-accent hover:underline underline-offset-2"
-                                      title="Open pro forma in Holded"
-                                    >
-                                      <Receipt size={10} /> {b.holded_invoice_number || 'Pro forma'}
-                                    </a>
-                                  )}
-                                  {b.holded_invoice_number && !holdedUrl && (
-                                    <span className="inline-flex items-center gap-1 text-[11px] font-mono text-text-muted">
-                                      <Receipt size={10} /> {b.holded_invoice_number}
-                                    </span>
-                                  )}
+                                  {(() => {
+                                    // Klikbare pro-forma link — gebruik publicUrl als
+                                    // 't bestaat, anders direct de Holded admin-URL.
+                                    const url = holdedProformaUrl(holdedUrl, b.holded_invoice_id);
+                                    if (!url || !b.holded_invoice_number) return null;
+                                    return (
+                                      <a
+                                        href={url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="inline-flex items-center gap-1 text-[11px] font-medium text-accent hover:underline underline-offset-2"
+                                        title="Open pro forma in Holded"
+                                      >
+                                        <Receipt size={10} /> {b.holded_invoice_number}
+                                      </a>
+                                    );
+                                  })()}
                                   {b.sales_invoice_converted_at ? (
                                     <span
                                       className="inline-flex items-center gap-1 text-[11px] font-medium text-success bg-success-soft border border-success/30 rounded-full px-2 py-0.5"
@@ -1079,9 +1090,19 @@ function KoelkastenContent() {
                               {b.status === 'compleet' ? <CheckCircle2 size={10} /> : <AlertCircle size={10} />}
                               {b.status === 'compleet' ? 'Intake complete' : 'Review'}
                             </Badge>
-                            {b.holded_invoice_number && (
-                              <Badge tone="accent"><Receipt size={10} /> {b.holded_invoice_number}</Badge>
-                            )}
+                            {b.holded_invoice_number && (() => {
+                              const url = holdedProformaUrl(holdedUrl, b.holded_invoice_id);
+                              if (!url) {
+                                return <Badge tone="accent"><Receipt size={10} /> {b.holded_invoice_number}</Badge>;
+                              }
+                              return (
+                                <a href={url} target="_blank" rel="noopener noreferrer" title="Open pro forma in Holded">
+                                  <Badge tone="accent" className="cursor-pointer hover:opacity-80 transition-opacity">
+                                    <Receipt size={10} /> {b.holded_invoice_number}
+                                  </Badge>
+                                </a>
+                              );
+                            })()}
                             {holdedPaid && <Badge tone="success">Paid</Badge>}
                             {partial && <Badge tone="warning">Partially paid</Badge>}
                             {linkSent && !holdedPaid && (
@@ -1153,16 +1174,20 @@ function KoelkastenContent() {
                             <ExternalLink size={11} /> Open payment link
                           </a>
                         )}
-                        {holdedUrl && (
-                          <a
-                            href={holdedUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-[12px] font-medium text-accent hover:underline underline-offset-4 px-2 self-center"
-                          >
-                            <Receipt size={11} /> Open pro forma in Holded
-                          </a>
-                        )}
+                        {(() => {
+                          const url = holdedProformaUrl(holdedUrl, b.holded_invoice_id);
+                          if (!url) return null;
+                          return (
+                            <a
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 text-[12px] font-medium text-accent hover:underline underline-offset-4 px-2 self-center"
+                            >
+                              <Receipt size={11} /> Open pro forma in Holded
+                            </a>
+                          );
+                        })()}
                       </div>
                       {/* Sales-invoice conversie-tracker. Verschijnt zodra 'r een
                           pro forma in Holded staat — checkbox is alleen klikbaar als
