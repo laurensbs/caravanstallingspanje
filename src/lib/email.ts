@@ -103,16 +103,14 @@ export function paymentReceivedHtml(input: {
   service: string;
   amountEur: number;
   reference: string;
+  // invoiceNumber/publicUrl worden door de webhook nog meegegeven (voor admin
+  // logging) maar bewust NIET in de klantmail getoond. Pro forma's zijn
+  // intern voor onze boekhouding.
   invoiceNumber?: string | null;
   publicUrl?: string | null;
 }): { subject: string; html: string; text: string } {
+  void input.invoiceNumber; void input.publicUrl;
   const subject = `Bedankt voor je bestelling — ${input.service}`;
-  const invoiceBlock = input.invoiceNumber
-    ? `<div class="row"><span class="muted">Pro forma</span><strong>${escapeHtml(input.invoiceNumber)}</strong></div>`
-    : '';
-  const linkBlock = input.publicUrl
-    ? `<a class="btn" href="${input.publicUrl}">Pro forma bekijken</a>`
-    : '';
 
   // Vriendelijke kind-specifieke vervolgtekst, automatisch gekozen op
   // basis van wat er in de service-omschrijving staat.
@@ -134,10 +132,8 @@ export function paymentReceivedHtml(input: {
     <div class="summary">
       <div class="row"><span class="muted">Dienst</span><strong>${escapeHtml(input.service)}</strong></div>
       <div class="row"><span class="muted">Bedrag</span><strong>${fmtEur(input.amountEur)}</strong></div>
-      ${invoiceBlock}
     </div>
     <div class="next"><strong>Wat gebeurt er nu?</strong><br/>${escapeHtml(nextStep)}</div>
-    ${linkBlock}
     <p class="ref">Referentie: ${escapeHtml(input.reference)}</p>
   `;
   const html = shell(card, {
@@ -145,7 +141,7 @@ export function paymentReceivedHtml(input: {
     heading: 'Bedankt voor je bestelling!',
     subline: 'We hebben je betaling ontvangen — we gaan voor je aan de slag.',
   });
-  const text = `Bedankt ${input.name},\n\nWe hebben je betaling van ${fmtEur(input.amountEur)} ontvangen voor: ${input.service}.${input.invoiceNumber ? `\nPro forma: ${input.invoiceNumber}` : ''}\n\n${nextStep}\n\nReferentie: ${input.reference}\n\nVragen? https://caravanstalling-spanje.com/contact`;
+  const text = `Bedankt ${input.name},\n\nWe hebben je betaling van ${fmtEur(input.amountEur)} ontvangen voor: ${input.service}.\n\n${nextStep}\n\nReferentie: ${input.reference}\n\nVragen? https://caravanstalling-spanje.com/contact`;
   return { subject, html, text };
 }
 

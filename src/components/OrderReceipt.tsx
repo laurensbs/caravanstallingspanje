@@ -141,9 +141,6 @@ export default function OrderReceipt({ refCode, fallbackTitle, fallbackBody }: P
               {data.period && <DetailRow label="Periode" value={data.period} />}
               {data.customerName && <DetailRow label="Naam" value={data.customerName} />}
               {data.customerEmail && <DetailRow label="E-mail" value={data.customerEmail} />}
-              {data.invoiceNumber && (
-                <DetailRow label="Pro forma" value={data.invoiceNumber} />
-              )}
             </div>
           </motion.div>
         )}
@@ -268,11 +265,11 @@ function buildSteps(data: Lookup | null, _t: TFn): Step[] {
     done: !!data.customerEmail,
   });
 
-  // 3. Pro forma — alle betaalde kinds (incl. transport)
+  // 3. Bestelling vastgelegd in ons systeem — vervangt de oude
+  //    'pro forma'-step want klant hoeft dat niet te zien (boekhouding-only).
   if (data.kind === 'koelkast' || data.kind === 'airco' || data.kind === 'stalling' || data.kind === 'service' || data.kind === 'transport') {
     steps.push({
-      label: 'Pro forma aangemaakt in Holded',
-      detail: data.invoiceNumber ? `nr. ${data.invoiceNumber}` : undefined,
+      label: 'Bestelling vastgelegd in ons systeem',
       done: data.invoiceCreated,
     });
   }
