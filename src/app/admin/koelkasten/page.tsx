@@ -80,10 +80,15 @@ function fmtPeriod(b: Booking): string {
   return `${start} – ${end}`;
 }
 
-function bookingDescription(b: Booking, fridgeName: string): string {
-  const camping = b.camping || 'Storage';
+// Beschrijving die uiteindelijk in de Holded pro forma + Stripe Checkout
+// product-titel terechtkomt — bewust in het NL want klanten zien dit.
+function bookingDescription(b: Booking, fridgeName: string, deviceTypeOverride?: string): string {
+  const dt = (deviceTypeOverride || b.device_type || '').toLowerCase();
+  const isAirco = dt.includes('airco');
+  const product = isAirco ? 'Airco huur' : 'Koelkast huur';
+  const camping = b.camping || 'Stalling';
   const period = fmtPeriod(b);
-  return `Fridge rental — ${camping} — ${period} (${fridgeName})`;
+  return `${product} — ${camping} — ${period} (${fridgeName})`;
 }
 
 export default function KoelkastenPage() {
@@ -437,9 +442,15 @@ function KoelkastenContent() {
   const openPayLink = (b: Booking, fridgeContext?: Fridge) => {
     const f = fridgeContext || drawerFridge;
     if (!f) return;
+    // Auto-bereken het bedrag op basis van booking-period + week-prijzen.
+    // Admin hoeft niet meer zelf te rekenen. Veld blijft editable als je
+    // een afwijkend bedrag wilt sturen.
+    const dt = (b.device_type || f.device_type || '') as DeviceType;
+    const wp = weekPrices?.[dt] ?? null;
+    const calc = priceForDates(dt, wp, b.start_date || '', b.end_date || '');
     setPayLinkForm({
-      description: bookingDescription(b, f.name),
-      amount: '',
+      description: bookingDescription(b, f.name, dt),
+      amount: calc ? calc.total.toFixed(2).replace('.', ',') : '',
       email: f.email || '',
       tax: '21',
     });
