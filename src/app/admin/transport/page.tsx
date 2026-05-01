@@ -93,6 +93,13 @@ function statusTone(status: string): 'warning' | 'success' | 'accent' | 'danger'
   return STATUS_OPTIONS.find((s) => s.value === status)?.tone ?? 'neutral';
 }
 
+function stallingLabel(s: string): string {
+  const map: Record<string, string> = {
+    controleren: 'Review', akkoord: 'Approved', betaald: 'Paid', afgewezen: 'Rejected',
+  };
+  return map[s] || s;
+}
+
 const emptyForm = {
   name: '', email: '', phone: '', camping: '',
   outbound_date: '', outbound_time: '',
@@ -489,7 +496,7 @@ function CustomerOverviewView({ overview, currentTransportId }: { overview?: Cus
                   <span className="text-text-muted truncate flex-1">
                     {b.start_date ? fmtDate(b.start_date) : '—'} → {b.end_date ? fmtDate(b.end_date) : '—'}
                   </span>
-                  <Badge tone={b.status === 'compleet' ? 'success' : 'warning'}>{b.status}</Badge>
+                  <Badge tone={b.status === 'compleet' ? 'success' : 'warning'}>{b.status === 'compleet' ? 'Complete' : b.status === 'controleren' ? 'Review' : b.status}</Badge>
                 </div>
               ))
             )}
@@ -509,7 +516,7 @@ function CustomerOverviewView({ overview, currentTransportId }: { overview?: Cus
                 <span className="text-text-muted truncate flex-1">
                   From {fmtDate(s.start_date)}{s.registration ? ` · ${s.registration}` : ''}
                 </span>
-                <Badge tone={s.status === 'akkoord' || s.status === 'betaald' ? 'success' : 'warning'}>{s.status}</Badge>
+                <Badge tone={s.status === 'akkoord' || s.status === 'betaald' ? 'success' : 'warning'}>{stallingLabel(s.status)}</Badge>
               </div>
             ))}
           </div>
@@ -528,7 +535,7 @@ function CustomerOverviewView({ overview, currentTransportId }: { overview?: Cus
                   <span className="text-text-muted truncate flex-1">
                     {t.camping || '—'} · {fmtDate(t.preferred_date)}
                   </span>
-                  <Badge tone={statusTone(t.status)}>{t.status}</Badge>
+                  <Badge tone={statusTone(t.status)}>{STATUS_OPTIONS.find((x) => x.value === t.status)?.label || t.status}</Badge>
                 </div>
               ))}
           </div>

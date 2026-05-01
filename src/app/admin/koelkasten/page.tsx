@@ -1011,7 +1011,7 @@ function KoelkastenContent() {
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1.5 text-[12px] font-medium text-text-muted hover:text-text underline-offset-4 hover:underline transition-colors px-2 self-center"
                           >
-                            <ExternalLink size={11} /> Open betaallink
+                            <ExternalLink size={11} /> Open payment link
                           </a>
                         )}
                         {holdedUrl && (

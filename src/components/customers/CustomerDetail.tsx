@@ -77,6 +77,21 @@ type ActivityEvent = {
   created_at: string;
 };
 
+function stallingStatusLabel(s: string): string {
+  const map: Record<string, string> = {
+    controleren: 'Review', akkoord: 'Approved', betaald: 'Paid', afgewezen: 'Rejected',
+  };
+  return map[s] || s;
+}
+
+function transportStatusLabel(s: string): string {
+  const map: Record<string, string> = {
+    controleren: 'Review', betaald: 'Paid', gepland: 'Scheduled',
+    uitgevoerd: 'Completed', afgewezen: 'Rejected',
+  };
+  return map[s] || s;
+}
+
 interface Props {
   initialCustomer: Customer;
   initialFridges: FridgeWithBookings[];
@@ -250,7 +265,7 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
                           {b.camping || '—'}{b.spot_number ? ` · ${b.spot_number}` : ''}
                           {b.start_date && b.end_date ? ` · ${b.start_date} → ${b.end_date}` : ''}
                         </span>
-                        <Badge tone={b.status === 'compleet' ? 'success' : 'warning'}>{b.status}</Badge>
+                        <Badge tone={b.status === 'compleet' ? 'success' : 'warning'}>{b.status === 'compleet' ? 'Complete' : b.status === 'controleren' ? 'Review' : b.status}</Badge>
                       </div>
                     ))}
                   </div>
@@ -278,7 +293,7 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
                     From {s.start_date}{s.registration ? ` · ${s.registration}` : ''}
                   </div>
                 </div>
-                <Badge tone={s.status === 'akkoord' || s.status === 'betaald' ? 'success' : 'warning'}>{s.status}</Badge>
+                <Badge tone={s.status === 'akkoord' || s.status === 'betaald' ? 'success' : 'warning'}>{stallingStatusLabel(s.status)}</Badge>
               </div>
             ))}
           </RelatedSection>
@@ -303,7 +318,7 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
                     {t.return_date ? ` · Return ${t.return_date}` : ''}
                   </div>
                 </div>
-                <Badge tone={t.status === 'uitgevoerd' ? 'success' : t.status === 'afgewezen' ? 'danger' : 'warning'}>{t.status}</Badge>
+                <Badge tone={t.status === 'uitgevoerd' ? 'success' : t.status === 'afgewezen' ? 'danger' : 'warning'}>{transportStatusLabel(t.status)}</Badge>
               </div>
             ))}
           </RelatedSection>
