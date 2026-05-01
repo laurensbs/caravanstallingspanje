@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Refrigerator, Bell, Truck, LogOut, ChevronLeft,
-  Settings, Users, Warehouse, MessageSquare, Search,
+  Settings, Users, Warehouse, MessageSquare, Search, PlayCircle,
 } from 'lucide-react';
 import { ReactNode } from 'react';
 import CommandPalette from './CommandPalette';
@@ -32,6 +32,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Beheer',
     items: [
+      { href: '/admin/test-flow', label: 'Test-flow', icon: PlayCircle },
       { href: '/admin/instellingen', label: 'Instellingen', icon: Settings },
     ],
   },
