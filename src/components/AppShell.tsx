@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { ReactNode } from 'react';
 import CommandPalette from './CommandPalette';
+import LocaleSwitch from './LocaleSwitch';
 
 type NavGroup = {
   label: string;
@@ -163,6 +164,7 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
               {initials(userName)}
             </div>
             <span className="flex-1 text-[12px] font-medium text-white truncate">{userName}</span>
+            <LocaleSwitch variant="dark" />
           </div>
           <button
             onClick={handleLogout}
