@@ -322,7 +322,7 @@ export default function KoelkastBestelPagina() {
               type="date"
               required
               value={form.end_date}
-              min={form.start_date || new Date().toISOString().slice(0, 10)}
+              min={minEndDate(form.start_date)}
               onChange={e => setForm({ ...form, end_date: e.target.value })}
               className={fieldCls}
             />
@@ -424,5 +424,17 @@ function SummaryRow({ label, value, bold }: { label: string; value: string; bold
       <span className={`text-[14px] tabular-nums text-right ${bold ? 'font-semibold' : ''}`}>{value}</span>
     </div>
   );
+}
+
+// Vroegste geldige eind-datum: start + minimum-aantal-dagen. Gebruikt
+// voor het `min` attribuut van de date-input zodat de browser zelf de
+// keuze blokkeert.
+function minEndDate(startDate: string): string {
+  const fallback = new Date().toISOString().slice(0, 10);
+  if (!startDate) return fallback;
+  const t = new Date(startDate).getTime();
+  if (!Number.isFinite(t)) return fallback;
+  const min = new Date(t + MIN_DAYS * 24 * 60 * 60 * 1000);
+  return min.toISOString().slice(0, 10);
 }
 

@@ -68,7 +68,13 @@ export async function calculatePriceWithSettings(deviceType: DeviceType, startDa
 function calculatePriceFor(weekPrice: number, startDate: string, endDate: string) {
   const dayPrice = Math.ceil((weekPrice / 7) * 100) / 100;
   const ms = new Date(endDate).getTime() - new Date(startDate).getTime();
-  const days = Math.max(MIN_DAYS, Math.round(ms / (1000 * 60 * 60 * 24)));
+  const rawDays = Math.round(ms / (1000 * 60 * 60 * 24));
+  // Hard-eisen: minimaal 7 dagen huren. Throwen i.p.v. stilletjes oprichten
+  // zodat de UI knop disabled blijft tot de klant een geldig bereik kiest.
+  if (!Number.isFinite(rawDays) || rawDays < MIN_DAYS) {
+    throw new Error(`Minimaal ${MIN_DAYS} dagen huren`);
+  }
+  const days = rawDays;
   const extraDays = Math.max(0, days - MIN_DAYS);
   const extraTotal = Math.round(extraDays * dayPrice * 100) / 100;
   const total = Math.round((weekPrice + extraTotal) * 100) / 100;
@@ -107,14 +113,7 @@ export function calculatePrice(deviceType: DeviceType, startDate: string, endDat
   extraTotal: number;
   total: number;
 } {
-  const weekPrice = PRICES[deviceType];
-  const dayPrice = Math.ceil((weekPrice / 7) * 100) / 100;
-  const ms = new Date(endDate).getTime() - new Date(startDate).getTime();
-  const days = Math.max(MIN_DAYS, Math.round(ms / (1000 * 60 * 60 * 24)));
-  const extraDays = Math.max(0, days - MIN_DAYS);
-  const extraTotal = Math.round(extraDays * dayPrice * 100) / 100;
-  const total = Math.round((weekPrice + extraTotal) * 100) / 100;
-  return { days, weekPrice, dayPrice, extraDays, extraTotal, total };
+  return calculatePriceFor(PRICES[deviceType], startDate, endDate);
 }
 
 export function formatEur(amount: number): string {

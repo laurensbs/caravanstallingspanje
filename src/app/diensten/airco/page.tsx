@@ -179,7 +179,13 @@ export default function AircoPage() {
           </Field>
           <Field label={t('fridge.end-date')} required>
             <input type="date" required value={form.end_date}
-              min={form.start_date || new Date().toISOString().slice(0, 10)}
+              min={(() => {
+                const fallback = new Date().toISOString().slice(0, 10);
+                if (!form.start_date) return fallback;
+                const t = new Date(form.start_date).getTime();
+                if (!Number.isFinite(t)) return fallback;
+                return new Date(t + MIN_DAYS * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+              })()}
               onChange={e => setForm({ ...form, end_date: e.target.value })}
               className={fieldCls} />
           </Field>
