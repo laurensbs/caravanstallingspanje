@@ -54,23 +54,37 @@ export async function sendMail(params: {
 
 // ─── Shared layout ────────────────────────────────────────
 
+// E-mail-clients (Outlook, Gmail) hebben beperkte CSS-support; we
+// houden styles inline en simpel. Navy hero matcht de homepage zodat
+// klanten de stijl direct herkennen.
 const STYLES = `
-body{margin:0;background:#FAFAFA;color:#0A0A0A;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
-.wrap{max-width:520px;margin:0 auto;padding:32px 24px}
-.card{background:#fff;border:1px solid #EAEAEA;border-radius:16px;padding:32px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
-.brand{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#6B7280;margin-bottom:8px}
-h1{font-size:22px;line-height:1.3;margin:0 0 12px;font-weight:600;letter-spacing:-.011em}
-p{font-size:14px;line-height:1.55;margin:0 0 14px;color:#0A0A0A}
+body{margin:0;background:#F4F6FA;color:#0A1929;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:560px;margin:0 auto;padding:0}
+.hero{background:linear-gradient(160deg,#142F4D 0%,#0A1929 100%);padding:32px 24px 28px;text-align:center;color:#F1F5F9}
+.hero-eyebrow{font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:rgba(241,245,249,.55);margin-bottom:8px}
+.hero h1{font-size:22px;line-height:1.25;margin:0;font-weight:600;letter-spacing:-.014em;color:#FFFFFF}
+.hero p{font-size:14px;line-height:1.55;margin:10px 0 0;color:rgba(241,245,249,.7)}
+.body{padding:28px 24px 8px;background:#FFFFFF;border-left:1px solid #EAEAEA;border-right:1px solid #EAEAEA}
+.body p{font-size:14px;line-height:1.6;margin:0 0 14px;color:#0A1929}
+h1{font-size:20px;line-height:1.3;margin:0 0 12px;font-weight:600;letter-spacing:-.012em;color:#0A1929}
 .muted{color:#6B7280}
-.row{display:flex;justify-content:space-between;font-size:13px;padding:8px 0;border-bottom:1px solid #EAEAEA}
+.summary{background:#F4F6FA;border-radius:12px;padding:14px 16px;margin:8px 0 18px}
+.row{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px solid #E5E7EB}
 .row:last-child{border-bottom:0}
-.btn{display:inline-block;background:#0A0A0A;color:#fff;text-decoration:none;padding:11px 18px;border-radius:8px;font-size:13px;font-weight:500;margin-top:8px}
-.footer{margin-top:32px;padding-top:24px;border-top:1px solid #EAEAEA;font-size:11px;color:#9CA3AF;text-align:center}
-.ref{font-family:ui-monospace,monospace;font-size:11px;color:#6B7280}
+.btn{display:inline-block;background:#142F4D;color:#FFFFFF !important;text-decoration:none;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:500;margin-top:6px}
+.next{background:#FEF7E5;border-left:3px solid #F4B942;padding:14px 16px;border-radius:8px;margin:14px 0 4px;font-size:13px;line-height:1.55;color:#0A1929}
+.next strong{color:#0A1929}
+.footer{padding:20px 24px 28px;background:#FFFFFF;border:1px solid #EAEAEA;border-top:0;border-radius:0 0 16px 16px;font-size:11px;color:#9CA3AF;text-align:center;line-height:1.6}
+.footer a{color:#142F4D;text-decoration:none}
+.body-top{border-top-left-radius:0;border-top-right-radius:0}
+.ref{font-family:ui-monospace,monospace;font-size:11px;color:#6B7280;margin-top:14px;letter-spacing:.04em}
 `;
 
-function shell(content: string): string {
-  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${STYLES}</style></head><body><div class="wrap"><div class="brand">Caravanstalling</div>${content}<div class="footer">Caravanstalling Spanje · Costa Brava<br/>Reageren? Antwoord direct op deze e-mail.</div></div></body></html>`;
+function shell(content: string, opts?: { eyebrow?: string; heading?: string; subline?: string }): string {
+  const eyebrow = opts?.eyebrow || 'Caravanstalling Spanje';
+  const heading = opts?.heading || 'Bedankt voor je bestelling';
+  const subline = opts?.subline || 'We gaan voor je aan de slag.';
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${STYLES}</style></head><body><div class="wrap"><div class="hero" style="border-radius:16px 16px 0 0"><div class="hero-eyebrow">${escapeHtml(eyebrow)}</div><h1>${escapeHtml(heading)}</h1><p>${escapeHtml(subline)}</p></div><div class="body body-top">${content}</div><div class="footer">Caravanstalling Spanje · Costa Brava<br/>Vragen? <a href="https://caravanstalling-spanje.com/contact">Stuur ons een bericht →</a></div></div></body></html>`;
 }
 
 function fmtEur(eur: number): string {
@@ -92,25 +106,47 @@ export function paymentReceivedHtml(input: {
   invoiceNumber?: string | null;
   publicUrl?: string | null;
 }): { subject: string; html: string; text: string } {
-  const subject = `Betaling ontvangen — ${input.service}`;
+  const subject = `Bedankt voor je bestelling — ${input.service}`;
   const invoiceBlock = input.invoiceNumber
-    ? `<div class="row"><span class="muted">Factuur</span><strong>${input.invoiceNumber}</strong></div>`
+    ? `<div class="row"><span class="muted">Factuur</span><strong>${escapeHtml(input.invoiceNumber)}</strong></div>`
     : '';
   const linkBlock = input.publicUrl
     ? `<a class="btn" href="${input.publicUrl}">Factuur bekijken</a>`
     : '';
+
+  // Vriendelijke kind-specifieke vervolgtekst, automatisch gekozen op
+  // basis van wat er in de service-omschrijving staat.
+  const lower = input.service.toLowerCase();
+  let nextStep = 'We sturen je binnen 1 werkdag een bevestiging met de planning.';
+  if (lower.includes('airco')) {
+    nextStep = 'Onze monteur bezorgt en installeert je airco op de afgesproken datum. Je hoort van ons als hij klaar staat.';
+  } else if (lower.includes('koelkast')) {
+    nextStep = 'Onze monteur bezorgt je koelkast op je staanplaats. Je hoort van ons als hij klaar staat.';
+  } else if (lower.includes('transport')) {
+    nextStep = 'We zorgen dat je caravan op de bestemming staat. Je hoort van ons zodra het is gepland of uitgevoerd.';
+  } else if (lower.includes('stalling')) {
+    nextStep = 'We bevestigen je plek en sturen je de aanvullende info zodat je kunt langskomen.';
+  }
+
   const card = `
-    <div class="card">
-      <h1>Bedankt, ${escapeHtml(input.name)}</h1>
-      <p>We hebben je betaling ontvangen. Hieronder staat een overzicht.</p>
+    <p>Hi ${escapeHtml(input.name)}, fijn dat je bij ons hebt geboekt!</p>
+    <p>We hebben je betaling ontvangen en zijn al voor je aan de slag.</p>
+    <div class="summary">
       <div class="row"><span class="muted">Dienst</span><strong>${escapeHtml(input.service)}</strong></div>
       <div class="row"><span class="muted">Bedrag</span><strong>${fmtEur(input.amountEur)}</strong></div>
       ${invoiceBlock}
-      ${linkBlock}
-      <p class="ref">Referentie: ${escapeHtml(input.reference)}</p>
-    </div>`;
-  const text = `Bedankt ${input.name},\n\nWe hebben je betaling van ${fmtEur(input.amountEur)} ontvangen voor: ${input.service}.${input.invoiceNumber ? `\nFactuur: ${input.invoiceNumber}` : ''}\n\nReferentie: ${input.reference}`;
-  return { subject, html: shell(card), text };
+    </div>
+    <div class="next"><strong>Wat gebeurt er nu?</strong><br/>${escapeHtml(nextStep)}</div>
+    ${linkBlock}
+    <p class="ref">Referentie: ${escapeHtml(input.reference)}</p>
+  `;
+  const html = shell(card, {
+    eyebrow: 'Caravanstalling Spanje',
+    heading: 'Bedankt voor je bestelling!',
+    subline: 'We hebben je betaling ontvangen — we gaan voor je aan de slag.',
+  });
+  const text = `Bedankt ${input.name},\n\nWe hebben je betaling van ${fmtEur(input.amountEur)} ontvangen voor: ${input.service}.${input.invoiceNumber ? `\nFactuur: ${input.invoiceNumber}` : ''}\n\n${nextStep}\n\nReferentie: ${input.reference}\n\nVragen? https://caravanstalling-spanje.com/contact`;
+  return { subject, html, text };
 }
 
 export function requestReceivedHtml(input: {
