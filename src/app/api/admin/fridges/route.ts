@@ -62,7 +62,9 @@ export async function POST(req: NextRequest) {
     });
     const admin = getAdminInfo(req);
     await logActivity({ actor: admin.name, role: admin.role, action: 'Koelkast aangemaakt', entityType: 'fridge', entityId: String(fridge.id), entityLabel: validated.data.name });
-    return NextResponse.json({ fridge }, { status: 201 });
+    // Frontend verwacht altijd een bookings-array op een Fridge — ook voor
+    // pas-aangemaakte fridges zonder periodes.
+    return NextResponse.json({ fridge: { ...fridge, bookings: [] } }, { status: 201 });
   } catch (error) {
     console.error('Fridges POST error:', error);
     return NextResponse.json({ error: 'Failed to create fridge' }, { status: 500 });

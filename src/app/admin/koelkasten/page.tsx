@@ -161,7 +161,7 @@ function KoelkastenContent() {
 
   const years = useMemo(() => {
     const set = new Set<number>();
-    fridges.forEach(f => f.bookings.forEach(b => { if (b.start_date) set.add(new Date(b.start_date).getFullYear()); }));
+    fridges.forEach(f => (f.bookings || []).forEach(b => { if (b.start_date) set.add(new Date(b.start_date).getFullYear()); }));
     return Array.from(set).sort((a, b) => b - a);
   }, [fridges]);
 
@@ -530,11 +530,14 @@ function KoelkastenContent() {
           <ul className="divide-y divide-border">
             <AnimatePresence initial={false}>
               {fridges.map(f => {
-                const hasCheck = f.bookings.some(b => b.status === 'controleren');
-                const hasInvoice = f.bookings.some(b => b.holded_invoice_number);
+                // Defensief: een vers aangemaakte of gecorrumpeerde fridge
+                // kan zonder bookings-array door de UI komen.
+                const bookings = Array.isArray(f.bookings) ? f.bookings : [];
+                const hasCheck = bookings.some(b => b.status === 'controleren');
+                const hasInvoice = bookings.some(b => b.holded_invoice_number);
                 // Sorteer periodes op startdatum (recentst eerst) en toon
                 // standaard de eerste 3; rest komt in de drawer.
-                const sortedBookings = [...f.bookings].sort((a, b) => {
+                const sortedBookings = [...bookings].sort((a, b) => {
                   const ta = a.start_date ? new Date(a.start_date).getTime() : 0;
                   const tb = b.start_date ? new Date(b.start_date).getTime() : 0;
                   return tb - ta;
@@ -813,11 +816,11 @@ function KoelkastenContent() {
                 <h3 className="text-xs font-medium uppercase tracking-wider text-text-muted">Periodes</h3>
                 <Button size="sm" variant="secondary" onClick={openNewBooking}><Plus size={12} /> Toevoegen</Button>
               </div>
-              {drawerFridge.bookings.length === 0 ? (
+              {(drawerFridge.bookings || []).length === 0 ? (
                 <p className="text-xs text-text-muted italic">Nog geen periodes</p>
               ) : (
                 <ul className="space-y-2">
-                  {drawerFridge.bookings.map(b => {
+                  {(drawerFridge.bookings || []).map(b => {
                     const holded = holdedStatuses[b.id];
                     const paid = holded?.status === 'paid' || b.status === 'compleet';
                     const partial = holded?.status === 'partial';
