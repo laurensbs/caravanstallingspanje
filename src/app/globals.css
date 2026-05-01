@@ -190,6 +190,56 @@ html {
   letter-spacing: -0.018em;
 }
 
+/* Dark-mode override voor publieke pagina's met navy achtergrond. Maakt
+   inputs, cards en text-colors lichter zodat ze leesbaar zijn op donker.
+   Wrapt om je <main> heen — bv. <main class="page-public-dark"> of via
+   PublicShell. */
+.page-public-dark {
+  color: #F1F5F9;
+}
+.page-public-dark .text-text { color: rgba(241,245,249,0.95); }
+.page-public-dark .text-text-muted { color: rgba(241,245,249,0.65); }
+.page-public-dark .text-text-subtle { color: rgba(241,245,249,0.45); }
+.page-public-dark .bg-surface {
+  background: rgba(255,255,255,0.06) !important;
+}
+.page-public-dark .bg-surface-2 {
+  background: rgba(255,255,255,0.04) !important;
+}
+.page-public-dark .border-border {
+  border-color: rgba(255,255,255,0.12) !important;
+}
+.page-public-dark .border-border-strong {
+  border-color: rgba(255,255,255,0.22) !important;
+}
+.page-public-dark input:not([type="checkbox"]):not([type="radio"]),
+.page-public-dark select,
+.page-public-dark textarea {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.12);
+  color: #F1F5F9;
+}
+.page-public-dark input::placeholder,
+.page-public-dark textarea::placeholder {
+  color: rgba(241,245,249,0.4);
+}
+.page-public-dark input:focus,
+.page-public-dark select:focus,
+.page-public-dark textarea:focus {
+  border-color: rgba(126,168,255,0.6);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(126,168,255,0.2);
+}
+.page-public-dark .card-surface {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.page-public-dark .placeholder\:text-text-subtle::placeholder {
+  color: rgba(241,245,249,0.4);
+}
+
 /* Admin-page typography. Slightly larger than the default 13px so admin
    pages voelen ruimer en leesbaarder zonder vol marketing-grote tekst. */
 .page-admin {

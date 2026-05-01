@@ -152,14 +152,7 @@ export default function PublicHero({
         </motion.div>
       </div>
 
-      {/* Subtiele wave-overgang naar witte body — voorkomt harde rand */}
-      <div
-        aria-hidden
-        className="absolute bottom-0 inset-x-0 h-6"
-        style={{
-          background: 'linear-gradient(to bottom, transparent 0%, var(--color-bg) 100%)',
-        }}
-      />
+      {/* Geen body-overgang meer: de hele pagina is nu navy-blauw. */}
     </header>
   );
 }

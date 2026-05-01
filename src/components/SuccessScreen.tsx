@@ -31,7 +31,10 @@ export default function SuccessScreen({ title, body, reference }: SuccessScreenP
   const { t } = useLocale();
   const reduce = useReducedMotion();
   return (
-    <main className="min-h-screen flex items-center justify-center bg-bg page-public px-6 py-12">
+    <main
+      className="min-h-screen flex items-center justify-center page-public page-public-dark px-6 py-12"
+      style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}
+    >
       <div className="max-w-md text-center w-full">
         {/* Success badge met confetti-vonken */}
         <div className="relative w-24 h-24 mx-auto mb-8">

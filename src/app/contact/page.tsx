@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Send, Loader2 } from 'lucide-react';
 import PublicHero from '@/components/PublicHero';
+import PublicFooter from '@/components/PublicFooter';
 import { Field, fieldCls, Section } from '@/components/ServiceForm';
 import { useLocale } from '@/components/LocaleProvider';
 
@@ -39,7 +40,7 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="min-h-screen bg-bg page-public">
+    <main className="min-h-screen page-public page-public-dark flex flex-col" style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}>
       <PublicHero
         back={{ href: '/', label: t('common.brand') }}
         title="Stuur ons een bericht"
@@ -134,6 +135,7 @@ export default function ContactPage() {
           </p>
         </motion.form>
       </div>
+      <PublicFooter />
     </main>
   );
 }

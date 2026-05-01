@@ -63,7 +63,10 @@ export default function OrderReceipt({ refCode, fallbackTitle, fallbackBody }: P
   const steps = buildSteps(data, t as unknown as TFn);
 
   return (
-    <main className="min-h-screen flex items-start justify-center bg-bg page-public px-5 sm:px-6 py-10 sm:py-16">
+    <main
+      className="min-h-screen flex items-start justify-center page-public page-public-dark px-5 sm:px-6 py-10 sm:py-16"
+      style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}
+    >
       <div className="max-w-lg w-full">
         {/* Confetti badge */}
         <div className="relative w-24 h-24 mx-auto mb-7">

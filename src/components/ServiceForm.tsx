@@ -9,6 +9,7 @@ import PublicHero from './PublicHero';
 import Stepper from './Stepper';
 import SuccessScreen from './SuccessScreen';
 import { useLocale } from './LocaleProvider';
+import PublicFooter from './PublicFooter';
 
 export type ContactState = {
   name: string;
@@ -208,13 +209,16 @@ export function ServicePageShell({
 
   const E = [0.16, 1, 0.3, 1] as const;
   return (
-    <main className="min-h-screen bg-bg page-public">
+    <main
+      className="min-h-screen page-public page-public-dark flex flex-col"
+      style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}
+    >
       <PublicHero
         back={{ href: '/', label: t('common.brand') }}
         title={title}
         intro={intro}
       />
-      <div className="max-w-2xl mx-auto px-5 sm:px-6 py-8 sm:py-14">
+      <div className="flex-1 max-w-2xl w-full mx-auto px-5 sm:px-6 py-8 sm:py-14">
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -265,6 +269,7 @@ export function ServicePageShell({
       <AnimatePresence>
         {paid && submitting && <RedirectOverlay />}
       </AnimatePresence>
+      <PublicFooter />
     </main>
   );
 }
@@ -330,7 +335,10 @@ export function MultiStepShell({
   };
 
   return (
-    <main className="min-h-screen bg-bg page-public">
+    <main
+      className="min-h-screen page-public page-public-dark flex flex-col"
+      style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}
+    >
       <PublicHero
         back={{ href: '/', label: t('common.brand') }}
         title={title}
@@ -339,7 +347,7 @@ export function MultiStepShell({
         eyebrowIcon={eyebrowIcon}
         accent={accent}
       />
-      <div className="max-w-2xl mx-auto px-5 sm:px-6 py-8 sm:py-14">
+      <div className="flex-1 max-w-2xl w-full mx-auto px-5 sm:px-6 py-8 sm:py-14">
         <Stepper current={step} steps={stepLabels} />
 
         <motion.div
@@ -443,6 +451,7 @@ export function MultiStepShell({
       <AnimatePresence>
         {paid && submitting && <RedirectOverlay />}
       </AnimatePresence>
+      <PublicFooter />
     </main>
   );
 }

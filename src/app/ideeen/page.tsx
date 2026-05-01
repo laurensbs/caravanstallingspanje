@@ -8,6 +8,7 @@ import {
   Wrench, Tent, Coffee, Bike, Sun, Wind, ThumbsUp, ThumbsDown, Star,
 } from 'lucide-react';
 import PublicHero from '@/components/PublicHero';
+import PublicFooter from '@/components/PublicFooter';
 import { Field, fieldCls, Section } from '@/components/ServiceForm';
 
 const CATEGORIES = [
@@ -94,7 +95,7 @@ export default function IdeeenPage() {
   // Done-state — vriendelijke bedankt-pagina, geen receipt-flow.
   if (done) {
     return (
-      <main className="min-h-screen bg-bg page-public">
+      <main className="min-h-screen page-public page-public-dark flex flex-col" style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}>
         <PublicHero
           back={{ href: '/', label: 'Caravanstalling' }}
           title="Bedankt voor je idee!"
@@ -130,6 +131,7 @@ export default function IdeeenPage() {
             <ArrowRight size={14} className="rotate-180" /> Terug naar website
           </Link>
         </div>
+        <PublicFooter />
       </main>
     );
   }
@@ -296,6 +298,7 @@ export default function IdeeenPage() {
           </p>
         </motion.form>
       </div>
+      <PublicFooter />
     </main>
   );
 }
