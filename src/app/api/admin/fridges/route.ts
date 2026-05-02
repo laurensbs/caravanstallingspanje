@@ -46,9 +46,10 @@ export async function GET(req: NextRequest) {
 
     const result = await getAllFridges(year, status, search);
     return NextResponse.json(result);
-  } catch (error) {
-    console.error('Fridges GET error:', error);
-    return NextResponse.json({ error: 'Failed to fetch fridges' }, { status: 500 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'unknown';
+    console.error('[admin/fridges GET] error:', msg, err);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
 
@@ -70,8 +71,9 @@ export async function POST(req: NextRequest) {
     // Frontend verwacht altijd een bookings-array op een Fridge — ook voor
     // pas-aangemaakte fridges zonder periodes.
     return NextResponse.json({ fridge: { ...fridge, bookings: [] } }, { status: 201 });
-  } catch (error) {
-    console.error('Fridges POST error:', error);
-    return NextResponse.json({ error: 'Failed to create fridge' }, { status: 500 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'unknown';
+    console.error('[admin/fridges POST] error:', msg, err);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

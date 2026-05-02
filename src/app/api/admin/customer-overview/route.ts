@@ -8,8 +8,9 @@ export async function GET(req: NextRequest) {
     if (!email) return NextResponse.json({ error: 'email required' }, { status: 400 });
     const overview = await getCustomerOverview(email);
     return NextResponse.json(overview);
-  } catch (error) {
-    console.error('Customer overview GET error:', error);
-    return NextResponse.json({ error: 'Failed to fetch overview' }, { status: 500 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'unknown';
+    console.error('[admin/customer-overview GET] error:', msg, err);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

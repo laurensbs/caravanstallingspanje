@@ -8,9 +8,10 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     const fridge = await getFridgeById(parseInt(id));
     if (!fridge) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     return NextResponse.json({ fridge });
-  } catch (error) {
-    console.error('Fridge GET error:', error);
-    return NextResponse.json({ error: 'Failed to fetch fridge' }, { status: 500 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'unknown';
+    console.error('[admin/fridges/[id] GET] error:', msg, err);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
 
@@ -31,9 +32,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const admin = getAdminInfo(req);
     await logActivity({ actor: admin.name, role: admin.role, action: 'Fridge updated', entityType: 'fridge', entityId: id, entityLabel: validated.data.name || '' });
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('Fridge PUT error:', error);
-    return NextResponse.json({ error: 'Failed to update fridge' }, { status: 500 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'unknown';
+    console.error('[admin/fridges/[id] PUT] error:', msg, err);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
 
@@ -45,8 +47,9 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     const admin = getAdminInfo(req);
     await logActivity({ actor: admin.name, role: admin.role, action: 'Fridge deleted', entityType: 'fridge', entityId: id, entityLabel: fridge?.name || '' });
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('Fridge DELETE error:', error);
-    return NextResponse.json({ error: 'Failed to delete fridge' }, { status: 500 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'unknown';
+    console.error('[admin/fridges/[id] DELETE] error:', msg, err);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

@@ -65,6 +65,7 @@ export async function POST(req: NextRequest) {
       successUrl: `${origin}/diensten/bedankt?ref=${ref}&session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl: `${origin}/diensten/transport?cancelled=1`,
       customerEmail: d.email,
+      idempotencyKey: `transport_${entry.id}_${new Date().toISOString().slice(0, 10)}`,
       metadata: {
         kind: 'transport_request',
         refId: String(entry.id),

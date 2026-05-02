@@ -36,6 +36,9 @@ import { formatRef, refKindForFridge } from '@/lib/refs';
 // JSON-parsed version, so we run on the Node.js runtime and pass req.text().
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+// Webhook doet Holded-call + email + reparatiepanel-forward — kan tegen
+// trage upstream wrijven. Default Vercel timeout (10s) is te krap.
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   const sig = req.headers.get('stripe-signature');
@@ -310,7 +313,38 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'forward failed';
         console.error('[stripe-webhook] forward to reparatiepanel failed:', msg);
-        throw new Error(`Forward to reparatiepanel failed: ${msg}`);
+        // Niet throwen — anders retry-t Stripe en krijgen we dubbele Holded
+        // pro forma's en mails. Klant heeft betaald, intake-payload staat
+        // veilig in de DB. Admin krijgt een alert-mail zodat 't niet
+        // onzichtbaar blijft.
+        await logActivity({
+          action: 'Forward naar reparatiepaneel mislukt',
+          entityType: 'pending_intake',
+          entityId: String(pending.id),
+          details: msg,
+        }).catch(() => {});
+        const payload = pending.payload as IntakePayload;
+        const alertHtml = `
+          <h2 style="font-family:sans-serif;color:#dc2626">⚠ Service-forward mislukt</h2>
+          <p style="font-family:sans-serif">Klant heeft betaald maar de werkbon kon niet worden doorgezet naar het reparatiepaneel.</p>
+          <p style="font-family:sans-serif"><strong>Reden:</strong> ${msg}</p>
+          <table style="font-family:sans-serif;font-size:14px;border-collapse:collapse">
+            <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Klant</td><td style="padding:6px 0"><strong>${payload.customer?.name || '—'}</strong></td></tr>
+            <tr><td style="padding:6px 14px 6px 0;color:#6B7280">E-mail</td><td style="padding:6px 0">${payload.customer?.email || '—'}</td></tr>
+            <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Telefoon</td><td style="padding:6px 0">${payload.customer?.phone || '—'}</td></tr>
+            <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Service</td><td style="padding:6px 0"><strong>${payload.title || '—'}</strong></td></tr>
+            <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Pending intake id</td><td style="padding:6px 0;font-family:monospace">${pending.id}</td></tr>
+          </table>
+          <p style="font-family:sans-serif;font-size:13px;color:#6B7280;margin-top:18px">
+            Stuur de werkbon handmatig in via het reparatiepaneel of bel de klant.
+          </p>
+        `;
+        await sendMail({
+          to: 'laurens@caravanstalling-spanje.com',
+          subject: `⚠ Service-forward mislukt: ${payload.title || 'service'}`,
+          html: alertHtml,
+          text: `Forward mislukt voor ${payload.customer?.name || 'klant'} (${payload.customer?.email || '—'}). Reden: ${msg}. Pending intake id: ${pending.id}.`,
+        }).catch((mailErr) => console.error('[stripe-webhook] alert-mail mislukt:', mailErr));
       }
     }
     // Holded-factuur voor service.

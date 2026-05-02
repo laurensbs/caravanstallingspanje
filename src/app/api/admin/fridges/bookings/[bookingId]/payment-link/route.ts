@@ -146,6 +146,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
       // Stripe Checkout Sessions zijn max 24u geldig. Klant betaalt
       // doorgaans dezelfde dag; admin kan altijd opnieuw versturen.
       expiresInHours: 23,
+      // Idempotency: dezelfde booking + dag + bedrag-cents = dezelfde session.
+      // Bij her-versturen met ander bedrag krijg je wel een nieuwe.
+      idempotencyKey: `paylink_${id}_${Math.round(amountEur * 100)}_${new Date().toISOString().slice(0, 10)}`,
       metadata: {
         kind: 'fridge_booking_manual',
         refId: String(id),

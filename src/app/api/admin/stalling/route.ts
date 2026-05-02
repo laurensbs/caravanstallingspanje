@@ -10,8 +10,9 @@ export async function GET(req: NextRequest) {
     const entries = await getAllStallingRequests(status);
     return NextResponse.json({ entries });
   } catch (err) {
-    console.error('stalling GET error:', err);
-    return NextResponse.json({ error: 'list failed' }, { status: 500 });
+    const msg = err instanceof Error ? err.message : 'unknown';
+    console.error('[admin/stalling GET] error:', msg, err);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
 
@@ -45,7 +46,8 @@ export async function POST(req: NextRequest) {
     });
     return NextResponse.json({ entry: created });
   } catch (err) {
-    console.error('stalling POST error:', err);
-    return NextResponse.json({ error: err instanceof Error ? err.message : 'create failed' }, { status: 500 });
+    const msg = err instanceof Error ? err.message : 'unknown';
+    console.error('[admin/stalling POST] error:', msg, err);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

@@ -222,8 +222,9 @@ async function seed() {
     }
 
     return NextResponse.json({ success: true, fridges: fridgeCount, bookings: bookingCount });
-  } catch (error) {
-    console.error('Fridge seed error:', error);
-    return NextResponse.json({ error: 'Failed to seed fridge data' }, { status: 500 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'unknown';
+    console.error('[admin/fridges/seed] error:', msg, err);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

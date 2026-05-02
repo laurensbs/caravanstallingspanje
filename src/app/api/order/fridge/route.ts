@@ -134,6 +134,8 @@ export async function POST(req: NextRequest) {
         successUrl: `${origin}/koelkast/bedankt?ref=${ref}&session_id={CHECKOUT_SESSION_ID}`,
         cancelUrl: `${origin}/koelkast?cancelled=1`,
         customerEmail: data.email,
+        // Idempotency: dezelfde booking-id binnen 24u krijgt dezelfde session.
+        idempotencyKey: `fridge_${booking.id}_${new Date().toISOString().slice(0, 10)}`,
         metadata: {
           kind: 'fridge_booking',
           refId: String(booking.id),

@@ -12,9 +12,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ book
     const admin = getAdminInfo(req);
     await logActivity({ actor: admin.name, role: admin.role, action: 'Fridge period updated', entityType: 'fridge_booking', entityId: bookingId, entityLabel: validated.data.camping || '' });
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('Booking PUT error:', error);
-    return NextResponse.json({ error: 'Failed to update booking' }, { status: 500 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'unknown';
+    console.error('[admin/fridges/bookings PUT] error:', msg, err);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
 
@@ -25,8 +26,9 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ b
     const admin = getAdminInfo(req);
     await logActivity({ actor: admin.name, role: admin.role, action: 'Fridge period deleted', entityType: 'fridge_booking', entityId: bookingId });
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('Booking DELETE error:', error);
-    return NextResponse.json({ error: 'Failed to delete booking' }, { status: 500 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'unknown';
+    console.error('[admin/fridges/bookings DELETE] error:', msg, err);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

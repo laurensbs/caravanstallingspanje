@@ -6,7 +6,7 @@ function apiKey(): string {
   return key;
 }
 
-async function holdedFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
+async function holdedFetch<T>(path: string, init: RequestInit = {}, attempt = 0): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     ...init,
     headers: {
@@ -24,7 +24,14 @@ async function holdedFetch<T>(path: string, init: RequestInit = {}): Promise<T> 
       throw new Error('Holded weigert de API-key (401/403). Vernieuw de key in Vercel env vars.');
     }
     if (res.status === 429) {
-      throw new Error('Holded rate limit bereikt. Probeer het over een minuut opnieuw.');
+      // Retry met respect voor Retry-After header. Max 3 attempts: 2s, 4s, 8s.
+      if (attempt < 3) {
+        const retryAfter = Number(res.headers.get('retry-after')) || (2 ** (attempt + 1));
+        const waitMs = Math.min(8000, retryAfter * 1000);
+        await new Promise((r) => setTimeout(r, waitMs));
+        return holdedFetch<T>(path, init, attempt + 1);
+      }
+      throw new Error('Holded rate limit (3 retries opgebruikt). Probeer over een minuut opnieuw.');
     }
     const msg = (body && typeof body === 'object' && 'info' in body && typeof (body as { info: unknown }).info === 'string')
       ? (body as { info: string }).info
@@ -153,6 +160,11 @@ export async function pushContactToHolded(input: {
     mobile: input.mobile || input.phone || undefined,
     type: 'client',
     isperson: 1,
+    // Onderdruk welkomstmail van Holded — wij doen onze eigen comms.
+    notifyAtCreate: false,
+    sendMail: false,
+    sendByEmail: false,
+    notify: false,
   };
   if (input.address || input.city || input.postal_code || input.country) {
     body.address = {
@@ -270,6 +282,11 @@ export async function createContact(input: ContactInput): Promise<HoldedContact>
     mobile: input.phone || undefined,
     type: 'client',
     isperson: 1,
+    // Onderdruk welkomstmail van Holded — klanten krijgen onze eigen comms.
+    notifyAtCreate: false,
+    sendMail: false,
+    sendByEmail: false,
+    notify: false,
   };
   if (input.address || input.city || input.postal_code || input.country) {
     body.address = {

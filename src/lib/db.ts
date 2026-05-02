@@ -1143,9 +1143,16 @@ export async function markWaitlistNotified(id: number) {
   await sql`UPDATE fridge_waitlist SET status = 'genotificeerd', notified_at = NOW() WHERE id = ${id}`;
 }
 
+// Cache-reset zodat /api/admin/run-migrations alle ALTER's opnieuw kan
+// runnen — handig na deploys waar nieuwe kolommen zijn toegevoegd.
+export function resetSchemaCache(): void {
+  _migrationsApplied = null;
+  _miscMigrationsApplied = null;
+}
+
 // ─── Lazy migratie voor contact_messages en uitbreidingen op transport/stalling.
 let _miscMigrationsApplied: Promise<void> | null = null;
-async function ensureMiscSchema(): Promise<void> {
+export async function ensureMiscSchema(): Promise<void> {
   if (_miscMigrationsApplied) return _miscMigrationsApplied;
   _miscMigrationsApplied = (async () => {
     await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS transport_mode TEXT`;
@@ -1191,6 +1198,13 @@ async function ensureMiscSchema(): Promise<void> {
     await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_status TEXT`;
     await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_synced_at TIMESTAMP`;
     await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_url TEXT`;
+    // Composite index voor planning-view (getBookingsInRange) — voorkomt
+    // full-table scan op fridge_id+start_date filter.
+    await sql`CREATE INDEX IF NOT EXISTS idx_fridge_bookings_fridge_start
+      ON fridge_bookings(fridge_id, start_date)`;
+    // Partial index voor admin "review"-filter — heel hot pad.
+    await sql`CREATE INDEX IF NOT EXISTS idx_fridge_bookings_review
+      ON fridge_bookings(start_date) WHERE status = 'controleren'`;
     // Stripe paid_at + payment_intent_id én sales-invoice-conversion flag.
     // Pro forma's blijven pro forma in Holded; dit vinkje markeert dat een
     // admin 'm handmatig heeft omgezet naar een echte sales invoice in Holded.
@@ -1266,7 +1280,7 @@ Altijd koud en schoon drinkwater — makkelijk en praktisch tijdens de vakantie.
 // daarna gecached. Komt voor de helpers zodat deze nooit crashen op een
 // koude DB die niet via /api/setup is geïnitialiseerd.
 let _migrationsApplied: Promise<void> | null = null;
-async function ensureCustomerSchema(): Promise<void> {
+export async function ensureCustomerSchema(): Promise<void> {
   if (_migrationsApplied) return _migrationsApplied;
   _migrationsApplied = (async () => {
     await sql`CREATE TABLE IF NOT EXISTS customers (

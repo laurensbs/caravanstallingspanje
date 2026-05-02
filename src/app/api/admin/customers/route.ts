@@ -18,8 +18,9 @@ export async function GET(req: NextRequest) {
     }));
     return NextResponse.json({ ...result, customers: enriched });
   } catch (err) {
-    console.error('customers GET error:', err);
-    return NextResponse.json({ error: 'list failed' }, { status: 500 });
+    const msg = err instanceof Error ? err.message : 'unknown';
+    console.error('[admin/customers GET] error:', msg, err);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
 
@@ -115,7 +116,8 @@ export async function POST(req: NextRequest) {
       holdedSyncError,
     });
   } catch (err) {
-    console.error('customer create error:', err);
-    return NextResponse.json({ error: err instanceof Error ? err.message : 'create failed' }, { status: 500 });
+    const msg = err instanceof Error ? err.message : 'unknown';
+    console.error('[admin/customers POST] error:', msg, err);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

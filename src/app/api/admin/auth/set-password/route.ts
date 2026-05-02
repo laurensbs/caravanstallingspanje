@@ -56,8 +56,9 @@ export async function POST(req: NextRequest) {
       maxAge: 60 * 60 * 24 * 7,
     });
     return response;
-  } catch (error) {
-    console.error('Set password error:', error);
-    return NextResponse.json({ error: 'Failed to set password' }, { status: 500 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'unknown';
+    console.error('[admin/auth/set-password POST] error:', msg, err);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

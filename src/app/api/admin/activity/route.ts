@@ -5,8 +5,9 @@ export async function GET() {
   try {
     const events = await getRecentActivity(15);
     return NextResponse.json({ events });
-  } catch (error) {
-    console.error('Activity GET error:', error);
-    return NextResponse.json({ error: 'Failed to fetch activity' }, { status: 500 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'unknown';
+    console.error('[admin/activity GET] error:', msg, err);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

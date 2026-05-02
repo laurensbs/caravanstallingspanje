@@ -46,8 +46,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       entityLabel: `${fridge?.name || ''} - ${validated.data.camping || ''}`,
     });
     return NextResponse.json({ booking }, { status: 201 });
-  } catch (error) {
-    console.error('Fridge booking POST error:', error);
-    return NextResponse.json({ error: 'Failed to create booking' }, { status: 500 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'unknown';
+    console.error('[admin/fridges/[id]/bookings POST] error:', msg, err);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

@@ -37,6 +37,10 @@ export async function createCheckoutSession(input: {
    *  BELANGRIJK: Stripe Checkout Sessions staan max 24 uur expiry toe.
    *  Voor langere termijn moet je Payment Links gebruiken (andere API). */
   expiresInHours?: number;
+  /** Idempotency-key voor Stripe — als dezelfde key binnen 24u opnieuw
+   *  binnenkomt geeft Stripe dezelfde session terug i.p.v. een duplicaat.
+   *  Caller-routes geven typisch `${kind}_${refId}_${YYYYMMDD}` mee. */
+  idempotencyKey?: string;
 }): Promise<Stripe.Checkout.Session> {
   const expSec = Math.max(
     30 * 60,
@@ -44,27 +48,30 @@ export async function createCheckoutSession(input: {
     // vermijden ("must be less than 24 hours").
     Math.min(23.9 * 3600, Math.round((input.expiresInHours ?? 0.5) * 3600)),
   );
-  return stripe().checkout.sessions.create({
-    mode: 'payment',
-    payment_method_types: ['card', 'ideal', 'bancontact'],
-    line_items: [
-      {
-        price_data: {
-          currency: 'eur',
-          unit_amount: Math.round(input.amountEur * 100),
-          product_data: {
-            name: input.description,
+  return stripe().checkout.sessions.create(
+    {
+      mode: 'payment',
+      payment_method_types: ['card', 'ideal', 'bancontact'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'eur',
+            unit_amount: Math.round(input.amountEur * 100),
+            product_data: {
+              name: input.description,
+            },
           },
+          quantity: 1,
         },
-        quantity: 1,
-      },
-    ],
-    customer_email: input.customerEmail,
-    metadata: input.metadata,
-    success_url: input.successUrl,
-    cancel_url: input.cancelUrl,
-    locale: 'nl',
-    automatic_tax: { enabled: false },
-    expires_at: Math.floor(Date.now() / 1000) + expSec,
-  });
+      ],
+      customer_email: input.customerEmail,
+      metadata: input.metadata,
+      success_url: input.successUrl,
+      cancel_url: input.cancelUrl,
+      locale: 'nl',
+      automatic_tax: { enabled: false },
+      expires_at: Math.floor(Date.now() / 1000) + expSec,
+    },
+    input.idempotencyKey ? { idempotencyKey: input.idempotencyKey } : undefined,
+  );
 }

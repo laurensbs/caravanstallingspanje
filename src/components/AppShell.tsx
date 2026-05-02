@@ -6,7 +6,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Refrigerator, Bell, Truck, LogOut, ChevronLeft,
-  Settings, Users, Warehouse, MessageSquare, Search, PlayCircle, Lightbulb, Wind, CalendarRange,
+  Settings, Users, Warehouse, MessageSquare, Search, Lightbulb, Wind, CalendarRange,
 } from 'lucide-react';
 import { ReactNode, useState } from 'react';
 import CommandPalette from './CommandPalette';
@@ -35,7 +35,6 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Admin',
     items: [
-      { href: '/admin/test-flow', label: 'Test flow', icon: PlayCircle },
       { href: '/admin/instellingen', label: 'Settings', icon: Settings },
     ],
   },
