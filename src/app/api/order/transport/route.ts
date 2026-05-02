@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createTransportRequest, getSettings, logActivity } from '@/lib/db';
 import { validateBody, transportOrderSchema } from '@/lib/validations';
 import { createCheckoutSession } from '@/lib/stripe';
-import { effectiveAmountEur } from '@/lib/pricing';
+import { effectiveAmountEur, formatEur } from '@/lib/pricing';
 import { formatRef } from '@/lib/refs';
+import { sendMail } from '@/lib/email';
 
 // Transport is een betaalde dienst geworden. Twee tarieven:
 //  - 'wij_rijden' (default €100) — wij halen op + brengen terug
@@ -89,6 +90,34 @@ export async function POST(req: NextRequest) {
       entityId: String(entry.id),
       entityLabel: `${d.name} — ${d.camping} (${d.mode})`,
     });
+
+    // Notificatie naar admin-mailbox zodat we direct zien dat 'r een nieuwe
+    // transport-aanvraag binnen is — onafhankelijk van of de klant de
+    // Stripe-flow afmaakt of niet.
+    const modeLabel = d.mode === 'wij_rijden' ? 'Wij rijden voor je' : 'Klant haalt zelf op';
+    const adminNotifyHtml = `
+      <h2 style="font-family:sans-serif;color:#0A1929">Nieuwe transport-aanvraag</h2>
+      <p style="font-family:sans-serif">Een klant heeft zojuist via de website een transport-aanvraag gedaan:</p>
+      <table style="font-family:sans-serif;font-size:14px;border-collapse:collapse">
+        <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Klant</td><td style="padding:6px 0"><strong>${d.name}</strong></td></tr>
+        <tr><td style="padding:6px 14px 6px 0;color:#6B7280">E-mail</td><td style="padding:6px 0">${d.email}</td></tr>
+        <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Telefoon</td><td style="padding:6px 0">${d.phone}</td></tr>
+        <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Adres</td><td style="padding:6px 0">${d.address}, ${d.postal_code} ${d.city}, ${d.country}</td></tr>
+        <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Type</td><td style="padding:6px 0"><strong>${modeLabel}</strong></td></tr>
+        <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Camping</td><td style="padding:6px 0">${d.camping}</td></tr>
+        <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Heen</td><td style="padding:6px 0">${d.outboundDate}${d.outboundTime ? ` om ${d.outboundTime}` : ''}</td></tr>
+        <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Terug</td><td style="padding:6px 0">${d.returnDate}${d.returnTime ? ` om ${d.returnTime}` : ''}</td></tr>
+        ${d.registration ? `<tr><td style="padding:6px 14px 6px 0;color:#6B7280">Kenteken</td><td style="padding:6px 0">${d.registration}</td></tr>` : ''}
+        <tr><td style="padding:6px 14px 6px 0;color:#6B7280">Bedrag</td><td style="padding:6px 0"><strong>${formatEur(priceEur)}</strong></td></tr>
+      </table>
+      <p style="font-family:sans-serif;font-size:13px;color:#6B7280;margin-top:18px">Klant doorgelinkt naar Stripe Checkout. Status volgt automatisch zodra betaling binnen is.</p>
+    `;
+    sendMail({
+      to: 'laurens@caravanstalling-spanje.com',
+      subject: `🆕 Nieuwe transport-aanvraag: ${d.name}`,
+      html: adminNotifyHtml,
+      text: `Nieuwe transport-aanvraag van ${d.name} (${d.email}, ${d.phone}). Type: ${modeLabel}. Heen: ${d.outboundDate}, terug: ${d.returnDate}. Bedrag: ${formatEur(priceEur)}.`,
+    }).catch((err) => console.warn('[transport order] admin notify mail failed:', err));
 
     return NextResponse.json({ success: true, ref, checkoutUrl: session.url });
   } catch (error) {

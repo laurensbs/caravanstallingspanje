@@ -28,12 +28,12 @@ export default function ContactPage() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        setError(data.error || 'Verzenden mislukt');
+        setError(data.error || t('common.send-failed'));
         return;
       }
       window.location.href = `/diensten/bedankt?ref=${encodeURIComponent(data.ref)}`;
     } catch {
-      setError('Verbindingsfout');
+      setError(t('common.connection-error'));
     } finally {
       setSubmitting(false);
     }
@@ -43,8 +43,8 @@ export default function ContactPage() {
     <main className="min-h-screen page-public page-public-dark flex flex-col" style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}>
       <PublicHero
         back={{ href: '/', label: t('common.brand') }}
-        title="Stuur ons een bericht"
-        intro="Vragen over stalling, transport, reparatie of een service? Vul het formulier in — we sturen je snel een persoonlijke reactie."
+        title={t('contact.heading')}
+        intro={t('contact.intro')}
       />
       <div className="max-w-2xl mx-auto px-5 sm:px-6 py-8 sm:py-14">
         <motion.form
@@ -54,8 +54,8 @@ export default function ContactPage() {
           onSubmit={submit}
           className="space-y-7"
         >
-          <Section title="Contactgegevens">
-            <Field label="Naam" required>
+          <Section title={t('contact.section-details')}>
+            <Field label={t('common.name')} required>
               <input
                 required
                 value={form.name}
@@ -65,7 +65,7 @@ export default function ContactPage() {
               />
             </Field>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Field label="E-mail" required>
+              <Field label={t('common.email')} required>
                 <input
                   required
                   type="email"
@@ -75,7 +75,7 @@ export default function ContactPage() {
                   className={fieldCls}
                 />
               </Field>
-              <Field label={`Telefoon ${t('common.optional')}`}>
+              <Field label={`${t('common.phone')} ${t('common.optional')}`}>
                 <input
                   type="tel"
                   value={form.phone}
@@ -87,22 +87,22 @@ export default function ContactPage() {
             </div>
           </Section>
 
-          <Section title="Je bericht">
-            <Field label={`Onderwerp ${t('common.optional')}`}>
+          <Section title={t('contact.section-message')}>
+            <Field label={`${t('contact.subject')} ${t('common.optional')}`}>
               <input
                 value={form.subject}
                 onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                placeholder="Bv. Vraag over stalling-aanvraag"
+                placeholder={t('contact.subject-placeholder')}
                 className={fieldCls}
               />
             </Field>
-            <Field label="Bericht" required>
+            <Field label={t('contact.message')} required>
               <textarea
                 required
                 rows={6}
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
-                placeholder="Vertel ons waar we mee kunnen helpen…"
+                placeholder={t('contact.message-placeholder')}
                 className={`${fieldCls} min-h-[140px] py-2 resize-y`}
               />
             </Field>
@@ -124,11 +124,11 @@ export default function ContactPage() {
             className="press-spring w-full h-14 rounded-[var(--radius-lg)] bg-accent text-accent-fg font-semibold text-[15px] hover:bg-accent-hover transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2"
           >
             {submitting ? <Loader2 size={18} className="animate-spin" /> : <Send size={16} />}
-            {submitting ? 'Versturen…' : 'Verstuur bericht'}
+            {submitting ? t('common.sending') : t('contact.submit')}
           </button>
 
           <p className="text-[12px] text-text-muted text-center inline-flex items-center justify-center gap-1.5 w-full">
-            <Mail size={12} /> Of mail direct naar
+            <Mail size={12} /> {t('contact.or-mail')}
             <a href="mailto:info@caravanstalling-spanje.com" className="text-text underline-offset-4 hover:underline">
               info@caravanstalling-spanje.com
             </a>

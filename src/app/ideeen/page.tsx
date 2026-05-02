@@ -10,6 +10,7 @@ import {
 import PublicHero from '@/components/PublicHero';
 import PublicFooter from '@/components/PublicFooter';
 import { Field, fieldCls, Section } from '@/components/ServiceForm';
+import { useLocale } from '@/components/LocaleProvider';
 
 const CATEGORIES = [
   { value: 'service',    label: 'Nieuwe service / dienst', icon: Wrench },
@@ -60,6 +61,7 @@ const SUGGESTIONS: Record<string, string[]> = {
 };
 
 export default function IdeeenPage() {
+  const { t } = useLocale();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [category, setCategory] = useState<string>('');
@@ -81,12 +83,12 @@ export default function IdeeenPage() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        setError(data.error || 'Verzenden mislukt');
+        setError(data.error || t('common.send-failed'));
         return;
       }
       setDone(true);
     } catch {
-      setError('Verbindingsfout');
+      setError(t('common.connection-error'));
     } finally {
       setSubmitting(false);
     }
@@ -98,8 +100,8 @@ export default function IdeeenPage() {
       <main className="min-h-screen page-public page-public-dark flex flex-col" style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}>
         <PublicHero
           back={{ href: '/', label: 'Caravanstalling' }}
-          title="Bedankt voor je idee!"
-          intro="We lezen alles en koppelen terug zodra we ermee aan de slag gaan."
+          title={t('ideeen.thanks-title')}
+          intro={t('ideeen.thanks-intro')}
           eyebrow="💡 Ontvangen"
           accent="amber"
         />
@@ -314,6 +316,7 @@ type PublicIdea = {
 };
 
 function FeaturedIdeas() {
+  const { t } = useLocale();
   const [ideas, setIdeas] = useState<PublicIdea[] | null>(null);
   const [voting, setVoting] = useState<number | null>(null);
   const [voted, setVoted] = useState<Record<number, 'up' | 'down'>>({});
@@ -394,7 +397,7 @@ function FeaturedIdeas() {
                 }`}
               >
                 <ThumbsUp size={13} fill={userVote === 'up' ? 'currentColor' : 'none'} />
-                Goed idee
+                {t('ideeen.vote-up')}
                 <span className="tabular-nums opacity-70">{idea.votes_up}</span>
               </button>
               <button
@@ -408,7 +411,7 @@ function FeaturedIdeas() {
                 }`}
               >
                 <ThumbsDown size={13} fill={userVote === 'down' ? 'currentColor' : 'none'} />
-                Niet voor mij
+                {t('ideeen.vote-down')}
                 <span className="tabular-nums opacity-70">{idea.votes_down}</span>
               </button>
             </div>
@@ -423,7 +426,7 @@ function FeaturedIdeas() {
                 animate={{ opacity: 1 }}
                 className="text-[12px] text-text-muted mt-2 inline-flex items-center gap-1"
               >
-                <Check size={11} /> Bedankt voor je stem!
+                <Check size={11} /> {t('ideeen.vote-thanks')}
               </motion.p>
             )}
           </motion.div>

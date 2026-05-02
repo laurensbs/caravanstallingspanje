@@ -43,8 +43,21 @@ type RecentOrder = {
   camping?: string | null;
   type?: string;
   start_date?: string | null;
+  subject?: string | null;
+  title?: string | null;
+  category?: string | null;
 };
-type RecentOrders = { fridge: RecentOrder[]; stalling: RecentOrder[]; transport: RecentOrder[]; total: number };
+type RecentOrders = {
+  fridge: RecentOrder[];
+  stalling: RecentOrder[];
+  transport: RecentOrder[];
+  contact: RecentOrder[];
+  ideas: RecentOrder[];
+  waitlist: RecentOrder[];
+  total: number;
+};
+
+const EMPTY_RECENT: RecentOrders = { fridge: [], stalling: [], transport: [], contact: [], ideas: [], waitlist: [], total: 0 };
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
@@ -76,10 +89,19 @@ export default function DashboardPage() {
       .then((d) => setEvents(d.events || []))
       .catch(() => setEvents([]));
     loadHolded();
-    fetch('/api/admin/recent-orders', { credentials: 'include' })
-      .then((r) => r.ok ? r.json() : null)
-      .then((d) => setRecent(d || { fridge: [], stalling: [], transport: [], total: 0 }))
-      .catch(() => setRecent({ fridge: [], stalling: [], transport: [], total: 0 }));
+
+    // Recent-orders bannerdata — initieel + elke 30s pollen zodat admin
+    // niet hoeft te refreshen om nieuwe orders te zien. Werkt ook bij
+    // fout: setRecent valt op EMPTY_RECENT terug.
+    const loadRecent = () => {
+      fetch('/api/admin/recent-orders', { credentials: 'include' })
+        .then((r) => r.ok ? r.json() : null)
+        .then((d) => setRecent(d || EMPTY_RECENT))
+        .catch(() => setRecent(EMPTY_RECENT));
+    };
+    loadRecent();
+    const pollId = setInterval(loadRecent, 30_000);
+    return () => clearInterval(pollId);
   }, []);
 
   const triggerSync = async () => {
@@ -145,6 +167,9 @@ export default function DashboardPage() {
               {recent.fridge.length > 0 && <span>{recent.fridge.length} fridge/AC</span>}
               {recent.stalling.length > 0 && <span>{recent.stalling.length} storage</span>}
               {recent.transport.length > 0 && <span>{recent.transport.length} transport</span>}
+              {recent.contact.length > 0 && <span>{recent.contact.length} message{recent.contact.length === 1 ? '' : 's'}</span>}
+              {recent.ideas.length > 0 && <span>{recent.ideas.length} idea{recent.ideas.length === 1 ? '' : 's'}</span>}
+              {recent.waitlist.length > 0 && <span>{recent.waitlist.length} waitlist</span>}
             </div>
             {recent.fridge.slice(0, 3).map((o) => (
               <div key={`f-${o.id}`} className="text-[12px] text-text mt-1.5">

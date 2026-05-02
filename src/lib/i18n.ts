@@ -39,6 +39,39 @@ export const STRINGS = {
     en: "You'll receive a confirmation email immediately. Our workshop will reach out as soon as possible.",
   },
   'common.brand': { nl: 'Caravanstalling', en: 'Caravanstalling' },
+  'common.send-failed': { nl: 'Verzenden mislukt', en: 'Sending failed' },
+  'common.name': { nl: 'Naam', en: 'Name' },
+  'common.email': { nl: 'E-mail', en: 'Email' },
+  'common.phone': { nl: 'Telefoon', en: 'Phone' },
+  'common.note': { nl: 'Opmerking', en: 'Note' },
+
+  // ─── Contact-pagina ───
+  'contact.heading': { nl: 'Stuur ons een bericht', en: 'Send us a message' },
+  'contact.intro': {
+    nl: 'Vragen over stalling, transport, reparatie of een service? Vul het formulier in — we sturen je snel een persoonlijke reactie.',
+    en: 'Questions about storage, transport, repair or a service? Fill in the form — we\'ll send you a personal reply soon.',
+  },
+  'contact.section-details': { nl: 'Contactgegevens', en: 'Contact details' },
+  'contact.section-message': { nl: 'Je bericht', en: 'Your message' },
+  'contact.subject': { nl: 'Onderwerp', en: 'Subject' },
+  'contact.subject-placeholder': { nl: 'Bv. Vraag over stalling-aanvraag', en: 'e.g. Question about storage request' },
+  'contact.message': { nl: 'Bericht', en: 'Message' },
+  'contact.message-placeholder': { nl: 'Vertel ons waar we mee kunnen helpen…', en: 'Tell us how we can help…' },
+  'contact.submit': { nl: 'Verstuur bericht', en: 'Send message' },
+  'contact.or-mail': { nl: 'Of mail direct naar', en: 'Or email us directly at' },
+
+  // ─── Ideeën-pagina ───
+  'ideeen.thanks-title': { nl: 'Bedankt voor je idee!', en: 'Thanks for your idea!' },
+  'ideeen.thanks-intro': {
+    nl: 'We lezen alles en koppelen terug zodra we ermee aan de slag gaan.',
+    en: 'We read everything and follow up when we get to work on it.',
+  },
+  'ideeen.vote-up': { nl: 'Goed idee', en: 'Good idea' },
+  'ideeen.vote-down': { nl: 'Niet voor mij', en: 'Not for me' },
+  'ideeen.vote-thanks': { nl: 'Bedankt voor je stem!', en: 'Thanks for your vote!' },
+
+  // ─── Sold-out (gemeenschappelijk koelkast/airco) ───
+  'fridge.sold-out-dates': { nl: 'Op deze data zijn er geen units meer beschikbaar.', en: 'These dates are sold out.' },
   'common.locale-switch': { nl: 'NL', en: 'EN' },
   'common.next': { nl: 'Volgende', en: 'Next' },
   'common.back': { nl: 'Terug', en: 'Back' },

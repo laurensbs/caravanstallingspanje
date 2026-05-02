@@ -135,7 +135,7 @@ export default function AircoPage() {
             <AlertTriangle size={20} />
           </div>
           <p className="text-text-muted leading-relaxed mb-2">
-            Op deze data zijn er geen airco units meer beschikbaar.
+            {t('fridge.sold-out-dates')}
           </p>
           <p className="text-text-muted leading-relaxed mb-8">{t('fridge.sold-out-help')}</p>
           <button
