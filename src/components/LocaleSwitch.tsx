@@ -4,9 +4,11 @@ import { motion } from 'framer-motion';
 import { useLocale } from './LocaleProvider';
 import type { Locale } from '@/lib/i18n';
 
-const OPTIONS: { value: Locale; label: string }[] = [
-  { value: 'nl', label: 'NL' },
-  { value: 'en', label: 'EN' },
+// Vlag-emoji + label. Vlaggen renderen native via 't OS — geen extra
+// dependency en consistent op iOS/Android/desktop.
+const OPTIONS: { value: Locale; label: string; flag: string; full: string }[] = [
+  { value: 'nl', label: 'NL', flag: '🇳🇱', full: 'Nederlands' },
+  { value: 'en', label: 'EN', flag: '🇬🇧', full: 'English' },
 ];
 
 export default function LocaleSwitch({
@@ -40,8 +42,10 @@ export default function LocaleSwitch({
             key={opt.value}
             type="button"
             onClick={() => setLocale(opt.value)}
-            className="relative px-2.5 h-6 inline-flex items-center justify-center rounded-full transition-colors press-spring"
+            className="relative px-2.5 h-7 inline-flex items-center justify-center gap-1.5 rounded-full transition-colors press-spring"
             aria-pressed={active}
+            aria-label={opt.full}
+            title={opt.full}
           >
             {active && (
               <motion.span
@@ -51,8 +55,16 @@ export default function LocaleSwitch({
                 transition={{ type: 'spring', stiffness: 380, damping: 30 }}
               />
             )}
+            {/* Vlag — altijd zichtbaar; opacity dimt 'm bij niet-actief */}
             <span
-              className="relative z-10"
+              className="relative z-10 text-[14px] leading-none"
+              style={{ opacity: active ? 1 : 0.55 }}
+              aria-hidden
+            >
+              {opt.flag}
+            </span>
+            <span
+              className="relative z-10 text-[11px] font-semibold tracking-wide"
               style={{
                 color: active
                   ? isDark ? '#0A1929' : 'var(--color-accent-fg)'

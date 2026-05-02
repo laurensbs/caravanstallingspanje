@@ -102,6 +102,23 @@ export const STRINGS = {
   'services.storage-desc': { nl: 'Caravan stallen op ons terrein — binnen overdekt of buiten op plek.', en: 'Storage on our grounds — covered indoor or outside in a dedicated spot.' },
   'services.fridge-title': { nl: 'Koelkast huren', en: 'Rent a fridge' },
   'services.fridge-desc': { nl: 'Bezorgd op je staanplaats. Vanaf één week.', en: 'Delivered to your pitch. From one week.' },
+  'services.ac-title': { nl: 'Airco huren', en: 'Rent an AC' },
+  'services.ac-desc': { nl: 'Houd het koel tijdens warme dagen — bezorgd en geïnstalleerd.', en: 'Stay cool during hot days — delivered and installed.' },
+  'services.eyebrow': { nl: 'Costa Brava', en: 'Costa Brava' },
+  // Per-service CTA's voor de tegels.
+  'services.cta.fridge': { nl: 'Boek een koelkast', en: 'Book a fridge' },
+  'services.cta.ac': { nl: 'Boek een airco', en: 'Book an AC' },
+  'services.cta.storage': { nl: 'Vraag stalling aan', en: 'Request storage' },
+  'services.cta.transport': { nl: 'Plan transport', en: 'Plan transport' },
+  'services.cta.service': { nl: 'Kies een dienst', en: 'Pick a service' },
+  'services.cta.repair': { nl: 'Vraag reparatie aan', en: 'Request a repair' },
+  'services.cta.inspection': { nl: 'Vraag inspectie aan', en: 'Request inspection' },
+  // Index-pagina specifiek (titel + intro overschrijven)
+  'services.index-title': { nl: 'Diensten', en: 'Services' },
+  'services.index-intro': {
+    nl: 'Koelkasten, airco, stalling, transport, reparatie — kies wat je nodig hebt en we gaan ermee aan de slag.',
+    en: 'Fridges, AC units, storage, transport, repair — pick what you need and we go from there.',
+  },
 
   // ─── Repair page ─────────────────────────────────────────
   'repair.heading': { nl: 'Reparatie aanvragen', en: 'Request a repair' },
