@@ -139,7 +139,11 @@ export default function CampingPicker({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.15 }}
-            className="absolute z-30 left-0 right-0 mt-1.5 bg-surface border border-border rounded-[var(--radius-md)] shadow-lg overflow-hidden"
+            // Eigen ondoorzichtige achtergrond i.p.v. bg-surface — die wordt
+            // op page-public-dark overschreven naar 6% wit, wat de dropdown
+            // onleesbaar maakt over de navy hero. Inline style negeert die
+            // cascade gegarandeerd. Op admin (lichte BG) blijft 't ook netjes.
+            className="cs-camping-picker-popover absolute z-30 left-0 right-0 mt-1.5 border rounded-[var(--radius-md)] shadow-lg overflow-hidden"
           >
             {/* Search bar */}
             <div className="relative border-b border-border">

@@ -115,6 +115,35 @@ html {
   border-radius: var(--radius-sm);
 }
 
+/* CampingPicker dropdown — moet altijd ondoorzichtig zijn voor leesbaarheid,
+   ook over donkere navy hero's waar bg-surface naar 6% wit wordt
+   overschreven. Default: licht oppervlak. Donkere context: navy paneel. */
+.cs-camping-picker-popover {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+.page-public-dark .cs-camping-picker-popover {
+  background: #0F2238;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #F1F5F9;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.page-public-dark .cs-camping-picker-popover input {
+  color: #F1F5F9;
+}
+.page-public-dark .cs-camping-picker-popover .text-text-muted {
+  color: rgba(241, 245, 249, 0.7);
+}
+.page-public-dark .cs-camping-picker-popover .text-text-subtle {
+  color: rgba(241, 245, 249, 0.5);
+}
+.page-public-dark .cs-camping-picker-popover button[role="option"]:hover,
+.page-public-dark .cs-camping-picker-popover button[role="option"].bg-surface-2 {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
 /* Skip-link: visueel verborgen tot keyboard focus 'm onthult.
    WCAG 2.4.1 (bypass blocks). */
 .cs-skip-link {
