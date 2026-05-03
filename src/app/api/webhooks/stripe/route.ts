@@ -31,6 +31,7 @@ import { sendIntake, type IntakePayload } from '@/lib/work-order-hub';
 import { invoiceForCustomer, findContactByEmail } from '@/lib/holded';
 import { sendMail, paymentReceivedHtml } from '@/lib/email';
 import { formatRef, refKindForFridge } from '@/lib/refs';
+import { log } from '@/lib/log';
 
 // Stripe signature verification needs the raw request body, not the
 // JSON-parsed version, so we run on the Node.js runtime and pass req.text().
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
     event = stripe().webhooks.constructEvent(rawBody, sig, webhookSecret());
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'invalid signature';
-    console.error('[stripe-webhook] signature verification failed:', msg);
+    log.error('stripe_webhook_signature_invalid', err);
     return NextResponse.json({ error: `Webhook Error: ${msg}` }, { status: 400 });
   }
 
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest) {
     }
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'handler error';
-    console.error(`[stripe-webhook] handler ${event.type} failed:`, msg);
+    log.error('stripe_webhook_handler_failed', err, { event_type: event.type, event_id: event.id });
     // Roll back the event-id marker so Stripe's retry will be processed
     // instead of skipped as duplicate. The DB writes inside the handler
     // are all idempotent (UPSERT) so re-running is safe.
@@ -309,10 +310,10 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
           subject: `🔧 Nieuwe service-bestelling: ${payload.title || 'service'} (${result.publicCode})`,
           html: notifyHtml,
           text: `Nieuwe service-bestelling van ${customerName} — ${payload.title}. Werkbon-code: ${result.publicCode}.`,
-        }).catch((err) => console.error('[stripe-webhook] werkplaats-mail mislukt:', err));
+        }).catch((err) => log.error('stripe_webhook_workshop_mail_failed', err, { intake_id: pending.id }));
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'forward failed';
-        console.error('[stripe-webhook] forward to reparatiepanel failed:', msg);
+        log.error('stripe_webhook_forward_failed', err, { intake_id: pending.id });
         // Niet throwen — anders retry-t Stripe en krijgen we dubbele Holded
         // pro forma's en mails. Klant heeft betaald, intake-payload staat
         // veilig in de DB. Admin krijgt een alert-mail zodat 't niet
@@ -344,7 +345,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
           subject: `⚠ Service-forward mislukt: ${payload.title || 'service'}`,
           html: alertHtml,
           text: `Forward mislukt voor ${payload.customer?.name || 'klant'} (${payload.customer?.email || '—'}). Reden: ${msg}. Pending intake id: ${pending.id}.`,
-        }).catch((mailErr) => console.error('[stripe-webhook] alert-mail mislukt:', mailErr));
+        }).catch((mailErr) => log.error('stripe_webhook_alert_mail_failed', mailErr, { intake_id: pending.id }));
       }
     }
     // Holded-factuur voor service.
@@ -393,7 +394,7 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
       reference,
     });
     await sendMail({ to: customerEmail, subject: mail.subject, html: mail.html, text: mail.text }).catch((err) => {
-      console.error('[stripe-webhook] mail send failed:', err);
+      log.error('stripe_webhook_payment_mail_failed', err, { reference });
     });
   }
 }
@@ -522,7 +523,7 @@ async function ensureLocalCustomer(
       source: holdedHit ? 'holded_import' : 'stripe',
     });
   } catch (err) {
-    console.error('[webhook] ensureLocalCustomer failed:', err);
+    log.error('stripe_webhook_ensure_customer_failed', err);
     return null;
   }
 }

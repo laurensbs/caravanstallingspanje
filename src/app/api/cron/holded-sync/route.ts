@@ -9,6 +9,7 @@ import {
   logActivity,
 } from '@/lib/db';
 import { getInvoice } from '@/lib/holded';
+import { log } from '@/lib/log';
 
 // Vercel cron of admin-handmatig. Pakt batch facturen op die nog niet
 // gesynced zijn (of ouder dan 50 min) en haalt status uit Holded.
@@ -58,7 +59,7 @@ async function runSync() {
       summary.bookings++;
     } catch (err) {
       summary.errors++;
-      console.error('[holded-sync] booking', r.id, err);
+      log.error('holded_sync_booking_failed', err, { booking_id: r.id });
     }
   }
 
@@ -69,7 +70,7 @@ async function runSync() {
       summary.stalling++;
     } catch (err) {
       summary.errors++;
-      console.error('[holded-sync] stalling', r.id, err);
+      log.error('holded_sync_stalling_failed', err, { stalling_id: r.id });
     }
   }
 
@@ -80,7 +81,7 @@ async function runSync() {
       summary.transport++;
     } catch (err) {
       summary.errors++;
-      console.error('[holded-sync] transport', r.id, err);
+      log.error('holded_sync_transport_failed', err, { transport_id: r.id });
     }
   }
 
@@ -90,5 +91,6 @@ async function runSync() {
     details: `b=${summary.bookings} s=${summary.stalling} t=${summary.transport} e=${summary.errors}`,
   }).catch(() => {});
 
+  log.info('holded_sync_done', summary);
   return NextResponse.json({ ok: true, ...summary });
 }

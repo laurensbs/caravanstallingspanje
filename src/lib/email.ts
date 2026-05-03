@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { log } from '@/lib/log';
 
 let _resend: Resend | null = null;
 
@@ -21,6 +22,12 @@ function replyTo(): string | undefined {
   return process.env.MAIL_REPLY_TO || 'info@caravanstalling-spanje.com';
 }
 
+/** Extract domain for logging zonder PII te lekken. "foo@bar.com" → "bar.com". */
+function domainOf(email: string): string {
+  const at = email.lastIndexOf('@');
+  return at === -1 ? 'unknown' : email.slice(at + 1).toLowerCase();
+}
+
 export async function sendMail(params: {
   to: string;
   subject: string;
@@ -29,7 +36,7 @@ export async function sendMail(params: {
 }): Promise<{ ok: boolean; id?: string; error?: string }> {
   const r = client();
   if (!r) {
-    console.warn('[email] RESEND_API_KEY missing — skipping send to', params.to);
+    log.warn('email_skip_no_provider', { recipient_domain: domainOf(params.to), subject: params.subject });
     return { ok: false, error: 'mail provider not configured' };
   }
   try {
@@ -43,10 +50,13 @@ export async function sendMail(params: {
       replyTo: reply,
     });
     if (res.error) {
+      log.error('email_send_failed', new Error(res.error.message), { recipient_domain: domainOf(params.to), subject: params.subject });
       return { ok: false, error: res.error.message };
     }
+    log.info('email_sent', { recipient_domain: domainOf(params.to), subject: params.subject, message_id: res.data?.id });
     return { ok: true, id: res.data?.id };
   } catch (err) {
+    log.error('email_send_threw', err, { recipient_domain: domainOf(params.to), subject: params.subject });
     const msg = err instanceof Error ? err.message : 'send failed';
     return { ok: false, error: msg };
   }
