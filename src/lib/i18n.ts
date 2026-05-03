@@ -324,6 +324,37 @@ export const STRINGS = {
   'landing.cta-airco-title': { nl: 'Airco huren', en: 'Rent air-con' },
   'landing.cta-airco-desc': { nl: 'Verkoeling op je staanplaats. Vanaf één week.', en: 'Cooling at your pitch. From one week.' },
 
+  // ─── Footer ──────────────────────────────────────────────
+  'footer.tagline': {
+    nl: 'Stalling, reparatie, verkoop en verhuur aan de Costa Brava. Familiebedrijf, 24/7 beveiligd, volledig verzekerd.',
+    en: 'Indoor & outdoor caravan storage, repair, sales and rentals on the Costa Brava. Family-run, secured 24/7, fully insured.',
+  },
+  'footer.reviews': { nl: '4.9 / 5 · 25 reviews', en: '4.9 / 5 · 25 reviews' },
+  'footer.security': { nl: 'Securitas Direct', en: 'Securitas Direct' },
+  'footer.heading-contact': { nl: 'Contact', en: 'Contact' },
+  'footer.heading-services': { nl: 'Diensten', en: 'Services' },
+  'footer.heading-info': { nl: 'Informatie', en: 'Information' },
+  'footer.hours': { nl: 'Ma–Vr 09:30 – 16:30', en: 'Mon–Fri 09:30 – 16:30' },
+  'footer.hours-closed': { nl: 'Za & Zo gesloten', en: 'Sat & Sun closed' },
+  'footer.svc-fridge': { nl: 'Koelkast & airco huren', en: 'Fridges & AC rental' },
+  'footer.svc-airco': { nl: 'Airco-units', en: 'AC units' },
+  'footer.svc-storage': { nl: 'Stalling (binnen/buiten)', en: 'Storage (indoor/outdoor)' },
+  'footer.svc-transport': { nl: 'Transport', en: 'Transport' },
+  'footer.svc-service': { nl: 'Service & reparatie', en: 'Service & repair' },
+  'footer.svc-inspection': { nl: 'Inspectie', en: 'Inspection' },
+  'footer.info-contact': { nl: 'Contact', en: 'Contact' },
+  'footer.info-ideas': { nl: 'Ideeënbus', en: 'Ideas inbox' },
+  'footer.info-about': { nl: 'Over ons', en: 'About us' },
+  'footer.info-news': { nl: 'Nieuws', en: 'News' },
+  'footer.info-faq': { nl: 'Veelgestelde vragen', en: 'FAQ' },
+  'footer.info-privacy': { nl: 'Privacy', en: 'Privacy' },
+  'footer.info-cookies': { nl: 'Cookies', en: 'Cookies' },
+  'footer.info-processors': { nl: 'Verwerkers', en: 'Data processors' },
+  'footer.copyright': {
+    nl: '© {0} Caravan Storage Spain S.L. · Alle rechten voorbehouden.',
+    en: '© {0} Caravan Storage Spain S.L. · All rights reserved.',
+  },
+
   // ─── Cookie banner & legal ──────────────────────────────
   'cookies.title': { nl: 'Cookies & privacy', en: 'Cookies & privacy' },
   'cookies.body': {

@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Mail, Phone, MapPin, Clock, Shield, Star } from 'lucide-react';
+import { useLocale } from './LocaleProvider';
+import type { StringKey } from '@/lib/i18n';
 
 // Globale footer voor publieke pagina's. Navy gradient zodat 'm naadloos
 // aansluit op de hero/body. Mobile-first: één kolom op klein, drie kolommen
@@ -11,27 +13,33 @@ import { Mail, Phone, MapPin, Clock, Shield, Star } from 'lucide-react';
 const NAVY = '#0A1929';
 const NAVY_TOP = '#142F4D';
 
-const SERVICES = [
-  { href: '/koelkast', label: 'Fridges & AC rental' },
-  { href: '/diensten/airco', label: 'AC units' },
-  { href: '/diensten/stalling', label: 'Storage (indoor/outdoor)' },
-  { href: '/diensten/transport', label: 'Transport' },
-  { href: '/diensten/service', label: 'Service & repair' },
-  { href: '/diensten/inspectie', label: 'Inspection' },
+type ServiceLink = { href: string; label: StringKey };
+type InfoLink = { href: string; label: StringKey; external?: boolean };
+
+const SERVICES: ServiceLink[] = [
+  { href: '/koelkast', label: 'footer.svc-fridge' },
+  { href: '/diensten/airco', label: 'footer.svc-airco' },
+  { href: '/diensten/stalling', label: 'footer.svc-storage' },
+  { href: '/diensten/transport', label: 'footer.svc-transport' },
+  { href: '/diensten/service', label: 'footer.svc-service' },
+  { href: '/diensten/inspectie', label: 'footer.svc-inspection' },
 ];
 
-const ABOUT = [
-  { href: '/contact', label: 'Contact' },
-  { href: '/ideeen', label: 'Ideas inbox' },
-  { href: 'https://caravanstalling-spanje.com/over-ons', label: 'About us', external: true },
-  { href: 'https://caravanstalling-spanje.com/nieuws', label: 'News', external: true },
-  { href: 'https://caravanstalling-spanje.com/faq', label: 'FAQ', external: true },
-  { href: '/privacy', label: 'Privacy' },
-  { href: '/cookies', label: 'Cookies' },
-  { href: '/verwerkers', label: 'Data processors' },
+const ABOUT: InfoLink[] = [
+  { href: '/contact', label: 'footer.info-contact' },
+  { href: '/ideeen', label: 'footer.info-ideas' },
+  { href: 'https://caravanstalling-spanje.com/over-ons', label: 'footer.info-about', external: true },
+  { href: 'https://caravanstalling-spanje.com/nieuws', label: 'footer.info-news', external: true },
+  { href: 'https://caravanstalling-spanje.com/faq', label: 'footer.info-faq', external: true },
+  { href: '/privacy', label: 'footer.info-privacy' },
+  { href: '/cookies', label: 'footer.info-cookies' },
+  { href: '/verwerkers', label: 'footer.info-processors' },
 ];
 
 export default function PublicFooter() {
+  const { t } = useLocale();
+  const year = new Date().getFullYear();
+
   return (
     <footer
       className="relative text-white"
@@ -67,16 +75,15 @@ export default function PublicFooter() {
               className="text-[14px] leading-relaxed max-w-md"
               style={{ color: 'rgba(241,245,249,0.65)' }}
             >
-              Indoor &amp; outdoor caravan storage, repair, sales and rentals
-              on the Costa Brava. Family-run, secured 24/7, fully insured.
+              {t('footer.tagline')}
             </p>
             {/* Trust badges */}
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-5 text-[12px]">
               <span className="inline-flex items-center gap-1.5" style={{ color: 'rgba(241,245,249,0.55)' }}>
-                <Star size={12} className="text-warning" /> 4.9 / 5 · 25 reviews
+                <Star size={12} className="text-warning" /> {t('footer.reviews')}
               </span>
               <span className="inline-flex items-center gap-1.5" style={{ color: 'rgba(241,245,249,0.55)' }}>
-                <Shield size={12} /> Securitas Direct
+                <Shield size={12} /> {t('footer.security')}
               </span>
             </div>
           </div>
@@ -87,7 +94,7 @@ export default function PublicFooter() {
           {/* Contact */}
           <div>
             <h3 className="text-[11px] font-semibold uppercase tracking-[0.22em] mb-4" style={{ color: 'rgba(241,245,249,0.45)' }}>
-              Contact
+              {t('footer.heading-contact')}
             </h3>
             <ul className="space-y-3 text-[14px]">
               <li>
@@ -127,8 +134,8 @@ export default function PublicFooter() {
               <li className="inline-flex items-start gap-2" style={{ color: 'rgba(241,245,249,0.65)' }}>
                 <Clock size={14} className="mt-0.5 shrink-0" />
                 <span>
-                  Mon–Fri 09:30 – 16:30<br />
-                  Sat &amp; Sun closed
+                  {t('footer.hours')}<br />
+                  {t('footer.hours-closed')}
                 </span>
               </li>
             </ul>
@@ -137,7 +144,7 @@ export default function PublicFooter() {
           {/* Services */}
           <div>
             <h3 className="text-[11px] font-semibold uppercase tracking-[0.22em] mb-4" style={{ color: 'rgba(241,245,249,0.45)' }}>
-              Services
+              {t('footer.heading-services')}
             </h3>
             <ul className="space-y-2.5 text-[14px]">
               {SERVICES.map((s) => (
@@ -147,7 +154,7 @@ export default function PublicFooter() {
                     className="transition-colors hover:underline underline-offset-4"
                     style={{ color: 'rgba(241,245,249,0.85)' }}
                   >
-                    {s.label}
+                    {t(s.label)}
                   </Link>
                 </li>
               ))}
@@ -157,7 +164,7 @@ export default function PublicFooter() {
           {/* About */}
           <div>
             <h3 className="text-[11px] font-semibold uppercase tracking-[0.22em] mb-4" style={{ color: 'rgba(241,245,249,0.45)' }}>
-              Information
+              {t('footer.heading-info')}
             </h3>
             <ul className="space-y-2.5 text-[14px]">
               {ABOUT.map((a) => (
@@ -170,7 +177,7 @@ export default function PublicFooter() {
                       className="transition-colors hover:underline underline-offset-4"
                       style={{ color: 'rgba(241,245,249,0.85)' }}
                     >
-                      {a.label}
+                      {t(a.label)}
                     </a>
                   ) : (
                     <Link
@@ -178,7 +185,7 @@ export default function PublicFooter() {
                       className="transition-colors hover:underline underline-offset-4"
                       style={{ color: 'rgba(241,245,249,0.85)' }}
                     >
-                      {a.label}
+                      {t(a.label)}
                     </Link>
                   )}
                 </li>
@@ -192,7 +199,7 @@ export default function PublicFooter() {
           className="pt-6 border-t flex flex-col sm:flex-row gap-3 sm:gap-6 items-start sm:items-center justify-between text-[12px]"
           style={{ borderColor: 'rgba(241,245,249,0.08)', color: 'rgba(241,245,249,0.45)' }}
         >
-          <p>© {new Date().getFullYear()} Caravan Storage Spain S.L. · All rights reserved.</p>
+          <p>{t('footer.copyright', year)}</p>
           <div className="flex items-center gap-4">
             <a
               href="https://www.facebook.com/caravanstalling.spanje"
