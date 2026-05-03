@@ -424,6 +424,22 @@ html {
   letter-spacing: -0.014em;
 }
 
+/* Density-toggle: compact vs comfortable. Default = comfortable (geen
+   data-attr nodig). Compact knipt padding op cards en list-items zodat
+   power-users meer rijen tegelijk zien. */
+html[data-density="compact"] .page-admin .card-surface {
+  padding: 0.875rem 1rem;
+}
+html[data-density="compact"] .page-admin ul.divide-y > li > a,
+html[data-density="compact"] .page-admin ul.divide-y > li > button {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+html[data-density="compact"] .page-admin table tbody tr td {
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+}
+
 /* Legal-page typography (privacy, cookies, verwerkers).
    Donkere navy achtergrond; daarom expliciete contrastregels. */
 .prose-legal {
