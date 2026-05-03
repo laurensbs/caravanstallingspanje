@@ -4,33 +4,53 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Truck, KeyRound } from 'lucide-react';
 import {
-  ContactFields, MultiStepShell, Section, Field, fieldCls,
+  MultiStepShell, Section, Field, fieldCls,
   emptyContact, useServiceSubmit,
 } from '@/components/ServiceForm';
+import RhfContactFields from '@/components/RhfContactFields';
 import CampingPicker from '@/components/CampingPicker';
 import { useLocale } from '@/components/LocaleProvider';
 import { ArrowRight as ArrowRightIcon } from 'lucide-react';
 import AnimatedServiceIcon from '@/components/AnimatedServiceIcon';
+import { formatEur as fmtEur } from '@/lib/format';
+import { useZodForm } from '@/lib/forms';
+import { transportOrderSchema } from '@/lib/validations';
+import type { z } from 'zod';
 
-type Mode = 'wij_rijden' | 'zelf';
+type TransportForm = z.input<typeof transportOrderSchema>;
 
 export default function TransportPage() {
   const { t, locale } = useLocale();
-  const formatEur = (eur: number) =>
-    new Intl.NumberFormat(locale === 'nl' ? 'nl-NL' : 'en-IE', {
-      style: 'currency',
-      currency: 'EUR',
-    }).format(eur);
+  const formatEur = (eur: number) => fmtEur(eur, locale, 2);
 
-  const [mode, setMode] = useState<Mode | null>(null);
-  const [contact, setContact] = useState(emptyContact);
-  const [camping, setCamping] = useState('');
-  const [outboundDate, setOutboundDate] = useState('');
-  const [outboundTime, setOutboundTime] = useState('');
-  const [returnDate, setReturnDate] = useState('');
-  const [returnTime, setReturnTime] = useState('');
-  const [description, setDescription] = useState('');
   const [prices, setPrices] = useState<{ wij_rijden: number; zelf: number }>({ wij_rijden: 100, zelf: 50 });
+
+  const form = useZodForm<TransportForm>(transportOrderSchema, {
+    defaultValues: {
+      ...emptyContact,
+      mode: 'wij_rijden',
+      camping: '',
+      outboundDate: '',
+      outboundTime: '',
+      returnDate: '',
+      returnTime: '',
+      description: '',
+    },
+  });
+  const {
+    register, handleSubmit, control, watch, setValue, formState: { errors },
+  } = form;
+
+  // useController voor mode (we starten met null-state via een sentinel: lege string).
+  // Mode is required volgens schema; we forceren een keuze via UI-validation.
+  const mode = watch('mode');
+  const camping = watch('camping') || '';
+  const outboundDate = watch('outboundDate') || '';
+  const outboundTime = watch('outboundTime') || '';
+  const returnDate = watch('returnDate') || '';
+  const returnTime = watch('returnTime') || '';
+  const description = watch('description') || '';
+  const [modeChosen, setModeChosen] = useState(false);
 
   useEffect(() => {
     fetch('/api/order/prices')
@@ -46,31 +66,32 @@ export default function TransportPage() {
       .catch(() => { /* fallback blijft */ });
   }, []);
 
-  const { submit, submitting, error, done, publicCode } = useServiceSubmit('/api/order/transport');
+  const { submit, submitting, error, done, publicCode } = useServiceSubmit<TransportForm>('/api/order/transport');
 
-  const step1Valid = !!(mode && camping && outboundDate && returnDate);
-  const currentPrice = mode === 'wij_rijden'
-    ? prices.wij_rijden
-    : mode === 'zelf'
-      ? prices.zelf
-      : 0;
-
-  // Mode-afhankelijke labels — voor 'zelf' draait alles om "ophalen uit
-  // stalling", voor 'wij_rijden' om "wij komen langs op de camping".
-  // Default leesbaarheid als mode nog null is: behandel als 'wij_rijden'.
+  const step1Valid = !!(modeChosen && camping && outboundDate && returnDate);
   const isZelf = mode === 'zelf';
+  const currentPrice = isZelf ? prices.zelf : prices.wij_rijden;
+
   const pickupLabel = isZelf ? 'Ophaal-datum (uit stalling)' : 'Ophaal-datum (op camping)';
   const returnLabel = isZelf ? 'Terugbreng-datum (naar stalling)' : 'Terug-datum (terug naar stalling)';
   const campingHelperText = isZelf
     ? 'De camping waar je naartoe gaat — wij weten dan voor de terugrit waar de caravan staat als jij hem zelf later weer brengt.'
     : 'De camping waar wij je caravan komen halen.';
 
+  const today = new Date().toISOString().slice(0, 10);
+
+  const setCamping = (v: string) => setValue('camping', v, { shouldValidate: true, shouldDirty: true });
+  const setMode = (m: 'wij_rijden' | 'zelf') => {
+    setValue('mode', m, { shouldValidate: true, shouldDirty: true });
+    setModeChosen(true);
+  };
+
   const step1 = (
     <>
       <Section title="Hoe wil je het regelen?">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div role="radiogroup" aria-label="Transport-optie" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <ModeCard
-            selected={mode === 'wij_rijden'}
+            selected={modeChosen && mode === 'wij_rijden'}
             onClick={() => setMode('wij_rijden')}
             icon={Truck}
             title="Wij halen op"
@@ -78,7 +99,7 @@ export default function TransportPage() {
             price={formatEur(prices.wij_rijden)}
           />
           <ModeCard
-            selected={mode === 'zelf'}
+            selected={modeChosen && mode === 'zelf'}
             onClick={() => setMode('zelf')}
             icon={KeyRound}
             title="Ik haal zelf op"
@@ -89,7 +110,7 @@ export default function TransportPage() {
       </Section>
 
       <AnimatePresence initial={false}>
-        {mode && (
+        {modeChosen && (
           <motion.div
             key={mode}
             initial={{ opacity: 0, y: 10, height: 0 }}
@@ -100,7 +121,6 @@ export default function TransportPage() {
           >
             <div className="pt-2">
               <Section title={isZelf ? 'Ophalen bij Stalling' : 'Ophalen op camping'}>
-                {/* Visuele route-indicator */}
                 <div className="rounded-[var(--radius-lg)] border border-border bg-surface-2 p-3 flex items-center justify-between text-[12px] text-text-muted gap-3">
                   <span className="inline-flex items-center gap-1.5">
                     <AnimatedServiceIcon kind="transport" size={14} loop /> Stalling
@@ -121,58 +141,65 @@ export default function TransportPage() {
                     required
                     ariaLabel="Camping"
                   />
+                  {errors.camping?.message && (
+                    <p role="alert" className="mt-1 text-[12px] text-danger">{errors.camping.message}</p>
+                  )}
                 </Field>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Field label={pickupLabel} required hint={isZelf ? 'Wanneer kom je langs?' : 'Wanneer mogen wij komen?'}>
                     <div className="grid grid-cols-[1fr_110px] gap-2">
                       <input
+                        {...register('outboundDate', {
+                          onChange: (e) => {
+                            const v = e.target.value;
+                            if (!returnDate || returnDate < v) {
+                              setValue('returnDate', v, { shouldValidate: true });
+                            }
+                          },
+                        })}
                         type="date"
-                        required
-                        value={outboundDate}
-                        min={new Date().toISOString().slice(0, 10)}
-                        onChange={(e) => {
-                          const v = e.target.value;
-                          setOutboundDate(v);
-                          if (!returnDate || returnDate < v) setReturnDate(v);
-                        }}
+                        min={today}
+                        aria-invalid={!!errors.outboundDate}
                         className={fieldCls}
                       />
                       <input
+                        {...register('outboundTime')}
                         type="time"
-                        value={outboundTime}
-                        onChange={(e) => setOutboundTime(e.target.value)}
                         className={fieldCls}
                         aria-label="Ongeveer hoe laat"
                       />
                     </div>
+                    {errors.outboundDate?.message && (
+                      <p role="alert" className="mt-1 text-[12px] text-danger">{errors.outboundDate.message}</p>
+                    )}
                   </Field>
                   <Field label={returnLabel} required hint="Ongeveer wanneer komt hij terug?">
                     <div className="grid grid-cols-[1fr_110px] gap-2">
                       <input
+                        {...register('returnDate')}
                         type="date"
-                        required
-                        value={returnDate}
-                        min={outboundDate || new Date().toISOString().slice(0, 10)}
-                        onChange={(e) => setReturnDate(e.target.value)}
+                        min={outboundDate || today}
+                        aria-invalid={!!errors.returnDate}
                         className={fieldCls}
                       />
                       <input
+                        {...register('returnTime')}
                         type="time"
-                        value={returnTime}
-                        onChange={(e) => setReturnTime(e.target.value)}
                         className={fieldCls}
                         aria-label="Ongeveer hoe laat"
                       />
                     </div>
+                    {errors.returnDate?.message && (
+                      <p role="alert" className="mt-1 text-[12px] text-danger">{errors.returnDate.message}</p>
+                    )}
                   </Field>
                 </div>
 
                 <Field label={`${t('contact.note')} ${t('common.optional')}`}>
                   <textarea
+                    {...register('description')}
                     rows={3}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
                     placeholder={isZelf
                       ? 'Bv. tijd kan flexibel, ik bel je dezelfde ochtend nog'
                       : 'Bv. caravan staat op plek 12, achterzijde'}
@@ -185,8 +212,7 @@ export default function TransportPage() {
         )}
       </AnimatePresence>
 
-      {/* Hint als nog geen keuze is gemaakt */}
-      {!mode && (
+      {!modeChosen && (
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -202,7 +228,12 @@ export default function TransportPage() {
   const step2 = (
     <>
       <Section title={t('contact.section-heading')}>
-        <ContactFields state={contact} onChange={setContact} showLocation={false} />
+        <RhfContactFields<TransportForm>
+          register={register}
+          errors={errors}
+          control={control}
+          showLocation={false}
+        />
       </Section>
 
       <Section title={t('common.summary')}>
@@ -227,19 +258,7 @@ export default function TransportPage() {
       step1={step1}
       step2={step2}
       step1Valid={step1Valid}
-      onSubmit={(e) => {
-        e.preventDefault();
-        submit({
-          ...contact,
-          mode,
-          camping,
-          outboundDate,
-          outboundTime,
-          returnDate,
-          returnTime,
-          description,
-        });
-      }}
+      onSubmit={handleSubmit((values) => submit(values))}
       submitting={submitting}
       error={error}
       done={done}
@@ -261,6 +280,8 @@ function ModeCard({
   return (
     <motion.button
       type="button"
+      role="radio"
+      aria-checked={selected}
       onClick={onClick}
       whileTap={{ scale: 0.97 }}
       transition={{ type: 'spring', stiffness: 380, damping: 26 }}
@@ -274,7 +295,7 @@ function ModeCard({
         <div className="w-11 h-11 rounded-[var(--radius-md)] bg-surface-2 border border-border flex items-center justify-center text-text">
           <Icon size={20} />
         </div>
-        <div className={`w-5 h-5 rounded-full border-2 transition-colors flex items-center justify-center ${selected ? 'border-accent bg-accent' : 'border-border'}`}>
+        <div aria-hidden className={`w-5 h-5 rounded-full border-2 transition-colors flex items-center justify-center ${selected ? 'border-accent bg-accent' : 'border-border'}`}>
           {selected && <Check size={11} className="text-accent-fg" strokeWidth={3} />}
         </div>
       </div>

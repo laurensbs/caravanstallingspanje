@@ -4,11 +4,16 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Sparkles } from 'lucide-react';
 import {
-  ContactFields, MultiStepShell, Section, Field, fieldCls,
+  MultiStepShell, Section, Field, fieldCls,
   emptyContact, useServiceSubmit,
 } from '@/components/ServiceForm';
+import RhfContactFields from '@/components/RhfContactFields';
 import { Skeleton } from '@/components/ui';
 import { useLocale } from '@/components/LocaleProvider';
+import { formatEur as fmtEur } from '@/lib/format';
+import { useZodForm } from '@/lib/forms';
+import { serviceOrderSchema } from '@/lib/validations';
+import type { z } from 'zod';
 
 type CatalogService = {
   id: number;
@@ -18,19 +23,26 @@ type CatalogService = {
   price_eur: number;
 };
 
+type ServiceForm = z.input<typeof serviceOrderSchema>;
+
 export default function ServicePage() {
   const { t, locale } = useLocale();
-  const formatEur = (eur: number) =>
-    new Intl.NumberFormat(locale === 'nl' ? 'nl-NL' : 'en-IE', {
-      style: 'currency',
-      currency: 'EUR',
-    }).format(eur);
+  const formatEur = (eur: number) => fmtEur(eur, locale, 2);
   const [catalog, setCatalog] = useState<CatalogService[] | null>(null);
-  const [contact, setContact] = useState(emptyContact);
-  const [serviceSlug, setServiceSlug] = useState<string>('');
-  const [description, setDescription] = useState('');
 
-  const { submit, submitting, error, done } = useServiceSubmit('/api/order/service');
+  const form = useZodForm<ServiceForm>(serviceOrderSchema, {
+    defaultValues: {
+      ...emptyContact,
+      serviceCategory: '',
+      description: '',
+    },
+  });
+  const { register, handleSubmit, control, watch, setValue, formState: { errors } } = form;
+
+  const serviceSlug = watch('serviceCategory') || '';
+  const description = watch('description') || '';
+
+  const { submit, submitting, error, done } = useServiceSubmit<ServiceForm>('/api/order/service');
 
   useEffect(() => {
     fetch('/api/order/services-catalog')
@@ -65,14 +77,20 @@ export default function ServicePage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div
+            role="radiogroup"
+            aria-label={t('service.which')}
+            className="grid grid-cols-1 sm:grid-cols-2 gap-2"
+          >
             {catalog.map((s) => {
               const sel = serviceSlug === s.slug;
               return (
                 <motion.button
                   key={s.id}
                   type="button"
-                  onClick={() => setServiceSlug(s.slug)}
+                  role="radio"
+                  aria-checked={sel}
+                  onClick={() => setValue('serviceCategory', s.slug, { shouldValidate: true, shouldDirty: true })}
                   whileTap={{ scale: 0.97 }}
                   transition={{ type: 'spring', stiffness: 380, damping: 26 }}
                   className={`text-left p-4 rounded-[var(--radius-lg)] border transition-all ${
@@ -84,6 +102,7 @@ export default function ServicePage() {
                   <div className="flex items-start justify-between mb-2 gap-2">
                     <span className="text-[15px] font-semibold">{s.name}</span>
                     <div
+                      aria-hidden
                       className={`w-5 h-5 rounded-full border-2 transition-colors shrink-0 flex items-center justify-center ${
                         sel ? 'border-accent bg-accent' : 'border-border'
                       }`}
@@ -106,9 +125,8 @@ export default function ServicePage() {
         <Section title={t('service.note-section')}>
           <Field label={`${t('contact.description')} ${t('common.optional')}`}>
             <textarea
+              {...register('description')}
               rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
               placeholder={t('service.note-placeholder')}
               className={`${fieldCls} min-h-[80px] py-2 resize-none`}
             />
@@ -121,7 +139,7 @@ export default function ServicePage() {
   const step2 = (
     <>
       <Section title={t('contact.section-heading')}>
-        <ContactFields state={contact} onChange={setContact} />
+        <RhfContactFields<ServiceForm> register={register} errors={errors} control={control} />
       </Section>
       {selected && (
         <Section title={t('common.summary')}>
@@ -144,11 +162,7 @@ export default function ServicePage() {
       step1={step1}
       step2={step2}
       step1Valid={step1Valid}
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (!serviceSlug) return;
-        submit({ ...contact, serviceCategory: serviceSlug, description });
-      }}
+      onSubmit={handleSubmit((values) => submit(values))}
       submitting={submitting}
       error={error}
       done={done}

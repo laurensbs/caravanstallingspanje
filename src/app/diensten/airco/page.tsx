@@ -6,41 +6,43 @@ import { Check, AlertTriangle, Wind } from 'lucide-react';
 import AnimatedServiceIcon from '@/components/AnimatedServiceIcon';
 import { calculatePriceWith, PRICES, MIN_DAYS } from '@/lib/pricing';
 import {
-  ContactFields, MultiStepShell, Section, Field, fieldCls, emptyContact,
-  type ContactState,
+  MultiStepShell, Section, Field, fieldCls, emptyContact,
 } from '@/components/ServiceForm';
+import RhfContactFields from '@/components/RhfContactFields';
 import CampingPicker from '@/components/CampingPicker';
 import PublicHero from '@/components/PublicHero';
 import { useLocale } from '@/components/LocaleProvider';
+import { formatEur as fmtEur } from '@/lib/format';
+import { useZodForm } from '@/lib/forms';
+import { fridgeOrderSchema } from '@/lib/validations';
+import type { z } from 'zod';
 
-type FormState = {
-  start_date: string;
-  end_date: string;
-  camping: string;
-  spot_number: string;
-  notes: string;
-};
-
-const empty: FormState = {
-  start_date: '',
-  end_date: '',
-  camping: '',
-  spot_number: '',
-  notes: '',
-};
+type AircoForm = z.input<typeof fridgeOrderSchema>;
 
 export default function AircoPage() {
   const { t, locale } = useLocale();
-  const formatEur = (eur: number) =>
-    new Intl.NumberFormat(locale === 'nl' ? 'nl-NL' : 'en-IE', {
-      style: 'currency',
-      currency: 'EUR',
-    }).format(eur);
+  const formatEur = (eur: number) => fmtEur(eur, locale, 2);
 
-  const [form, setForm] = useState<FormState>(empty);
-  const [contact, setContact] = useState<ContactState>(emptyContact);
+  const form = useZodForm<AircoForm>(fridgeOrderSchema, {
+    defaultValues: {
+      ...emptyContact,
+      device_type: 'Airco',
+      start_date: '',
+      end_date: '',
+      camping: '',
+      spot_number: '',
+      notes: '',
+    },
+  });
+  const { register, handleSubmit, setValue, watch, control, formState: { errors } } = form;
+
+  const startDate = watch('start_date') || '';
+  const endDate = watch('end_date') || '';
+  const camping = watch('camping') || '';
+  const spotNumber = watch('spot_number') || '';
+
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
+  const [serverError, setServerError] = useState('');
   const [done, setDone] = useState<{ total: number; days: number } | null>(null);
   const [soldOut, setSoldOut] = useState(false);
   const [aircoWeekPrice, setAircoWeekPrice] = useState<number>(PRICES.Airco);
@@ -55,41 +57,25 @@ export default function AircoPage() {
   }, []);
 
   const price = useMemo(() => {
-    if (!form.start_date || !form.end_date) return null;
-    if (new Date(form.end_date) <= new Date(form.start_date)) return null;
+    if (!startDate || !endDate) return null;
+    if (new Date(endDate) <= new Date(startDate)) return null;
     try {
-      return calculatePriceWith(aircoWeekPrice, form.start_date, form.end_date);
+      return calculatePriceWith(aircoWeekPrice, startDate, endDate);
     } catch {
       return null;
     }
-  }, [form.start_date, form.end_date, aircoWeekPrice]);
+  }, [startDate, endDate, aircoWeekPrice]);
 
-  const step1Valid = !!(form.start_date && form.end_date && form.camping && price);
+  const step1Valid = !!(startDate && endDate && camping && price);
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+  const submit = async (values: AircoForm) => {
+    setServerError('');
     setSubmitting(true);
     try {
       const res = await fetch('/api/order/fridge', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          device_type: 'Airco',
-          start_date: form.start_date,
-          end_date: form.end_date,
-          camping: form.camping,
-          spot_number: form.spot_number,
-          notes: form.notes,
-          name: contact.name,
-          email: contact.email,
-          phone: contact.phone,
-          address: contact.address,
-          postal_code: contact.postal_code,
-          city: contact.city,
-          country: contact.country,
-          vat_number: contact.vat_number,
-        }),
+        body: JSON.stringify({ ...values, device_type: 'Airco' }),
       });
       const data = await res.json();
       if (res.status === 409 && data.soldOut) {
@@ -97,7 +83,7 @@ export default function AircoPage() {
         return;
       }
       if (!res.ok || !data.success) {
-        setError(data.error || t('common.something-wrong'));
+        setServerError(data.error || t('common.something-wrong'));
         return;
       }
       if (data.checkoutUrl) {
@@ -106,7 +92,7 @@ export default function AircoPage() {
       }
       setDone({ total: data.total, days: data.days });
     } catch {
-      setError(t('common.connection-error'));
+      setServerError(t('common.connection-error'));
     } finally {
       setSubmitting(false);
     }
@@ -114,7 +100,7 @@ export default function AircoPage() {
 
   if (done) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-bg page-public px-6 py-12">
+      <main id="main" className="min-h-screen flex items-center justify-center bg-bg page-public px-6 py-12">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="max-w-md text-center">
           <div className="w-14 h-14 rounded-full bg-success-soft text-success flex items-center justify-center mx-auto mb-6">
             <Check size={22} />
@@ -128,15 +114,13 @@ export default function AircoPage() {
 
   if (soldOut) {
     return (
-      <main className="min-h-screen bg-bg page-public">
+      <main id="main" className="min-h-screen bg-bg page-public">
         <PublicHero back={{ href: '/diensten', label: t('common.services-link') }} title={t('fridge.sold-out')} />
         <div className="max-w-md mx-auto px-6 py-10 sm:py-14">
           <div className="w-12 h-12 rounded-full bg-warning-soft text-warning flex items-center justify-center mb-5">
             <AlertTriangle size={20} />
           </div>
-          <p className="text-text-muted leading-relaxed mb-2">
-            {t('fridge.sold-out-dates')}
-          </p>
+          <p className="text-text-muted leading-relaxed mb-2">{t('fridge.sold-out-dates')}</p>
           <p className="text-text-muted leading-relaxed mb-8">{t('fridge.sold-out-help')}</p>
           <button
             type="button"
@@ -151,6 +135,7 @@ export default function AircoPage() {
   }
 
   const dayPrice = Math.ceil((aircoWeekPrice / 7) * 100) / 100;
+  const today = new Date().toISOString().slice(0, 10);
 
   const step1 = (
     <>
@@ -177,22 +162,33 @@ export default function AircoPage() {
       <Section title={t('fridge.period')}>
         <div className="grid grid-cols-2 gap-3">
           <Field label={t('fridge.start-date')} required>
-            <input type="date" required value={form.start_date}
-              min={new Date().toISOString().slice(0, 10)}
-              onChange={e => setForm({ ...form, start_date: e.target.value })}
-              className={fieldCls} />
+            <input
+              {...register('start_date')}
+              type="date"
+              min={today}
+              aria-invalid={!!errors.start_date}
+              className={fieldCls}
+            />
+            {errors.start_date?.message && (
+              <p role="alert" className="mt-1 text-[12px] text-danger">{errors.start_date.message}</p>
+            )}
           </Field>
           <Field label={t('fridge.end-date')} required>
-            <input type="date" required value={form.end_date}
+            <input
+              {...register('end_date')}
+              type="date"
               min={(() => {
-                const fallback = new Date().toISOString().slice(0, 10);
-                if (!form.start_date) return fallback;
-                const t = new Date(form.start_date).getTime();
-                if (!Number.isFinite(t)) return fallback;
-                return new Date(t + MIN_DAYS * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+                if (!startDate) return today;
+                const ts = new Date(startDate).getTime();
+                if (!Number.isFinite(ts)) return today;
+                return new Date(ts + MIN_DAYS * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
               })()}
-              onChange={e => setForm({ ...form, end_date: e.target.value })}
-              className={fieldCls} />
+              aria-invalid={!!errors.end_date}
+              className={fieldCls}
+            />
+            {errors.end_date?.message && (
+              <p role="alert" className="mt-1 text-[12px] text-danger">{errors.end_date.message}</p>
+            )}
           </Field>
         </div>
         <p className="text-[12px] text-text-muted">{t('fridge.minimum-days', MIN_DAYS)}</p>
@@ -201,20 +197,32 @@ export default function AircoPage() {
       <Section title={t('fridge.camping')}>
         <div className="grid grid-cols-1 sm:grid-cols-[1fr_160px] gap-3">
           <Field label={t('fridge.camping')} required>
-            <CampingPicker value={form.camping} onChange={(name) => setForm({ ...form, camping: name })}
-              placeholder={t('fridge.camping-placeholder')} required ariaLabel={t('fridge.camping')} />
+            <CampingPicker
+              value={camping}
+              onChange={(name) => setValue('camping', name, { shouldValidate: true, shouldDirty: true })}
+              placeholder={t('fridge.camping-placeholder')}
+              required
+              ariaLabel={t('fridge.camping')}
+            />
+            {errors.camping?.message && (
+              <p role="alert" className="mt-1 text-[12px] text-danger">{errors.camping.message}</p>
+            )}
           </Field>
           <Field label={t('fridge.spot-number')}>
-            <input value={form.spot_number} onChange={e => setForm({ ...form, spot_number: e.target.value })}
-              placeholder="A12" className={fieldCls} />
+            <input {...register('spot_number')} placeholder="A12" className={fieldCls} />
           </Field>
         </div>
       </Section>
 
       <AnimatePresence>
         {price && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden"
+          >
             <div className="rounded-[var(--radius-xl)] bg-surface-2 border border-border p-5 space-y-2">
               <div className="flex justify-between text-[14px]">
                 <span className="text-text-muted">{t('fridge.first-week')}</span>
@@ -242,12 +250,18 @@ export default function AircoPage() {
   const step2 = (
     <>
       <Section title={t('contact.section-heading')}>
-        <ContactFields state={contact} onChange={setContact} showRegistration={false} showLocation={false} />
+        <RhfContactFields<AircoForm>
+          register={register}
+          errors={errors}
+          control={control}
+          showRegistration={false}
+          showLocation={false}
+        />
       </Section>
       <Section title={t('common.summary')}>
         <SummaryRow label={t('airco.heading')} value={t('airco.device-name')} />
-        <SummaryRow label={t('fridge.period')} value={`${form.start_date} → ${form.end_date}`} />
-        <SummaryRow label={t('fridge.camping')} value={form.camping + (form.spot_number ? ` · ${form.spot_number}` : '')} />
+        <SummaryRow label={t('fridge.period')} value={`${startDate} → ${endDate}`} />
+        <SummaryRow label={t('fridge.camping')} value={camping + (spotNumber ? ` · ${spotNumber}` : '')} />
         {price && <SummaryRow label={t('fridge.total-days', price.days)} value={formatEur(price.total)} bold />}
       </Section>
     </>
@@ -263,9 +277,9 @@ export default function AircoPage() {
       step1={step1}
       step2={step2}
       step1Valid={step1Valid}
-      onSubmit={submit}
+      onSubmit={handleSubmit(submit)}
       submitting={submitting}
-      error={error}
+      error={serverError}
       done={false}
       paid
     />

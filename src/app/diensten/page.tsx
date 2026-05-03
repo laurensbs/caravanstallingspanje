@@ -46,6 +46,7 @@ export default function DienstenIndex() {
   const { t } = useLocale();
   return (
     <main
+      id="main"
       className="min-h-screen page-public page-public-dark flex flex-col"
       style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}
     >

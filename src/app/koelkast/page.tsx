@@ -13,6 +13,7 @@ import CampingPicker from '@/components/CampingPicker';
 import PublicHero from '@/components/PublicHero';
 import { useLocale } from '@/components/LocaleProvider';
 import type { StringKey } from '@/lib/i18n';
+import { formatEur as fmtEur } from '@/lib/format';
 
 const DEVICE_LABEL_KEY: Record<DeviceType, StringKey> = {
   'Grote koelkast': 'fridge.device-large',
@@ -50,11 +51,7 @@ const empty: FormState = {
 
 export default function KoelkastBestelPagina() {
   const { t, locale } = useLocale();
-  const formatEur = (eur: number) =>
-    new Intl.NumberFormat(locale === 'nl' ? 'nl-NL' : 'en-IE', {
-      style: 'currency',
-      currency: 'EUR',
-    }).format(eur);
+  const formatEur = (eur: number) => fmtEur(eur, locale, 2);
 
   const [form, setForm] = useState<FormState>(empty);
   const [contact, setContact] = useState<ContactState>(emptyContact);

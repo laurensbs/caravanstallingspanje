@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { useLocale } from '@/components/LocaleProvider';
 import LocaleSwitch from '@/components/LocaleSwitch';
 import { PRICES } from '@/lib/pricing';
+import { formatEur } from '@/lib/format';
 
 // Mollie-meets-Stripe deep navy met subtiele warme glow voor zomer-vibe.
 const NAVY_GRAD =
@@ -51,15 +52,11 @@ export default function LandingPage() {
       .catch(() => { /* fallback blijft */ });
   }, []);
 
-  const fmt = (eur: number) =>
-    new Intl.NumberFormat(locale === 'nl' ? 'nl-NL' : 'en-IE', {
-      style: 'currency',
-      currency: 'EUR',
-      maximumFractionDigits: 0,
-    }).format(eur);
+  const fmt = (eur: number) => formatEur(eur, locale);
 
   return (
     <main
+      id="main"
       className="min-h-screen relative overflow-hidden"
       style={{ background: NAVY_GRAD, color: '#F1F5F9' }}
     >

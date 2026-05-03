@@ -5,12 +5,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import {
   Lightbulb, Send, Loader2, Check, ArrowRight, Sparkles,
-  Wrench, Tent, Coffee, Bike, Sun, Wind, ThumbsUp, ThumbsDown, Star,
+  Wrench, Tent, Coffee, Bike, Sun, Wind, ThumbsUp, ThumbsDown, Star, AlertCircle,
 } from 'lucide-react';
 import PublicHero from '@/components/PublicHero';
 import PublicFooter from '@/components/PublicFooter';
 import { Field, fieldCls, Section } from '@/components/ServiceForm';
 import { useLocale } from '@/components/LocaleProvider';
+import { useZodForm } from '@/lib/forms';
+import { ideaSchema } from '@/lib/validations';
+import type { z } from 'zod';
 
 const CATEGORIES = [
   { value: 'service',    label: 'Nieuwe service / dienst', icon: Wrench },
@@ -60,44 +63,51 @@ const SUGGESTIONS: Record<string, string[]> = {
   ],
 };
 
+type IdeaForm = z.input<typeof ideaSchema>;
+
 export default function IdeeenPage() {
   const { t } = useLocale();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [category, setCategory] = useState<string>('');
-  const [title, setTitle] = useState('');
-  const [message, setMessage] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
+  const [serverError, setServerError] = useState('');
   const [done, setDone] = useState(false);
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSubmitting(true);
+  const form = useZodForm<IdeaForm>(ideaSchema, {
+    defaultValues: { name: '', email: '', category: '', title: '', message: '' },
+  });
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    watch,
+    formState: { errors, isSubmitting },
+  } = form;
+
+  const category = watch('category') || '';
+  const title = watch('title') || '';
+
+  const submit = async (values: IdeaForm) => {
+    setServerError('');
     try {
       const res = await fetch('/api/order/idea', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, category, title, message }),
+        body: JSON.stringify(values),
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        setError(data.error || t('common.send-failed'));
+        setServerError(data.error || t('common.send-failed'));
         return;
       }
       setDone(true);
     } catch {
-      setError(t('common.connection-error'));
-    } finally {
-      setSubmitting(false);
+      setServerError(t('common.connection-error'));
     }
   };
 
   // Done-state — vriendelijke bedankt-pagina, geen receipt-flow.
   if (done) {
     return (
-      <main className="min-h-screen page-public page-public-dark flex flex-col" style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}>
+      <main id="main" className="min-h-screen page-public page-public-dark flex flex-col" style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}>
         <PublicHero
           back={{ href: '/', label: 'Caravanstalling' }}
           title={t('ideeen.thanks-title')}
@@ -121,7 +131,7 @@ export default function IdeeenPage() {
               type="button"
               onClick={() => {
                 setDone(false);
-                setTitle(''); setMessage(''); setCategory('');
+                reset({ name: '', email: '', category: '', title: '', message: '' });
               }}
               className="text-text underline underline-offset-4"
             >Nog eentje insturen</button>.
@@ -141,7 +151,7 @@ export default function IdeeenPage() {
   const activeSuggestions = category && SUGGESTIONS[category] ? SUGGESTIONS[category] : [];
 
   return (
-    <main className="min-h-screen bg-bg page-public">
+    <main id="main" className="min-h-screen bg-bg page-public">
       <PublicHero
         back={{ href: '/', label: 'Caravanstalling' }}
         title="Heb jij een idee voor ons?"
@@ -157,7 +167,8 @@ export default function IdeeenPage() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          onSubmit={submit}
+          onSubmit={handleSubmit(submit)}
+          noValidate
           className="space-y-7"
         >
           <Section title="Welk soort idee? (optioneel)">
@@ -173,7 +184,7 @@ export default function IdeeenPage() {
                     key={c.value}
                     type="button"
                     // Klik nogmaals = deselecteren. Zo voelt 't echt optioneel.
-                    onClick={() => setCategory(sel ? '' : c.value)}
+                    onClick={() => setValue('category', sel ? '' : c.value, { shouldDirty: true })}
                     whileTap={{ scale: 0.96 }}
                     transition={{ type: 'spring', stiffness: 380, damping: 26 }}
                     className={`text-left p-3 rounded-[var(--radius-md)] border transition-all ${
@@ -191,7 +202,7 @@ export default function IdeeenPage() {
             {category && (
               <button
                 type="button"
-                onClick={() => setCategory('')}
+                onClick={() => setValue('category', '', { shouldDirty: true })}
                 className="text-[12px] text-text-muted hover:text-text underline-offset-4 hover:underline mt-2"
               >
                 Geen categorie kiezen
@@ -217,7 +228,7 @@ export default function IdeeenPage() {
                       <button
                         key={s}
                         type="button"
-                        onClick={() => setTitle(s)}
+                        onClick={() => setValue('title', s, { shouldDirty: true, shouldValidate: true })}
                         className="press-spring text-[12px] px-2.5 py-1 rounded-full border border-border bg-surface hover:border-border-strong transition-colors"
                       >
                         {s}
@@ -235,22 +246,28 @@ export default function IdeeenPage() {
           <Section title="Vertel ons je idee">
             <Field label="Korte samenvatting" required>
               <input
-                required
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                {...register('title')}
                 placeholder="Bv. 'BBQ-pakket verhuren'"
+                aria-invalid={!!errors.title}
+                aria-describedby={errors.title ? 'err-title' : undefined}
                 className={fieldCls}
               />
+              {errors.title?.message && (
+                <p id="err-title" role="alert" className="mt-1 text-[12px] text-danger">{errors.title.message}</p>
+              )}
             </Field>
             <Field label="Uitleg" required hint="Wat zou je voor je zien? Hoe zou het werken?">
               <textarea
-                required
+                {...register('message')}
                 rows={6}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
                 placeholder="Vertel zoveel of zo weinig als je wilt — wij lezen alles."
+                aria-invalid={!!errors.message}
+                aria-describedby={errors.message ? 'err-message' : undefined}
                 className={`${fieldCls} min-h-[140px] py-2 resize-y`}
               />
+              {errors.message?.message && (
+                <p id="err-message" role="alert" className="mt-1 text-[12px] text-danger">{errors.message.message}</p>
+              )}
             </Field>
           </Section>
 
@@ -258,41 +275,48 @@ export default function IdeeenPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field label="Naam" hint="Anoniem mag ook">
                 <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  {...register('name')}
+                  autoComplete="name"
                   placeholder="Bv. Jan"
                   className={fieldCls}
                 />
               </Field>
               <Field label="E-mail" hint="Alleen als je een terugkoppeling wilt">
                 <input
+                  {...register('email')}
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  inputMode="email"
+                  autoComplete="email"
                   placeholder="jij@voorbeeld.nl"
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? 'err-email' : undefined}
                   className={fieldCls}
                 />
+                {errors.email?.message && (
+                  <p id="err-email" role="alert" className="mt-1 text-[12px] text-danger">{errors.email.message}</p>
+                )}
               </Field>
             </div>
           </Section>
 
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-[14px]"
+          {serverError && (
+            <div
+              role="alert"
+              aria-live="polite"
+              className="rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-[14px] inline-flex items-start gap-2"
             >
-              {error}
-            </motion.div>
+              <AlertCircle size={16} className="mt-0.5 shrink-0" />
+              <span>{serverError}</span>
+            </div>
           )}
 
           <button
             type="submit"
-            disabled={submitting}
+            disabled={isSubmitting}
             className="press-spring w-full h-14 rounded-[var(--radius-lg)] bg-accent text-accent-fg font-semibold text-[15px] hover:bg-accent-hover transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2"
           >
-            {submitting ? <Loader2 size={18} className="animate-spin" /> : <Send size={16} />}
-            {submitting ? 'Versturen…' : 'Verstuur mijn idee'}
+            {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <Send size={16} />}
+            {isSubmitting ? 'Versturen…' : 'Verstuur mijn idee'}
           </button>
 
           <p className="text-[12px] text-text-muted text-center">
