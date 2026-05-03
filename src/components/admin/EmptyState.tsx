@@ -25,7 +25,9 @@ export default function EmptyState({ title, description, icon: Icon = Inbox, act
       className={`card-surface p-10 sm:p-12 text-center ${className}`}
       role="status"
     >
-      <div className="w-12 h-12 mx-auto rounded-full bg-surface-2 border border-border flex items-center justify-center text-text-subtle mb-4">
+      <div
+        className="cs-empty-icon w-12 h-12 mx-auto rounded-full bg-surface-2 border border-border flex items-center justify-center text-text-subtle mb-4"
+      >
         <Icon size={20} aria-hidden />
       </div>
       <h2 className="text-[15px] font-semibold text-text">{title}</h2>

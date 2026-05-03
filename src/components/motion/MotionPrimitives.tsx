@@ -79,3 +79,67 @@ export function MotionItem({ children, ...rest }: HTMLMotionProps<'div'> & { chi
     </motion.div>
   );
 }
+
+/** Error-shake op een vlak. `trigger` toggle-prop: elke wijziging activeert
+ *  één shake. Gebruik op error-banners boven forms. Reduced-motion: stilstand. */
+type ShakeProps = Omit<HTMLMotionProps<'div'>, 'animate' | 'variants'> & {
+  children: ReactNode;
+  trigger: number | string | boolean;
+};
+
+export function MotionShake({ children, trigger, ...rest }: ShakeProps) {
+  const reduced = useReducedMotion();
+  return (
+    <motion.div
+      key={String(trigger)}
+      animate={
+        reduced
+          ? { x: 0 }
+          : { x: [0, -6, 6, -4, 4, -2, 2, 0] }
+      }
+      transition={{ duration: 0.42, ease: [0.36, 0.07, 0.19, 0.97] }}
+      {...rest}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/** Spring-bounce voor success-checkmarks. Mount-driven (niet trigger). */
+export function MotionBounce({ children, ...rest }: HTMLMotionProps<'div'> & { children: ReactNode }) {
+  const reduced = useReducedMotion();
+  return (
+    <motion.div
+      initial={reduced ? { scale: 1, opacity: 1 } : { scale: 0.6, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={
+        reduced
+          ? { duration: 0 }
+          : { type: 'spring', stiffness: 380, damping: 22 }
+      }
+      {...rest}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/** Subtiele page-in transitie voor route-changes — fade + tiny lift.
+ *  Mount op de top-level main per pagina. ≤300ms zodat 't niet vertraagt. */
+export function MotionPageTransition({ children, ...rest }: HTMLMotionProps<'div'> & { children: ReactNode }) {
+  const reduced = useReducedMotion();
+  return (
+    <motion.div
+      initial={reduced ? { opacity: 1 } : { opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={
+        reduced
+          ? { duration: 0 }
+          : { duration: 0.28, ease: [0.16, 1, 0.3, 1] }
+      }
+      {...rest}
+    >
+      {children}
+    </motion.div>
+  );
+}

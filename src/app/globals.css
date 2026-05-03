@@ -194,23 +194,20 @@ html {
   border-radius: var(--radius-sm);
 }
 
-/* CampingPicker dropdown — moet altijd ondoorzichtig zijn voor leesbaarheid,
-   ook over donkere navy hero's waar bg-surface naar 6% wit wordt
-   overschreven. Default: licht oppervlak. Donkere context: navy paneel. */
+/* CampingPicker dropdown — context-aware via --cs-surface-elevated.
+   Op licht: var pakt color-surface (wit). Op .page-public-dark: navy paneel. */
 .cs-camping-picker-popover {
-  background: var(--color-surface);
-  border-color: var(--color-border);
-  color: var(--color-text);
+  background: var(--cs-surface-elevated);
+  border-color: var(--cs-border);
+  color: var(--cs-fg);
+  box-shadow: var(--shadow-popover);
 }
 .page-public-dark .cs-camping-picker-popover {
-  background: #0F2238;
-  border-color: rgba(255, 255, 255, 0.12);
-  color: #F1F5F9;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
 .page-public-dark .cs-camping-picker-popover input {
-  color: #F1F5F9;
+  color: var(--cs-fg);
 }
 .page-public-dark .cs-camping-picker-popover .text-text-muted {
   color: rgba(241, 245, 249, 0.7);
@@ -270,6 +267,16 @@ html {
   50% { opacity: 0.9; }
 }
 
+/* Empty-state icoon — heel subtiele ademende beweging zodat 't niet dood
+   voelt. Globale prefers-reduced-motion regel kapt dit terug naar 0.001ms. */
+@keyframes empty-breathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.04); opacity: 0.9; }
+}
+.cs-empty-icon {
+  animation: empty-breathe 3.2s var(--ease-in-out, ease-in-out) infinite;
+}
+
 .animate-fade-in {
   animation: fade-in 300ms ease-out forwards;
 }
@@ -327,13 +334,30 @@ html {
   letter-spacing: -0.018em;
 }
 
-/* Dark-mode override voor publieke pagina's met navy achtergrond. Maakt
-   inputs, cards en text-colors lichter zodat ze leesbaar zijn op donker.
-   Wrapt om je <main> heen — bv. <main class="page-public-dark"> of via
-   PublicShell. */
+/* Dark-mode override voor publieke pagina's met navy achtergrond.
+   Wrapt om je <main> heen — bv. <main class="page-public-dark">.
+   Componenten die `var(--cs-fg|surface|...)` gebruiken switchen automatisch
+   van light → dark zonder !important-cascade. */
 .page-public-dark {
   color: #F1F5F9;
+
+  /* Context-token-overrides: bron van waarheid voor donkere publieke pagina's. */
+  --cs-fg: rgba(241, 245, 249, 0.95);
+  --cs-fg-muted: rgba(241, 245, 249, 0.65);
+  --cs-fg-subtle: rgba(241, 245, 249, 0.45);
+  --cs-surface: rgba(255, 255, 255, 0.06);
+  --cs-surface-2: rgba(255, 255, 255, 0.04);
+  --cs-surface-elevated: #0F2238;
+  --cs-border: rgba(255, 255, 255, 0.12);
+  --cs-border-strong: rgba(255, 255, 255, 0.22);
+  --cs-ring: rgba(126, 168, 255, 0.6);
 }
+
+/* Tijdelijk: bestaande Tailwind-class-overrides blijven geldig zolang
+   componenten nog niet naar var(--cs-*) zijn gemigreerd. In fase 2 wordt
+   elke migratie gepaard met het verwijderen van de bijbehorende regel
+   hieronder. !important blijft nodig zolang Tailwind utility-classes hier
+   moeten winnen van directe component-styling. */
 .page-public-dark .text-text { color: rgba(241,245,249,0.95); }
 .page-public-dark .text-text-muted { color: rgba(241,245,249,0.65); }
 .page-public-dark .text-text-subtle { color: rgba(241,245,249,0.45); }
