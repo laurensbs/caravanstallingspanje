@@ -323,6 +323,39 @@ export const STRINGS = {
   'airco.device-name': { nl: 'Airco unit', en: 'Air-con unit' },
   'landing.cta-airco-title': { nl: 'Airco huren', en: 'Rent air-con' },
   'landing.cta-airco-desc': { nl: 'Verkoeling op je staanplaats. Vanaf één week.', en: 'Cooling at your pitch. From one week.' },
+
+  // ─── Cookie banner & legal ──────────────────────────────
+  'cookies.title': { nl: 'Cookies & privacy', en: 'Cookies & privacy' },
+  'cookies.body': {
+    nl: 'We gebruiken essentiële cookies om de site te laten werken. Met jouw toestemming gebruiken we ook analytische en marketing-cookies om de site te verbeteren. Je keuze is altijd aan te passen.',
+    en: 'We use essential cookies to make this site work. With your permission we also use analytics and marketing cookies to improve the site. You can change your choice at any time.',
+  },
+  'cookies.accept-all': { nl: 'Alles accepteren', en: 'Accept all' },
+  'cookies.reject-all': { nl: 'Alles weigeren', en: 'Reject all' },
+  'cookies.customize': { nl: 'Voorkeuren', en: 'Preferences' },
+  'cookies.save': { nl: 'Voorkeuren opslaan', en: 'Save preferences' },
+  'cookies.cat-essential': { nl: 'Essentieel', en: 'Essential' },
+  'cookies.cat-essential-desc': {
+    nl: 'Nodig om in te loggen, formulieren te versturen en betalingen te verwerken. Altijd aan.',
+    en: 'Required to log in, submit forms and process payments. Always on.',
+  },
+  'cookies.cat-analytics': { nl: 'Analytisch', en: 'Analytics' },
+  'cookies.cat-analytics-desc': {
+    nl: 'Helpt ons te begrijpen welke pagina\'s werken en welke niet. Geanonimiseerd.',
+    en: 'Helps us understand which pages work and which don\'t. Anonymised.',
+  },
+  'cookies.cat-marketing': { nl: 'Marketing', en: 'Marketing' },
+  'cookies.cat-marketing-desc': {
+    nl: 'Voor advertenties en gepersonaliseerde inhoud op andere websites.',
+    en: 'For advertising and personalised content on other websites.',
+  },
+  'cookies.more-info': { nl: 'Meer informatie', en: 'More information' },
+  'cookies.policy-link': { nl: 'Cookiebeleid', en: 'Cookie policy' },
+  'cookies.privacy-link': { nl: 'Privacyverklaring', en: 'Privacy policy' },
+  'legal.privacy-title': { nl: 'Privacyverklaring', en: 'Privacy policy' },
+  'legal.cookies-title': { nl: 'Cookiebeleid', en: 'Cookie policy' },
+  'legal.processors-title': { nl: 'Verwerkers', en: 'Data processors' },
+  'legal.last-updated': { nl: 'Laatst bijgewerkt', en: 'Last updated' },
 } as const satisfies Record<string, Record<Locale, string>>;
 
 export type StringKey = keyof typeof STRINGS;

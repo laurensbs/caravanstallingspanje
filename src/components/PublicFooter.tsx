@@ -26,7 +26,9 @@ const ABOUT = [
   { href: 'https://caravanstalling-spanje.com/over-ons', label: 'About us', external: true },
   { href: 'https://caravanstalling-spanje.com/nieuws', label: 'News', external: true },
   { href: 'https://caravanstalling-spanje.com/faq', label: 'FAQ', external: true },
-  { href: 'https://caravanstalling-spanje.com/privacy', label: 'Privacy', external: true },
+  { href: '/privacy', label: 'Privacy' },
+  { href: '/cookies', label: 'Cookies' },
+  { href: '/verwerkers', label: 'Data processors' },
 ];
 
 export default function PublicFooter() {
