@@ -679,8 +679,16 @@ function KoelkastenContent() {
             ))}
           </div>
         ) : visibleFridges.length === 0 ? (
-          <div className="py-16 text-center text-sm text-text-muted">
-            {deviceFilter ? `No customers with "${deviceFilter}"` : 'No customers found'}
+          <div className="py-12 px-6 text-center">
+            <div className="w-12 h-12 mx-auto rounded-full bg-surface-2 border border-border flex items-center justify-center text-text-subtle mb-4">
+              {debouncedSearch ? <Search size={20} aria-hidden /> : <Refrigerator size={20} aria-hidden />}
+            </div>
+            <h2 className="text-[15px] font-semibold text-text">
+              {debouncedSearch ? `No matches for "${debouncedSearch}"` : deviceFilter ? `No customers with "${deviceFilter}"` : 'No customers found'}
+            </h2>
+            <p className="text-[13px] text-text-muted mt-1.5 leading-relaxed max-w-md mx-auto">
+              {debouncedSearch ? 'Try a different search term, or press Esc to clear.' : 'New paid bookings appear here automatically.'}
+            </p>
           </div>
         ) : (
           <ul className="divide-y divide-border">

@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Save } from 'lucide-react';
 import { Button, Input, Skeleton } from '@/components/ui';
 import PageHeader from '@/components/admin/PageHeader';
+import AuditLogPanel from '@/components/admin/AuditLogPanel';
 
 type FormState = {
   stalling_price_binnen: string;
@@ -217,6 +218,10 @@ export default function SettingsPage() {
           </Button>
         </div>
       </form>
+
+      <div className="mt-12 pt-8 border-t border-border">
+        <AuditLogPanel limit={50} />
+      </div>
     </>
   );
 }

@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { Mail, Phone, MapPin, Calendar, Trash2, Bell, Clock } from 'lucide-react';
 import { Button, Badge, Skeleton } from '@/components/ui';
 import PageHeader from '@/components/admin/PageHeader';
+import EmptyState from '@/components/admin/EmptyState';
 
 type Entry = {
   id: number;
@@ -76,15 +77,11 @@ export default function WachtlijstPage() {
           ))}
         </div>
       ) : entries.length === 0 ? (
-        <div className="card-surface p-12 text-center">
-          <div className="w-12 h-12 rounded-[var(--radius-2xl)] bg-surface-2 border border-border flex items-center justify-center mx-auto mb-4">
-            <Bell size={18} className="text-text-subtle" />
-          </div>
-          <p className="text-sm text-text">No waitlist entries yet</p>
-          <p className="text-xs text-text-muted mt-1">
-            When someone joins the waitlist, it will appear here.
-          </p>
-        </div>
+        <EmptyState
+          icon={Bell}
+          title="No waitlist entries yet"
+          description="When someone joins the waitlist for sold-out periods, they appear here."
+        />
       ) : (
         <ul className="space-y-3">
           <AnimatePresence initial={false}>

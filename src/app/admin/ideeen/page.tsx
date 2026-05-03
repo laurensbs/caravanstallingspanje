@@ -4,10 +4,11 @@ import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
-  Lightbulb, Mail, Trash2, Check, RotateCcw, Star, ThumbsUp, ThumbsDown,
+  Lightbulb, Mail, Trash2, Check, RotateCcw, Star, ThumbsUp, ThumbsDown, Search, X,
 } from 'lucide-react';
 import { Button, Badge, Skeleton, Select } from '@/components/ui';
 import PageHeader from '@/components/admin/PageHeader';
+import EmptyState from '@/components/admin/EmptyState';
 
 type Idea = {
   id: number;
@@ -38,6 +39,29 @@ function fmtDate(s: string): string {
 export default function IdeasInboxPage() {
   const [ideas, setIdeas] = useState<Idea[] | null>(null);
   const [filter, setFilter] = useState('new');
+  const [search, setSearch] = useState('');
+
+  const visible = (() => {
+    if (!ideas) return null;
+    const q = search.trim().toLowerCase();
+    if (!q) return ideas;
+    return ideas.filter((i) =>
+      [i.title, i.message, i.name, i.email, i.category].filter(Boolean).some((v) => v!.toLowerCase().includes(q))
+    );
+  })();
+
+  useEffect(() => {
+    function onKey(ev: KeyboardEvent) {
+      const t = ev.target as HTMLElement | null;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      if (ev.key === '/') {
+        ev.preventDefault();
+        document.getElementById('ideas-search')?.focus();
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   const load = useCallback(async () => {
     try {
@@ -101,23 +125,46 @@ export default function IdeasInboxPage() {
         }
       />
 
+      <div className="relative max-w-md mb-4">
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle pointer-events-none" />
+        <input
+          id="ideas-search"
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Escape') setSearch(''); }}
+          placeholder="Search by title, message, name, email…"
+          aria-label="Search ideas"
+          className="w-full h-9 pl-9 pr-9 text-sm bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors placeholder:text-text-subtle"
+        />
+        {search && (
+          <button type="button" onClick={() => setSearch('')} aria-label="Clear" className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded text-text-subtle hover:text-text">
+            <X size={12} />
+          </button>
+        )}
+        <kbd className="hidden md:inline-block absolute right-9 top-1/2 -translate-y-1/2 text-[10px] text-text-subtle border border-border rounded px-1.5 py-0.5 pointer-events-none">/</kbd>
+      </div>
+
       {ideas === null ? (
         <div className="space-y-2">
           {[0, 1, 2].map((i) => <Skeleton key={i} className="h-24" delayMs={i * 40} />)}
         </div>
       ) : ideas.length === 0 ? (
-        <div className="card-surface p-12 text-center">
-          <div className="w-12 h-12 rounded-[var(--radius-2xl)] bg-surface-2 border border-border flex items-center justify-center mx-auto mb-4">
-            <Lightbulb size={18} className="text-text-subtle" />
-          </div>
-          <p className="text-sm text-text">
-            {filter ? `No ideas with status "${filter}"` : 'No ideas yet'}
-          </p>
-        </div>
+        <EmptyState
+          icon={Lightbulb}
+          title={filter ? `No ideas with status "${filter}"` : 'No ideas yet'}
+          description={filter ? 'Try clearing the filter.' : 'Customer-submitted ideas via /ideeen will appear here.'}
+        />
+      ) : visible && visible.length === 0 ? (
+        <EmptyState
+          icon={Search}
+          title={`No matches for "${search}"`}
+          description="Try a different search term, or press Esc to clear."
+        />
       ) : (
         <ul className="space-y-3">
           <AnimatePresence initial={false}>
-            {ideas.map((m) => {
+            {visible!.map((m) => {
               const tone = STATUS_OPTIONS.find((s) => s.value === m.status)?.tone || 'neutral';
               const label = STATUS_OPTIONS.find((s) => s.value === m.status)?.label || m.status;
               return (

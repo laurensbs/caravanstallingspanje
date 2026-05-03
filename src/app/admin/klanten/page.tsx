@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { Button, Skeleton, Badge } from '@/components/ui';
 import PageHeader from '@/components/admin/PageHeader';
+import EmptyState from '@/components/admin/EmptyState';
 import NewCustomerDialog from '@/components/NewCustomerDialog';
 import type { CustomerLite } from '@/components/CustomerPicker';
 
@@ -170,8 +171,8 @@ export default function KlantenPage() {
         </div>
       </div>
 
-      <div className="card-surface overflow-hidden">
-        {loading ? (
+      {loading ? (
+        <div className="card-surface overflow-hidden">
           <div className="divide-y divide-border">
             {[0, 1, 2, 3, 4].map(i => (
               <div key={i} className="px-5 py-4 flex items-center gap-4">
@@ -181,11 +182,20 @@ export default function KlantenPage() {
               </div>
             ))}
           </div>
-        ) : !data || data.customers.length === 0 ? (
-          <div className="py-16 text-center text-sm text-text-muted">
-            {debounced ? `No results for "${debounced}"` : 'No customers yet — import from Holded or create manually.'}
-          </div>
-        ) : (
+        </div>
+      ) : !data || data.customers.length === 0 ? (
+        <EmptyState
+          icon={debounced ? Search : User}
+          title={debounced ? `No results for "${debounced}"` : 'No customers yet'}
+          description={debounced ? 'Try a different search term.' : 'Import from Holded or create a customer manually.'}
+          action={!debounced ? (
+            <Button onClick={() => setCreating(true)}>
+              <Plus size={14} /> New customer
+            </Button>
+          ) : undefined}
+        />
+      ) : (
+        <div className="card-surface overflow-hidden">
           <ul className="divide-y divide-border">
             <AnimatePresence initial={false}>
               {data.customers
@@ -259,8 +269,8 @@ export default function KlantenPage() {
               ))}
             </AnimatePresence>
           </ul>
-        )}
-      </div>
+        </div>
+      )}
 
       {totalPages > 1 && (
         <div className="mt-6 flex items-center justify-center gap-3 text-[13px]">

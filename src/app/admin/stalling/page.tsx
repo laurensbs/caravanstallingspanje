@@ -5,10 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
   Mail, Phone, Calendar, Trash2, Warehouse, Plus, Pencil,
-  FileCheck2, Square, CheckSquare, Receipt,
+  FileCheck2, Square, CheckSquare, Receipt, Search, X,
 } from 'lucide-react';
 import { Button, Badge, Skeleton, Select, Input } from '@/components/ui';
 import PageHeader from '@/components/admin/PageHeader';
+import EmptyState from '@/components/admin/EmptyState';
 import Drawer from '@/components/Drawer';
 
 type Entry = {
@@ -61,6 +62,7 @@ function statusTone(status: string): 'warning' | 'success' | 'accent' | 'danger'
 export default function StallingAdminPage() {
   const [entries, setEntries] = useState<Entry[] | null>(null);
   const [filter, setFilter] = useState('');
+  const [search, setSearch] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState(empty);
@@ -79,6 +81,33 @@ export default function StallingAdminPage() {
   }, [filter]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Client-side zoek over de geladen lijst — server-zoek is overkill voor
+  // de typische dataset-grootte (paar honderd entries).
+  const visibleEntries = (() => {
+    if (!entries) return null;
+    const q = search.trim().toLowerCase();
+    if (!q) return entries;
+    return entries.filter((e) =>
+      [e.name, e.email, e.phone, e.registration, e.brand, e.model]
+        .filter(Boolean)
+        .some((v) => v!.toLowerCase().includes(q))
+    );
+  })();
+
+  // '/' shortcut voor zoekfocus.
+  useEffect(() => {
+    function onKey(ev: KeyboardEvent) {
+      const t = ev.target as HTMLElement | null;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      if (ev.key === '/') {
+        ev.preventDefault();
+        document.getElementById('stalling-search')?.focus();
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   const openCreate = () => {
     setEditingId(null);
@@ -189,23 +218,47 @@ export default function StallingAdminPage() {
         }
       />
 
+      <div className="relative max-w-md mb-4">
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle pointer-events-none" />
+        <input
+          id="stalling-search"
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Escape') setSearch(''); }}
+          placeholder="Search by name, email, phone, registration…"
+          aria-label="Search storage requests"
+          className="w-full h-9 pl-9 pr-9 text-sm bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors placeholder:text-text-subtle"
+        />
+        {search && (
+          <button type="button" onClick={() => setSearch('')} aria-label="Clear" className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded text-text-subtle hover:text-text">
+            <X size={12} />
+          </button>
+        )}
+        <kbd className="hidden md:inline-block absolute right-9 top-1/2 -translate-y-1/2 text-[10px] text-text-subtle border border-border rounded px-1.5 py-0.5 pointer-events-none">/</kbd>
+      </div>
+
       {entries === null ? (
         <div className="space-y-2">
           {[0, 1, 2].map((i) => <Skeleton key={i} className="h-24" delayMs={i * 40} />)}
         </div>
       ) : entries.length === 0 ? (
-        <div className="card-surface p-12 text-center">
-          <div className="w-12 h-12 rounded-[var(--radius-2xl)] bg-surface-2 border border-border flex items-center justify-center mx-auto mb-4">
-            <Warehouse size={18} className="text-text-subtle" />
-          </div>
-          <p className="text-sm text-text">
-            {filter ? `No storage requests with status "${filter}"` : 'No storage requests yet'}
-          </p>
-        </div>
+        <EmptyState
+          icon={Warehouse}
+          title={filter ? `No requests with status "${filter}"` : 'No storage requests yet'}
+          description={filter ? 'Try clearing the filter.' : 'New requests submitted via the public form will appear here.'}
+          action={!filter ? <Button onClick={openCreate}><Plus size={14} /> Add storage</Button> : undefined}
+        />
+      ) : visibleEntries && visibleEntries.length === 0 ? (
+        <EmptyState
+          icon={Search}
+          title={`No matches for "${search}"`}
+          description="Try a different search term, or press Esc to clear."
+        />
       ) : (
         <ul className="space-y-3">
           <AnimatePresence initial={false}>
-            {entries.map((e) => (
+            {visibleEntries!.map((e) => (
               <motion.li
                 key={e.id}
                 layout
