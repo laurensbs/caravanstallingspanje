@@ -2,10 +2,35 @@ import Stripe from 'stripe';
 
 let _stripe: Stripe | null = null;
 
+// Boot-check: voorkomt dat een test-key in production deploy gaat (of andersom).
+// Gooit één keer bij eerste stripe()-aanroep; daarna gecachet.
+function assertKeyMatchesEnv(secretKey: string): void {
+  const isLiveKey = secretKey.startsWith('sk_live_');
+  const isTestKey = secretKey.startsWith('sk_test_');
+  if (!isLiveKey && !isTestKey) {
+    throw new Error('STRIPE_SECRET_KEY heeft een onverwacht format (geen sk_live_ of sk_test_)');
+  }
+  if (process.env.NODE_ENV === 'production' && isTestKey) {
+    // Vercel preview-deploys lopen ook met NODE_ENV=production maar zijn niet de live site;
+    // VERCEL_ENV onderscheidt dat. Alleen op echte production breken.
+    if (process.env.VERCEL_ENV === 'production') {
+      throw new Error(
+        'Stripe test-key in production. Zet STRIPE_SECRET_KEY op sk_live_ óf check je Vercel env.',
+      );
+    }
+  }
+  if (process.env.NODE_ENV !== 'production' && isLiveKey && process.env.VERCEL_ENV !== 'production') {
+    // Live-key in dev/preview — laat door maar log een waarschuwing.
+    // Throw zou local development frustreren als iemand prod-env per ongeluk pulled.
+    console.warn('[stripe] WAARSCHUWING: live-key buiten productie. Dit kan echte betalingen veroorzaken.');
+  }
+}
+
 export function stripe(): Stripe {
   if (_stripe) return _stripe;
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) throw new Error('STRIPE_SECRET_KEY ontbreekt');
+  assertKeyMatchesEnv(key);
   _stripe = new Stripe(key);
   return _stripe;
 }
@@ -41,6 +66,8 @@ export async function createCheckoutSession(input: {
    *  binnenkomt geeft Stripe dezelfde session terug i.p.v. een duplicaat.
    *  Caller-routes geven typisch `${kind}_${refId}_${YYYYMMDD}` mee. */
   idempotencyKey?: string;
+  /** Locale voor Stripe-checkout UI. Default 'nl' (legacy). */
+  locale?: 'nl' | 'en';
 }): Promise<Stripe.Checkout.Session> {
   const expSec = Math.max(
     30 * 60,
@@ -51,6 +78,9 @@ export async function createCheckoutSession(input: {
   return stripe().checkout.sessions.create(
     {
       mode: 'payment',
+      // Apple Pay / Google Pay / Link verschijnen automatisch wanneer 'card'
+      // in de lijst staat én je domain in Stripe is geverifieerd. iDEAL +
+      // Bancontact dekken NL/BE klanten zonder kaart.
       payment_method_types: ['card', 'ideal', 'bancontact'],
       line_items: [
         {
@@ -68,7 +98,7 @@ export async function createCheckoutSession(input: {
       metadata: input.metadata,
       success_url: input.successUrl,
       cancel_url: input.cancelUrl,
-      locale: 'nl',
+      locale: input.locale ?? 'nl',
       automatic_tax: { enabled: false },
       expires_at: Math.floor(Date.now() / 1000) + expSec,
     },
