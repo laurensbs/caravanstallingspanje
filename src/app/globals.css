@@ -48,9 +48,88 @@
   --shadow-md: 0 4px 12px 0 rgba(20, 14, 5, 0.06);
   --shadow-lg: 0 12px 32px 0 rgba(20, 14, 5, 0.08);
   --shadow-card: 0 1px 2px 0 rgba(0, 0, 0, 0.03), inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+  /* Warm-tinted elevation voor popovers/modals/hero — geen pure black,
+     past bij stone-paper look. */
+  --shadow-popover: 0 4px 12px 0 rgba(20, 14, 5, 0.06), 0 12px 28px -8px rgba(20, 14, 5, 0.10);
+  --shadow-modal: 0 24px 56px -12px rgba(20, 14, 5, 0.18), 0 12px 24px -8px rgba(20, 14, 5, 0.10);
+  --shadow-glow-amber: 0 0 0 1px rgba(255, 180, 80, 0.18), 0 8px 32px -4px rgba(255, 180, 80, 0.18);
+  --shadow-glow-cyan: 0 0 0 1px rgba(126, 168, 255, 0.20), 0 8px 32px -4px rgba(126, 168, 255, 0.18);
+  --shadow-glow-violet: 0 0 0 1px rgba(167, 139, 250, 0.22), 0 8px 32px -4px rgba(167, 139, 250, 0.18);
 
   --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Type-scale — als @theme font-sizes zodat `text-micro|small|body|h3|h2|h1|display`
+     als Tailwind-utility werkt. line-height verhouding tunet leesbaarheid. */
+  --text-micro: 11px;
+  --text-micro--line-height: 1.4;
+  --text-small: 13px;
+  --text-small--line-height: 1.5;
+  --text-body: 15px;
+  --text-body--line-height: 1.55;
+  --text-lead: 17px;
+  --text-lead--line-height: 1.5;
+  --text-h3: 19px;
+  --text-h3--line-height: 1.35;
+  --text-h2: 22px;
+  --text-h2--line-height: 1.3;
+  --text-h1: 26px;
+  --text-h1--line-height: 1.25;
+  --text-display: 32px;
+  --text-display--line-height: 1.15;
+  --text-hero: 44px;
+  --text-hero--line-height: 1.1;
+
+  /* Spacing-aliassen — ritme voor field/card/section/page. */
+  --space-field: 8px;
+  --space-card: 16px;
+  --space-section: 48px;
+  --space-page: 80px;
+
+  /* Motion-tokens (CSS-mirror van src/lib/motion.ts). Gebruik in plain CSS
+     transitions zodat ze synchroon lopen met framer-motion. */
+  --dur-fast: 180ms;
+  --dur-base: 320ms;
+  --dur-slow: 500ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Z-index stack — geen ad-hoc z-30/40/50/60/70 meer. */
+  --z-base: 1;
+  --z-dropdown: 20;
+  --z-sticky: 30;
+  --z-drawer: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+  --z-skip-link: 70;
+
+  /* Gradient-tokens — bewuste navy stops gecentraliseerd. */
+  --gradient-hero-navy: radial-gradient(120% 80% at 50% 0%, #142F4D 0%, #0A1929 60%, #050D18 100%);
+  --gradient-hero-glow-amber: radial-gradient(50% 50% at 50% 50%, rgba(255,180,80,0.18) 0%, transparent 70%);
+  --gradient-hero-glow-cyan: radial-gradient(40% 55% at 50% 28%, rgba(126,168,255,0.22) 0%, rgba(126,168,255,0.08) 40%, transparent 75%);
+  --gradient-footer-navy: linear-gradient(180deg, #142F4D 0%, #0A1929 60%, #050D18 100%);
+  --gradient-page-navy: linear-gradient(180deg, #0A1929 0%, #050D18 100%);
+
+  /* Branded brand-tinten voor accent-glows en pills (Costa Brava warm/zee/lavendel). */
+  --color-amber: #F4B942;
+  --color-amber-soft: rgba(255, 180, 80, 0.12);
+  --color-amber-border: rgba(255, 180, 80, 0.25);
+  --color-cyan-soft: rgba(126, 168, 255, 0.12);
+  --color-violet-soft: rgba(167, 139, 250, 0.14);
+
+  /* Context-aware aliassen — overschreven door .page-public-dark.
+     Componenten kunnen `var(--cs-fg)` gebruiken zonder te weten of ze op
+     light of dark context staan. */
+  --cs-fg: var(--color-text);
+  --cs-fg-muted: var(--color-text-muted);
+  --cs-fg-subtle: var(--color-text-subtle);
+  --cs-surface: var(--color-surface);
+  --cs-surface-2: var(--color-surface-2);
+  --cs-surface-elevated: var(--color-surface);
+  --cs-border: var(--color-border);
+  --cs-border-strong: var(--color-border-strong);
+  --cs-ring: var(--color-ring);
 }
 
 * {

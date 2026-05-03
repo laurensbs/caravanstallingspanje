@@ -4,15 +4,17 @@ import { useEffect, useState } from 'react';
 import type { Transition, Variants } from 'framer-motion';
 
 // Eén bron voor motion-tokens zodat duur/easing consistent is over de site.
-// Zelfde easing als de bestaande hero-animaties (Apple-achtige out-cubic).
+// CSS-mirror in `src/app/globals.css` (--dur-fast/base/slow + --ease-out).
+// Wijzig je deze waarden, sync de CSS-vars dan ook.
 
 export const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 export const EASE_IN_OUT = [0.4, 0, 0.2, 1] as const;
+export const EASE_SPRING = [0.34, 1.56, 0.64, 1] as const;
 
 export const DURATION = {
-  fast: 0.18,
-  base: 0.32,
-  slow: 0.5,
+  fast: 0.18,   // 180ms — micro-interactions (button-press, badge-tick)
+  base: 0.32,   // 320ms — page-elements fade/slide
+  slow: 0.5,    // 500ms — hero/page-transitions
 } as const;
 
 /** Detecteert `prefers-reduced-motion` met SSR-safe default. */
