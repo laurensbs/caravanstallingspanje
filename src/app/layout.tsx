@@ -58,13 +58,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Toaster
           position="top-right"
           toastOptions={{
-            style: {
-              background: 'var(--color-surface)',
-              color: 'var(--color-text)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-md)',
-              boxShadow: 'var(--shadow-md)',
-              fontFamily: 'var(--font-sans)',
+            classNames: {
+              toast: 'cs-toast',
+              title: 'cs-toast-title',
+              description: 'cs-toast-desc',
+              actionButton: 'cs-toast-action',
+              cancelButton: 'cs-toast-cancel',
+              success: 'cs-toast-success',
+              error: 'cs-toast-error',
+              warning: 'cs-toast-warning',
+              info: 'cs-toast-info',
             },
           }}
         />

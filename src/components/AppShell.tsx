@@ -8,12 +8,23 @@ import {
   LayoutDashboard, Refrigerator, Bell, Truck, LogOut, ChevronLeft,
   Settings, Users, Warehouse, MessageSquare, Search, Lightbulb, Wind, CalendarRange,
 } from 'lucide-react';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import CommandPalette from './CommandPalette';
+import ShortcutsPanel from './admin/ShortcutsPanel';
+import DensityToggle from './admin/DensityToggle';
+
+type CountKey = 'stalling' | 'transport' | 'fridge' | 'contact' | 'ideas' | 'waitlist';
 
 type NavGroup = {
   label: string;
-  items: { href: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[];
+  items: {
+    href: string;
+    label: string;
+    icon: typeof LayoutDashboard;
+    exact?: boolean;
+    /** Welke count uit /api/admin/badge-counts hoort bij dit item. */
+    countKey?: CountKey;
+  }[];
 };
 
 const NAV_GROUPS: NavGroup[] = [
@@ -22,14 +33,14 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard, exact: true },
       { href: '/admin/klanten', label: 'Customers', icon: Users },
-      { href: '/admin/koelkasten', label: 'Fridges', icon: Refrigerator },
+      { href: '/admin/koelkasten', label: 'Fridges', icon: Refrigerator, countKey: 'fridge' },
       { href: '/admin/koelkasten?device=Airco', label: 'AC units', icon: Wind },
       { href: '/admin/planning', label: 'Planning', icon: CalendarRange },
-      { href: '/admin/stalling', label: 'Storage', icon: Warehouse },
-      { href: '/admin/transport', label: 'Transport', icon: Truck },
-      { href: '/admin/contact', label: 'Messages', icon: MessageSquare },
-      { href: '/admin/ideeen', label: 'Ideas inbox', icon: Lightbulb },
-      { href: '/admin/wachtlijst', label: 'Waitlist', icon: Bell },
+      { href: '/admin/stalling', label: 'Storage', icon: Warehouse, countKey: 'stalling' },
+      { href: '/admin/transport', label: 'Transport', icon: Truck, countKey: 'transport' },
+      { href: '/admin/contact', label: 'Messages', icon: MessageSquare, countKey: 'contact' },
+      { href: '/admin/ideeen', label: 'Ideas inbox', icon: Lightbulb, countKey: 'ideas' },
+      { href: '/admin/wachtlijst', label: 'Waitlist', icon: Bell, countKey: 'waitlist' },
     ],
   },
   {
@@ -39,6 +50,36 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
 ];
+
+type Counts = Partial<Record<CountKey, number>>;
+
+const POLL_MS = 30_000;
+
+function useBadgeCounts(): Counts {
+  const [counts, setCounts] = useState<Counts>({});
+  useEffect(() => {
+    let mounted = true;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    async function load() {
+      try {
+        const r = await fetch('/api/admin/badge-counts', { credentials: 'include' });
+        if (!r.ok) return;
+        const d = (await r.json()) as Counts;
+        if (mounted) setCounts(d);
+      } catch {
+        /* zwijgen — sidebar mag rustig leeg blijven bij offline */
+      } finally {
+        if (mounted) timer = setTimeout(load, POLL_MS);
+      }
+    }
+    load();
+    return () => {
+      mounted = false;
+      if (timer) clearTimeout(timer);
+    };
+  }, []);
+  return counts;
+}
 
 interface AppShellProps {
   userName: string;
@@ -64,6 +105,7 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
   // padding van COLLAPSED_WIDTH zodat hij niet schuift bij hovering.
   const [hovered, setHovered] = useState(false);
   const expanded = hovered;
+  const counts = useBadgeCounts();
 
   const handleLogout = async () => {
     try {
@@ -189,11 +231,14 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
                   // overeenkomt (beide leeg = Fridges; 'Airco' = AC units).
                   const active = pathMatch && hrefDevice === currentDevice;
                   const Icon = item.icon;
+                  const count = item.countKey ? counts[item.countKey] ?? 0 : 0;
+                  const showCount = count > 0;
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
-                      title={!expanded ? item.label : undefined}
+                      title={!expanded ? `${item.label}${showCount ? ` (${count})` : ''}` : undefined}
+                      aria-label={showCount ? `${item.label}, ${count} pending` : item.label}
                       className="relative flex items-center gap-3 px-3 h-10 rounded-[var(--radius-md)] text-[14px] transition-colors"
                       style={{ color: active ? 'white' : 'rgba(255,255,255,0.7)' }}
                     >
@@ -205,9 +250,34 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
                           transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                         />
                       )}
-                      <Icon size={18} className="relative z-10 shrink-0" />
+                      <span className="relative z-10 shrink-0">
+                        <Icon size={18} />
+                        {/* Compact-state: kleine dot rechtsboven het icoon. */}
+                        {!expanded && showCount && (
+                          <span
+                            aria-hidden
+                            className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full"
+                            style={{ background: 'var(--color-amber)', boxShadow: '0 0 0 2px var(--color-sidebar)' }}
+                          />
+                        )}
+                      </span>
                       {expanded && (
-                        <span className="relative z-10 whitespace-nowrap">{item.label}</span>
+                        <>
+                          <span className="relative z-10 whitespace-nowrap flex-1">{item.label}</span>
+                          {showCount && (
+                            <span
+                              aria-hidden
+                              className="relative z-10 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-semibold tabular-nums"
+                              style={{
+                                background: 'rgba(244, 185, 66, 0.18)',
+                                color: 'var(--color-amber)',
+                                border: '1px solid rgba(244, 185, 66, 0.32)',
+                              }}
+                            >
+                              {count > 99 ? '99+' : count}
+                            </span>
+                          )}
+                        </>
                       )}
                     </Link>
                   );
@@ -242,7 +312,12 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
         </div>
       </aside>
 
-      <main className="min-w-0">
+      <main className="min-w-0 relative">
+        {/* Floating density-toggle rechtsboven — zichtbaar op desktop, verborgen
+            onder lg om mobile-screens niet te crowden. */}
+        <div className="hidden lg:block absolute top-4 right-6" style={{ zIndex: 'var(--z-sticky)' }}>
+          <DensityToggle />
+        </div>
         <AnimatePresence mode="wait">
           <motion.div
             key={pathname}
@@ -257,6 +332,7 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
         </AnimatePresence>
       </main>
       <CommandPalette />
+      <ShortcutsPanel />
     </div>
   );
 }
