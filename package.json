@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "@neondatabase/serverless": "^0.10.4",
     "bcryptjs": "^2.4.3",
     "framer-motion": "^12.4.7",
@@ -18,6 +19,7 @@
     "next": "^15.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.75.0",
     "resend": "^6.12.2",
     "sonner": "^2.0.7",
     "stripe": "^22.1.0",
