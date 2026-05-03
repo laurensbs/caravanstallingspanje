@@ -317,6 +317,19 @@ html {
   box-shadow: var(--shadow-card);
 }
 
+/* Service-card outer glow op hover — gebruikt --cs-card-glow CSS-var
+   die per kaart wordt gezet (cyan/amber/violet). De inner radial-gradient
+   voor "binnenkant-glow" zit al op de Link zelf via group-hover opacity. */
+.cs-service-card {
+  transition: transform var(--dur-base) var(--ease-out),
+              box-shadow var(--dur-base) var(--ease-out);
+}
+.cs-service-card:hover {
+  box-shadow:
+    0 0 0 1px var(--cs-card-glow, transparent),
+    0 14px 36px -10px var(--cs-card-glow, transparent);
+}
+
 /* Public-page typography. Larger than the admin's 13px so marketing pages
    feel comfortable at arm's length on phones. Wrap a page in `.page-public`
    to opt in. */

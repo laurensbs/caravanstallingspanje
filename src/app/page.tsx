@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ArrowRight, Refrigerator, Wind, Truck, Sun, Sparkles, Star } from 'lucide-react';
+import { ArrowRight, Refrigerator, Wind, Truck, Sun, Sparkles, Star, Wrench } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useLocale } from '@/components/LocaleProvider';
 import LocaleSwitch from '@/components/LocaleSwitch';
@@ -127,30 +127,60 @@ export default function LandingPage() {
             Direct online bestellen, betalen en wij staan voor je klaar.
           </p>
 
-          <motion.a
-            href="https://g.co/kgs/caravanstalling"
-            target="_blank"
-            rel="noopener noreferrer"
+          {/* Trust-triplet — geïntegreerd onder de hero-CTA. Behoudt de
+              click-naar-Google review als primaire tegel; voegt 25 jaar +
+              eigen werkplaats toe als visuele bekrachtiging. */}
+          <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.4 }}
-            className="press-spring inline-flex items-center gap-2 mt-6 px-3 py-1.5 rounded-full transition-colors"
-            style={{
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.10)',
-              color: '#F1F5F9',
-            }}
+            className="mt-6 flex flex-wrap items-center justify-center gap-2"
           >
-            <span className="flex items-center gap-0.5">
-              {[0, 1, 2, 3, 4].map((i) => (
-                <Star key={i} size={11} fill="currentColor" style={{ color: '#F4B942' }} />
-              ))}
+            <a
+              href="https://g.co/kgs/caravanstalling"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="press-spring inline-flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors"
+              style={{
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.10)',
+                color: '#F1F5F9',
+              }}
+              aria-label="4.9 sterren op 25 Google reviews"
+            >
+              <span aria-hidden className="flex items-center gap-0.5">
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <Star key={i} size={11} fill="currentColor" style={{ color: 'var(--color-amber)' }} />
+                ))}
+              </span>
+              <span className="text-[11px] font-medium tabular-nums">4.9</span>
+              <span className="text-[11px]" style={{ color: 'rgba(241,245,249,0.6)' }}>
+                · 25 reviews
+              </span>
+            </a>
+            <span
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                color: 'rgba(241,245,249,0.85)',
+              }}
+            >
+              <Sparkles size={11} aria-hidden style={{ color: 'var(--color-amber)' }} />
+              25 jaar ervaring
             </span>
-            <span className="text-[11px] font-medium tabular-nums">4.9</span>
-            <span className="text-[11px]" style={{ color: 'rgba(241,245,249,0.6)' }}>
-              · 25 Google reviews
+            <span
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                color: 'rgba(241,245,249,0.85)',
+              }}
+            >
+              <Wrench size={11} aria-hidden style={{ color: 'rgba(241,245,249,0.7)' }} />
+              Eigen werkplaats
             </span>
-          </motion.a>
+          </motion.div>
         </motion.div>
 
         {/* CTA cards */}
@@ -258,11 +288,13 @@ function ServiceCard({
     >
       <Link
         href={href}
-        className="group block p-5 sm:p-6 rounded-[20px] relative overflow-hidden transition-all hover:-translate-y-0.5"
+        className="cs-service-card group block p-5 sm:p-6 rounded-[20px] relative overflow-hidden transition-all hover:-translate-y-0.5"
         style={{
           background: 'rgba(255,255,255,0.06)',
           border: '1px solid rgba(255,255,255,0.10)',
           backdropFilter: 'blur(6px)',
+          // CSS-variable per accent — class-rule in globals leest 'm voor outer-glow.
+          ['--cs-card-glow' as string]: a.glow,
         }}
       >
         <div
