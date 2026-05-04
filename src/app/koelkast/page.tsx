@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Loader2, AlertTriangle, Refrigerator } from 'lucide-react';
+import { Check, Loader2, AlertTriangle, Refrigerator, Sparkles } from 'lucide-react';
 import AnimatedServiceIcon from '@/components/AnimatedServiceIcon';
+import { MotionBounce } from '@/components/motion/MotionPrimitives';
 import { calculatePriceWith, PRICES, MIN_DAYS, type DeviceType } from '@/lib/pricing';
 import {
   ContactFields, MultiStepShell, Section, Field, fieldCls, emptyContact,
@@ -173,23 +174,90 @@ export default function KoelkastBestelPagina() {
   // ── Done states ─────────────────────────────────────────
   if (done) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-bg page-public px-6 py-12">
+      <main
+        id="main"
+        className="min-h-screen page-public page-public-dark relative overflow-hidden flex items-center justify-center px-6 py-12"
+        style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}
+      >
+        {/* Subtiele celebrate-orbs — niet drukker dan de homepage. */}
+        <div
+          aria-hidden
+          className="cs-orb-amber pointer-events-none absolute -top-32 -right-20 h-[420px] w-[420px] blur-3xl opacity-60"
+          style={{ background: 'var(--gradient-hero-glow-amber)' }}
+        />
+        <div
+          aria-hidden
+          className="cs-orb-cyan pointer-events-none absolute -bottom-32 -left-20 h-[420px] w-[420px] blur-3xl opacity-50"
+          style={{ background: 'var(--gradient-hero-glow-cyan)' }}
+        />
+
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="max-w-md text-center"
+          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+          className="relative max-w-md text-center"
+          style={{ color: '#F1F5F9' }}
         >
-          <div className="w-14 h-14 rounded-full bg-success-soft text-success flex items-center justify-center mx-auto mb-6">
-            <Check size={22} />
-          </div>
-          <h1 className="text-3xl font-semibold tracking-tight mb-3">{t('fridge.confirm-title')}</h1>
-          <p className="text-text-muted leading-relaxed">
+          {/* Bounce-checkmark met sunset-gradient glow ring */}
+          <MotionBounce className="relative mx-auto mb-7" style={{ width: 72, height: 72 }}>
+            <div
+              aria-hidden
+              className="absolute inset-0 rounded-full blur-xl opacity-60"
+              style={{ background: 'var(--gradient-sunset)' }}
+            />
+            <div
+              className="relative w-full h-full rounded-full flex items-center justify-center"
+              style={{
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(242,169,59,0.5)',
+                boxShadow: '0 0 0 1px rgba(242,169,59,0.18) inset',
+              }}
+            >
+              <Check size={28} strokeWidth={2.5} style={{ color: 'var(--color-amber-bright)' }} />
+            </div>
+          </MotionBounce>
+
+          {/* Sparkle-iconen die zachtjes faden ná de bounce */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+            aria-hidden
+            className="absolute top-2 left-1/2 -translate-x-32 hidden sm:block"
+          >
+            <Sparkles size={14} style={{ color: 'var(--color-amber-bright)', opacity: 0.7 }} />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.55, duration: 0.6 }}
+            aria-hidden
+            className="absolute top-8 left-1/2 translate-x-24 hidden sm:block"
+          >
+            <Sparkles size={12} style={{ color: 'var(--color-coral)', opacity: 0.6 }} />
+          </motion.div>
+
+          <h1
+            className="font-semibold tracking-tight mb-3"
+            style={{
+              fontSize: 'clamp(1.75rem, 2vw + 0.75rem, 2.25rem)',
+              letterSpacing: '-0.02em',
+              lineHeight: 1.15,
+              color: '#FFFFFF',
+            }}
+          >
+            {t('fridge.confirm-title')}
+          </h1>
+          <p className="leading-relaxed text-[15px]" style={{ color: 'rgba(251,245,236,0.78)' }}>
             {t('fridge.confirm-body', done.days, formatEur(done.total))}
           </p>
-          <p className="text-[14px] text-text-muted mt-8">
+          <p className="text-[14px] mt-8" style={{ color: 'rgba(251,245,236,0.5)' }}>
             {t('common.questions')}{' '}
-            <a href="mailto:info@caravanstalling-spanje.com" className="text-text underline-offset-4 hover:underline">
+            <a
+              href="mailto:info@caravanstalling-spanje.com"
+              className="underline-offset-4 hover:underline"
+              style={{ color: 'var(--color-amber-bright)' }}
+            >
               info@caravanstalling-spanje.com
             </a>
           </p>

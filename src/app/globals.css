@@ -106,17 +106,53 @@
 
   /* Gradient-tokens — bewuste navy stops gecentraliseerd. */
   --gradient-hero-navy: radial-gradient(120% 80% at 50% 0%, #142F4D 0%, #0A1929 60%, #050D18 100%);
-  --gradient-hero-glow-amber: radial-gradient(50% 50% at 50% 50%, rgba(255,180,80,0.18) 0%, transparent 70%);
-  --gradient-hero-glow-cyan: radial-gradient(40% 55% at 50% 28%, rgba(126,168,255,0.22) 0%, rgba(126,168,255,0.08) 40%, transparent 75%);
+  --gradient-hero-glow-amber: radial-gradient(50% 50% at 50% 50%, rgba(242,169,59,0.22) 0%, rgba(242,169,59,0.06) 35%, transparent 70%);
+  --gradient-hero-glow-cyan: radial-gradient(40% 55% at 50% 28%, rgba(79,168,184,0.26) 0%, rgba(79,168,184,0.10) 40%, transparent 75%);
+  --gradient-hero-glow-coral: radial-gradient(45% 50% at 50% 50%, rgba(232,132,94,0.18) 0%, transparent 70%);
   --gradient-footer-navy: linear-gradient(180deg, #142F4D 0%, #0A1929 60%, #050D18 100%);
   --gradient-page-navy: linear-gradient(180deg, #0A1929 0%, #050D18 100%);
 
-  /* Branded brand-tinten voor accent-glows en pills (Costa Brava warm/zee/lavendel). */
-  --color-amber: #F4B942;
-  --color-amber-soft: rgba(255, 180, 80, 0.12);
-  --color-amber-border: rgba(255, 180, 80, 0.25);
-  --color-cyan-soft: rgba(126, 168, 255, 0.12);
-  --color-violet-soft: rgba(167, 139, 250, 0.14);
+  /* Sun-set verloop — gebruikt voor amber-pill borders en hero-edge. */
+  --gradient-sunset: linear-gradient(135deg, #F2A93B 0%, #E8845E 50%, #B49AE8 100%);
+  --gradient-sea: linear-gradient(135deg, #4FA8B8 0%, #142F4D 100%);
+
+  /* ─── Brand: Costa Brava paleet ─────────────────────────────
+     Warm zonlicht, deep navy zee, zandzachte cream, lichte zee-cyaan.
+     Voor pills/accent-glows en specifieke brand-momenten (hero-orbs,
+     service-card streep, success-star). */
+
+  /* Warm amber — primary brand-accent. Iets dieper dan F4B942 voor
+     leesbaarheid op witte achtergrond, lichter op donker. */
+  --color-amber: #F2A93B;
+  --color-amber-bright: #FFC25A; /* highlights, sterren */
+  --color-amber-deep: #C97D14;   /* hovered amber, links op licht */
+  --color-amber-soft: rgba(242, 169, 59, 0.14);
+  --color-amber-border: rgba(242, 169, 59, 0.28);
+
+  /* Zee-cyaan — secundaire brand-accent. Voelt als ondiepe zee bij
+     gouden uur, niet IT-blauw. */
+  --color-sea: #4FA8B8;
+  --color-sea-soft: rgba(79, 168, 184, 0.14);
+  --color-sea-deep: #2C7B8A;
+
+  /* Coral — ondersteunende warmte voor success-states / love.
+     Sparingly used — niet voor primary CTA (rood-associatie). */
+  --color-coral: #E8845E;
+  --color-coral-soft: rgba(232, 132, 94, 0.14);
+
+  /* Cream — zandzachte achtergrond-alternatief voor admin info-cards.
+     Iets warmer dan --color-bg om hiërarchie te creëren. */
+  --color-cream: #FBF5EC;
+  --color-cream-deep: #F5EAD8;
+
+  /* Lavender — voor hero-secundaire glow + service-card violet variant.
+     Vervangt het 'koudere' rgba(167,139,250) wat nu in gebruik is. */
+  --color-lavender: #B49AE8;
+  --color-lavender-soft: rgba(180, 154, 232, 0.14);
+
+  /* Legacy (nu via paletten hierboven gedefinieerd). */
+  --color-cyan-soft: var(--color-sea-soft);
+  --color-violet-soft: var(--color-lavender-soft);
 
   /* Context-aware aliassen — overschreven door .page-public-dark.
      Componenten kunnen `var(--cs-fg)` gebruiken zonder te weten of ze op
@@ -277,6 +313,88 @@ html {
 }
 .cs-empty-icon {
   animation: empty-breathe 3.2s var(--ease-in-out, ease-in-out) infinite;
+}
+
+/* ─── Brand: Costa Brava ambient orbs ─────────────────────────
+   Twee floating orbs met verschillende amplitudes — de hero "ademt"
+   met zomerlicht. Performance-veilig: alleen translate3d + opacity,
+   geen filter-animations. */
+@keyframes orb-float-amber {
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.85; }
+  33%      { transform: translate3d(-1.5%, -2.5%, 0); opacity: 1; }
+  66%      { transform: translate3d(2%, 1.5%, 0); opacity: 0.7; }
+}
+@keyframes orb-float-cyan {
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.6; }
+  50%      { transform: translate3d(2.5%, -1.5%, 0); opacity: 0.9; }
+}
+@keyframes orb-pulse {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50%      { opacity: 0.85; transform: scale(1.06); }
+}
+
+.cs-orb-amber {
+  animation: orb-float-amber 16s var(--ease-in-out, ease-in-out) infinite;
+}
+.cs-orb-cyan {
+  animation: orb-float-cyan 20s var(--ease-in-out, ease-in-out) infinite;
+}
+.cs-orb-pulse {
+  animation: orb-pulse 9s var(--ease-in-out, ease-in-out) infinite;
+}
+
+/* Sunset accent-stripe — voor onder eyebrows en in service-cards.
+   1px hairline met gradient van amber → coral → lavender. */
+.cs-accent-stripe {
+  display: inline-block;
+  width: 32px;
+  height: 2px;
+  background: var(--gradient-sunset);
+  border-radius: 2px;
+  vertical-align: middle;
+}
+
+/* Brand-pill — eyebrow met sunset-tint. Vervangt de amber-only pill op
+   homepage hero. */
+.cs-brand-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  background: rgba(242, 169, 59, 0.10);
+  border: 1px solid rgba(242, 169, 59, 0.28);
+  color: rgba(255, 210, 140, 0.95);
+  box-shadow: 0 0 24px -6px rgba(242, 169, 59, 0.20) inset;
+}
+.cs-brand-eyebrow::before {
+  content: '';
+  width: 18px;
+  height: 1.5px;
+  background: var(--gradient-sunset);
+  border-radius: 2px;
+}
+
+/* Service-card top accent stripe — kleurrijke hairline op de bovenrand
+   die de accent-tint van de kaart uit. CSS-var --cs-card-accent komt
+   per kaart. */
+.cs-card-stripe {
+  position: absolute;
+  top: 0;
+  left: 1.25rem;
+  right: 1.25rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--cs-card-accent, var(--gradient-sunset));
+  opacity: 0.6;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+.cs-service-card:hover .cs-card-stripe {
+  opacity: 1;
 }
 
 .animate-fade-in {

@@ -346,18 +346,32 @@ export function MultiStepShell({
   return (
     <main
       id="main"
-      className="min-h-screen page-public page-public-dark flex flex-col"
+      className="min-h-screen page-public page-public-dark flex flex-col relative overflow-hidden"
       style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}
     >
-      <PublicHero
-        back={{ href: '/', label: t('common.brand') }}
-        title={title}
-        intro={intro}
-        eyebrow={eyebrow}
-        eyebrowIcon={eyebrowIcon}
-        accent={accent}
+      {/* Subtiele ambient orbs — minder druk dan op homepage zodat
+          formulieren rustig blijven, maar zelfde brand-warmte. */}
+      <div
+        aria-hidden
+        className="cs-orb-cyan pointer-events-none absolute inset-x-0 top-0 h-[420px] blur-3xl opacity-60"
+        style={{ background: 'var(--gradient-hero-glow-cyan)' }}
       />
-      <div className="flex-1 max-w-2xl w-full mx-auto px-5 sm:px-6 py-8 sm:py-14">
+      <div
+        aria-hidden
+        className="cs-orb-amber pointer-events-none absolute -bottom-32 -right-20 h-[420px] w-[420px] blur-3xl opacity-50"
+        style={{ background: 'var(--gradient-hero-glow-amber)' }}
+      />
+      <div className="relative">
+        <PublicHero
+          back={{ href: '/', label: t('common.brand') }}
+          title={title}
+          intro={intro}
+          eyebrow={eyebrow}
+          eyebrowIcon={eyebrowIcon}
+          accent={accent}
+        />
+      </div>
+      <div className="relative flex-1 max-w-2xl w-full mx-auto px-5 sm:px-6 py-8 sm:py-14">
         <Stepper current={step} steps={stepLabels} />
 
         <motion.div
