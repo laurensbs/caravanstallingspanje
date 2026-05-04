@@ -63,8 +63,8 @@ const DEVICE_VALUES: string[] = DEVICE_TYPES.map(d => d.value);
 const emptyFridge: { name: string; email: string; extra_email: string; device_type: string; notes: string; customer_id: number | null } = {
   name: '', email: '', extra_email: '', device_type: 'Grote koelkast', notes: '', customer_id: null,
 };
-const emptyBooking: { camping: string; start_date: string; end_date: string; spot_number: string; status: 'compleet' | 'controleren'; notes: string } = {
-  camping: '', start_date: '', end_date: '', spot_number: '', status: 'compleet', notes: '',
+const emptyBooking: { camping: string; start_date: string; end_date: string; spot_number: string; status: 'compleet' | 'controleren'; notes: string; already_paid: boolean } = {
+  camping: '', start_date: '', end_date: '', spot_number: '', status: 'compleet', notes: '', already_paid: false,
 };
 
 function fmtDate(s: string | null): string {
@@ -352,6 +352,8 @@ function KoelkastenContent() {
       spot_number: b.spot_number || '',
       status: b.status,
       notes: b.notes || '',
+      // already_paid is alleen een create-time toggle; bij edit niet relevant.
+      already_paid: false,
     });
     setBookingDialog({ open: true, mode: 'edit', bookingId: b.id });
   };
@@ -1098,6 +1100,11 @@ function KoelkastenContent() {
                     const holdedPaid = holded?.status === 'paid' || b.holded_invoice_status === 'paid';
                     const partial = holded?.status === 'partial';
                     const linkSent = !!b.payment_link_sent_at;
+                    // "Offline paid" = paid_at gezet door admin bij create
+                    // (already_paid checkbox), zonder Stripe payment_intent
+                    // én zonder Holded pro forma. In dat geval slaan we de
+                    // hele betaal-flow over.
+                    const offlinePaid = !!b.paid_at && !b.stripe_payment_intent_id && !b.holded_invoice_number;
                     // Holded URL kan komen uit live-status (publicUrl) of uit
                     // de gecachte holded_invoice_url kolom — beide tonen we als
                     // klikbare link.
@@ -1125,6 +1132,7 @@ function KoelkastenContent() {
                               );
                             })()}
                             {holdedPaid && <Badge tone="success">Paid</Badge>}
+                            {offlinePaid && <Badge tone="success"><CheckCircle2 size={10} /> Paid offline</Badge>}
                             {partial && <Badge tone="warning">Partially paid</Badge>}
                             {linkSent && !holdedPaid && (
                               <Badge tone="accent">Link sent · awaiting payment</Badge>
@@ -1172,19 +1180,26 @@ function KoelkastenContent() {
                         </div>
                       </div>
                       <div className="pt-2 border-t border-border flex flex-wrap gap-2">
-                        {!b.holded_invoice_number && (
+                        {offlinePaid && (
+                          <p className="text-[12px] text-text-muted italic self-center">
+                            Customer paid offline on {new Date(b.paid_at!).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} — no payment link or pro forma needed.
+                          </p>
+                        )}
+                        {!offlinePaid && !b.holded_invoice_number && (
                           <Button size="sm" variant="secondary" onClick={() => openInvoice(b)}>
                             <Receipt size={12} /> Manual pro forma
                           </Button>
                         )}
-                        <Button
-                          size="sm"
-                          variant={b.payment_link_sent_at ? 'secondary' : 'primary'}
-                          onClick={() => openPayLink(b)}
-                        >
-                          {b.payment_link_sent_at ? <RefreshCw size={12} /> : <Send size={12} />}
-                          {holdedPaid ? 'New payment link' : b.payment_link_sent_at ? 'Resend payment link' : 'Send payment link'}
-                        </Button>
+                        {!offlinePaid && (
+                          <Button
+                            size="sm"
+                            variant={b.payment_link_sent_at ? 'secondary' : 'primary'}
+                            onClick={() => openPayLink(b)}
+                          >
+                            {b.payment_link_sent_at ? <RefreshCw size={12} /> : <Send size={12} />}
+                            {holdedPaid ? 'New payment link' : b.payment_link_sent_at ? 'Resend payment link' : 'Send payment link'}
+                          </Button>
+                        )}
                         {b.payment_link_url && (
                           <a
                             href={b.payment_link_url}
@@ -1322,6 +1337,27 @@ function KoelkastenContent() {
                   <option value="controleren">Review</option>
                 </Select>
                 <Textarea label="Notes" value={bookingForm.notes} onChange={e => setBookingForm({ ...bookingForm, notes: e.target.value })} />
+                {/* Already-paid toggle — alleen bij create. Bij edit
+                    laten we de bestaande paid_at via Stripe-webhook of
+                    sales-invoice-flow lopen, dus geen toggle. */}
+                {bookingDialog.mode === 'create' && (
+                  <label
+                    className="flex items-start gap-3 p-3 rounded-[var(--radius-md)] border border-border bg-surface-2 cursor-pointer hover:border-accent/40 transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={bookingForm.already_paid}
+                      onChange={e => setBookingForm({ ...bookingForm, already_paid: e.target.checked })}
+                      className="mt-0.5 w-4 h-4 accent-accent cursor-pointer"
+                    />
+                    <span className="text-[13px] leading-relaxed">
+                      <span className="font-medium text-text">Already paid (offline)</span>
+                      <span className="block text-[11px] text-text-muted mt-0.5">
+                        Tick if the customer paid in cash or via bank transfer. We&apos;ll skip the payment link and pro forma — the booking is marked paid right away.
+                      </span>
+                    </span>
+                  </label>
+                )}
                 <div className="flex justify-end gap-2 pt-2">
                   <Button type="button" variant="ghost" onClick={() => setBookingDialog({ open: false, mode: 'create' })}>Cancel</Button>
                   <Button type="submit" loading={savingBooking}>

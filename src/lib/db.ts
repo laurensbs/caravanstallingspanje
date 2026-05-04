@@ -474,20 +474,23 @@ export async function deleteFridge(id: number) {
   await sql`DELETE FROM fridges WHERE id = ${id}`;
 }
 
-export async function createFridgeBooking(fridgeId: number, data: { camping?: string | null; start_date?: string | null; end_date?: string | null; spot_number?: string | null; status?: string; notes?: string | null; device_type?: string | null }) {
+export async function createFridgeBooking(fridgeId: number, data: { camping?: string | null; start_date?: string | null; end_date?: string | null; spot_number?: string | null; status?: string; notes?: string | null; device_type?: string | null; already_paid?: boolean }) {
   // Probeer ensureMiscSchema (voegt device_type kolom toe als 'm mist) maar
   // laat een eventuele migratie-fout de booking-create niet blokkeren.
   await ensureMiscSchema().catch(() => {});
+  // Als admin "already paid" aanvinkt: zet paid_at = NOW(). Dit signaleert
+  // overal in de UI dat er geen betaal-link of pro-forma meer hoeft.
+  const paidAt = data.already_paid ? new Date().toISOString() : null;
   try {
-    const res = await sql`INSERT INTO fridge_bookings (fridge_id, camping, start_date, end_date, spot_number, status, notes, device_type)
-      VALUES (${fridgeId}, ${data.camping || null}, ${data.start_date || null}::date, ${data.end_date || null}::date, ${data.spot_number || null}, ${data.status || 'compleet'}, ${data.notes || null}, ${data.device_type || null}) RETURNING *`;
+    const res = await sql`INSERT INTO fridge_bookings (fridge_id, camping, start_date, end_date, spot_number, status, notes, device_type, paid_at)
+      VALUES (${fridgeId}, ${data.camping || null}, ${data.start_date || null}::date, ${data.end_date || null}::date, ${data.spot_number || null}, ${data.status || 'compleet'}, ${data.notes || null}, ${data.device_type || null}, ${paidAt}::timestamp) RETURNING *`;
     return res[0];
   } catch (err) {
     // Fallback: oude DB zonder device_type kolom. Insert zonder dat veld.
     const msg = err instanceof Error ? err.message : '';
     if (/column.*device_type.*does not exist/i.test(msg)) {
-      const res = await sql`INSERT INTO fridge_bookings (fridge_id, camping, start_date, end_date, spot_number, status, notes)
-        VALUES (${fridgeId}, ${data.camping || null}, ${data.start_date || null}::date, ${data.end_date || null}::date, ${data.spot_number || null}, ${data.status || 'compleet'}, ${data.notes || null}) RETURNING *`;
+      const res = await sql`INSERT INTO fridge_bookings (fridge_id, camping, start_date, end_date, spot_number, status, notes, paid_at)
+        VALUES (${fridgeId}, ${data.camping || null}, ${data.start_date || null}::date, ${data.end_date || null}::date, ${data.spot_number || null}, ${data.status || 'compleet'}, ${data.notes || null}, ${paidAt}::timestamp) RETURNING *`;
       return res[0];
     }
     throw err;

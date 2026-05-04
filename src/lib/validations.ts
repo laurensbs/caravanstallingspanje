@@ -32,6 +32,9 @@ export const fridgeBookingSchema = z.object({
   spot_number: z.string().max(50).optional(),
   status: z.enum(['compleet', 'controleren']).default('compleet'),
   notes: z.string().max(2000).optional(),
+  // Admin-only: vink aan als de klant al cash/bankoverboeking heeft
+  // betaald. Zet paid_at direct, slaat de payment-link + pro-forma flow over.
+  already_paid: z.boolean().optional(),
 });
 
 export const waitlistSchema = z.object({
