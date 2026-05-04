@@ -42,3 +42,32 @@ export function firstErrorMessage<T extends FieldValues>(form: UseFormReturn<T>)
   }
   return null;
 }
+
+/** Scroll + focus naar het eerste veld met een rhf-error. Aanroepen vanuit
+ *  de submit-error-tak van handleSubmit. Werkt door `name`-attributen die
+ *  rhf zelf op inputs zet via register(). */
+export function focusFirstError<T extends FieldValues>(form: UseFormReturn<T>): void {
+  if (typeof document === 'undefined') return;
+  const errors = form.formState.errors;
+  const firstKey = Object.keys(errors)[0];
+  if (!firstKey) return;
+  // Probeer 't echte input-element via name= attribuut.
+  const el = document.querySelector<HTMLElement>(`[name="${firstKey}"]`);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Iets later focussen zodat de scroll niet door focus geinterrupteerd wordt.
+    setTimeout(() => {
+      try { el.focus({ preventScroll: true }); } catch { /* noop */ }
+    }, 200);
+  }
+}
+
+/** Vriendelijke samenvatting voor een error-banner — niet rauwe Zod-zinnen.
+ *  Gebruik in <MotionShake> bovenaan de form bij submit-fail. */
+export function summaryError<T extends FieldValues>(form: UseFormReturn<T>): string | null {
+  const errors = form.formState.errors;
+  const count = Object.keys(errors).length;
+  if (count === 0) return null;
+  if (count === 1) return firstErrorMessage(form) || 'Eén veld klopt nog niet.';
+  return 'Een paar velden zijn nog niet ingevuld of niet correct.';
+}

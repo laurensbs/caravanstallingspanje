@@ -370,6 +370,70 @@ export const STRINGS = {
   'home.svc-service-price': { nl: 'op aanvraag', en: 'on request' },
   'home.svc-cta-order': { nl: 'Bestellen', en: 'Order' },
 
+  // Extra dienst-cards op homepage (stalling/reparatie/inspectie).
+  'home.svc-storage-tag': { nl: 'Binnen of buiten', en: 'Indoor or outdoor' },
+  'home.svc-storage-title': { nl: 'Stalling', en: 'Storage' },
+  'home.svc-storage-desc': {
+    nl: '24/7 beveiligd terrein, alarm, verzekering inbegrepen — overdekt of buitenplek.',
+    en: '24/7 secured site, alarm, insurance included — covered or outside spot.',
+  },
+  'home.svc-storage-price': { nl: 'op aanvraag', en: 'on request' },
+
+  'home.svc-repair-tag': { nl: 'Eigen werkplaats', en: 'On-site workshop' },
+  'home.svc-repair-title': { nl: 'Reparatie', en: 'Repair' },
+  'home.svc-repair-desc': {
+    nl: 'Schade, beading, onderdelen — onze monteurs lossen het ter plaatse op.',
+    en: 'Damage, beading, parts — our mechanics fix it on the spot.',
+  },
+  'home.svc-repair-price': { nl: 'op aanvraag', en: 'on request' },
+
+  'home.svc-inspection-tag': { nl: 'Vóór seizoen of na schade', en: 'Pre-season or post-damage' },
+  'home.svc-inspection-title': { nl: 'Inspectie', en: 'Inspection' },
+  'home.svc-inspection-desc': {
+    nl: 'Technische keuring met rapport — handig voor verkoop, verzekering of zekerheid.',
+    en: 'Technical inspection with report — for sale, insurance or peace of mind.',
+  },
+  'home.svc-inspection-price': { nl: 'op aanvraag', en: 'on request' },
+
+  'home.svc-cta-info': { nl: 'Meer weten', en: 'Learn more' },
+  'home.section-services': { nl: 'Wat kunnen we voor je doen?', en: 'What we can do for you' },
+  'home.section-services-intro': {
+    nl: 'Alles op één plek — direct online boeken of even een bericht sturen voor een offerte.',
+    en: 'Everything in one place — book online or send a message for a quote.',
+  },
+
+  // Service-info shared (gebruikt op /diensten/{reparatie,inspectie,stalling})
+  'service-info.cta-title': { nl: 'Vraag een offerte aan', en: 'Get a quote' },
+  'service-info.cta-body': {
+    nl: 'Stuur ons je situatie en we koppelen binnen één werkdag terug. Bellen mag ook — we spreken Nederlands.',
+    en: 'Send us your situation and we get back within one business day. Calling works too — we speak English and Dutch.',
+  },
+  'service-info.cta-form': { nl: 'Stuur een bericht', en: 'Send a message' },
+
+  // Reparatie info
+  'repair-info.eyebrow': { nl: 'Eigen werkplaats', en: 'On-site workshop' },
+  'repair-info.bullet-1': { nl: 'Carrosserieschade, lekkages, beading en raamreparaties', en: 'Bodywork damage, leaks, beading and window repairs' },
+  'repair-info.bullet-2': { nl: 'Origineel onderdeel of gelijkwaardig — altijd in overleg', en: 'Original part or equivalent — always in consultation' },
+  'repair-info.bullet-3': { nl: 'Foto-rapport vóór en na, transparante factuur', en: 'Photo report before and after, transparent invoice' },
+  'repair-info.bullet-4': { nl: 'Spoedreparatie mogelijk in seizoen', en: 'Emergency repair possible in season' },
+  'repair-info.subject': { nl: 'Reparatie-aanvraag', en: 'Repair request' },
+
+  // Inspectie info
+  'inspection-info.eyebrow': { nl: 'Vóór seizoen of voor verkoop', en: 'Pre-season or for sale' },
+  'inspection-info.bullet-1': { nl: 'Volledige technische keuring met checklist', en: 'Full technical inspection with checklist' },
+  'inspection-info.bullet-2': { nl: 'PDF-rapport met foto\'s — handig voor verzekering of koper', en: 'PDF report with photos — useful for insurance or buyer' },
+  'inspection-info.bullet-3': { nl: 'Adviezen voor onderhoud of reparaties', en: 'Recommendations for maintenance or repairs' },
+  'inspection-info.bullet-4': { nl: 'Optioneel: kentekenkeuring (NL)', en: 'Optional: vehicle test (NL)' },
+  'inspection-info.subject': { nl: 'Inspectie-aanvraag', en: 'Inspection request' },
+
+  // Stalling info
+  'storage-info.eyebrow': { nl: '24/7 beveiligd', en: '24/7 secured' },
+  'storage-info.bullet-1': { nl: 'Camera\'s, alarm en Securitas Direct — verzekering inbegrepen', en: 'Cameras, alarm and Securitas Direct — insurance included' },
+  'storage-info.bullet-2': { nl: 'Overdekt of buitenplek, naar voorkeur', en: 'Covered or outside spot, your choice' },
+  'storage-info.bullet-3': { nl: 'Vast personeel — je weet bij wie je bent', en: 'Fixed staff — you know who you\'re dealing with' },
+  'storage-info.bullet-4': { nl: 'Eigen werkplaats voor onderhoud tijdens stalling', en: 'On-site workshop for maintenance during storage' },
+  'storage-info.subject': { nl: 'Stalling-aanvraag', en: 'Storage request' },
+
   // Reassurance row
   'home.reassure-payment': { nl: 'Beveiligde betaling', en: 'Secure payment' },
   'home.reassure-confirm': { nl: 'Bevestiging in je inbox', en: 'Confirmation in your inbox' },

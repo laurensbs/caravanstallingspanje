@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ArrowRight, Refrigerator, Wind, Truck, Sun, Sparkles, Star, Wrench } from 'lucide-react';
+import { ArrowRight, Refrigerator, Wind, Truck, Sun, Sparkles, Star, Wrench, Warehouse, ClipboardCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useLocale } from '@/components/LocaleProvider';
 import LocaleSwitch from '@/components/LocaleSwitch';
@@ -226,6 +226,39 @@ export default function LandingPage() {
             price={t('home.svc-service-price')}
             cta={t('home.svc-cta-order')}
             delay={0.26}
+            accent="cyan"
+          />
+          <ServiceCard
+            href="/diensten/stalling"
+            icon={Warehouse}
+            tag={t('home.svc-storage-tag')}
+            title={t('home.svc-storage-title')}
+            desc={t('home.svc-storage-desc')}
+            price={t('home.svc-storage-price')}
+            cta={t('home.svc-cta-info')}
+            delay={0.33}
+            accent="amber"
+          />
+          <ServiceCard
+            href="/diensten/reparatie"
+            icon={Wrench}
+            tag={t('home.svc-repair-tag')}
+            title={t('home.svc-repair-title')}
+            desc={t('home.svc-repair-desc')}
+            price={t('home.svc-repair-price')}
+            cta={t('home.svc-cta-info')}
+            delay={0.40}
+            accent="violet"
+          />
+          <ServiceCard
+            href="/diensten/inspectie"
+            icon={ClipboardCheck}
+            tag={t('home.svc-inspection-tag')}
+            title={t('home.svc-inspection-title')}
+            desc={t('home.svc-inspection-desc')}
+            price={t('home.svc-inspection-price')}
+            cta={t('home.svc-cta-info')}
+            delay={0.47}
             accent="cyan"
           />
         </div>

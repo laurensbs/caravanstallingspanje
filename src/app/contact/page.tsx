@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Mail, Send, Loader2, AlertCircle } from 'lucide-react';
 import PublicHero from '@/components/PublicHero';
 import PublicFooter from '@/components/PublicFooter';
@@ -13,13 +14,31 @@ import type { z } from 'zod';
 
 type FormValues = z.input<typeof contactMessageSchema>;
 
+// useSearchParams forceert dynamic-rendering. Wrap in Suspense voor build —
+// Next eist 't expliciet zodat de server de bailout kan plannen.
 export default function ContactPage() {
+  return (
+    <Suspense fallback={null}>
+      <ContactPageInner />
+    </Suspense>
+  );
+}
+
+function ContactPageInner() {
   const { t } = useLocale();
   const [serverError, setServerError] = useState('');
+  const searchParams = useSearchParams();
+  const initialSubject = searchParams.get('subject') ?? '';
 
   const form = useZodForm<FormValues>(contactMessageSchema, {
-    defaultValues: { name: '', email: '', phone: '', subject: '', message: '' },
+    defaultValues: { name: '', email: '', phone: '', subject: initialSubject, message: '' },
   });
+
+  // Sync subject als de query later verandert (back-button etc.).
+  useEffect(() => {
+    if (initialSubject) form.setValue('subject', initialSubject);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialSubject]);
 
   const {
     register,

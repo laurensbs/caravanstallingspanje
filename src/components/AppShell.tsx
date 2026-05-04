@@ -12,6 +12,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import CommandPalette from './CommandPalette';
 import ShortcutsPanel from './admin/ShortcutsPanel';
 import DensityToggle from './admin/DensityToggle';
+import NewOrderNotifier from './admin/NewOrderNotifier';
 
 type CountKey = 'stalling' | 'transport' | 'fridge' | 'contact' | 'ideas' | 'waitlist';
 
@@ -333,6 +334,7 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
       </main>
       <CommandPalette />
       <ShortcutsPanel />
+      <NewOrderNotifier />
     </div>
   );
 }

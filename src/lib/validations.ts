@@ -36,9 +36,9 @@ export const fridgeBookingSchema = z.object({
 
 export const waitlistSchema = z.object({
   device_type: z.enum(['Grote koelkast', 'Tafelmodel koelkast', 'Airco']),
-  name: z.string().min(2, 'Vul je naam in').max(200),
-  email: z.string().email('Vul een geldig e-mailadres in'),
-  phone: z.string().min(5, 'Vul je telefoonnummer in').max(40).optional().or(z.literal('')),
+  name: z.string().min(2, 'Hoe heten we je aanspreken?').max(200),
+  email: z.string().email('Klopt dit e-mailadres?'),
+  phone: z.string().min(5, 'Op welk telefoonnummer kunnen we je bereiken?').max(40).optional().or(z.literal('')),
   camping: z.string().max(200).optional().or(z.literal('')),
   spot_number: z.string().max(50).optional().or(z.literal('')),
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -48,13 +48,13 @@ export const waitlistSchema = z.object({
 
 export const fridgeOrderSchema = z.object({
   device_type: z.enum(['Grote koelkast', 'Tafelmodel koelkast', 'Airco']),
-  name: z.string().min(2, 'Vul je naam in').max(200),
-  email: z.string().email('Vul een geldig e-mailadres in'),
-  phone: z.string().min(5, 'Vul je telefoonnummer in').max(40),
-  address: z.string().min(2, 'Vul je adres in').max(300),
+  name: z.string().min(2, 'Hoe heten we je aanspreken?').max(200),
+  email: z.string().email('Klopt dit e-mailadres?'),
+  phone: z.string().min(5, 'Op welk telefoonnummer kunnen we je bereiken?').max(40),
+  address: z.string().min(2, 'Welk adres gebruiken we voor de factuur?').max(300),
   postal_code: z.string().min(2, 'Vul je postcode in').max(20),
-  city: z.string().min(2, 'Vul je woonplaats in').max(150),
-  country: z.string().min(2, 'Vul je land in').max(80),
+  city: z.string().min(2, 'In welke plaats woon je?').max(150),
+  country: z.string().min(2, 'Welk land?').max(80),
   vat_number: z.string().max(40).optional().or(z.literal('')),
   camping: knownCamping,
   spot_number: z.string().max(50).optional().or(z.literal('')),
@@ -79,17 +79,17 @@ export const fridgeOrderSchema = z.object({
 // pro forma in Holded en kloppen onze boekhouding-exports niet.
 // vat_number is optioneel (particulieren hebben er geen).
 const billingFields = {
-  address: z.string().min(2, 'Vul je adres in').max(300),
+  address: z.string().min(2, 'Welk adres gebruiken we voor de factuur?').max(300),
   postal_code: z.string().min(2, 'Vul je postcode in').max(20),
-  city: z.string().min(2, 'Vul je woonplaats in').max(150),
-  country: z.string().min(2, 'Vul je land in').max(80),
+  city: z.string().min(2, 'In welke plaats woon je?').max(150),
+  country: z.string().min(2, 'Welk land?').max(80),
   vat_number: z.string().max(40).optional().or(z.literal('')),
 };
 
 const contactBase = {
-  name: z.string().min(2, 'Vul je naam in').max(200),
-  email: z.string().email('Vul een geldig e-mailadres in'),
-  phone: z.string().min(5, 'Vul je telefoonnummer in').max(40),
+  name: z.string().min(2, 'Hoe heten we je aanspreken?').max(200),
+  email: z.string().email('Klopt dit e-mailadres?'),
+  phone: z.string().min(5, 'Op welk telefoonnummer kunnen we je bereiken?').max(40),
   ...billingFields,
   registration: z.string().max(40).optional().or(z.literal('')),
   brand: z.string().max(80).optional().or(z.literal('')),
@@ -172,13 +172,13 @@ export const settingsUpdateSchema = z.object({
 
 export const stallingOrderSchema = z.object({
   type: z.enum(['binnen', 'buiten']),
-  name: z.string().min(2, 'Vul je naam in').max(200),
-  email: z.string().email('Vul een geldig e-mailadres in'),
-  phone: z.string().min(5, 'Vul je telefoonnummer in').max(40),
-  address: z.string().min(2, 'Vul je adres in').max(300),
+  name: z.string().min(2, 'Hoe heten we je aanspreken?').max(200),
+  email: z.string().email('Klopt dit e-mailadres?'),
+  phone: z.string().min(5, 'Op welk telefoonnummer kunnen we je bereiken?').max(40),
+  address: z.string().min(2, 'Welk adres gebruiken we voor de factuur?').max(300),
   postal_code: z.string().min(2, 'Vul je postcode in').max(20),
-  city: z.string().min(2, 'Vul je woonplaats in').max(150),
-  country: z.string().min(2, 'Vul je land in').max(80),
+  city: z.string().min(2, 'In welke plaats woon je?').max(150),
+  country: z.string().min(2, 'Welk land?').max(80),
   vat_number: z.string().max(40).optional().or(z.literal('')),
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Datum is verplicht'),
   end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().or(z.literal('')),
@@ -201,8 +201,14 @@ export const holdedInvoiceSchema = z.object({
 export function validateBody<T>(schema: z.ZodSchema<T>, data: unknown): { success: true; data: T } | { success: false; error: string } {
   const result = schema.safeParse(data);
   if (!result.success) {
-    const errors = result.error.issues.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
-    return { success: false, error: errors };
+    // Toon alleen de eerste vriendelijke melding aan de klant — geen rauwe
+    // path:msg-lijst die op de banner als 'name: Vul je naam in, email: ...'
+    // verschijnt. De rhf-resolver toont al per-veld inline-errors; deze
+    // server-respons fungeert als fallback voor klanten zonder JS of
+    // edge-cases waar de client het te laat opvangt.
+    const first = result.error.issues[0];
+    const error = first?.message || 'Sommige velden zijn nog niet ingevuld of niet correct.';
+    return { success: false, error };
   }
   return { success: true, data: result.data };
 }
