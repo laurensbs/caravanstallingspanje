@@ -16,7 +16,7 @@ const SERVICES = [
   { name: 'Service', description: 'Waxen, schoonmaak, ozonbehandeling en meer onderhoudsdiensten.', url: '/diensten/service' },
   { name: 'Inspectie', description: 'Technische keuring met rapport — vóór seizoen of na schade.', url: '/diensten/inspectie' },
   { name: 'Transport', description: 'Heen-en-terug van stalling naar je camping. Wij regelen het.', url: '/diensten/transport' },
-  { name: 'Stalling', description: 'Caravan stallen op ons terrein — binnen overdekt of buiten op plek.', url: '/diensten/stalling' },
+  { name: 'Stalling', description: 'Caravan stallen op ons terrein — binnen of buiten op een vaste plek.', url: '/diensten/stalling' },
   { name: 'Airco huren', description: 'Verkoeling op je staanplaats — bezorgd, geïnstalleerd en weer opgehaald.', url: '/diensten/airco' },
 ];
 

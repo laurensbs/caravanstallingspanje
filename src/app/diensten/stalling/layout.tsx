@@ -5,7 +5,7 @@ import JsonLd from '@/components/JsonLd';
 export const metadata: Metadata = {
   title: 'Stalling — binnen of buiten',
   description:
-    'Caravan stallen aan de Costa Brava — overdekt binnen of buiten op een vaste plek. 24/7 beveiligd, alarm + camera, verzekering inbegrepen.',
+    'Caravan stallen aan de Costa Brava — binnen in de loods of buiten op een vaste plek. 24/7 beveiligd, alarm + camera, verzekering inbegrepen.',
   alternates: alternatesFor('/diensten/stalling'),
 };
 

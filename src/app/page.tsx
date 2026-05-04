@@ -182,16 +182,10 @@ function StorageOverview({ t }: { t: (k: StringKey, ...a: (string | number)[]) =
       featureKeys: ['mk.storage-feat-securitas', 'mk.storage-feat-insurance', 'mk.storage-feat-check'] as StringKey[],
     },
     {
-      titleKey: 'mk.storage-covered-title' as StringKey,
-      descKey: 'mk.storage-covered-desc' as StringKey,
-      featured: true,
-      featureKeys: ['mk.storage-feat-securitas', 'mk.storage-feat-insurance', 'mk.storage-feat-uv', 'mk.storage-feat-tech', 'mk.storage-feat-priority'] as StringKey[],
-    },
-    {
       titleKey: 'mk.storage-indoor-title' as StringKey,
       descKey: 'mk.storage-indoor-desc' as StringKey,
-      featured: false,
-      featureKeys: ['mk.storage-feat-securitas', 'mk.storage-feat-insurance', 'mk.storage-feat-climate', 'mk.storage-feat-staff'] as StringKey[],
+      featured: true,
+      featureKeys: ['mk.storage-feat-securitas', 'mk.storage-feat-insurance', 'mk.storage-feat-climate', 'mk.storage-feat-staff', 'mk.storage-feat-priority'] as StringKey[],
     },
   ];
 
@@ -204,7 +198,7 @@ function StorageOverview({ t }: { t: (k: StringKey, ...a: (string | number)[]) =
           <p className="mt-3">{t('mk.storage-intro')}</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-[820px] mx-auto">
           {tiers.map((tier) => (
             <div
               key={tier.titleKey}
@@ -221,7 +215,7 @@ function StorageOverview({ t }: { t: (k: StringKey, ...a: (string | number)[]) =
                   className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[0.72rem] font-bold uppercase tracking-[0.05em]"
                   style={{ background: 'var(--color-terracotta)', color: '#fff' }}
                 >
-                  {t('mk.storage-covered-badge')}
+                  {t('mk.storage-badge')}
                 </span>
               )}
               <h3

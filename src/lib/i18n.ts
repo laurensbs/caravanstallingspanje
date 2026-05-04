@@ -208,7 +208,7 @@ export const STRINGS = {
   'services.transport-title': { nl: 'Transport', en: 'Transport' },
   'services.transport-desc': { nl: 'Heen-en-terug van stalling naar je camping. Wij regelen het.', en: 'Round-trip from storage to your camping. We handle it.' },
   'services.storage-title': { nl: 'Stalling', en: 'Storage' },
-  'services.storage-desc': { nl: 'Caravan stallen op ons terrein — binnen overdekt of buiten op plek.', en: 'Storage on our grounds — covered indoor or outside in a dedicated spot.' },
+  'services.storage-desc': { nl: 'Caravan stallen op ons terrein — binnen of buiten op een vaste plek.', en: 'Storage on our grounds — indoor or outside on a dedicated spot.' },
   'services.fridge-title': { nl: 'Koelkast huren', en: 'Rent a fridge' },
   'services.fridge-desc': { nl: 'Bezorgd op je staanplaats. Vanaf één week.', en: 'Delivered to your pitch. From one week.' },
   'services.ac-title': { nl: 'Airco huren', en: 'Rent an AC' },
@@ -301,8 +301,8 @@ export const STRINGS = {
   // ─── Stalling page ───────────────────────────────────────
   'storage.heading': { nl: 'Stalling aanvragen', en: 'Request storage' },
   'storage.intro': {
-    nl: 'Caravan stallen op ons terrein aan de Costa Brava — heel jaar vooraf, overdekt of buiten.',
-    en: 'Store your caravan on our grounds on the Costa Brava — full year up-front, covered or outside.',
+    nl: 'Caravan stallen op ons terrein aan de Costa Brava — heel jaar vooraf, binnen of buiten.',
+    en: 'Store your caravan on our grounds on the Costa Brava — full year up-front, indoor or outside.',
   },
   'storage.section-type': { nl: 'Soort stalling', en: 'Type of storage' },
   'storage.indoor': { nl: 'Binnen', en: 'Indoor' },
@@ -450,8 +450,8 @@ export const STRINGS = {
   'home.svc-storage-tag': { nl: 'Binnen of buiten', en: 'Indoor or outdoor' },
   'home.svc-storage-title': { nl: 'Stalling', en: 'Storage' },
   'home.svc-storage-desc': {
-    nl: '24/7 beveiligd terrein, alarm, verzekering inbegrepen — overdekt of buitenplek.',
-    en: '24/7 secured site, alarm, insurance included — covered or outside spot.',
+    nl: '24/7 beveiligd terrein, alarm, verzekering inbegrepen — binnen of buiten op plek.',
+    en: '24/7 secured site, alarm, insurance included — indoor or outside spot.',
   },
   'home.svc-storage-price': { nl: 'op aanvraag', en: 'on request' },
 
@@ -564,7 +564,7 @@ export const STRINGS = {
     en: 'Four core areas, smoothly aligned so you never have to search again.',
   },
   'home2.svc-storage-title': { nl: 'Stalling', en: 'Storage' },
-  'home2.svc-storage-desc': { nl: 'Binnen overdekt of buiten op vaste plek — 24/7 beveiligd.', en: 'Indoor covered or outside on a fixed spot — 24/7 secured.' },
+  'home2.svc-storage-desc': { nl: 'Binnen in de loods of buiten op vaste plek — 24/7 beveiligd.', en: 'Indoor in the hall or outside on a fixed spot — 24/7 secured.' },
   'home2.svc-repair-title': { nl: 'Reparatie & onderhoud', en: 'Repair & maintenance' },
   'home2.svc-repair-desc': { nl: 'Eigen werkplaats, vaste monteurs, transparante factuur.', en: 'On-site workshop, fixed mechanics, transparent invoicing.' },
   'home2.svc-rentals-title': { nl: 'Verhuur', en: 'Rentals' },
@@ -644,7 +644,7 @@ export const STRINGS = {
 
   // Stalling overview (zonder prijzen — gebruiker geeft die niet publiek)
   'mk.storage-eyebrow': { nl: 'Stalling', en: 'Storage' },
-  'mk.storage-h2': { nl: 'Drie manieren om je caravan veilig te stallen', en: 'Three ways to safely store your caravan' },
+  'mk.storage-h2': { nl: 'Twee manieren om je caravan veilig te stallen', en: 'Two ways to safely store your caravan' },
   'mk.storage-intro': {
     nl: 'Inclusief verzekering, tweewekelijkse damage-check en jaarlijkse technische inspectie. Vraag een persoonlijke offerte aan — geen verborgen kosten.',
     en: 'Includes insurance, bi-weekly damage check and annual technical inspection. Request a personal quote — no hidden fees.',
@@ -654,12 +654,7 @@ export const STRINGS = {
     nl: 'Open verharde plek op afgesloten terrein. Voor wie z\'n caravan flink gebruikt en makkelijk wil oppakken.',
     en: 'Open paved spot on secured grounds. For frequent users who want easy access.',
   },
-  'mk.storage-covered-title': { nl: 'Overdekte stalling', en: 'Covered storage' },
-  'mk.storage-covered-desc': {
-    nl: 'Onder eigen dak, beschermd tegen regen, hagel en de Spaanse zon. Beste prijs-kwaliteit voor langere termijn.',
-    en: 'Under our own roof, protected from rain, hail and the Spanish sun. Best value for the long term.',
-  },
-  'mk.storage-covered-badge': { nl: 'Meest gekozen', en: 'Most chosen' },
+  'mk.storage-badge': { nl: 'Meest gekozen', en: 'Most chosen' },
   'mk.storage-indoor-title': { nl: 'Binnenstalling', en: 'Indoor storage' },
   'mk.storage-indoor-desc': {
     nl: 'Volledig in de loods, klimaatstabiel. Voor exclusieve caravans, oldtimers en wie de kleinste schade wil voorkomen.',
@@ -668,8 +663,6 @@ export const STRINGS = {
   'mk.storage-feat-securitas': { nl: 'Securitas + camerabewaking', en: 'Securitas + camera surveillance' },
   'mk.storage-feat-insurance': { nl: 'Verzekering inbegrepen', en: 'Insurance included' },
   'mk.storage-feat-check': { nl: '2-wekelijkse schadecontrole', en: 'Bi-weekly damage check' },
-  'mk.storage-feat-uv': { nl: 'Bescherming tegen UV & weer', en: 'UV & weather protection' },
-  'mk.storage-feat-tech': { nl: 'Jaarlijkse technische check', en: 'Annual technical check' },
   'mk.storage-feat-priority': { nl: 'Voorrang bij vakantieservice', en: 'Priority for holiday service' },
   'mk.storage-feat-climate': { nl: 'Constante temperatuur', en: 'Constant temperature' },
   'mk.storage-feat-staff': { nl: 'Alleen toegang door personeel', en: 'Staff-only access' },
@@ -811,8 +804,8 @@ export const STRINGS = {
   },
   'mk.faq-q5': { nl: 'Stallen jullie ook campers?', en: 'Do you also store motorhomes?' },
   'mk.faq-a5': {
-    nl: 'Ja. Voor campers gelden dezelfde mogelijkheden als voor caravans: binnen, overdekt of buiten op afgesloten terrein. Boten stallen we niet — we richten ons volledig op caravans en campers.',
-    en: 'Yes. The same options apply to motorhomes as to caravans: indoor, covered or outdoors on a fenced site. We don\'t store boats — we focus exclusively on caravans and motorhomes.',
+    nl: 'Ja. Voor campers gelden dezelfde mogelijkheden als voor caravans: binnen in de loods of buiten op afgesloten terrein. Boten stallen we niet — we richten ons volledig op caravans en campers.',
+    en: 'Yes. The same options apply to motorhomes as to caravans: indoor in the hall or outdoors on a fenced site. We don\'t store boats — we focus exclusively on caravans and motorhomes.',
   },
 
   // CTA-strip
