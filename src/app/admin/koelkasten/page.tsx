@@ -16,7 +16,7 @@ import PageHeader from '@/components/admin/PageHeader';
 import CustomerPicker, { type CustomerLite } from '@/components/CustomerPicker';
 import NewCustomerDialog from '@/components/NewCustomerDialog';
 import CampingPicker from '@/components/CampingPicker';
-import { calculatePriceWith, MIN_DAYS, type DeviceType } from '@/lib/pricing';
+import { calculatePriceWith, MIN_DAYS, PRICES, type DeviceType } from '@/lib/pricing';
 
 type Booking = {
   id: number;
@@ -1952,10 +1952,27 @@ function minBookingEndDate(startDate: string): string | undefined {
   return min.toISOString().slice(0, 10);
 }
 
-function priceForDates(deviceType: string | null | undefined, weekPrice: number | null, start: string, end: string) {
-  if (!deviceType || !start || !end || weekPrice == null) return null;
+// Bereken prijs voor een booking-period. Als weekPrice ontbreekt (bv. live
+// prices fetch faalde) valt 'm terug op de hardcoded PRICES-tabel zodat de
+// auto-fill in admin altijd een bedrag levert. Dates worden coerced naar
+// een ISO YYYY-MM-DD string zodat Postgres Date-objecten / timestamps met
+// een 'T00:00:00.000Z' suffix gewoon werken.
+function priceForDates(deviceType: string | null | undefined, weekPrice: number | null, start: unknown, end: unknown) {
+  if (!deviceType || !start || !end) return null;
+  const dt = resolveDeviceType(deviceType);
+  // Fallback naar hardcoded PRICES als live-prijs ontbreekt of 0 is.
+  const wp = weekPrice && weekPrice > 0 ? weekPrice : PRICES[dt];
+  if (!wp || wp <= 0) return null;
+  const toIsoDay = (v: unknown): string => {
+    if (typeof v === 'string') return v.slice(0, 10);
+    if (v instanceof Date) return v.toISOString().slice(0, 10);
+    return '';
+  };
+  const startStr = toIsoDay(start);
+  const endStr = toIsoDay(end);
+  if (!startStr || !endStr) return null;
   try {
-    return calculatePriceWith(weekPrice, start, end);
+    return calculatePriceWith(wp, startStr, endStr);
   } catch {
     return null;
   }
