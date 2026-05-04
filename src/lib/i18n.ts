@@ -324,6 +324,58 @@ export const STRINGS = {
   'landing.cta-airco-title': { nl: 'Airco huren', en: 'Rent air-con' },
   'landing.cta-airco-desc': { nl: 'Verkoeling op je staanplaats. Vanaf één week.', en: 'Cooling at your pitch. From one week.' },
 
+  // ─── Homepage hero + CTA ─────────────────────────────────
+  'home.eyebrow': { nl: 'Klaar voor de zomer', en: 'Ready for summer' },
+  'home.h1-line1': { nl: 'Maak het op je staanplaats', en: 'Make your pitch' },
+  'home.h1-line2': { nl: 'meteen comfortabel', en: 'comfortable right away' },
+  'home.intro': {
+    nl: 'Koelkast, airco of transport van/naar de camping — wij regelen het. Direct online bestellen, betalen en wij staan voor je klaar.',
+    en: 'Fridge, AC or transport to and from the campsite — we take care of it. Book online, pay, and we get to work.',
+  },
+  'home.trust-reviews': { nl: '· 25 reviews', en: '· 25 reviews' },
+  'home.trust-experience': { nl: '25 jaar ervaring', en: '25 years experience' },
+  'home.trust-workshop': { nl: 'Eigen werkplaats', en: 'On-site workshop' },
+  'home.trust-aria': { nl: '4.9 sterren op 25 Google reviews', en: '4.9 stars from 25 Google reviews' },
+
+  // Service-cards (homepage)
+  'home.svc-fridge-tag': { nl: 'Vanaf één week', en: 'From one week' },
+  'home.svc-fridge-title': { nl: 'Koelkast huren', en: 'Rent a fridge' },
+  'home.svc-fridge-desc': {
+    nl: 'Bezorgd op je staanplaats — koel bier, verse boodschappen, geen gedoe.',
+    en: 'Delivered to your pitch — cold drinks, fresh groceries, no hassle.',
+  },
+  'home.svc-fridge-price': { nl: 'vanaf {0}/wk', en: 'from {0}/wk' },
+
+  'home.svc-airco-tag': { nl: 'Direct verkoeling', en: 'Instant cooling' },
+  'home.svc-airco-title': { nl: 'Airco huren', en: 'Rent an AC unit' },
+  'home.svc-airco-desc': {
+    nl: 'Verkoeling op je staanplaats — bezorgd, geïnstalleerd en weer opgehaald.',
+    en: 'Cooling on your pitch — delivered, installed and collected.',
+  },
+  'home.svc-airco-price': { nl: '{0}/wk', en: '{0}/wk' },
+
+  'home.svc-transport-tag': { nl: 'Stalling ↔ camping', en: 'Storage ↔ campsite' },
+  'home.svc-transport-title': { nl: 'Transport', en: 'Transport' },
+  'home.svc-transport-desc': {
+    nl: 'Wij brengen je caravan van de stalling naar de camping en weer terug.',
+    en: 'We move your caravan from storage to the campsite and back.',
+  },
+
+  'home.svc-service-tag': { nl: 'Onderhoud & verzorging', en: 'Maintenance & care' },
+  'home.svc-service-title': { nl: 'Service & onderhoud', en: 'Service & maintenance' },
+  'home.svc-service-desc': {
+    nl: 'Waxen, schoonmaak, ozon-behandeling en meer — onze werkplaats pakt het op.',
+    en: 'Waxing, cleaning, ozone treatment and more — our workshop handles it.',
+  },
+  'home.svc-service-price': { nl: 'op aanvraag', en: 'on request' },
+  'home.svc-cta-order': { nl: 'Bestellen', en: 'Order' },
+
+  // Reassurance row
+  'home.reassure-payment': { nl: 'Beveiligde betaling', en: 'Secure payment' },
+  'home.reassure-confirm': { nl: 'Bevestiging in je inbox', en: 'Confirmation in your inbox' },
+  'home.reassure-team': { nl: 'Vast team aan de Costa Brava', en: 'Fixed team on the Costa Brava' },
+  'home.contact-link': { nl: 'Vragen? Stuur ons een bericht →', en: 'Questions? Send us a message →' },
+
   // ─── Footer ──────────────────────────────────────────────
   'footer.tagline': {
     nl: 'Stalling, reparatie, verkoop en verhuur aan de Costa Brava. Familiebedrijf, 24/7 beveiligd, volledig verzekerd.',

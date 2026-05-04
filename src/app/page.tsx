@@ -33,7 +33,7 @@ const FALLBACK: LivePrices = {
 };
 
 export default function LandingPage() {
-  const { locale } = useLocale();
+  const { locale, t } = useLocale();
   const [prices, setPrices] = useState<LivePrices>(FALLBACK);
 
   useEffect(() => {
@@ -110,21 +110,20 @@ export default function LandingPage() {
               border: '1px solid rgba(255,180,80,0.25)',
             }}
           >
-            <Sun size={12} /> Klaar voor de zomer
+            <Sun size={12} /> {t('home.eyebrow')}
           </div>
           <h1
             className="text-[30px] sm:text-[44px] leading-[1.1] font-semibold tracking-tight"
             style={{ color: '#FFFFFF' }}
           >
-            Maak het op je staanplaats
-            <br className="hidden sm:block" /> meteen comfortabel
+            {t('home.h1-line1')}
+            <br className="hidden sm:block" /> {t('home.h1-line2')}
           </h1>
           <p
             className="mt-4 leading-relaxed max-w-lg mx-auto text-[15px] sm:text-[17px]"
             style={{ color: 'rgba(241,245,249,0.72)' }}
           >
-            Koelkast, airco of transport van/naar de camping — wij regelen het.
-            Direct online bestellen, betalen en wij staan voor je klaar.
+            {t('home.intro')}
           </p>
 
           {/* Trust-triplet — geïntegreerd onder de hero-CTA. Behoudt de
@@ -146,7 +145,7 @@ export default function LandingPage() {
                 border: '1px solid rgba(255,255,255,0.10)',
                 color: '#F1F5F9',
               }}
-              aria-label="4.9 sterren op 25 Google reviews"
+              aria-label={t('home.trust-aria')}
             >
               <span aria-hidden className="flex items-center gap-0.5">
                 {[0, 1, 2, 3, 4].map((i) => (
@@ -155,7 +154,7 @@ export default function LandingPage() {
               </span>
               <span className="text-[11px] font-medium tabular-nums">4.9</span>
               <span className="text-[11px]" style={{ color: 'rgba(241,245,249,0.6)' }}>
-                · 25 reviews
+                {t('home.trust-reviews')}
               </span>
             </a>
             <span
@@ -167,7 +166,7 @@ export default function LandingPage() {
               }}
             >
               <Sparkles size={11} aria-hidden style={{ color: 'var(--color-amber)' }} />
-              25 jaar ervaring
+              {t('home.trust-experience')}
             </span>
             <span
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium"
@@ -178,7 +177,7 @@ export default function LandingPage() {
               }}
             >
               <Wrench size={11} aria-hidden style={{ color: 'rgba(241,245,249,0.7)' }} />
-              Eigen werkplaats
+              {t('home.trust-workshop')}
             </span>
           </motion.div>
         </motion.div>
@@ -188,40 +187,44 @@ export default function LandingPage() {
           <ServiceCard
             href="/koelkast"
             icon={Refrigerator}
-            tag="Vanaf één week"
-            title="Koelkast huren"
-            desc="Bezorgd op je staanplaats — koel bier, verse boodschappen, geen gedoe."
-            price={`vanaf ${fmt(prices.fridgeTable)}/wk`}
+            tag={t('home.svc-fridge-tag')}
+            title={t('home.svc-fridge-title')}
+            desc={t('home.svc-fridge-desc')}
+            price={t('home.svc-fridge-price', fmt(prices.fridgeTable))}
+            cta={t('home.svc-cta-order')}
             delay={0.05}
             accent="cyan"
           />
           <ServiceCard
             href="/diensten/airco"
             icon={Wind}
-            tag="Direct verkoeling"
-            title="Airco huren"
-            desc="Verkoeling op je staanplaats — bezorgd, geïnstalleerd en weer opgehaald."
-            price={`${fmt(prices.airco)}/wk`}
+            tag={t('home.svc-airco-tag')}
+            title={t('home.svc-airco-title')}
+            desc={t('home.svc-airco-desc')}
+            price={t('home.svc-airco-price', fmt(prices.airco))}
+            cta={t('home.svc-cta-order')}
             delay={0.12}
             accent="amber"
           />
           <ServiceCard
             href="/diensten/transport"
             icon={Truck}
-            tag="Stalling ↔ camping"
-            title="Transport"
-            desc="Wij brengen je caravan van de stalling naar de camping en weer terug."
+            tag={t('home.svc-transport-tag')}
+            title={t('home.svc-transport-title')}
+            desc={t('home.svc-transport-desc')}
             price={`${fmt(prices.transportZelf)} – ${fmt(prices.transportWij)}`}
+            cta={t('home.svc-cta-order')}
             delay={0.19}
             accent="violet"
           />
           <ServiceCard
             href="/diensten/service"
             icon={Sparkles}
-            tag="Onderhoud & verzorging"
-            title="Service & onderhoud"
-            desc="Waxen, schoonmaak, ozon-behandeling en meer — onze werkplaats pakt het op."
-            price="op aanvraag"
+            tag={t('home.svc-service-tag')}
+            title={t('home.svc-service-title')}
+            desc={t('home.svc-service-desc')}
+            price={t('home.svc-service-price')}
+            cta={t('home.svc-cta-order')}
             delay={0.26}
             accent="cyan"
           />
@@ -239,13 +242,13 @@ export default function LandingPage() {
             style={{ color: 'rgba(241,245,249,0.55)' }}
           >
             <span className="inline-flex items-center gap-1.5">
-              <Sparkles size={11} /> Beveiligde betaling
+              <Sparkles size={11} aria-hidden /> {t('home.reassure-payment')}
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <Sparkles size={11} /> Bevestiging in je inbox
+              <Sparkles size={11} aria-hidden /> {t('home.reassure-confirm')}
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <Sparkles size={11} /> Vast team aan de Costa Brava
+              <Sparkles size={11} aria-hidden /> {t('home.reassure-team')}
             </span>
           </div>
           <Link
@@ -253,7 +256,7 @@ export default function LandingPage() {
             className="inline-block mt-6 text-[13px] underline-offset-4 hover:underline transition-colors"
             style={{ color: 'rgba(241,245,249,0.7)' }}
           >
-            Vragen? Stuur ons een bericht →
+            {t('home.contact-link')}
           </Link>
         </motion.div>
       </div>
@@ -262,7 +265,7 @@ export default function LandingPage() {
 }
 
 function ServiceCard({
-  href, icon: Icon, tag, title, desc, price, delay, accent,
+  href, icon: Icon, tag, title, desc, price, cta, delay, accent,
 }: {
   href: string;
   icon: typeof Refrigerator;
@@ -270,6 +273,7 @@ function ServiceCard({
   title: string;
   desc: string;
   price: string;
+  cta: string;
   delay: number;
   accent: 'cyan' | 'amber' | 'violet';
 }) {
@@ -341,7 +345,7 @@ function ServiceCard({
             className="inline-flex items-center gap-1.5 text-[13px] sm:text-[14px] font-medium transition-transform group-hover:translate-x-0.5"
             style={{ color: a.text }}
           >
-            Bestellen <ArrowRight size={15} />
+            {cta} <ArrowRight size={15} aria-hidden />
           </span>
         </div>
       </Link>
