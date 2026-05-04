@@ -164,11 +164,14 @@ function KoelkastenContent() {
   const [savingBooking, setSavingBooking] = useState(false);
 
   const [invoiceDialog, setInvoiceDialog] = useState<{ open: boolean; booking: Booking | null }>({ open: false, booking: null });
-  const [invoiceForm, setInvoiceForm] = useState({ description: '', units: '1', subtotal: '', tax: '21', notes: '' });
+  // BTW voor verhuur van koelkasten/airco's is in Spanje 10% (verlaagd
+  // tarief op kortdurende verhuur van roerende goederen). Niet de 21%
+  // standaard.
+  const [invoiceForm, setInvoiceForm] = useState({ description: '', units: '1', subtotal: '', tax: '10', notes: '' });
   const [creatingInvoice, setCreatingInvoice] = useState(false);
 
   const [payLinkDialog, setPayLinkDialog] = useState<{ open: boolean; booking: Booking | null }>({ open: false, booking: null });
-  const [payLinkForm, setPayLinkForm] = useState({ description: '', amount: '', email: '', tax: '21' });
+  const [payLinkForm, setPayLinkForm] = useState({ description: '', amount: '', email: '', tax: '10' });
   const [sendingPayLink, setSendingPayLink] = useState(false);
 
   const [confirmDelete, setConfirmDelete] = useState<{ type: 'fridge' | 'booking'; id: number } | null>(null);
@@ -419,7 +422,7 @@ function KoelkastenContent() {
       description: bookingDescription(b, drawerFridge.name),
       units: '1',
       subtotal: '',
-      tax: '21',
+      tax: '10',
       notes: '',
     });
     setInvoiceDialog({ open: true, booking: b });
@@ -481,7 +484,7 @@ function KoelkastenContent() {
       description: bookingDescription(b, f.name, dt),
       amount: calc ? calc.total.toFixed(2).replace('.', ',') : '',
       email: f.email || '',
-      tax: '21',
+      tax: '10',
     });
     setPayLinkDialog({ open: true, booking: b });
   };
@@ -523,7 +526,7 @@ function KoelkastenContent() {
           amountEur: amount,
           description: payLinkForm.description,
           email: payLinkForm.email,
-          taxPercent: parseFloat(payLinkForm.tax) || 21,
+          taxPercent: parseFloat(payLinkForm.tax) || 10,
         }),
         credentials: 'include',
       });

@@ -45,7 +45,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
     const amountEur = Number(body.amountEur);
     const description = String(body.description || '').trim();
     const overrideEmail = String(body.email || '').trim();
-    const taxPercent = Number.isFinite(Number(body.taxPercent)) ? Number(body.taxPercent) : 21;
+    // Default 10% — verlaagd Spaans BTW-tarief voor kortdurende verhuur
+    // van koelkasten/airco's. Admin kan overschrijven via taxPercent.
+    const taxPercent = Number.isFinite(Number(body.taxPercent)) ? Number(body.taxPercent) : 10;
 
     if (!Number.isFinite(amountEur) || amountEur <= 0) {
       return NextResponse.json({ error: 'Enter a valid amount' }, { status: 400 });
