@@ -42,16 +42,21 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
     }
 
     const body = await req.json().catch(() => ({}));
-    const amountEur = Number(body.amountEur);
+    const amountEurExVat = Number(body.amountEur);
     const description = String(body.description || '').trim();
     const overrideEmail = String(body.email || '').trim();
     // Default 10% — verlaagd Spaans BTW-tarief voor kortdurende verhuur
     // van koelkasten/airco's. Admin kan overschrijven via taxPercent.
     const taxPercent = Number.isFinite(Number(body.taxPercent)) ? Number(body.taxPercent) : 10;
 
-    if (!Number.isFinite(amountEur) || amountEur <= 0) {
+    if (!Number.isFinite(amountEurExVat) || amountEurExVat <= 0) {
       return NextResponse.json({ error: 'Enter a valid amount' }, { status: 400 });
     }
+    // Het amount-veld in admin is ALTIJD ex BTW (afspraak met opdrachtgever).
+    // Holded pro-forma rekent zelf de BTW erbovenop op basis van `tax`. Stripe
+    // moet daarentegen het inclusief-BTW bedrag innen — dat is wat de klant
+    // op de checkout ziet en uiteindelijk betaalt.
+    const amountEurIncVat = Math.round(amountEurExVat * (1 + taxPercent / 100) * 100) / 100;
     if (!description || description.length < 3) {
       return NextResponse.json({ error: 'Enter a description' }, { status: 400 });
     }
@@ -123,7 +128,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
       const proforma = await createProforma({
         contactId: holdedContact.id,
         desc: description,
-        items: [{ name: description, units: 1, subtotal: amountEur, tax: taxPercent }],
+        // Holded `subtotal` is ex BTW; Holded telt `tax` zelf bovenop.
+        items: [{ name: description, units: 1, subtotal: amountEurExVat, tax: taxPercent }],
       });
       holdedInvoiceId = proforma.id;
       holdedInvoiceNumber = proforma.invoiceNum;
@@ -142,7 +148,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
     const ref = formatRef(refKindForFridge(fridge.device_type), id);
     const session = await createCheckoutSession({
       description,
-      amountEur,
+      // Stripe int wat de klant betaalt → inclusief BTW.
+      amountEur: amountEurIncVat,
       successUrl: `${origin}/koelkast/bedankt?ref=${ref}&session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl: `${origin}/koelkast?cancelled=1`,
       customerEmail,
@@ -156,7 +163,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
       // Zelfde input → zelfde key (true idempotent retry).
       // Andere input → andere key (= nieuwe session).
       idempotencyKey: (() => {
-        const cents = Math.round(amountEur * 100);
+        const cents = Math.round(amountEurIncVat * 100);
         const day = new Date().toISOString().slice(0, 10);
         const fingerprint = createHash('sha1')
           .update(`${description}|${customerEmail}|${taxPercent}`)
@@ -168,7 +175,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
         kind: 'fridge_booking_manual',
         refId: String(id),
         ref,
-        originalAmountCents: String(Math.round(amountEur * 100)),
+        originalAmountCents: String(Math.round(amountEurIncVat * 100)),
         description,
         // Adresvelden → webhook kan ze gebruiken voor de bevestigings-mail /
         // ensureLocalCustomer als de klant nog niet centraal staat.
@@ -186,13 +193,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
       return NextResponse.json({ error: 'Stripe did not return a checkout URL' }, { status: 502 });
     }
 
-    await setBookingPaymentLink(id, session.url, customerEmail, Math.round(amountEur * 100));
+    await setBookingPaymentLink(id, session.url, customerEmail, Math.round(amountEurIncVat * 100));
 
     // ── Mail naar klant ──
     const mail = paymentLinkHtml({
       name: contactInput.name,
       description,
-      amountEur,
+      // Klant ziet en betaalt het inclusief-BTW bedrag.
+      amountEur: amountEurIncVat,
       checkoutUrl: session.url,
       invoiceNumber: holdedInvoiceNumber,
       startDate: booking.start_date,

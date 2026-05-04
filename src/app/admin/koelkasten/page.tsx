@@ -1442,7 +1442,7 @@ function KoelkastenContent() {
                 <Input label="Description" required value={invoiceForm.description} onChange={e => setInvoiceForm({ ...invoiceForm, description: e.target.value })} />
                 <div className="grid grid-cols-3 gap-3">
                   <Input label="Quantity" type="number" min="1" step="1" value={invoiceForm.units} onChange={e => setInvoiceForm({ ...invoiceForm, units: e.target.value })} />
-                  <Input label="Amount (€)" required inputMode="decimal" placeholder="0,00" value={invoiceForm.subtotal} onChange={e => setInvoiceForm({ ...invoiceForm, subtotal: e.target.value })} />
+                  <Input label="Amount ex VAT (€)" required inputMode="decimal" placeholder="0,00" value={invoiceForm.subtotal} onChange={e => setInvoiceForm({ ...invoiceForm, subtotal: e.target.value })} />
                   <Input label="VAT (%)" type="number" min="0" max="100" step="1" value={invoiceForm.tax} onChange={e => setInvoiceForm({ ...invoiceForm, tax: e.target.value })} />
                 </div>
                 <Textarea label="Notes" value={invoiceForm.notes} onChange={e => setInvoiceForm({ ...invoiceForm, notes: e.target.value })} />
@@ -1520,7 +1520,7 @@ function KoelkastenContent() {
                 })()}
                 <div className="grid grid-cols-2 gap-3">
                   <Input
-                    label="Amount (€)"
+                    label="Amount ex VAT (€)"
                     required
                     inputMode="decimal"
                     placeholder="0,00"
@@ -1537,6 +1537,22 @@ function KoelkastenContent() {
                     onChange={e => setPayLinkForm({ ...payLinkForm, tax: e.target.value })}
                   />
                 </div>
+                {/* Toon wat de klant uiteindelijk in Stripe gaat betalen
+                    (incl. BTW) zodat admin zonder rekenwerk weet wat de
+                    payment-link uiteindelijk afrekent. */}
+                {(() => {
+                  const ex = parseFloat(payLinkForm.amount.replace(',', '.'));
+                  const taxPct = parseFloat(payLinkForm.tax) || 0;
+                  if (!Number.isFinite(ex) || ex <= 0) return null;
+                  const inc = Math.round(ex * (1 + taxPct / 100) * 100) / 100;
+                  const vatAmt = Math.round((inc - ex) * 100) / 100;
+                  return (
+                    <p className="text-[12px] text-text-muted -mt-2">
+                      Customer pays <span className="tabular-nums font-medium text-text">€ {inc.toFixed(2)}</span> incl. BTW
+                      {' '}(+ € {vatAmt.toFixed(2)} {taxPct}% VAT)
+                    </p>
+                  );
+                })()}
                 <Input
                   label="Customer email"
                   type="email"
