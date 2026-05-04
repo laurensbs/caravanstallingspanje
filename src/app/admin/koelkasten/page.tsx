@@ -812,6 +812,9 @@ function KoelkastenContent() {
                               const linkSent = !!b.payment_link_sent_at && !holdedPaid;
                               const holdedUrl = live?.publicUrl || b.holded_invoice_url || null;
                               const period = fmtPeriod(b);
+                              // Offline-paid: paid_at gezet door admin, geen Stripe en geen
+                              // Holded — pay-link en pro-forma flow vervalt.
+                              const offlinePaid = !!b.paid_at && !b.stripe_payment_intent_id && !b.holded_invoice_number;
                               return (
                                 <div key={b.id} className="flex items-center gap-2 flex-wrap">
                                   <span
@@ -845,23 +848,32 @@ function KoelkastenContent() {
                                       ) : null;
                                     })()}
                                   </span>
-                                  {/* Stuur-betaallink-knop is altijd zichtbaar — ook bij betaalde
-                                      periodes voor vervolg-/extra-betalingen. Label past zich aan op de status. */}
-                                  <button
-                                    type="button"
-                                    onClick={(e) => { e.stopPropagation(); openPayLink(b, f); }}
-                                    className={`inline-flex items-center gap-1 text-[11px] font-medium px-1.5 py-0.5 rounded border transition-colors ${
-                                      holdedPaid
-                                        ? 'text-text-muted border-border bg-surface hover:text-text hover:border-text-muted'
-                                        : b.payment_link_sent_at
-                                          ? 'text-text-muted border-border bg-surface hover:text-text'
-                                          : 'text-text border-border bg-surface hover:text-accent hover:border-accent'
-                                    }`}
-                                    title={holdedPaid ? 'Send another payment link' : b.payment_link_sent_at ? 'Resend payment link' : 'Send payment link'}
-                                  >
-                                    {b.payment_link_sent_at ? <RefreshCw size={10} /> : <Send size={10} />}
-                                    {holdedPaid ? 'New link' : b.payment_link_sent_at ? 'Resend link' : 'Send payment link'}
-                                  </button>
+                                  {offlinePaid ? (
+                                    <span
+                                      className="inline-flex items-center gap-1 text-[11px] font-medium text-success bg-success-soft border border-success/30 rounded-full px-2 py-0.5"
+                                      title={`Paid offline on ${new Date(b.paid_at!).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`}
+                                    >
+                                      <CheckCircle2 size={10} /> Paid offline
+                                    </span>
+                                  ) : (
+                                    /* Stuur-betaallink-knop — verborgen bij offline-paid
+                                       bookings. Label past zich aan op de status. */
+                                    <button
+                                      type="button"
+                                      onClick={(e) => { e.stopPropagation(); openPayLink(b, f); }}
+                                      className={`inline-flex items-center gap-1 text-[11px] font-medium px-1.5 py-0.5 rounded border transition-colors ${
+                                        holdedPaid
+                                          ? 'text-text-muted border-border bg-surface hover:text-text hover:border-text-muted'
+                                          : b.payment_link_sent_at
+                                            ? 'text-text-muted border-border bg-surface hover:text-text'
+                                            : 'text-text border-border bg-surface hover:text-accent hover:border-accent'
+                                      }`}
+                                      title={holdedPaid ? 'Send another payment link' : b.payment_link_sent_at ? 'Resend payment link' : 'Send payment link'}
+                                    >
+                                      {b.payment_link_sent_at ? <RefreshCw size={10} /> : <Send size={10} />}
+                                      {holdedPaid ? 'New link' : b.payment_link_sent_at ? 'Resend link' : 'Send payment link'}
+                                    </button>
+                                  )}
                                   {(() => {
                                     // Klikbare pro-forma link — gebruik publicUrl als
                                     // 't bestaat, anders direct de Holded admin-URL.
