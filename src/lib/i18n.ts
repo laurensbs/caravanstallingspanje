@@ -70,6 +70,82 @@ export const STRINGS = {
   'ideeen.vote-down': { nl: 'Niet voor mij', en: 'Not for me' },
   'ideeen.vote-thanks': { nl: 'Bedankt voor je stem!', en: 'Thanks for your vote!' },
 
+  // ─── Ideeën pagina makeover ────────────────────────────────
+  'ideas.eyebrow': { nl: 'Ideeënbus', en: 'Ideas inbox' },
+  'ideas.h1': { nl: 'Wat zou jij willen?', en: 'What would you love?' },
+  'ideas.intro': {
+    nl: 'Een nieuwe service, een handigheidje voor de camping, een bundel die we missen — alles is welkom. We lezen elk idee.',
+    en: 'A new service, a clever campsite tweak, a bundle we\'re missing — everything\'s welcome. We read every idea.',
+  },
+  'ideas.live-count': { nl: '{0} ideeën deze maand', en: '{0} ideas this month' },
+  'ideas.live-count-singular': { nl: '{0} idee deze maand', en: '{0} idea this month' },
+
+  // Compose card
+  'ideas.compose-title': { nl: 'Deel je idee', en: 'Share your idea' },
+  'ideas.compose-step-cat': { nl: 'Categorie', en: 'Category' },
+  'ideas.compose-step-cat-hint': {
+    nl: 'Optioneel — helpt ons sneller bij de juiste persoon.',
+    en: 'Optional — helps us route it faster.',
+  },
+  'ideas.compose-step-cat-skip': { nl: 'Geen categorie', en: 'No category' },
+  'ideas.compose-step-idea': { nl: 'Je idee', en: 'Your idea' },
+  'ideas.compose-step-idea-title': { nl: 'In één regel', en: 'In one line' },
+  'ideas.compose-step-idea-title-placeholder': { nl: 'Bv. BBQ-pakket verhuren', en: 'E.g. rent a BBQ kit' },
+  'ideas.compose-step-idea-detail': { nl: 'Uitleg', en: 'Tell us more' },
+  'ideas.compose-step-idea-detail-hint': { nl: 'Wat zou je voor je zien? Hoe zou het werken?', en: 'What does it look like? How would it work?' },
+  'ideas.compose-step-idea-detail-placeholder': {
+    nl: 'Vertel zoveel of zo weinig als je wilt — wij lezen alles.',
+    en: 'Say as much or little as you like — we read everything.',
+  },
+  'ideas.compose-step-you': { nl: 'Wie ben je?', en: 'Who are you?' },
+  'ideas.compose-step-you-hint': { nl: 'Optioneel — alleen voor terugkoppeling.', en: 'Optional — only for follow-up.' },
+  'ideas.compose-name': { nl: 'Naam', en: 'Name' },
+  'ideas.compose-name-placeholder': { nl: 'Bv. Jan', en: 'E.g. Jan' },
+  'ideas.compose-name-hint': { nl: 'Anoniem mag ook.', en: 'Anonymous is fine.' },
+  'ideas.compose-email-placeholder': { nl: 'jij@voorbeeld.nl', en: 'you@example.com' },
+  'ideas.compose-email-hint': { nl: 'Alleen als je een terugkoppeling wilt.', en: 'Only if you want feedback.' },
+  'ideas.compose-submit': { nl: 'Verstuur mijn idee', en: 'Send my idea' },
+  'ideas.compose-submit-busy': { nl: 'Versturen…', en: 'Sending…' },
+  'ideas.compose-disclaimer': {
+    nl: 'Geen verkooppraatjes, geen spam. Echt.',
+    en: 'No sales pitch, no spam. Promise.',
+  },
+
+  // Inspiratie chips
+  'ideas.inspire-title': { nl: 'Even inspireren', en: 'Inspire me' },
+  'ideas.inspire-hint': { nl: 'Klik om als startpunt te gebruiken', en: 'Click to use as starting point' },
+
+  // Categorieën
+  'ideas.cat-service': { nl: 'Nieuwe dienst', en: 'New service' },
+  'ideas.cat-camping': { nl: 'Camping-tip', en: 'Campsite tip' },
+  'ideas.cat-comfort': { nl: 'Comfort', en: 'Comfort' },
+  'ideas.cat-verhuur': { nl: 'Verhuur', en: 'Rental' },
+  'ideas.cat-zomer': { nl: 'Zomer-extra', en: 'Summer extra' },
+  'ideas.cat-klimaat': { nl: 'Klimaat & energie', en: 'Climate & energy' },
+  'ideas.cat-anders': { nl: 'Iets heel anders', en: 'Something else' },
+
+  // Feed
+  'ideas.feed-title': { nl: 'Wij denken aan…', en: 'On our mind…' },
+  'ideas.feed-empty': {
+    nl: 'Geen actuele voorstellen om over te stemmen — wees jij de eerste.',
+    en: 'No live proposals to vote on — be the first.',
+  },
+  'ideas.feed-featured-pill': { nl: 'Stem mee', en: 'Vote now' },
+  'ideas.feed-vote-prompt': { nl: 'Wat vind jij?', en: 'What do you think?' },
+  'ideas.feed-votes-summary': {
+    nl: '{0} stemmen · {1}% positief',
+    en: '{0} votes · {1}% positive',
+  },
+
+  // Done-state
+  'ideas.done-title': { nl: 'Top, dit lezen we!', en: 'Got it — we\'ll read it!' },
+  'ideas.done-body': {
+    nl: 'Bedankt voor het meedenken. Heb je nog een idee?',
+    en: 'Thanks for thinking along. Got another one?',
+  },
+  'ideas.done-another': { nl: 'Nog eentje insturen', en: 'Send another' },
+  'ideas.done-back': { nl: 'Terug naar website', en: 'Back to website' },
+
   // ─── Sold-out (gemeenschappelijk koelkast/airco) ───
   'fridge.sold-out-dates': { nl: 'Op deze data zijn er geen units meer beschikbaar.', en: 'These dates are sold out.' },
   'common.locale-switch': { nl: 'NL', en: 'EN' },

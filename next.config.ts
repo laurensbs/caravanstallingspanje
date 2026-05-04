@@ -12,7 +12,11 @@ const nextConfig: NextConfig = {
   compress: true,
 
   images: {
-    remotePatterns: [],
+    remotePatterns: [
+      // Tijdelijke foto-host voor brand-fotografie van de stalling.
+      // Vervangen wanneer we eigen CDN/Vercel-blob gebruiken.
+      { protocol: 'https', hostname: 'u.cubeupload.com' },
+    ],
     // AVIF + WebP waar mogelijk; ~30% kleiner dan PNG/JPG.
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 60 * 60 * 24 * 60,

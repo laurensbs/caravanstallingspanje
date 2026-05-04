@@ -200,10 +200,11 @@ export default function LandingPage() {
           <div className="hidden lg:block lg:col-span-5">
             <PhotoSlot
               ratio="hero"
-              ariaLabel="Onze stalling op de Costa Brava"
+              src="https://u.cubeupload.com/laurensbos/IMG3797.jpg"
+              alt="Onze caravanstalling aan de Costa Brava"
+              priority
               className="rounded-[var(--radius-2xl)]"
               style={{
-                background: 'rgba(255,255,255,0.04)',
                 border: '1px solid rgba(255,255,255,0.10)',
                 boxShadow: '0 24px 56px -12px rgba(0,0,0,0.5)',
               }}
