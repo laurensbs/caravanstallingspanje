@@ -722,72 +722,84 @@ function KoelkastenContent() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="px-5 py-3.5 hover:bg-surface-2 transition-colors"
+                    className="hover:bg-surface-2 transition-colors"
                   >
-                    <div className="flex items-start gap-4">
-                      <button
-                        type="button"
-                        onClick={() => { setDrawerFridge(f); openEdit(f); }}
-                        className="w-9 h-9 rounded-full bg-surface-2 text-text flex items-center justify-center text-xs font-medium shrink-0 border border-border mt-0.5 hover:border-border-strong"
-                        aria-label="Open customer for editing"
-                        title="Open for editing"
-                      >
-                        {f.name.split(/\s+/).slice(0, 2).map(p => p[0]?.toUpperCase()).join('')}
-                      </button>
-                      <div className="flex-1 min-w-0 space-y-2">
-                        <div className="flex items-start justify-between gap-2 flex-wrap">
-                          <button
-                            type="button"
-                            onClick={() => toggleExpand(f)}
-                            className="flex items-center gap-2 flex-wrap min-w-0 text-left hover:underline underline-offset-2 decoration-text-subtle"
-                            title={expandedId === f.id ? 'Hide details' : 'Show all details'}
-                          >
-                            <motion.span
-                              animate={{ rotate: expandedId === f.id ? 90 : 0 }}
-                              transition={{ duration: 0.2 }}
-                              className="inline-flex"
-                            >
-                              <ChevronRight size={12} className="text-text-subtle" />
-                            </motion.span>
-                            <span className="text-sm font-medium text-text">{f.name}</span>
-                            {f.holded_contact_id && (
-                              <span title="Linked to Holded">
-                                <LinkIcon size={11} className="text-text-subtle" />
-                              </span>
-                            )}
-                            {/* Toon unieke device-types die deze klant heeft —
-                                bv. een klant met zowel een koelkast als airco
-                                ziet beide chips. */}
-                            {(() => {
-                              const types = Array.from(new Set(
-                                (f.bookings || []).map(b => b.device_type || f.device_type || '').filter(Boolean)
-                              ));
-                              if (types.length === 0 && f.device_type) types.push(f.device_type);
-                              return types.map((t) => {
-                                const isAirco = t.toLowerCase().includes('airco');
-                                const Icon = isAirco ? Wind : Refrigerator;
-                                return (
-                                  <span key={t} className="inline-flex items-center gap-1 text-[11px] text-text-muted">
-                                    <Icon size={10} /> {t}
-                                  </span>
-                                );
-                              });
-                            })()}
-                            {f.email && <span className="text-xs text-text-muted">· {f.email}</span>}
-                          </button>
-                          <div className="flex items-center gap-2 shrink-0">
-                            {hasInvoice && <Badge tone="success"><Receipt size={10} /> Pro forma</Badge>}
-                            {hasCheck && <Badge tone="warning"><AlertCircle size={10} /> Review</Badge>}
-                            <button
-                              type="button"
-                              onClick={() => openEdit(f)}
-                              className="text-text-subtle hover:text-text transition-colors"
-                              aria-label="Open details"
-                            >
-                              <ChevronRight size={14} />
-                            </button>
+                    {/* Hele rij is klikbaar — toggelt de inline collapse
+                        eronder. Inner action-knoppen (pay-link, pro-forma,
+                        sales-invoice) gebruiken stopPropagation zodat ze
+                        hun eigen actie houden. */}
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => toggleExpand(f)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          toggleExpand(f);
+                        }
+                      }}
+                      aria-expanded={expandedId === f.id}
+                      aria-label={`${expandedId === f.id ? 'Collapse' : 'Expand'} ${f.name}`}
+                      title={expandedId === f.id ? 'Hide details' : 'Show all details'}
+                      className="px-5 py-3.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 focus-visible:bg-surface-2"
+                    >
+                      <div className="flex items-start gap-4">
+                        <span
+                          aria-hidden
+                          className="w-9 h-9 rounded-full bg-surface-2 text-text flex items-center justify-center text-xs font-medium shrink-0 border border-border mt-0.5"
+                        >
+                          {f.name.split(/\s+/).slice(0, 2).map(p => p[0]?.toUpperCase()).join('')}
+                        </span>
+                        <div className="flex-1 min-w-0 space-y-2">
+                          <div className="flex items-start justify-between gap-2 flex-wrap">
+                            <div className="flex items-center gap-2 flex-wrap min-w-0">
+                              <motion.span
+                                animate={{ rotate: expandedId === f.id ? 90 : 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="inline-flex"
+                                aria-hidden
+                              >
+                                <ChevronRight size={12} className="text-text-subtle" />
+                              </motion.span>
+                              <span className="text-sm font-medium text-text">{f.name}</span>
+                              {f.holded_contact_id && (
+                                <span title="Linked to Holded">
+                                  <LinkIcon size={11} className="text-text-subtle" />
+                                </span>
+                              )}
+                              {/* Toon unieke device-types die deze klant heeft —
+                                  bv. een klant met zowel een koelkast als airco
+                                  ziet beide chips. */}
+                              {(() => {
+                                const types = Array.from(new Set(
+                                  (f.bookings || []).map(b => b.device_type || f.device_type || '').filter(Boolean)
+                                ));
+                                if (types.length === 0 && f.device_type) types.push(f.device_type);
+                                return types.map((t) => {
+                                  const isAirco = t.toLowerCase().includes('airco');
+                                  const Icon = isAirco ? Wind : Refrigerator;
+                                  return (
+                                    <span key={t} className="inline-flex items-center gap-1 text-[11px] text-text-muted">
+                                      <Icon size={10} /> {t}
+                                    </span>
+                                  );
+                                });
+                              })()}
+                              {f.email && <span className="text-xs text-text-muted">· {f.email}</span>}
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              {hasInvoice && <Badge tone="success"><Receipt size={10} /> Pro forma</Badge>}
+                              {hasCheck && <Badge tone="warning"><AlertCircle size={10} /> Review</Badge>}
+                              <motion.span
+                                animate={{ rotate: expandedId === f.id ? 90 : 0 }}
+                                transition={{ duration: 0.2 }}
+                                aria-hidden
+                                className="text-text-subtle"
+                              >
+                                <ChevronRight size={14} />
+                              </motion.span>
+                            </div>
                           </div>
-                        </div>
                         {previewBookings.length === 0 ? (
                           <p className="text-[11px] text-text-subtle italic">No periods yet</p>
                         ) : (
@@ -837,7 +849,7 @@ function KoelkastenContent() {
                                       periodes voor vervolg-/extra-betalingen. Label past zich aan op de status. */}
                                   <button
                                     type="button"
-                                    onClick={() => openPayLink(b, f)}
+                                    onClick={(e) => { e.stopPropagation(); openPayLink(b, f); }}
                                     className={`inline-flex items-center gap-1 text-[11px] font-medium px-1.5 py-0.5 rounded border transition-colors ${
                                       holdedPaid
                                         ? 'text-text-muted border-border bg-surface hover:text-text hover:border-text-muted'
@@ -878,7 +890,7 @@ function KoelkastenContent() {
                                   ) : holdedPaid ? (
                                     <button
                                       type="button"
-                                      onClick={() => toggleSalesInvoice(b.id, true)}
+                                      onClick={(e) => { e.stopPropagation(); toggleSalesInvoice(b.id, true); }}
                                       className="inline-flex items-center gap-1 text-[11px] font-medium text-warning bg-warning-soft border border-warning/30 rounded-full px-2 py-0.5 hover:bg-warning-soft/70 transition-colors"
                                       title="Mark as converted to sales invoice"
                                     >
@@ -891,7 +903,7 @@ function KoelkastenContent() {
                             {extraBookings > 0 && (
                               <button
                                 type="button"
-                                onClick={() => openEdit(f)}
+                                onClick={(e) => { e.stopPropagation(); toggleExpand(f); }}
                                 className="text-[11px] text-text-muted hover:text-text underline-offset-2 hover:underline"
                               >
                                 +{extraBookings} more period{extraBookings === 1 ? '' : 's'}
@@ -899,6 +911,7 @@ function KoelkastenContent() {
                             )}
                           </div>
                         )}
+                        </div>
                       </div>
                     </div>
                     {/* Slide-down customer panel — Holded data + alle periodes
