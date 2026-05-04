@@ -54,7 +54,7 @@ export default function MarketingPage({
   return (
     <div className="mk-page min-h-screen flex flex-col" style={{ background: bg }}>
       <Topbar />
-      <PublicHeader variant="light" />
+      <PublicHeader variant="marketing-cream" />
 
       <main id="main" className="flex-1">
         {hero && <PageHero {...hero} />}

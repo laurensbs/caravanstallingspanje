@@ -102,23 +102,54 @@ export default function PublicHeader({ variant = 'marketing-cream' }: PublicHead
       style={headerStyle}
     >
       <div className="max-w-[1180px] mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
-        {/* Logo */}
+        {/* Logo — terracotta mark + navy serif wordmark op licht;
+            full image-logo met glow op donker. */}
         <Link
           href="/"
           aria-label={t('common.brand')}
           className="flex items-center gap-2.5 shrink-0"
         >
-          <Image
-            src="/images/logo.png"
-            alt="Caravanstalling Spanje"
-            width={420}
-            height={95}
-            priority
-            className="h-9 w-auto"
-            style={{
-              filter: isOverDark ? 'drop-shadow(0 0 14px rgba(255,255,255,0.18))' : 'none',
-            }}
-          />
+          {isOverDark ? (
+            <Image
+              src="/images/logo.png"
+              alt="Caravanstalling Spanje"
+              width={420}
+              height={95}
+              priority
+              className="h-9 w-auto"
+              style={{ filter: 'drop-shadow(0 0 14px rgba(255,255,255,0.18))' }}
+            />
+          ) : (
+            <>
+              <span
+                aria-hidden
+                className="grid place-items-center text-white font-bold"
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 10,
+                  background: 'linear-gradient(135deg, var(--color-terracotta), var(--color-terracotta-deep))',
+                  fontSize: '0.95rem',
+                  letterSpacing: '0.02em',
+                  boxShadow: 'var(--shadow-sm)',
+                }}
+              >
+                CS
+              </span>
+              <span
+                className="font-display"
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontWeight: 700,
+                  fontSize: '1.15rem',
+                  color: 'var(--color-navy)',
+                  letterSpacing: '-0.012em',
+                }}
+              >
+                Caravanstalling Spanje
+              </span>
+            </>
+          )}
         </Link>
 
         {/* Desktop nav */}
