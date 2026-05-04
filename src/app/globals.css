@@ -846,3 +846,63 @@ html[data-density="compact"] .page-admin table tbody tr td {
   font-size: 0.95rem;
   line-height: 1.55;
 }
+
+/* Legal-prose voor cream-canvas (privacy/cookies/verwerkers). */
+.mk-prose-legal {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--color-marketing-ink);
+}
+.mk-prose-legal h2 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-navy);
+  margin-top: 2rem;
+  margin-bottom: 0.6rem;
+  letter-spacing: -0.012em;
+}
+.mk-prose-legal h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-navy);
+  margin-top: 1.5rem;
+  margin-bottom: 0.4rem;
+}
+.mk-prose-legal p {
+  margin-bottom: 1rem;
+  color: var(--color-marketing-ink-soft);
+}
+.mk-prose-legal ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin-bottom: 1rem;
+  color: var(--color-marketing-ink-soft);
+}
+.mk-prose-legal ul li { margin-bottom: 0.35rem; }
+.mk-prose-legal a {
+  color: var(--color-terracotta-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.mk-prose-legal a:hover { text-decoration-thickness: 2px; }
+.mk-prose-legal strong { color: var(--color-navy); font-weight: 600; }
+.mk-prose-legal table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  font-size: 14px;
+}
+.mk-prose-legal th, .mk-prose-legal td {
+  text-align: left;
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--color-marketing-line);
+  vertical-align: top;
+  color: var(--color-marketing-ink);
+}
+.mk-prose-legal th {
+  color: var(--color-navy);
+  font-weight: 700;
+  background: var(--color-sand);
+}

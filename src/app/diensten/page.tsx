@@ -5,8 +5,7 @@ import { motion } from 'framer-motion';
 import {
   Refrigerator, Wind, Warehouse, Truck, Wrench, ClipboardCheck, Sparkles, ArrowRight,
 } from 'lucide-react';
-import PublicHero from '@/components/PublicHero';
-import PublicFooter from '@/components/PublicFooter';
+import MarketingPage from '@/components/marketing/MarketingPage';
 import { useLocale } from '@/components/LocaleProvider';
 import type { StringKey } from '@/lib/i18n';
 
@@ -45,20 +44,15 @@ const ACCENT_FILL: Record<Accent, string> = {
 export default function DienstenIndex() {
   const { t } = useLocale();
   return (
-    <main
-      id="main"
-      className="min-h-screen page-public page-public-dark flex flex-col"
-      style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}
+    <MarketingPage
+      hero={{
+        title: t('services.index-title'),
+        intro: t('services.index-intro'),
+        eyebrow: t('services.eyebrow'),
+        back: { href: '/', label: t('common.brand') },
+      }}
     >
-      <PublicHero
-        back={{ href: '/', label: t('common.brand') }}
-        title={t('services.index-title')}
-        intro={t('services.index-intro')}
-        eyebrow={t('services.eyebrow')}
-        accent="cyan"
-      />
-
-      <section className="flex-1 max-w-6xl w-full mx-auto px-5 sm:px-8 py-10 sm:py-14">
+      <section className="max-w-[1180px] w-full mx-auto px-5 sm:px-8 py-10 sm:py-14">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {SERVICES.map((s, i) => {
             const Icon = s.icon;
@@ -71,36 +65,44 @@ export default function DienstenIndex() {
               >
                 <Link
                   href={s.href}
-                  className="block h-full p-5 sm:p-6 rounded-[var(--radius-2xl)] transition-all hover:-translate-y-0.5 group"
+                  className="group block h-full p-5 sm:p-6 rounded-[var(--radius-2xl)] transition-all hover:-translate-y-0.5"
                   style={{
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    backdropFilter: 'blur(8px)',
-                    WebkitBackdropFilter: 'blur(8px)',
+                    background: '#fff',
+                    border: '1px solid var(--color-marketing-line)',
+                    boxShadow: 'var(--shadow-sm)',
                   }}
                 >
                   <div
                     className="w-11 h-11 rounded-[var(--radius-lg)] flex items-center justify-center mb-4"
                     style={{
-                      background: ACCENT_FILL[s.accent],
-                      border: `1px solid ${ACCENT_RING[s.accent]}`,
-                      color: '#F1F5F9',
+                      background: 'var(--color-sand)',
+                      border: '1px solid var(--color-marketing-line)',
+                      color: 'var(--color-navy)',
                     }}
                   >
-                    <Icon size={20} />
+                    <Icon size={20} aria-hidden />
                   </div>
-                  <h2 className="text-[18px] sm:text-[19px] font-semibold mb-1.5 tracking-tight" style={{ color: '#FFFFFF' }}>
+                  <h2
+                    className="font-display"
+                    style={{
+                      color: 'var(--color-navy)',
+                      fontSize: '1.2rem',
+                      fontWeight: 700,
+                      letterSpacing: '-0.012em',
+                      margin: '0 0 0.4rem',
+                    }}
+                  >
                     {t(s.titleKey)}
                   </h2>
-                  <p className="text-[14px] leading-relaxed mb-5" style={{ color: 'rgba(241,245,249,0.65)' }}>
+                  <p className="text-[14px] leading-relaxed mb-5" style={{ color: 'var(--color-marketing-ink-soft)' }}>
                     {t(s.descKey)}
                   </p>
                   <span
-                    className="inline-flex items-center gap-1.5 text-[13px] font-medium transition-colors"
-                    style={{ color: '#F1F5F9' }}
+                    className="inline-flex items-center gap-1.5 text-[13px] font-semibold transition-transform group-hover:translate-x-0.5"
+                    style={{ color: 'var(--color-terracotta-deep)' }}
                   >
                     {t(s.ctaKey)}
-                    <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+                    <ArrowRight size={14} aria-hidden />
                   </span>
                 </Link>
               </motion.div>
@@ -108,8 +110,6 @@ export default function DienstenIndex() {
           })}
         </div>
       </section>
-
-      <PublicFooter />
-    </main>
+    </MarketingPage>
   );
 }

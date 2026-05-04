@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Loader2, AlertTriangle, Refrigerator, Sparkles } from 'lucide-react';
+import { Check, Loader2, AlertTriangle, Refrigerator } from 'lucide-react';
 import AnimatedServiceIcon from '@/components/AnimatedServiceIcon';
 import { MotionBounce } from '@/components/motion/MotionPrimitives';
 import { calculatePriceWith, PRICES, MIN_DAYS, type DeviceType } from '@/lib/pricing';
@@ -11,7 +11,7 @@ import {
   type ContactState,
 } from '@/components/ServiceForm';
 import CampingPicker from '@/components/CampingPicker';
-import PublicHero from '@/components/PublicHero';
+import MarketingPage from '@/components/marketing/MarketingPage';
 import { useLocale } from '@/components/LocaleProvider';
 import type { StringKey } from '@/lib/i18n';
 import { formatEur as fmtEur } from '@/lib/format';
@@ -174,135 +174,126 @@ export default function KoelkastBestelPagina() {
   // ── Done states ─────────────────────────────────────────
   if (done) {
     return (
-      <main
-        id="main"
-        className="min-h-screen page-public page-public-dark relative overflow-hidden flex items-center justify-center px-6 py-12"
-        style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}
-      >
-        {/* Subtiele celebrate-orbs — niet drukker dan de homepage. */}
-        <div
-          aria-hidden
-          className="cs-orb-amber pointer-events-none absolute -top-32 -right-20 h-[420px] w-[420px] blur-3xl opacity-60"
-          style={{ background: 'var(--gradient-hero-glow-amber)' }}
-        />
-        <div
-          aria-hidden
-          className="cs-orb-cyan pointer-events-none absolute -bottom-32 -left-20 h-[420px] w-[420px] blur-3xl opacity-50"
-          style={{ background: 'var(--gradient-hero-glow-cyan)' }}
-        />
+      <MarketingPage variant="cream">
+        <section className="max-w-md mx-auto text-center px-5 sm:px-6 py-16 sm:py-24">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <MotionBounce className="relative mx-auto mb-7" style={{ width: 72, height: 72 }}>
+              <div
+                aria-hidden
+                className="absolute inset-0 rounded-full blur-xl opacity-50"
+                style={{ background: 'var(--color-terracotta)' }}
+              />
+              <div
+                className="relative w-full h-full rounded-full flex items-center justify-center"
+                style={{
+                  background: '#fff',
+                  border: '1px solid var(--color-terracotta)',
+                  boxShadow: '0 8px 24px rgba(217,110,60,0.25)',
+                }}
+              >
+                <Check size={28} strokeWidth={2.5} style={{ color: 'var(--color-terracotta-deep)' }} aria-hidden />
+              </div>
+            </MotionBounce>
 
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          className="relative max-w-md text-center"
-          style={{ color: '#F1F5F9' }}
-        >
-          {/* Bounce-checkmark met sunset-gradient glow ring */}
-          <MotionBounce className="relative mx-auto mb-7" style={{ width: 72, height: 72 }}>
-            <div
-              aria-hidden
-              className="absolute inset-0 rounded-full blur-xl opacity-60"
-              style={{ background: 'var(--gradient-sunset)' }}
-            />
-            <div
-              className="relative w-full h-full rounded-full flex items-center justify-center"
+            <h1
+              className="font-display"
               style={{
-                background: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(242,169,59,0.5)',
-                boxShadow: '0 0 0 1px rgba(242,169,59,0.18) inset',
+                fontSize: 'clamp(1.75rem, 2vw + 0.75rem, 2.25rem)',
+                letterSpacing: '-0.012em',
+                lineHeight: 1.15,
+                color: 'var(--color-navy)',
+                fontWeight: 700,
+                margin: '0 0 0.6rem',
               }}
             >
-              <Check size={28} strokeWidth={2.5} style={{ color: 'var(--color-amber-bright)' }} />
-            </div>
-          </MotionBounce>
-
-          {/* Sparkle-iconen die zachtjes faden ná de bounce */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-            aria-hidden
-            className="absolute top-2 left-1/2 -translate-x-32 hidden sm:block"
-          >
-            <Sparkles size={14} style={{ color: 'var(--color-amber-bright)', opacity: 0.7 }} />
+              {t('fridge.confirm-title')}
+            </h1>
+            <p className="leading-relaxed text-[15px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+              {t('fridge.confirm-body', done.days, formatEur(done.total))}
+            </p>
+            <p className="text-[14px] mt-8" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+              {t('common.questions')}{' '}
+              <a
+                href="mailto:info@caravanstalling-spanje.com"
+                className="underline-offset-4 hover:underline"
+                style={{ color: 'var(--color-terracotta-deep)' }}
+              >
+                info@caravanstalling-spanje.com
+              </a>
+            </p>
           </motion.div>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.55, duration: 0.6 }}
-            aria-hidden
-            className="absolute top-8 left-1/2 translate-x-24 hidden sm:block"
-          >
-            <Sparkles size={12} style={{ color: 'var(--color-coral)', opacity: 0.6 }} />
-          </motion.div>
-
-          <h1
-            className="font-semibold tracking-tight mb-3"
-            style={{
-              fontSize: 'clamp(1.75rem, 2vw + 0.75rem, 2.25rem)',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.15,
-              color: '#FFFFFF',
-            }}
-          >
-            {t('fridge.confirm-title')}
-          </h1>
-          <p className="leading-relaxed text-[15px]" style={{ color: 'rgba(251,245,236,0.78)' }}>
-            {t('fridge.confirm-body', done.days, formatEur(done.total))}
-          </p>
-          <p className="text-[14px] mt-8" style={{ color: 'rgba(251,245,236,0.5)' }}>
-            {t('common.questions')}{' '}
-            <a
-              href="mailto:info@caravanstalling-spanje.com"
-              className="underline-offset-4 hover:underline"
-              style={{ color: 'var(--color-amber-bright)' }}
-            >
-              info@caravanstalling-spanje.com
-            </a>
-          </p>
-        </motion.div>
-      </main>
+        </section>
+      </MarketingPage>
     );
   }
 
   if (waitlistDone) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-bg page-public px-6 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="max-w-md text-center"
-        >
-          <div className="w-14 h-14 rounded-full bg-success-soft text-success flex items-center justify-center mx-auto mb-6">
-            <Check size={22} />
-          </div>
-          <h1 className="text-3xl font-semibold tracking-tight mb-3">{t('fridge.waitlist-on-title')}</h1>
-          <p className="text-text-muted leading-relaxed">
-            {t('fridge.waitlist-on-body-one', t(DEVICE_LABEL_LOWER_KEY[form.device_type]))}
-          </p>
-        </motion.div>
-      </main>
+      <MarketingPage variant="cream">
+        <section className="max-w-md mx-auto text-center px-5 sm:px-6 py-16 sm:py-24">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <div
+              className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-6"
+              style={{
+                background: 'var(--color-success-soft)',
+                color: 'var(--color-success)',
+              }}
+            >
+              <Check size={22} aria-hidden />
+            </div>
+            <h1
+              className="font-display"
+              style={{
+                color: 'var(--color-navy)',
+                fontSize: 'clamp(1.75rem, 2vw + 0.75rem, 2.25rem)',
+                fontWeight: 700,
+                letterSpacing: '-0.012em',
+                lineHeight: 1.15,
+                margin: '0 0 0.6rem',
+              }}
+            >
+              {t('fridge.waitlist-on-title')}
+            </h1>
+            <p className="leading-relaxed" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+              {t('fridge.waitlist-on-body-one', t(DEVICE_LABEL_LOWER_KEY[form.device_type]))}
+            </p>
+          </motion.div>
+        </section>
+      </MarketingPage>
     );
   }
 
   // ── Sold-out (full page) ─────────────────────────────────
   if (soldOut) {
     return (
-      <main className="min-h-screen bg-bg page-public">
-        <PublicHero
-          back={{ href: '/diensten', label: t('common.services-link') }}
-          title={t('fridge.sold-out')}
-        />
-        <div className="max-w-md mx-auto px-6 py-10 sm:py-14">
-          <div className="w-12 h-12 rounded-full bg-warning-soft text-warning flex items-center justify-center mb-5">
-            <AlertTriangle size={20} />
+      <MarketingPage
+        variant="cream"
+        hero={{
+          title: t('fridge.sold-out'),
+          back: { href: '/diensten', label: t('common.services-link') },
+        }}
+      >
+        <section className="max-w-md mx-auto px-5 sm:px-6 py-10 sm:py-14">
+          <div
+            className="w-12 h-12 rounded-full flex items-center justify-center mb-5"
+            style={{ background: 'var(--color-warning-soft)', color: 'var(--color-warning)' }}
+          >
+            <AlertTriangle size={20} aria-hidden />
           </div>
-          <p className="text-text-muted leading-relaxed mb-2">
+          <p className="leading-relaxed mb-2" style={{ color: 'var(--color-marketing-ink-soft)' }}>
             {t('fridge.sold-out-body-one', t(DEVICE_PLURAL_KEY[form.device_type]))}
           </p>
-          <p className="text-text-muted leading-relaxed mb-8">{t('fridge.sold-out-help')}</p>
+          <p className="leading-relaxed mb-8" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+            {t('fridge.sold-out-help')}
+          </p>
           <form onSubmit={submitWaitlist} className="space-y-3">
             {error && (
               <div className="rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-[14px]">{error}</div>
@@ -310,22 +301,26 @@ export default function KoelkastBestelPagina() {
             <button
               type="submit"
               disabled={submitting}
-              className="press-spring w-full h-14 rounded-[var(--radius-lg)] bg-accent text-accent-fg font-semibold text-[15px] hover:bg-accent-hover transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2"
+              className="mk-btn-primary w-full justify-center disabled:opacity-50"
+              style={{ height: '3.5rem', padding: '0 1.5rem', width: '100%' }}
             >
-              {submitting ? <Loader2 size={16} className="animate-spin" /> : null}
+              {submitting ? <Loader2 size={16} className="animate-spin" aria-hidden /> : null}
               {submitting ? t('common.busy') : t('fridge.add-to-waitlist')}
             </button>
             <button
               type="button"
               onClick={() => { setSoldOut(false); setError(''); }}
-              className="press-spring w-full h-12 rounded-[var(--radius-md)] border border-border bg-surface hover:border-border-strong text-[14px] font-medium transition-colors"
+              className="mk-btn-secondary w-full justify-center"
+              style={{ width: '100%', padding: '0.7rem 1.2rem', fontSize: '14px' }}
             >
               {t('fridge.adjust-period')}
             </button>
           </form>
-          <p className="text-[12px] text-text-muted mt-6">{t('fridge.privacy-note')}</p>
-        </div>
-      </main>
+          <p className="text-[12px] mt-6" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+            {t('fridge.privacy-note')}
+          </p>
+        </section>
+      </MarketingPage>
     );
   }
 

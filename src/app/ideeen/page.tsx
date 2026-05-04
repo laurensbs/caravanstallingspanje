@@ -4,12 +4,11 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import {
-  Lightbulb, Send, Loader2, Check, ArrowRight, ArrowLeft, Sparkles,
+  Lightbulb, Send, Loader2, Check, ArrowRight, Sparkles,
   Wrench, Tent, Coffee, Bike, Sun, Wind, ThumbsUp, ThumbsDown, Star,
   AlertCircle, X,
 } from 'lucide-react';
-import PublicFooter from '@/components/PublicFooter';
-import LocaleSwitch from '@/components/LocaleSwitch';
+import MarketingPage from '@/components/marketing/MarketingPage';
 import { Field, fieldCls } from '@/components/ServiceForm';
 import { useLocale } from '@/components/LocaleProvider';
 import { useZodForm, focusFirstError, summaryError } from '@/lib/forms';
@@ -99,37 +98,8 @@ export default function IdeeenPage() {
   const activeSuggestions = category && SUGGESTIONS[category] ? SUGGESTIONS[category] : [];
 
   return (
-    <main id="main" className="min-h-screen flex flex-col" style={{ background: 'var(--color-bg)' }}>
-      {/* HERO — alleen dit deel is donker. Twee subtiele orbs (geen lavender-pulse meer). */}
-      <header
-        className="page-public-dark relative overflow-hidden"
-        style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}
-      >
-        <div
-          aria-hidden
-          className="cs-orb-amber pointer-events-none absolute -top-24 -right-24 h-[480px] w-[480px] blur-3xl opacity-60"
-          style={{ background: 'var(--gradient-hero-glow-amber)' }}
-        />
-        <div
-          aria-hidden
-          className="cs-orb-cyan pointer-events-none absolute top-32 -left-32 h-[420px] w-[420px] blur-3xl opacity-50"
-          style={{ background: 'var(--gradient-hero-glow-cyan)' }}
-        />
-
-        {/* Top bar — minimaal, geen logo (header heeft 'm prominenter). */}
-        <div className="relative max-w-6xl mx-auto w-full px-5 sm:px-8 pt-5 sm:pt-7 flex items-center justify-between">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-[13px] transition-opacity hover:opacity-100"
-            style={{ color: 'rgba(241,245,249,0.6)' }}
-          >
-            <ArrowLeft size={14} aria-hidden /> {t('common.brand')}
-          </Link>
-          <LocaleSwitch />
-        </div>
-
-        <IdeasHero />
-      </header>
+    <MarketingPage variant="cream">
+      <IdeasHero />
 
       {/* CONTENT — wit canvas, premium rust. Compose links + feed rechts. */}
       <section
@@ -403,9 +373,7 @@ export default function IdeeenPage() {
           </div>
         </div>
       </section>
-
-      <PublicFooter />
-    </main>
+    </MarketingPage>
   );
 }
 
@@ -428,61 +396,60 @@ function IdeasHero() {
   }, []);
 
   return (
-    <header className="relative max-w-6xl w-full mx-auto px-5 sm:px-8 pt-10 sm:pt-16 pb-8 sm:pb-12">
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="relative grid grid-cols-1 lg:grid-cols-12 gap-6 items-end"
-      >
-        <div className="lg:col-span-8">
-          {/* Eyebrow — sunset pill */}
-          <div className="cs-brand-eyebrow mb-4">
-            <Lightbulb size={12} aria-hidden /> {t('ideas.eyebrow')}
-          </div>
+    <header
+      className="relative border-b"
+      style={{
+        background: 'linear-gradient(180deg, #fff 0%, var(--color-marketing-cream) 100%)',
+        borderColor: 'var(--color-marketing-line)',
+      }}
+    >
+      <div className="max-w-[1180px] w-full mx-auto px-5 sm:px-8 pt-10 sm:pt-14 pb-8 sm:pb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="relative grid grid-cols-1 lg:grid-cols-12 gap-6 items-end"
+        >
+          <div className="lg:col-span-8">
+            <span className="mk-eyebrow mb-3 inline-flex items-center gap-1.5">
+              <Lightbulb size={12} aria-hidden /> {t('ideas.eyebrow')}
+            </span>
 
-          <h1
-            className="font-semibold tracking-tight"
-            style={{
-              color: '#FFFFFF',
-              fontSize: 'clamp(2rem, 4vw + 0.75rem, 3.25rem)',
-              lineHeight: 1.08,
-              letterSpacing: '-0.022em',
-            }}
-          >
-            <span
+            <h1
+              className="font-display"
               style={{
-                background: 'linear-gradient(135deg, #FFFFFF 0%, #FBF5EC 50%, #FFC25A 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
+                color: 'var(--color-navy)',
+                fontSize: 'clamp(2rem, 4vw + 0.75rem, 3.25rem)',
+                lineHeight: 1.08,
+                letterSpacing: '-0.012em',
+                fontWeight: 700,
+                margin: '0 0 0.4em',
               }}
             >
               {t('ideas.h1')}
-            </span>
-          </h1>
-          <p className="mt-4 leading-relaxed text-[15px] sm:text-[17px] max-w-xl" style={{ color: 'rgba(251,245,236,0.72)' }}>
-            {t('ideas.intro')}
-          </p>
+            </h1>
+            <p className="mt-2 leading-relaxed text-[15px] sm:text-[17px] max-w-xl" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+              {t('ideas.intro')}
+            </p>
 
-          {count !== null && count > 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.4 }}
-              className="mt-5 inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
-              style={{
-                background: 'rgba(79,168,184,0.10)',
-                border: '1px solid rgba(79,168,184,0.26)',
-              }}
-            >
-              <span aria-hidden className="cs-orb-pulse w-2 h-2 rounded-full" style={{ background: 'var(--color-sea)' }} />
-              <span className="text-[12px] font-medium tabular-nums" style={{ color: 'rgba(180,225,235,0.95)' }}>
-                {t(count === 1 ? 'ideas.live-count-singular' : 'ideas.live-count', count)}
-              </span>
-            </motion.div>
-          )}
-        </div>
+            {count !== null && count > 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.4 }}
+                className="mt-5 inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
+                style={{
+                  background: 'var(--color-terracotta-soft)',
+                  border: '1px solid rgba(217,110,60,0.28)',
+                }}
+              >
+                <span aria-hidden className="cs-orb-pulse w-2 h-2 rounded-full" style={{ background: 'var(--color-terracotta)' }} />
+                <span className="text-[12px] font-medium tabular-nums" style={{ color: 'var(--color-terracotta-deep)' }}>
+                  {t(count === 1 ? 'ideas.live-count-singular' : 'ideas.live-count', count)}
+                </span>
+              </motion.div>
+            )}
+          </div>
 
         {/* Floating glyph — lightbulb in soft glow circle, alleen op lg+ */}
         <div className="hidden lg:flex lg:col-span-4 justify-end">
@@ -496,21 +463,22 @@ function IdeasHero() {
             <div
               aria-hidden
               className="absolute inset-0 rounded-full blur-2xl"
-              style={{ background: 'var(--gradient-sunset)', opacity: 0.45 }}
+              style={{ background: 'var(--color-terracotta)', opacity: 0.18 }}
             />
             <div
               className="cs-orb-pulse relative w-32 h-32 rounded-full flex items-center justify-center"
               style={{
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,194,90,0.30)',
-                boxShadow: '0 0 0 8px rgba(242,169,59,0.06), inset 0 0 32px rgba(242,169,59,0.18)',
+                background: '#fff',
+                border: '1px solid var(--color-terracotta-soft)',
+                boxShadow: '0 0 0 8px rgba(217,110,60,0.06), inset 0 0 32px rgba(217,110,60,0.10)',
               }}
             >
-              <Lightbulb size={48} style={{ color: 'var(--color-amber-bright)' }} />
+              <Lightbulb size={48} style={{ color: 'var(--color-terracotta-deep)' }} />
             </div>
           </motion.div>
         </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </header>
   );
 }

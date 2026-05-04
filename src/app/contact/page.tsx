@@ -3,8 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Mail, Send, Loader2, AlertCircle } from 'lucide-react';
-import PublicHero from '@/components/PublicHero';
-import PublicFooter from '@/components/PublicFooter';
+import MarketingPage from '@/components/marketing/MarketingPage';
 import { Field, fieldCls, Section } from '@/components/ServiceForm';
 import { useLocale } from '@/components/LocaleProvider';
 import { MotionFade } from '@/components/motion/MotionPrimitives';
@@ -70,17 +69,14 @@ function ContactPageInner() {
   };
 
   return (
-    <main
-      id="main"
-      className="min-h-screen page-public page-public-dark flex flex-col"
-      style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}
+    <MarketingPage
+      hero={{
+        title: t('contact.heading'),
+        intro: t('contact.intro'),
+        back: { href: '/', label: t('common.brand') },
+      }}
     >
-      <PublicHero
-        back={{ href: '/', label: t('common.brand') }}
-        title={t('contact.heading')}
-        intro={t('contact.intro')}
-      />
-      <div className="max-w-2xl mx-auto px-5 sm:px-6 py-8 sm:py-14 w-full">
+      <div className="max-w-2xl mx-auto px-5 sm:px-6 py-10 sm:py-14 w-full">
         <MotionFade>
           <form
             onSubmit={handleSubmit(submit, () => {
@@ -185,8 +181,7 @@ function ContactPageInner() {
           </form>
         </MotionFade>
       </div>
-      <PublicFooter />
-    </main>
+    </MarketingPage>
   );
 }
 

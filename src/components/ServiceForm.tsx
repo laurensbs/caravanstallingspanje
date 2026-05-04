@@ -5,11 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Loader2, Lock } from 'lucide-react';
 import InfoBanner from './InfoBanner';
 import CampingPicker from './CampingPicker';
-import PublicHero from './PublicHero';
 import Stepper from './Stepper';
 import SuccessScreen from './SuccessScreen';
 import { useLocale } from './LocaleProvider';
-import PublicFooter from './PublicFooter';
+import MarketingPage from './marketing/MarketingPage';
 import { MotionShake } from './motion/MotionPrimitives';
 
 export type ContactState = {
@@ -210,17 +209,14 @@ export function ServicePageShell({
 
   const E = [0.16, 1, 0.3, 1] as const;
   return (
-    <main
-      id="main"
-      className="min-h-screen page-public page-public-dark flex flex-col"
-      style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}
+    <MarketingPage
+      hero={{
+        title,
+        intro,
+        back: { href: '/', label: t('common.brand') },
+      }}
     >
-      <PublicHero
-        back={{ href: '/', label: t('common.brand') }}
-        title={title}
-        intro={intro}
-      />
-      <div className="flex-1 max-w-2xl w-full mx-auto px-5 sm:px-6 py-8 sm:py-14">
+      <section className="max-w-2xl w-full mx-auto px-5 sm:px-6 py-10 sm:py-14">
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -253,26 +249,26 @@ export function ServicePageShell({
           <button
             type="submit"
             disabled={submitting}
-            className="press-spring w-full h-14 rounded-[var(--radius-lg)] bg-accent text-accent-fg font-semibold text-[15px] hover:bg-accent-hover transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2"
+            className="mk-btn-primary w-full h-14 justify-center text-[15px] disabled:opacity-50"
+            style={{ width: '100%' }}
           >
-            {submitting ? <Loader2 size={18} className="animate-spin" /> : null}
+            {submitting ? <Loader2 size={18} className="animate-spin" aria-hidden /> : null}
             {submitting
               ? (paid ? t('common.forwarding') : t('common.sending'))
               : (paid ? t('common.continue-to-pay') : t('common.send-request'))}
-            {!submitting && <ArrowRight size={17} className="transition-transform" />}
+            {!submitting && <ArrowRight size={17} aria-hidden />}
           </button>
-          <p className="text-[12px] text-text-muted text-center">
+          <p className="text-[12px] text-center" style={{ color: 'var(--color-marketing-ink-soft)' }}>
             {paid ? t('common.stripe-footer-paid') : t('common.email-confirmation-footer')}
           </p>
         </motion.form>
-      </div>
+      </section>
 
       {/* Stripe-redirect overlay: voorkomt 'flash of old form' tussen submit en window.location.href */}
       <AnimatePresence>
         {paid && submitting && <RedirectOverlay />}
       </AnimatePresence>
-      <PublicFooter />
-    </main>
+    </MarketingPage>
   );
 }
 
@@ -343,35 +339,21 @@ export function MultiStepShell({
     if (step === 0 && step1Valid) setStep(1);
   };
 
+  // eyebrowIcon en accent worden niet meer visueel gebruikt op cream-canvas;
+  // we behouden ze als props (geen breaking-change voor callers).
+  void eyebrowIcon;
+  void accent;
+
   return (
-    <main
-      id="main"
-      className="min-h-screen page-public page-public-dark flex flex-col relative overflow-hidden"
-      style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}
+    <MarketingPage
+      hero={{
+        title,
+        intro,
+        eyebrow,
+        back: { href: '/', label: t('common.brand') },
+      }}
     >
-      {/* Subtiele ambient orbs — minder druk dan op homepage zodat
-          formulieren rustig blijven, maar zelfde brand-warmte. */}
-      <div
-        aria-hidden
-        className="cs-orb-cyan pointer-events-none absolute inset-x-0 top-0 h-[420px] blur-3xl opacity-60"
-        style={{ background: 'var(--gradient-hero-glow-cyan)' }}
-      />
-      <div
-        aria-hidden
-        className="cs-orb-amber pointer-events-none absolute -bottom-32 -right-20 h-[420px] w-[420px] blur-3xl opacity-50"
-        style={{ background: 'var(--gradient-hero-glow-amber)' }}
-      />
-      <div className="relative">
-        <PublicHero
-          back={{ href: '/', label: t('common.brand') }}
-          title={title}
-          intro={intro}
-          eyebrow={eyebrow}
-          eyebrowIcon={eyebrowIcon}
-          accent={accent}
-        />
-      </div>
-      <div className="relative flex-1 max-w-2xl w-full mx-auto px-5 sm:px-6 py-8 sm:py-14">
+      <section className="max-w-2xl w-full mx-auto px-5 sm:px-6 py-10 sm:py-14">
         <Stepper current={step} steps={stepLabels} />
 
         <motion.div
@@ -438,9 +420,10 @@ export function MultiStepShell({
               <button
                 type="button"
                 onClick={() => setStep(0)}
-                className="press-spring inline-flex items-center justify-center gap-2 h-12 px-5 rounded-[var(--radius-md)] border border-border bg-surface hover:border-border-strong text-[14px] font-medium transition-colors w-full sm:w-auto"
+                className="mk-btn-secondary w-full sm:w-auto justify-center"
+                style={{ padding: '0.7rem 1.2rem', fontSize: '14px' }}
               >
-                <ArrowLeft size={15} /> {t('common.back')}
+                <ArrowLeft size={15} aria-hidden /> {t('common.back')}
               </button>
             ) : (
               <span aria-hidden className="hidden sm:block" />
@@ -450,35 +433,36 @@ export function MultiStepShell({
                 type="button"
                 disabled={!step1Valid}
                 onClick={goNext}
-                className="press-spring inline-flex items-center justify-center gap-2 h-14 px-6 rounded-[var(--radius-lg)] bg-accent text-accent-fg font-semibold text-[15px] hover:bg-accent-hover transition-colors disabled:opacity-50 w-full sm:w-auto sm:ml-auto"
+                className="mk-btn-primary w-full sm:w-auto sm:ml-auto justify-center disabled:opacity-50"
+                style={{ height: '3.5rem', padding: '0 1.5rem' }}
               >
-                {t('common.next')} <ArrowRight size={17} />
+                {t('common.next')} <ArrowRight size={17} aria-hidden />
               </button>
             ) : (
               <button
                 type="submit"
                 disabled={submitting}
-                className="press-spring inline-flex items-center justify-center gap-2 h-14 px-6 rounded-[var(--radius-lg)] bg-accent text-accent-fg font-semibold text-[15px] hover:bg-accent-hover transition-colors disabled:opacity-50 w-full sm:w-auto sm:ml-auto"
+                className="mk-btn-primary w-full sm:w-auto sm:ml-auto justify-center disabled:opacity-50"
+                style={{ height: '3.5rem', padding: '0 1.5rem' }}
               >
-                {submitting ? <Loader2 size={18} className="animate-spin" /> : null}
+                {submitting ? <Loader2 size={18} className="animate-spin" aria-hidden /> : null}
                 {submitting
                   ? (paid ? t('common.forwarding') : t('common.sending'))
                   : (paid ? t('common.continue-to-pay') : t('common.send-request'))}
-                {!submitting && <ArrowRight size={17} />}
+                {!submitting && <ArrowRight size={17} aria-hidden />}
               </button>
             )}
           </div>
-          <p className="text-[12px] text-text-muted text-center mt-4">
+          <p className="text-[12px] text-center mt-4" style={{ color: 'var(--color-marketing-ink-soft)' }}>
             {step === 1 ? (paid ? t('common.stripe-footer-paid') : t('common.email-confirmation-footer')) : ' '}
           </p>
         </form>
-      </div>
+      </section>
 
       <AnimatePresence>
         {paid && submitting && <RedirectOverlay />}
       </AnimatePresence>
-      <PublicFooter />
-    </main>
+    </MarketingPage>
   );
 }
 
