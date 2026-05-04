@@ -187,9 +187,10 @@ html {
   scrollbar-color: oklch(0.85 0.005 75 / 0.6) transparent;
 }
 
-/* Focus ring */
+/* Focus ring — context-aware via --cs-ring (lichte ring op donker, amber
+   op licht). Outline-offset blijft 2px voor visibility. */
 :focus-visible {
-  outline: 2px solid var(--color-ring);
+  outline: 2px solid var(--cs-ring);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
@@ -244,9 +245,10 @@ html {
   font-weight: 500;
   font-size: 0.875rem;
   border-radius: var(--radius-md);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-  outline: 2px solid var(--color-ring);
+  box-shadow: var(--shadow-popover);
+  outline: 2px solid var(--cs-ring);
   outline-offset: 2px;
+  z-index: var(--z-skip-link);
 }
 
 /* ─── Animations ─────────────────────────────────────────── */
