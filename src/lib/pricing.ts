@@ -66,7 +66,14 @@ export async function calculatePriceWithSettings(deviceType: DeviceType, startDa
 }
 
 function calculatePriceFor(weekPrice: number, startDate: string, endDate: string) {
-  const dayPrice = Math.ceil((weekPrice / 7) * 100) / 100;
+  // Dagprijs als exact 1/7 van de weekprijs — zo komt 14 dagen netjes uit
+  // op 2 × weekprijs (€80 voor Grote koelkast) en 21 dagen op 3 ×
+  // weekprijs. Het displayed dayPrice afronden we wel op centen voor de
+  // breakdown-strip (admin/klant), maar de extraTotal en total worden
+  // berekend op de exacte fractie zodat hele weken nooit een 'paar cent
+  // teveel' krijgen door rounding.
+  const exactDayPrice = weekPrice / 7;
+  const dayPrice = Math.round(exactDayPrice * 100) / 100;
   const ms = new Date(endDate).getTime() - new Date(startDate).getTime();
   const rawDays = Math.round(ms / (1000 * 60 * 60 * 24));
   // Hard-eisen: minimaal 7 dagen huren. Throwen i.p.v. stilletjes oprichten
@@ -76,7 +83,7 @@ function calculatePriceFor(weekPrice: number, startDate: string, endDate: string
   }
   const days = rawDays;
   const extraDays = Math.max(0, days - MIN_DAYS);
-  const extraTotal = Math.round(extraDays * dayPrice * 100) / 100;
+  const extraTotal = Math.round(extraDays * exactDayPrice * 100) / 100;
   const total = Math.round((weekPrice + extraTotal) * 100) / 100;
   return { days, weekPrice, dayPrice, extraDays, extraTotal, total };
 }
