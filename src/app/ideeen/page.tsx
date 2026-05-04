@@ -42,7 +42,7 @@ const SUGGESTIONS: Record<string, string[]> = {
   service: ['Banden-vervanging op locatie', 'Mover-installatie voor caravan', 'Bekleding-reiniging professioneel'],
   camping: ['Vaste partner-kortingen bij Costa-Brava-campings', 'Pakket "stalling + camping-reservering"', 'Welkomstpakket bij aankomst'],
   comfort: ['Verhuur van caravan-voortenten', 'Strandstoelen en parasol-verhuur', 'Buiten-koelkast op zonne-energie'],
-  verhuur: ['E-bikes voor onderweg', 'BBQ + tafel + stoelen pakket', 'SUP-board of kayak voor aan zee'],
+  verhuur: ['Watermachine — altijd koud drinkwater', 'E-bikes voor onderweg', 'BBQ + tafel + stoelen pakket'],
   zomer:   ['Mobiel zonnescherm voor je staanplaats', 'Mini-zwembadje voor de kinderen', 'Ventilator-set met accu'],
   klimaat: ['Zonnepaneel-set voor op je dak', 'Powerbank-station voor langere kampeertrips', 'Waterbespaar-set'],
   anders:  ['Een idee dat hier niet past?'],

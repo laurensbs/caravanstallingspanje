@@ -67,7 +67,7 @@ export const STRINGS = {
     en: 'We read everything and follow up when we get to work on it.',
   },
   'ideeen.vote-up': { nl: 'Goed idee', en: 'Good idea' },
-  'ideeen.vote-down': { nl: 'Niet voor mij', en: 'Not for me' },
+  'ideeen.vote-down': { nl: 'Geen goed idee', en: 'Not a good idea' },
   'ideeen.vote-thanks': { nl: 'Bedankt voor je stem!', en: 'Thanks for your vote!' },
 
   // ─── Ideeën pagina makeover ────────────────────────────────
@@ -624,8 +624,8 @@ export const STRINGS = {
   'mk.hero-h1-accent': { nl: 'stallen', en: 'stored' },
   'mk.hero-h1-suffix': { nl: 'aan de Costa Brava — alsof je caravan thuiskomt.', en: 'on the Costa Brava — as if your caravan came home.' },
   'mk.hero-lead': {
-    nl: 'Binnen- en buitenstalling voor caravan, camper en boot. Standaard verzekerd, 24/7 bewaakt en compleet onderhouden door onze eigen werkplaats. Op 15 minuten van Palamós, op het rustige binnenland van de Costa Brava.',
-    en: 'Indoor and outdoor storage for caravan, motorhome and boat. Standard insurance, 24/7 surveillance and complete maintenance by our own workshop. 15 minutes from Palamós, in the quiet inland of the Costa Brava.',
+    nl: 'Binnen- en buitenstalling voor caravan en camper. Standaard verzekerd, 24/7 bewaakt en compleet onderhouden door onze eigen werkplaats. Op 15 minuten van Palamós, op het rustige binnenland van de Costa Brava.',
+    en: 'Indoor and outdoor storage for caravan and motorhome. Standard insurance, 24/7 surveillance and complete maintenance by our own workshop. 15 minutes from Palamós, in the quiet inland of the Costa Brava.',
   },
   'mk.hero-cta-primary': { nl: 'Bekijk diensten', en: 'View services' },
   'mk.hero-cta-secondary': { nl: 'Vraag offerte aan', en: 'Request a quote' },
@@ -772,8 +772,8 @@ export const STRINGS = {
   'mk.about-eyebrow': { nl: 'Over ons', en: 'About us' },
   'mk.about-h2': { nl: 'Een Nederlands familiebedrijf in het hart van Catalonië', en: 'A Dutch family business in the heart of Catalonia' },
   'mk.about-p1': {
-    nl: 'Sinds 2009 zorgen wij — een Nederlandse familie — voor de caravans, campers en boten van Nederlandse en Belgische gasten. Onze aanpak: persoonlijk, eerlijk, oog voor detail.',
-    en: 'Since 2009, we — a Dutch family — care for the caravans, motorhomes and boats of Dutch and Belgian guests. Our approach: personal, honest, attentive.',
+    nl: 'Sinds 2009 zorgen wij — een Nederlandse familie — voor de caravans en campers van Nederlandse en Belgische gasten. Onze aanpak: persoonlijk, eerlijk, oog voor detail.',
+    en: 'Since 2009, we — a Dutch family — care for the caravans and motorhomes of Dutch and Belgian guests. Our approach: personal, honest, attentive.',
   },
   'mk.about-p2': {
     nl: 'Onze locatie ligt rustig in het binnenland, op 15 minuten van het strand bij Palamós en op een halfuur van Girona. Op het terrein heb je alles bij elkaar: stalling, werkplaats, transport en verkoop.',
@@ -809,10 +809,10 @@ export const STRINGS = {
     nl: 'Ja, dat is precies onze kracht. Spreek af wat er moet gebeuren — banden, remmen, hagelschade, airco — en wij sturen foto\'s van het werk naar je toe. Bij aankomst is alles klaar.',
     en: 'Yes, that\'s our strength. Agree on what needs to happen — tires, brakes, hail damage, AC — and we send photos of the work. By arrival everything is ready.',
   },
-  'mk.faq-q5': { nl: 'Kan ik mijn boot ook stallen?', en: 'Can I store my boat too?' },
+  'mk.faq-q5': { nl: 'Stallen jullie ook campers?', en: 'Do you also store motorhomes?' },
   'mk.faq-a5': {
-    nl: 'Zeker. We hebben overdekte en buitenplaatsen voor boten op trailer. Vraag een specifieke offerte aan met de afmetingen van je boot.',
-    en: 'Of course. We have covered and outdoor spots for boats on trailers. Request a specific quote with the dimensions of your boat.',
+    nl: 'Ja. Voor campers gelden dezelfde mogelijkheden als voor caravans: binnen, overdekt of buiten op afgesloten terrein. Boten stallen we niet — we richten ons volledig op caravans en campers.',
+    en: 'Yes. The same options apply to motorhomes as to caravans: indoor, covered or outdoors on a fenced site. We don\'t store boats — we focus exclusively on caravans and motorhomes.',
   },
 
   // CTA-strip
