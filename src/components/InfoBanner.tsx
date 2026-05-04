@@ -8,17 +8,25 @@ interface InfoBannerProps {
   className?: string;
 }
 
+// Subtiele info-strip op cream-canvas: terracotta-soft fill met
+// accent-bar links — sluit aan bij brand i.p.v. een afwijkende warning-amber.
 export default function InfoBanner({ children, className = '' }: InfoBannerProps) {
   return (
     <div
-      className={`rounded-[var(--radius-lg)] border px-4 py-3 flex gap-3 text-[12px] leading-relaxed ${className}`}
+      className={`relative rounded-[var(--radius-md)] pl-5 pr-4 py-3 flex gap-3 text-[12.5px] leading-relaxed overflow-hidden ${className}`}
       style={{
-        background: 'var(--color-warning-soft)',
-        borderColor: 'color-mix(in oklch, var(--color-warning), transparent 70%)',
-        color: 'var(--color-text)',
+        background: 'var(--color-terracotta-soft)',
+        border: '1px solid rgba(217,110,60,0.22)',
+        color: 'var(--color-marketing-ink)',
       }}
     >
-      <Info size={14} className="shrink-0 mt-0.5" style={{ color: 'var(--color-warning)' }} />
+      {/* Terracotta accent-bar links */}
+      <span
+        aria-hidden
+        className="absolute left-0 top-0 bottom-0 w-[3px]"
+        style={{ background: 'var(--color-terracotta)' }}
+      />
+      <Info size={14} className="shrink-0 mt-0.5" style={{ color: 'var(--color-terracotta-deep)' }} />
       <div className="min-w-0">{children}</div>
     </div>
   );

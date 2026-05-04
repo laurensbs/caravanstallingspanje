@@ -279,47 +279,53 @@ export default function KoelkastBestelPagina() {
         hero={{
           title: t('fridge.sold-out'),
           back: { href: '/diensten', label: t('common.services-link') },
-          icon: Refrigerator,
+          variant: 'compact',
         }}
       >
-        <section className="max-w-md mx-auto px-5 sm:px-6 py-10 sm:py-14">
-          <div
-            className="w-12 h-12 rounded-full flex items-center justify-center mb-5"
-            style={{ background: 'var(--color-warning-soft)', color: 'var(--color-warning)' }}
-          >
-            <AlertTriangle size={20} aria-hidden />
+        <section className="max-w-md mx-auto px-5 sm:px-6 py-8 sm:py-12">
+          <div className="mk-card p-6 sm:p-8 space-y-5">
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center"
+              style={{
+                background: 'var(--color-terracotta-soft)',
+                border: '1px solid rgba(217,110,60,0.22)',
+                color: 'var(--color-terracotta-deep)',
+              }}
+            >
+              <AlertTriangle size={20} aria-hidden />
+            </div>
+            <div className="space-y-2">
+              <p className="leading-relaxed" style={{ color: 'var(--color-marketing-ink)' }}>
+                {t('fridge.sold-out-body-one', t(DEVICE_PLURAL_KEY[form.device_type]))}
+              </p>
+              <p className="leading-relaxed" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+                {t('fridge.sold-out-help')}
+              </p>
+            </div>
+            <form onSubmit={submitWaitlist} className="space-y-3">
+              {error && (
+                <div className="rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-[14px]">{error}</div>
+              )}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="mk-btn-primary w-full justify-center disabled:opacity-50"
+              >
+                {submitting ? <Loader2 size={16} className="animate-spin" aria-hidden /> : null}
+                {submitting ? t('common.busy') : t('fridge.add-to-waitlist')}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setSoldOut(false); setError(''); }}
+                className="mk-btn-secondary w-full justify-center"
+              >
+                {t('fridge.adjust-period')}
+              </button>
+            </form>
+            <p className="text-[12px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+              {t('fridge.privacy-note')}
+            </p>
           </div>
-          <p className="leading-relaxed mb-2" style={{ color: 'var(--color-marketing-ink-soft)' }}>
-            {t('fridge.sold-out-body-one', t(DEVICE_PLURAL_KEY[form.device_type]))}
-          </p>
-          <p className="leading-relaxed mb-8" style={{ color: 'var(--color-marketing-ink-soft)' }}>
-            {t('fridge.sold-out-help')}
-          </p>
-          <form onSubmit={submitWaitlist} className="space-y-3">
-            {error && (
-              <div className="rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-[14px]">{error}</div>
-            )}
-            <button
-              type="submit"
-              disabled={submitting}
-              className="mk-btn-primary w-full justify-center disabled:opacity-50"
-              style={{ height: '3.5rem', padding: '0 1.5rem', width: '100%' }}
-            >
-              {submitting ? <Loader2 size={16} className="animate-spin" aria-hidden /> : null}
-              {submitting ? t('common.busy') : t('fridge.add-to-waitlist')}
-            </button>
-            <button
-              type="button"
-              onClick={() => { setSoldOut(false); setError(''); }}
-              className="mk-btn-secondary w-full justify-center"
-              style={{ width: '100%', padding: '0.7rem 1.2rem', fontSize: '14px' }}
-            >
-              {t('fridge.adjust-period')}
-            </button>
-          </form>
-          <p className="text-[12px] mt-6" style={{ color: 'var(--color-marketing-ink-soft)' }}>
-            {t('fridge.privacy-note')}
-          </p>
         </section>
       </MarketingPage>
     );
@@ -341,28 +347,40 @@ export default function KoelkastBestelPagina() {
                 onClick={() => setForm({ ...form, device_type: type })}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: 'spring', stiffness: 380, damping: 26 }}
-                className={`text-left p-5 rounded-[var(--radius-xl)] border-2 transition-all ${
-                  selected
-                    ? 'border-accent bg-surface shadow-md'
-                    : 'border-border bg-surface hover:border-border-strong'
-                }`}
+                className="mk-card mk-card-hover text-left p-5"
+                style={{
+                  borderColor: selected ? 'var(--color-terracotta)' : undefined,
+                  boxShadow: selected
+                    ? '0 0 0 4px rgba(217,110,60,0.10), 0 1px 2px rgba(20,14,5,0.05), 0 16px 40px -16px rgba(217,110,60,0.18)'
+                    : undefined,
+                }}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-[var(--radius-md)] bg-surface-2 border border-border flex items-center justify-center text-text">
+                    <div className="mk-icon-disc">
                       <AnimatedServiceIcon kind="fridge" size={20} loop />
                     </div>
-                    <span className="text-[15px] font-semibold">{t(DEVICE_LABEL_KEY[type])}</span>
+                    <span className="text-[15px] font-semibold" style={{ color: 'var(--color-marketing-ink)' }}>
+                      {t(DEVICE_LABEL_KEY[type])}
+                    </span>
                   </div>
-                  <div className={`w-5 h-5 rounded-full border-2 transition-colors flex items-center justify-center ${selected ? 'border-accent bg-accent' : 'border-border'}`}>
-                    {selected && <Check size={11} className="text-accent-fg" strokeWidth={3} />}
+                  <div
+                    className="w-5 h-5 rounded-full flex items-center justify-center transition-colors"
+                    style={{
+                      border: `2px solid ${selected ? 'var(--color-terracotta)' : 'var(--color-marketing-line)'}`,
+                      background: selected ? 'var(--color-terracotta)' : 'transparent',
+                    }}
+                  >
+                    {selected && <Check size={11} color="#fff" strokeWidth={3} />}
                   </div>
                 </div>
-                <div className="text-[26px] font-semibold tabular-nums mt-1">
+                <div className="text-[26px] font-semibold tabular-nums mt-1" style={{ color: 'var(--color-marketing-ink)' }}>
                   {formatEur(weekPrice)}
-                  <span className="text-[14px] font-normal text-text-muted"> {t('fridge.per-week')}</span>
+                  <span className="text-[14px] font-normal" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+                    {' '}{t('fridge.per-week')}
+                  </span>
                 </div>
-                <div className="text-[13px] text-text-muted mt-1">
+                <div className="text-[13px] mt-1" style={{ color: 'var(--color-marketing-ink-soft)' }}>
                   {t('fridge.afterwards')} {formatEur(dayPrice)}{t('fridge.per-day')}
                 </div>
               </motion.button>
@@ -394,7 +412,7 @@ export default function KoelkastBestelPagina() {
             />
           </Field>
         </div>
-        <p className="text-[12px] text-text-muted">{t('fridge.minimum-days', MIN_DAYS)}</p>
+        <p className="text-[12px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>{t('fridge.minimum-days', MIN_DAYS)}</p>
       </Section>
 
       <Section title={t('fridge.camping')}>
@@ -428,22 +446,31 @@ export default function KoelkastBestelPagina() {
             transition={{ duration: 0.25 }}
             className="overflow-hidden"
           >
-            <div className="rounded-[var(--radius-xl)] bg-surface-2 border border-border p-5 space-y-2">
+            <div
+              className="rounded-[var(--radius-xl)] p-5 space-y-2"
+              style={{
+                background: 'var(--color-sand)',
+                border: '1px solid var(--color-marketing-line)',
+              }}
+            >
               <div className="flex justify-between text-[14px]">
-                <span className="text-text-muted">{t('fridge.first-week')}</span>
-                <span className="tabular-nums">{formatEur(price.weekPrice)}</span>
+                <span style={{ color: 'var(--color-marketing-ink-soft)' }}>{t('fridge.first-week')}</span>
+                <span className="tabular-nums" style={{ color: 'var(--color-marketing-ink)' }}>{formatEur(price.weekPrice)}</span>
               </div>
               {price.extraDays > 0 && (
                 <div className="flex justify-between text-[14px]">
-                  <span className="text-text-muted">
+                  <span style={{ color: 'var(--color-marketing-ink-soft)' }}>
                     {t(price.extraDays === 1 ? 'fridge.extra-days-one' : 'fridge.extra-days-many', price.extraDays, formatEur(price.dayPrice))}
                   </span>
-                  <span className="tabular-nums">{formatEur(price.extraTotal)}</span>
+                  <span className="tabular-nums" style={{ color: 'var(--color-marketing-ink)' }}>{formatEur(price.extraTotal)}</span>
                 </div>
               )}
-              <div className="flex justify-between pt-3 border-t border-border">
-                <span className="font-semibold">{t('fridge.total-days', price.days)}</span>
-                <span className="font-semibold tabular-nums text-xl">{formatEur(price.total)}</span>
+              <div
+                className="flex justify-between pt-3 border-t"
+                style={{ borderColor: 'var(--color-marketing-line)' }}
+              >
+                <span className="font-semibold" style={{ color: 'var(--color-marketing-ink)' }}>{t('fridge.total-days', price.days)}</span>
+                <span className="font-semibold tabular-nums text-xl" style={{ color: 'var(--color-navy)' }}>{formatEur(price.total)}</span>
               </div>
             </div>
           </motion.div>
@@ -488,9 +515,17 @@ export default function KoelkastBestelPagina() {
 
 function SummaryRow({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
   return (
-    <div className="flex justify-between items-baseline gap-3 py-2 border-b border-border last:border-b-0">
-      <span className="text-[13px] text-text-muted">{label}</span>
-      <span className={`text-[14px] tabular-nums text-right ${bold ? 'font-semibold' : ''}`}>{value}</span>
+    <div
+      className="flex justify-between items-baseline gap-3 py-2.5 border-b last:border-b-0"
+      style={{ borderColor: 'var(--color-marketing-line)' }}
+    >
+      <span className="text-[13px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>{label}</span>
+      <span
+        className={`text-[14px] tabular-nums text-right ${bold ? 'font-semibold' : ''}`}
+        style={{ color: 'var(--color-marketing-ink)' }}
+      >
+        {value}
+      </span>
     </div>
   );
 }

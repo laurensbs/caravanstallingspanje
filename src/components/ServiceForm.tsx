@@ -41,20 +41,33 @@ export const emptyContact: ContactState = {
   locationHint: '',
 };
 
+// Form-input voor marketing/cream-canvas: witte fill, marketing-line border,
+// terracotta focus-ring. Komt op /koelkast, /contact, /ideeen, en in alle
+// MultiStepShell/ServicePageShell forms terecht. Admin-forms gebruiken dit
+// niet (die hebben hun eigen Input component).
 const inputCls =
-  'w-full h-12 px-3.5 text-[15px] bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors placeholder:text-text-subtle';
+  'w-full h-12 px-3.5 text-[15px] bg-white text-[var(--color-marketing-ink)] border border-[var(--color-marketing-line)] rounded-[var(--radius-md)] transition-colors placeholder:opacity-60 focus:outline-none focus:ring-2 focus:border-[color:var(--color-terracotta)] focus:ring-[color:var(--color-terracotta-soft)]';
 
 export const fieldCls = inputCls;
 
 export function Field({ label, required, children, hint }: { label: string; required?: boolean; children: ReactNode; hint?: string }) {
   return (
     <div className="space-y-2">
-      <label className="block text-[13px] font-medium text-text">
+      <label
+        className="block text-[13px] font-medium"
+        style={{ color: 'var(--color-marketing-ink)' }}
+      >
         {label}
-        {required && <span className="text-text-subtle ml-0.5">*</span>}
+        {required && (
+          <span className="ml-0.5" style={{ color: 'var(--color-terracotta)' }}>*</span>
+        )}
       </label>
       {children}
-      {hint && <p className="text-[12px] text-text-subtle">{hint}</p>}
+      {hint && (
+        <p className="text-[12px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+          {hint}
+        </p>
+      )}
     </div>
   );
 }
@@ -62,7 +75,12 @@ export function Field({ label, required, children, hint }: { label: string; requ
 export function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="space-y-4">
-      <h2 className="text-[11px] font-semibold text-text-muted uppercase tracking-[0.18em]">{title}</h2>
+      <h2
+        className="text-[11px] font-semibold uppercase tracking-[0.18em]"
+        style={{ color: 'var(--color-marketing-ink-soft)' }}
+      >
+        {title}
+      </h2>
       {children}
     </section>
   );
@@ -217,27 +235,22 @@ export function ServicePageShell({
         intro,
         back: { href: '/', label: t('common.brand') },
         icon,
+        variant: 'compact',
       }}
     >
-      <section className="max-w-2xl w-full mx-auto px-5 sm:px-6 py-10 sm:py-14">
-        <motion.div
+      <section className="max-w-2xl w-full mx-auto px-5 sm:px-6 py-8 sm:py-12">
+        <motion.form
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: E }}
+          transition={{ duration: 0.45, ease: E }}
+          onSubmit={onSubmit}
+          className="mk-card p-6 sm:p-8 space-y-8"
         >
           <InfoBanner>
             <strong>{t('banner.important')}</strong> {t('banner.match-hint')}
           </InfoBanner>
-        </motion.div>
 
-        <motion.form
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.45, ease: E }}
-          onSubmit={onSubmit}
-          className="mt-8 space-y-9"
-        >
-          {children}
+          <div className="space-y-9">{children}</div>
 
           {error && (
             <motion.div
@@ -249,21 +262,22 @@ export function ServicePageShell({
             </motion.div>
           )}
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="mk-btn-primary w-full h-14 justify-center text-[15px] disabled:opacity-50"
-            style={{ width: '100%' }}
-          >
-            {submitting ? <Loader2 size={18} className="animate-spin" aria-hidden /> : null}
-            {submitting
-              ? (paid ? t('common.forwarding') : t('common.sending'))
-              : (paid ? t('common.continue-to-pay') : t('common.send-request'))}
-            {!submitting && <ArrowRight size={17} aria-hidden />}
-          </button>
-          <p className="text-[12px] text-center" style={{ color: 'var(--color-marketing-ink-soft)' }}>
-            {paid ? t('common.stripe-footer-paid') : t('common.email-confirmation-footer')}
-          </p>
+          <div className="pt-6 border-t" style={{ borderColor: 'var(--color-marketing-line)' }}>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="mk-btn-primary w-full justify-center disabled:opacity-50"
+            >
+              {submitting ? <Loader2 size={18} className="animate-spin" aria-hidden /> : null}
+              {submitting
+                ? (paid ? t('common.forwarding') : t('common.sending'))
+                : (paid ? t('common.continue-to-pay') : t('common.send-request'))}
+              {!submitting && <ArrowRight size={17} aria-hidden />}
+            </button>
+            <p className="text-[12px] text-center mt-3" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+              {paid ? t('common.stripe-footer-paid') : t('common.email-confirmation-footer')}
+            </p>
+          </div>
         </motion.form>
       </section>
 
@@ -357,21 +371,10 @@ export function MultiStepShell({
         eyebrow,
         back: { href: '/', label: t('common.brand') },
         icon,
+        variant: 'compact',
       }}
     >
-      <section className="max-w-2xl w-full mx-auto px-5 sm:px-6 py-10 sm:py-14">
-        <Stepper current={step} steps={stepLabels} />
-
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, ease: E }}
-        >
-          <InfoBanner>
-            <strong>{t('banner.important')}</strong> {t('banner.match-hint')}
-          </InfoBanner>
-        </motion.div>
-
+      <section className="max-w-2xl w-full mx-auto px-5 sm:px-6 py-8 sm:py-12">
         <form
           onSubmit={(e) => {
             // Voorkom dat een per ongeluk-submit (bv. enter in date-input)
@@ -383,8 +386,20 @@ export function MultiStepShell({
             }
             onSubmit(e);
           }}
-          className="mt-8"
+          className="mk-card p-6 sm:p-8"
         >
+          <Stepper current={step} steps={stepLabels} />
+
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: E }}
+            className="mb-7"
+          >
+            <InfoBanner>
+              <strong>{t('banner.important')}</strong> {t('banner.match-hint')}
+            </InfoBanner>
+          </motion.div>
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
@@ -421,13 +436,12 @@ export function MultiStepShell({
             </MotionShake>
           )}
 
-          <div className="mt-10 flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between">
+          <div className="mt-9 pt-6 border-t flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between" style={{ borderColor: 'var(--color-marketing-line)' }}>
             {step === 1 ? (
               <button
                 type="button"
                 onClick={() => setStep(0)}
                 className="mk-btn-secondary w-full sm:w-auto justify-center"
-                style={{ padding: '0.7rem 1.2rem', fontSize: '14px' }}
               >
                 <ArrowLeft size={15} aria-hidden /> {t('common.back')}
               </button>
@@ -440,7 +454,6 @@ export function MultiStepShell({
                 disabled={!step1Valid}
                 onClick={goNext}
                 className="mk-btn-primary w-full sm:w-auto sm:ml-auto justify-center disabled:opacity-50"
-                style={{ height: '3.5rem', padding: '0 1.5rem' }}
               >
                 {t('common.next')} <ArrowRight size={17} aria-hidden />
               </button>
@@ -449,7 +462,6 @@ export function MultiStepShell({
                 type="submit"
                 disabled={submitting}
                 className="mk-btn-primary w-full sm:w-auto sm:ml-auto justify-center disabled:opacity-50"
-                style={{ height: '3.5rem', padding: '0 1.5rem' }}
               >
                 {submitting ? <Loader2 size={18} className="animate-spin" aria-hidden /> : null}
                 {submitting

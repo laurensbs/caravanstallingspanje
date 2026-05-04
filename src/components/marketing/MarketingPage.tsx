@@ -30,6 +30,12 @@ type HeroProps = {
   /** Optioneel sfeer-icoon — verschijnt rechts in een cream-disc met
    *  zachte terracotta-glow. Geeft elke hero een visueel anker. */
   icon?: LucideIcon;
+  /** Hero-stijl. 'rich' (default) = sfeerrijke marketing-hero met
+   *  drie orbs, ribbon en float-disc — voor /diensten, /contact,
+   *  showcase-pagina's. 'compact' = rustige form-hero (één subtiele
+   *  orb, geen disc, kleinere titel) — voor boekflows zoals /koelkast,
+   *  /diensten/airco etc. waar de form-content de focus is. */
+  variant?: 'rich' | 'compact';
 };
 
 interface MarketingPageProps {
@@ -69,10 +75,11 @@ export default function MarketingPage({
   );
 }
 
-function PageHero({ title, intro, eyebrow, eyebrowKey, back, icon: Icon }: HeroProps) {
+function PageHero({ title, intro, eyebrow, eyebrowKey, back, icon: Icon, variant = 'rich' }: HeroProps) {
   const { t } = useLocale();
   const reduceMotion = useReducedMotion();
   const eyebrowText = eyebrowKey ? t(eyebrowKey) : eyebrow;
+  const isCompact = variant === 'compact';
 
   // Stagger zodat eyebrow → title → intro één voor één binnenkomen.
   // Bij reduced-motion zet alles onmiddellijk zichtbaar zonder delay.
@@ -92,38 +99,40 @@ function PageHero({ title, intro, eyebrow, eyebrowKey, back, icon: Icon }: HeroP
         background: 'linear-gradient(180deg, #fff 0%, var(--color-marketing-cream) 100%)',
       }}
     >
-      {/* Drie decoratieve orb-glows voor diepte: terracotta rechtsboven
-          (warmte), navy linksonder (verankering), kleine amber rechts-
-          onder (sfeer-twinkel). */}
+      {/* Compact: één subtiele orb. Rich: drie orbs (terracotta rechts-
+          boven warmte, navy linksonder verankering, amber rechts-onder
+          sfeer-twinkel) plus ribbon-line. */}
       <div
         aria-hidden
-        className="absolute -top-32 -right-32 w-[520px] h-[520px] rounded-full pointer-events-none"
+        className={`absolute -top-32 -right-32 rounded-full pointer-events-none ${isCompact ? 'w-[360px] h-[360px]' : 'w-[520px] h-[520px]'}`}
         style={{
-          background: 'radial-gradient(circle, rgba(217,110,60,0.18) 0%, transparent 60%)',
+          background: `radial-gradient(circle, rgba(217,110,60,${isCompact ? '0.10' : '0.18'}) 0%, transparent 60%)`,
           filter: 'blur(8px)',
         }}
       />
-      <div
-        aria-hidden
-        className="absolute -bottom-28 -left-28 w-[360px] h-[360px] rounded-full pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle, rgba(14,58,85,0.09) 0%, transparent 65%)',
-          filter: 'blur(8px)',
-        }}
-      />
-      <div
-        aria-hidden
-        className="hidden lg:block absolute bottom-12 right-24 w-[160px] h-[160px] rounded-full pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle, rgba(255,180,80,0.18) 0%, transparent 70%)',
-          filter: 'blur(4px)',
-        }}
-      />
+      {!isCompact && (
+        <>
+          <div
+            aria-hidden
+            className="absolute -bottom-28 -left-28 w-[360px] h-[360px] rounded-full pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle, rgba(14,58,85,0.09) 0%, transparent 65%)',
+              filter: 'blur(8px)',
+            }}
+          />
+          <div
+            aria-hidden
+            className="hidden lg:block absolute bottom-12 right-24 w-[160px] h-[160px] rounded-full pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle, rgba(255,180,80,0.18) 0%, transparent 70%)',
+              filter: 'blur(4px)',
+            }}
+          />
+          {Icon && <div aria-hidden className="mk-hero-ribbon hidden lg:block" />}
+        </>
+      )}
 
-      {/* Hero-ribbon — verbindt titel-blok visueel met het sfeer-icoon */}
-      {Icon && <div aria-hidden className="mk-hero-ribbon hidden lg:block" />}
-
-      <div className="relative max-w-[1180px] mx-auto px-5 sm:px-8 py-12 sm:py-20">
+      <div className={`relative max-w-[1180px] mx-auto px-5 sm:px-8 ${isCompact ? 'py-9 sm:py-12' : 'py-12 sm:py-20'}`}>
         {back && (
           <motion.div {...fadeUp(0)} className="mb-7">
             <Link
@@ -171,11 +180,13 @@ function PageHero({ title, intro, eyebrow, eyebrowKey, back, icon: Icon }: HeroP
               className="font-display"
               style={{
                 color: 'var(--color-navy)',
-                fontSize: 'clamp(2.1rem, 4.4vw, 3.4rem)',
+                fontSize: isCompact
+                  ? 'clamp(1.7rem, 3.4vw, 2.4rem)'
+                  : 'clamp(2.1rem, 4.4vw, 3.4rem)',
                 fontWeight: 700,
-                lineHeight: 1.06,
+                lineHeight: 1.08,
                 letterSpacing: '-0.014em',
-                margin: '0 0 0.5em',
+                margin: '0 0 0.4em',
               }}
             >
               {title}
@@ -189,31 +200,32 @@ function PageHero({ title, intro, eyebrow, eyebrowKey, back, icon: Icon }: HeroP
                 {intro}
               </motion.p>
             )}
-            {/* Subtle accent-rule met terracotta gradient. Iets langer
-                dan voorheen + kleine cs-orb-pulse rechts ervan voor
-                "live"-gevoel. */}
+            {/* Subtle accent-rule met terracotta gradient. In rich-mode
+                + tweede pulse-orb voor "live"-gevoel. */}
             <motion.div
               {...fadeUp(0.28)}
               aria-hidden
-              className="mt-8 inline-flex items-center gap-2.5"
+              className={`${isCompact ? 'mt-6' : 'mt-8'} inline-flex items-center gap-2.5`}
             >
               <span
                 className="block h-[2px] rounded-full"
                 style={{
-                  width: 88,
+                  width: isCompact ? 56 : 88,
                   background: 'linear-gradient(90deg, var(--color-terracotta), transparent)',
                 }}
               />
-              <span
-                className="cs-orb-pulse w-1 h-1 rounded-full"
-                style={{ background: 'var(--color-terracotta)', opacity: 0.5 }}
-              />
+              {!isCompact && (
+                <span
+                  className="cs-orb-pulse w-1 h-1 rounded-full"
+                  style={{ background: 'var(--color-terracotta)', opacity: 0.5 }}
+                />
+              )}
             </motion.div>
           </div>
 
           {/* Sfeer-icoon rechts — desktop only, cream-disc met dubbele
-              ring-glow (binnen + buiten) en zachte float-animatie. */}
-          {Icon && (
+              ring-glow + float-animatie. Niet getoond in compact mode. */}
+          {Icon && !isCompact && (
             <motion.div
               initial={reduceMotion ? false : { opacity: 0, scale: 0.85, rotate: -6 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
