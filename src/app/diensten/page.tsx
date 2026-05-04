@@ -30,17 +30,6 @@ const SERVICES: Service[] = [
   { href: '/diensten/inspectie', titleKey: 'services.inspection-title', descKey: 'services.inspection-desc', ctaKey: 'services.cta.inspection', icon: ClipboardCheck,  accent: 'cyan'   },
 ];
 
-const ACCENT_RING: Record<Accent, string> = {
-  cyan: 'rgba(126,168,255,0.35)',
-  amber: 'rgba(255,180,80,0.35)',
-  violet: 'rgba(180,140,255,0.35)',
-};
-const ACCENT_FILL: Record<Accent, string> = {
-  cyan: 'rgba(126,168,255,0.12)',
-  amber: 'rgba(255,180,80,0.12)',
-  violet: 'rgba(180,140,255,0.12)',
-};
-
 export default function DienstenIndex() {
   const { t } = useLocale();
   return (
@@ -54,52 +43,43 @@ export default function DienstenIndex() {
       }}
     >
       <section className="max-w-[1180px] w-full mx-auto px-5 sm:px-8 py-10 sm:py-14">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
           {SERVICES.map((s, i) => {
             const Icon = s.icon;
+            const num = String(i + 1).padStart(2, '0');
             return (
               <motion.div
                 key={s.href}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ delay: i * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               >
                 <Link
                   href={s.href}
-                  className="group block h-full p-5 sm:p-6 rounded-[var(--radius-2xl)] transition-all hover:-translate-y-0.5"
-                  style={{
-                    background: '#fff',
-                    border: '1px solid var(--color-marketing-line)',
-                    boxShadow: 'var(--shadow-sm)',
-                  }}
+                  className="mk-card mk-card-hover group block h-full p-6 sm:p-7"
                 >
-                  <div
-                    className="w-11 h-11 rounded-[var(--radius-lg)] flex items-center justify-center mb-4"
-                    style={{
-                      background: 'var(--color-sand)',
-                      border: '1px solid var(--color-marketing-line)',
-                      color: 'var(--color-navy)',
-                    }}
-                  >
-                    <Icon size={20} aria-hidden />
+                  <span aria-hidden className="mk-card-num">{num} / {String(SERVICES.length).padStart(2, '0')}</span>
+                  <div className="mk-icon-disc mk-icon-disc-lg mb-5">
+                    <Icon size={24} strokeWidth={1.7} aria-hidden />
                   </div>
                   <h2
                     className="font-display"
                     style={{
                       color: 'var(--color-navy)',
-                      fontSize: '1.2rem',
+                      fontSize: '1.25rem',
                       fontWeight: 700,
                       letterSpacing: '-0.012em',
-                      margin: '0 0 0.4rem',
+                      margin: '0 0 0.45rem',
                     }}
                   >
                     {t(s.titleKey)}
                   </h2>
-                  <p className="text-[14px] leading-relaxed mb-5" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+                  <p className="text-[14px] leading-relaxed mb-6" style={{ color: 'var(--color-marketing-ink-soft)' }}>
                     {t(s.descKey)}
                   </p>
                   <span
-                    className="inline-flex items-center gap-1.5 text-[13px] font-semibold transition-transform group-hover:translate-x-0.5"
+                    className="inline-flex items-center gap-1.5 text-[13px] font-semibold transition-all group-hover:gap-2.5"
                     style={{ color: 'var(--color-terracotta-deep)' }}
                   >
                     {t(s.ctaKey)}

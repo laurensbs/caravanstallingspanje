@@ -699,26 +699,47 @@ html[data-density="compact"] .page-admin table tbody tr td {
   font-weight: 700;
 }
 
-/* Marketing button — gevulde terracotta met soft shadow */
+/* Marketing button — premium terracotta met inner-highlight + gelaagde shadow.
+   De top-shine via inset-gradient (lighter at top) en dual-shadow (close
+   1px + glow 24px) geven 'm dezelfde "soft cushion" als Stripe/Apple buttons. */
 .mk-btn-primary {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
   padding: 0.85rem 1.4rem;
   border-radius: 9999px;
-  background: var(--color-terracotta);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 55%),
+    var(--color-terracotta);
   color: #fff;
   font-weight: 600;
   font-size: 0.98rem;
-  box-shadow: 0 6px 18px rgba(217, 110, 60, 0.35);
-  transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 1px 2px rgba(135, 56, 18, 0.20),
+    0 8px 22px rgba(217, 110, 60, 0.32);
+  transition: transform 0.18s ease, background 0.2s ease, box-shadow 0.25s ease;
   border: none;
 }
 .mk-btn-primary:hover {
-  background: var(--color-terracotta-deep);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0) 55%),
+    var(--color-terracotta-deep);
   transform: translateY(-1px);
   text-decoration: none;
   color: #fff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 2px 3px rgba(135, 56, 18, 0.24),
+    0 14px 32px rgba(217, 110, 60, 0.42);
+}
+.mk-btn-primary:active {
+  transform: translateY(0);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 1px 2px rgba(135, 56, 18, 0.18),
+    0 4px 12px rgba(217, 110, 60, 0.28);
 }
 
 /* Marketing button — secundair (outline navy op licht, wit-outline op donker) */
@@ -777,6 +798,129 @@ html[data-density="compact"] .page-admin table tbody tr td {
 .mk-page h1 { font-weight: 700; font-size: clamp(2.1rem, 4.6vw, 3.6rem); }
 .mk-page h2 { font-weight: 700; font-size: clamp(1.7rem, 3vw, 2.4rem); }
 .mk-page h3 { font-weight: 700; font-size: 1.2rem; }
+
+/* ──────────────────────────────────────────────────────────────
+   Premium building-blocks. Eén bron-of-truth voor de cards, iconen,
+   dividers en section-headers die overal op de marketing-pages
+   gebruikt worden — zo voelen homepage, /diensten, /contact en alle
+   service-pages hetzelfde aan.
+   ────────────────────────────────────────────────────────────── */
+
+/* Premium card — wit op cream, dual-shadow, terracotta-tint border bij hover.
+   Vervangt overal de "wit + 1px line + sm-shadow" cards die plat aanvoelden. */
+.mk-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--color-marketing-line);
+  border-radius: var(--radius-2xl);
+  box-shadow:
+    0 1px 2px rgba(20, 14, 5, 0.04),
+    0 16px 40px -16px rgba(20, 14, 5, 0.08);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.3s ease,
+    transform 0.25s ease;
+}
+.mk-card-hover:hover {
+  border-color: rgba(217, 110, 60, 0.35);
+  transform: translateY(-2px);
+  box-shadow:
+    0 1px 2px rgba(20, 14, 5, 0.05),
+    0 8px 18px -6px rgba(217, 110, 60, 0.12),
+    0 28px 56px -20px rgba(20, 14, 5, 0.16);
+}
+
+/* Premium icon-disc — sand fill met top-light gradient, inset shadow,
+   border tint. Op .mk-card-hover hover wordt de icon naar terracotta-deep. */
+.mk-icon-disc {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(180deg, #fff 0%, var(--color-sand) 100%);
+  border: 1px solid var(--color-marketing-line);
+  color: var(--color-navy);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -2px 4px rgba(135, 56, 18, 0.06);
+  transition: color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+.mk-icon-disc-lg {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+}
+.mk-card-hover:hover .mk-icon-disc {
+  color: var(--color-terracotta-deep);
+  border-color: rgba(217, 110, 60, 0.30);
+  transform: scale(1.04);
+}
+
+/* Number-badge — Playfair italic, terracotta-soft, top-right card-positie */
+.mk-card-num {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.4rem;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-terracotta);
+  opacity: 0.55;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.mk-card-hover:hover .mk-card-num {
+  opacity: 1;
+}
+
+/* Section-divider — verticale fade tussen secties op cream-canvas.
+   Subtiel: gradient van transparant → marketing-line → transparant. */
+.mk-section-divider {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-marketing-line) 30%,
+    var(--color-marketing-line) 70%,
+    transparent 100%
+  );
+  margin: 0;
+}
+
+/* Hero ribbon — flowing horizontal gradient achter het hero-block,
+   verbindt het titel-blok visueel met het sfeer-icoon rechts. */
+.mk-hero-ribbon {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(217, 110, 60, 0.10) 35%,
+    rgba(217, 110, 60, 0.18) 50%,
+    rgba(217, 110, 60, 0.10) 65%,
+    transparent 100%
+  );
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+/* Drop-cap-style opening voor hero intro — eerste woord in Playfair italic
+   navy. Wrap met <span class="mk-lede"> in copy. */
+.mk-lede {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--color-navy);
+}
 
 /* Utility color classes voor marketing-context (geen Tailwind override) */
 .mk-text-navy { color: var(--color-navy); }

@@ -92,25 +92,36 @@ function PageHero({ title, intro, eyebrow, eyebrowKey, back, icon: Icon }: HeroP
         background: 'linear-gradient(180deg, #fff 0%, var(--color-marketing-cream) 100%)',
       }}
     >
-      {/* Decoratieve orb-glow rechtsboven — zelfde sfeer als de IdeasHero
-          en VacationTagline. Geeft hero's een warme anchor. */}
+      {/* Drie decoratieve orb-glows voor diepte: terracotta rechtsboven
+          (warmte), navy linksonder (verankering), kleine amber rechts-
+          onder (sfeer-twinkel). */}
       <div
         aria-hidden
-        className="absolute -top-32 -right-32 w-[480px] h-[480px] rounded-full pointer-events-none"
+        className="absolute -top-32 -right-32 w-[520px] h-[520px] rounded-full pointer-events-none"
         style={{
-          background: 'radial-gradient(circle, rgba(217,110,60,0.16) 0%, transparent 60%)',
+          background: 'radial-gradient(circle, rgba(217,110,60,0.18) 0%, transparent 60%)',
           filter: 'blur(8px)',
         }}
       />
-      {/* Subtiele tweede orb linksonder voor diepte */}
       <div
         aria-hidden
-        className="absolute -bottom-24 -left-24 w-[320px] h-[320px] rounded-full pointer-events-none"
+        className="absolute -bottom-28 -left-28 w-[360px] h-[360px] rounded-full pointer-events-none"
         style={{
-          background: 'radial-gradient(circle, rgba(14,58,85,0.08) 0%, transparent 65%)',
+          background: 'radial-gradient(circle, rgba(14,58,85,0.09) 0%, transparent 65%)',
           filter: 'blur(8px)',
         }}
       />
+      <div
+        aria-hidden
+        className="hidden lg:block absolute bottom-12 right-24 w-[160px] h-[160px] rounded-full pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle, rgba(255,180,80,0.18) 0%, transparent 70%)',
+          filter: 'blur(4px)',
+        }}
+      />
+
+      {/* Hero-ribbon — verbindt titel-blok visueel met het sfeer-icoon */}
+      {Icon && <div aria-hidden className="mk-hero-ribbon hidden lg:block" />}
 
       <div className="relative max-w-[1180px] mx-auto px-5 sm:px-8 py-12 sm:py-20">
         {back && (
@@ -127,16 +138,34 @@ function PageHero({ title, intro, eyebrow, eyebrowKey, back, icon: Icon }: HeroP
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-10 lg:gap-14 items-center">
           <div className="max-w-2xl">
-            {eyebrowText && (
-              <motion.div {...fadeUp(0.05)} className="mb-4 inline-flex items-center gap-2">
+            <motion.div {...fadeUp(0.05)} className="mb-4 inline-flex items-center gap-2.5">
+              {/* Mobile-only icon-chip — ipv het te grote desktop-disc dat
+                  op mobile zou wegvallen, krijg je hier een klein
+                  terracotta-tinted chip vóór de eyebrow. */}
+              {Icon && (
                 <span
                   aria-hidden
-                  className="cs-orb-pulse w-1.5 h-1.5 rounded-full"
-                  style={{ background: 'var(--color-terracotta)' }}
-                />
-                <span className="mk-eyebrow">{eyebrowText}</span>
-              </motion.div>
-            )}
+                  className="lg:hidden inline-flex items-center justify-center w-7 h-7 rounded-full"
+                  style={{
+                    background: 'var(--color-terracotta-soft)',
+                    border: '1px solid rgba(217,110,60,0.28)',
+                  }}
+                >
+                  <Icon size={14} strokeWidth={2} style={{ color: 'var(--color-terracotta-deep)' }} />
+                </span>
+              )}
+              {eyebrowText && (
+                <>
+                  <span
+                    aria-hidden
+                    className="cs-orb-pulse w-1.5 h-1.5 rounded-full"
+                    style={{ background: 'var(--color-terracotta)' }}
+                  />
+                  <span className="mk-eyebrow">{eyebrowText}</span>
+                </>
+              )}
+            </motion.div>
+
             <motion.h1
               {...fadeUp(0.12)}
               className="font-display"
@@ -146,7 +175,7 @@ function PageHero({ title, intro, eyebrow, eyebrowKey, back, icon: Icon }: HeroP
                 fontWeight: 700,
                 lineHeight: 1.06,
                 letterSpacing: '-0.014em',
-                margin: '0 0 0.45em',
+                margin: '0 0 0.5em',
               }}
             >
               {title}
@@ -160,20 +189,30 @@ function PageHero({ title, intro, eyebrow, eyebrowKey, back, icon: Icon }: HeroP
                 {intro}
               </motion.p>
             )}
-            {/* Subtle accent-rule onder hero-content — zelfde terracotta */}
+            {/* Subtle accent-rule met terracotta gradient. Iets langer
+                dan voorheen + kleine cs-orb-pulse rechts ervan voor
+                "live"-gevoel. */}
             <motion.div
               {...fadeUp(0.28)}
               aria-hidden
-              className="mt-7 h-[2px] rounded-full"
-              style={{
-                width: 64,
-                background: 'linear-gradient(90deg, var(--color-terracotta), transparent)',
-              }}
-            />
+              className="mt-8 inline-flex items-center gap-2.5"
+            >
+              <span
+                className="block h-[2px] rounded-full"
+                style={{
+                  width: 88,
+                  background: 'linear-gradient(90deg, var(--color-terracotta), transparent)',
+                }}
+              />
+              <span
+                className="cs-orb-pulse w-1 h-1 rounded-full"
+                style={{ background: 'var(--color-terracotta)', opacity: 0.5 }}
+              />
+            </motion.div>
           </div>
 
-          {/* Sfeer-icoon rechts — alleen op lg+ en als icon is meegegeven.
-              Cream-disc met dubbele soft glow + zachte float-animatie. */}
+          {/* Sfeer-icoon rechts — desktop only, cream-disc met dubbele
+              ring-glow (binnen + buiten) en zachte float-animatie. */}
           {Icon && (
             <motion.div
               initial={reduceMotion ? false : { opacity: 0, scale: 0.85, rotate: -6 }}
@@ -194,20 +233,34 @@ function PageHero({ title, intro, eyebrow, eyebrowKey, back, icon: Icon }: HeroP
                     : { duration: 6, repeat: Infinity, ease: 'easeInOut' }
                 }
                 className="relative"
-                style={{ width: 160, height: 160 }}
+                style={{ width: 168, height: 168 }}
               >
+                {/* Outer wide soft glow */}
                 <div
                   aria-hidden
-                  className="absolute inset-0 rounded-full blur-2xl"
-                  style={{ background: 'var(--color-terracotta)', opacity: 0.18 }}
+                  className="absolute inset-[-20px] rounded-full blur-2xl"
+                  style={{ background: 'var(--color-terracotta)', opacity: 0.16 }}
                 />
+                {/* Mid ring with subtle gradient */}
+                <div
+                  aria-hidden
+                  className="absolute inset-[-6px] rounded-full"
+                  style={{
+                    background:
+                      'conic-gradient(from 140deg, rgba(217,110,60,0.0) 0%, rgba(217,110,60,0.22) 25%, rgba(217,110,60,0.0) 60%, rgba(255,180,80,0.18) 80%, rgba(217,110,60,0.0) 100%)',
+                    filter: 'blur(2px)',
+                    opacity: 0.85,
+                  }}
+                />
+                {/* Disc */}
                 <div
                   className="cs-orb-pulse relative w-full h-full rounded-full flex items-center justify-center"
                   style={{
-                    background: '#fff',
-                    border: '1px solid var(--color-terracotta-soft)',
+                    background:
+                      'radial-gradient(circle at 30% 25%, #fff 0%, #fff 50%, var(--color-marketing-cream) 100%)',
+                    border: '1px solid rgba(217,110,60,0.30)',
                     boxShadow:
-                      '0 0 0 10px rgba(217,110,60,0.05), inset 0 0 40px rgba(217,110,60,0.10)',
+                      '0 0 0 10px rgba(217,110,60,0.05), inset 0 1px 0 rgba(255,255,255,0.7), inset 0 0 40px rgba(217,110,60,0.12)',
                   }}
                 >
                   <Icon size={64} strokeWidth={1.6} style={{ color: 'var(--color-terracotta-deep)' }} />

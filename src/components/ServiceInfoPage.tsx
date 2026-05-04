@@ -44,32 +44,27 @@ export default function ServiceInfoPage({
       }}
     >
       <section className="max-w-2xl w-full mx-auto px-5 sm:px-8 py-10 sm:py-14">
-        <motion.ul
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="space-y-3 mb-10"
-        >
-          {bullets.map((b) => (
-            <li
+        <ul className="space-y-3 mb-10">
+          {bullets.map((b, i) => (
+            <motion.li
               key={b}
-              className="flex items-start gap-3 px-4 py-3 rounded-[var(--radius-lg)]"
-              style={{
-                background: '#fff',
-                border: '1px solid var(--color-marketing-line)',
-              }}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ delay: i * 0.05, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="mk-card flex items-start gap-3 px-5 py-3.5"
             >
               <span
                 aria-hidden
-                className="mt-1 w-1.5 h-1.5 rounded-full shrink-0"
+                className="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0"
                 style={{ background: 'var(--color-terracotta)' }}
               />
               <span className="text-[14px] leading-relaxed" style={{ color: 'var(--color-marketing-ink)' }}>
                 {t(b)}
               </span>
-            </li>
+            </motion.li>
           ))}
-        </motion.ul>
+        </ul>
 
         <motion.div
           initial={{ opacity: 0, y: 8 }}
