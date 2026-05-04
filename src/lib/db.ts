@@ -497,7 +497,7 @@ export async function createFridgeBooking(fridgeId: number, data: { camping?: st
   }
 }
 
-export async function updateFridgeBooking(id: number, data: { camping?: string | null; start_date?: string | null; end_date?: string | null; spot_number?: string | null; status?: string; notes?: string | null }) {
+export async function updateFridgeBooking(id: number, data: { camping?: string | null; start_date?: string | null; end_date?: string | null; spot_number?: string | null; status?: string; notes?: string | null; already_paid?: boolean }) {
   await sql`UPDATE fridge_bookings SET
     camping = COALESCE(${data.camping ?? null}, camping),
     start_date = COALESCE(${data.start_date ?? null}::date, start_date),
@@ -507,6 +507,25 @@ export async function updateFridgeBooking(id: number, data: { camping?: string |
     notes = COALESCE(${data.notes ?? null}, notes),
     updated_at = NOW()
     WHERE id = ${id}`;
+
+  // Offline-paid toggle bij edit. Alleen aanpassen als er GEEN Stripe-
+  // payment-intent en GEEN Holded pro-forma is — anders zou je een online-
+  // paid timestamp kunnen overschrijven of een actieve betaal-flow ondermijnen.
+  if (typeof data.already_paid === 'boolean') {
+    if (data.already_paid) {
+      await sql`UPDATE fridge_bookings
+        SET paid_at = COALESCE(paid_at, NOW()), updated_at = NOW()
+        WHERE id = ${id}
+          AND stripe_payment_intent_id IS NULL
+          AND (holded_invoice_number IS NULL OR holded_invoice_number = '')`;
+    } else {
+      await sql`UPDATE fridge_bookings
+        SET paid_at = NULL, updated_at = NOW()
+        WHERE id = ${id}
+          AND stripe_payment_intent_id IS NULL
+          AND (holded_invoice_number IS NULL OR holded_invoice_number = '')`;
+    }
+  }
 }
 
 export async function setBookingHoldedInvoice(id: number, holdedInvoiceId: string, holdedInvoiceNumber: string) {

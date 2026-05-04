@@ -345,6 +345,11 @@ function KoelkastenContent() {
   };
 
   const openEditBooking = (b: Booking) => {
+    // Pre-fill already_paid alleen voor offline-betaalde bookings (paid_at
+    // gezet, geen Stripe payment-intent, geen Holded pro-forma). Voor
+    // Stripe/Holded-bookings is de checkbox niet bedoeld — de toggle is
+    // dan ook disabled in de UI.
+    const offlinePaid = !!b.paid_at && !b.stripe_payment_intent_id && !b.holded_invoice_number;
     setBookingForm({
       camping: b.camping || '',
       start_date: b.start_date ? b.start_date.split('T')[0] : '',
@@ -352,8 +357,7 @@ function KoelkastenContent() {
       spot_number: b.spot_number || '',
       status: b.status,
       notes: b.notes || '',
-      // already_paid is alleen een create-time toggle; bij edit niet relevant.
-      already_paid: false,
+      already_paid: offlinePaid,
     });
     setBookingDialog({ open: true, mode: 'edit', bookingId: b.id });
   };
@@ -1337,27 +1341,43 @@ function KoelkastenContent() {
                   <option value="controleren">Review</option>
                 </Select>
                 <Textarea label="Notes" value={bookingForm.notes} onChange={e => setBookingForm({ ...bookingForm, notes: e.target.value })} />
-                {/* Already-paid toggle — alleen bij create. Bij edit
-                    laten we de bestaande paid_at via Stripe-webhook of
-                    sales-invoice-flow lopen, dus geen toggle. */}
-                {bookingDialog.mode === 'create' && (
-                  <label
-                    className="flex items-start gap-3 p-3 rounded-[var(--radius-md)] border border-border bg-surface-2 cursor-pointer hover:border-accent/40 transition-colors"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={bookingForm.already_paid}
-                      onChange={e => setBookingForm({ ...bookingForm, already_paid: e.target.checked })}
-                      className="mt-0.5 w-4 h-4 accent-accent cursor-pointer"
-                    />
-                    <span className="text-[13px] leading-relaxed">
-                      <span className="font-medium text-text">Already paid (offline)</span>
-                      <span className="block text-[11px] text-text-muted mt-0.5">
-                        Tick if the customer paid in cash or via bank transfer. We&apos;ll skip the payment link and pro forma — the booking is marked paid right away.
+                {/* Already-paid toggle. Bij edit alleen bewerkbaar als de
+                    booking niet via Stripe of Holded loopt — anders zouden
+                    we een online-paid timestamp kunnen overschrijven. */}
+                {(() => {
+                  const editingBooking = bookingDialog.mode === 'edit' && bookingDialog.bookingId
+                    ? (drawerFridge?.bookings || []).find(x => x.id === bookingDialog.bookingId)
+                    : null;
+                  const lockedByStripeOrHolded = !!editingBooking && (
+                    !!editingBooking.stripe_payment_intent_id ||
+                    !!editingBooking.holded_invoice_number
+                  );
+                  return (
+                    <label
+                      className={`flex items-start gap-3 p-3 rounded-[var(--radius-md)] border bg-surface-2 transition-colors ${
+                        lockedByStripeOrHolded
+                          ? 'border-border opacity-60 cursor-not-allowed'
+                          : 'border-border hover:border-accent/40 cursor-pointer'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={bookingForm.already_paid}
+                        disabled={lockedByStripeOrHolded}
+                        onChange={e => setBookingForm({ ...bookingForm, already_paid: e.target.checked })}
+                        className="mt-0.5 w-4 h-4 accent-accent cursor-pointer disabled:cursor-not-allowed"
+                      />
+                      <span className="text-[13px] leading-relaxed">
+                        <span className="font-medium text-text">Already paid (offline)</span>
+                        <span className="block text-[11px] text-text-muted mt-0.5">
+                          {lockedByStripeOrHolded
+                            ? 'This booking has a Stripe payment or Holded pro forma — paid status is managed automatically.'
+                            : 'Tick if the customer paid in cash or via bank transfer. We’ll skip the payment link and pro forma — the booking is marked paid right away.'}
+                        </span>
                       </span>
-                    </span>
-                  </label>
-                )}
+                    </label>
+                  );
+                })()}
                 <div className="flex justify-end gap-2 pt-2">
                   <Button type="button" variant="ghost" onClick={() => setBookingDialog({ open: false, mode: 'create' })}>Cancel</Button>
                   <Button type="submit" loading={savingBooking}>
