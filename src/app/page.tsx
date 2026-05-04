@@ -56,35 +56,29 @@ export default function LandingPage() {
   const fmt = (eur: number) => formatEur(eur, locale);
 
   return (
-    <main
-      id="main"
-      className="min-h-screen relative overflow-hidden"
-      style={{ background: NAVY_GRAD, color: '#F1F5F9' }}
-    >
-      {/* Ambient orbs — drie floating glows die samen een Costa Brava-vibe
-          ademen: cyaan zee bovenaan, amber zon rechtsonder, lavender
-          zonsondergang linksboven. Performance: alleen translate3d. */}
-      <div
-        aria-hidden
-        className="cs-orb-cyan pointer-events-none absolute inset-x-0 top-0 h-[520px] blur-3xl"
-        style={{ background: 'var(--gradient-hero-glow-cyan)' }}
-      />
-      <div
-        aria-hidden
-        className="cs-orb-amber pointer-events-none absolute -bottom-32 -right-20 h-[520px] w-[520px] blur-3xl"
-        style={{ background: 'var(--gradient-hero-glow-amber)' }}
-      />
-      <div
-        aria-hidden
-        className="cs-orb-pulse pointer-events-none absolute -top-10 -left-32 h-[360px] w-[360px] blur-3xl opacity-50"
-        style={{
-          background: 'radial-gradient(50% 50% at 50% 50%, rgba(180,154,232,0.18) 0%, transparent 70%)',
-        }}
-      />
+    <main id="main" className="min-h-screen" style={{ background: 'var(--color-bg)' }}>
+      {/* HERO — navy met ambient orbs. Alleen dit deel is donker; daarna
+          wordt de pagina rustig wit canvas. */}
+      <header
+        className="relative overflow-hidden"
+        style={{ background: NAVY_GRAD, color: '#F1F5F9' }}
+      >
+        {/* Twee subtiele ambient orbs — minder druk dan voorheen.
+            Lavender pulse weg om kleur-restraint te krijgen. */}
+        <div
+          aria-hidden
+          className="cs-orb-cyan pointer-events-none absolute inset-x-0 top-0 h-[520px] blur-3xl opacity-70"
+          style={{ background: 'var(--gradient-hero-glow-cyan)' }}
+        />
+        <div
+          aria-hidden
+          className="cs-orb-amber pointer-events-none absolute -bottom-32 -right-20 h-[520px] w-[520px] blur-3xl opacity-70"
+          style={{ background: 'var(--gradient-hero-glow-amber)' }}
+        />
 
-      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
-        <LocaleSwitch />
-      </div>
+        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
+          <LocaleSwitch />
+        </div>
 
       <div className="relative max-w-6xl mx-auto px-5 sm:px-8 pt-10 sm:pt-16 pb-12 sm:pb-20">
         {/* Hero — 12-kolom grid op lg+. Tekst links (col-span-7), PhotoSlot
@@ -172,23 +166,23 @@ export default function LandingPage() {
               <span
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium"
                 style={{
-                  background: 'rgba(232,132,94,0.10)',
-                  border: '1px solid rgba(232,132,94,0.24)',
-                  color: 'rgba(255,220,205,0.95)',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  color: 'rgba(251,245,236,0.85)',
                 }}
               >
-                <Sparkles size={11} aria-hidden style={{ color: 'var(--color-coral)' }} />
+                <Sparkles size={11} aria-hidden style={{ color: 'rgba(251,245,236,0.55)' }} />
                 {t('home.trust-experience')}
               </span>
               <span
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium"
                 style={{
-                  background: 'rgba(79,168,184,0.10)',
-                  border: '1px solid rgba(79,168,184,0.26)',
-                  color: 'rgba(200,230,238,0.95)',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  color: 'rgba(251,245,236,0.85)',
                 }}
               >
-                <Wrench size={11} aria-hidden style={{ color: 'var(--color-sea)' }} />
+                <Wrench size={11} aria-hidden style={{ color: 'rgba(251,245,236,0.55)' }} />
                 {t('home.trust-workshop')}
               </span>
             </motion.div>
@@ -225,6 +219,16 @@ export default function LandingPage() {
           <span className="text-[10px] uppercase tracking-[0.22em] font-medium">Bekijk diensten</span>
           <ChevronDown size={16} className="animate-bounce" />
         </motion.div>
+        </div>
+      </header>
+
+      {/* CONTENT — wit canvas, rust en witruimte. Geen ambient orbs hier;
+          de premium-feel komt van schaduw + typografie + gerichte amber-CTA's. */}
+      <section
+        className="relative"
+        style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}
+      >
+        <div className="relative max-w-6xl mx-auto px-5 sm:px-8 pt-12 sm:pt-20 pb-12 sm:pb-20">
 
         {/* Sectie-koptekst — context vóór de service-grid. */}
         <motion.div
@@ -239,7 +243,7 @@ export default function LandingPage() {
           <h2
             className="font-semibold tracking-tight"
             style={{
-              color: '#FFFFFF',
+              color: 'var(--color-text)',
               fontSize: 'clamp(1.5rem, 2vw + 0.75rem, 2.125rem)',
               letterSpacing: '-0.018em',
               lineHeight: 1.15,
@@ -249,7 +253,7 @@ export default function LandingPage() {
           </h2>
           <p
             className="mt-2 max-w-xl mx-auto lg:mx-0 text-[14px] sm:text-[15px] leading-relaxed"
-            style={{ color: 'rgba(251,245,236,0.62)' }}
+            style={{ color: 'var(--color-text-muted)' }}
           >
             {t('home.section-services-intro')}
           </p>
@@ -267,7 +271,7 @@ export default function LandingPage() {
             price={t('home.svc-fridge-price', fmt(prices.fridgeTable))}
             cta={t('home.svc-cta-order')}
             delay={0.05}
-            accent="sea"
+
             featured
           />
           <ServiceCard
@@ -279,7 +283,7 @@ export default function LandingPage() {
             price={t('home.svc-airco-price', fmt(prices.airco))}
             cta={t('home.svc-cta-order')}
             delay={0.12}
-            accent="amber"
+
           />
           <ServiceCard
             href="/diensten/transport"
@@ -290,7 +294,7 @@ export default function LandingPage() {
             price={`${fmt(prices.transportZelf)} – ${fmt(prices.transportWij)}`}
             cta={t('home.svc-cta-order')}
             delay={0.19}
-            accent="lavender"
+
           />
           <ServiceCard
             href="/diensten/service"
@@ -301,7 +305,7 @@ export default function LandingPage() {
             price={t('home.svc-service-price')}
             cta={t('home.svc-cta-order')}
             delay={0.26}
-            accent="coral"
+
           />
           <ServiceCard
             href="/diensten/stalling"
@@ -312,7 +316,7 @@ export default function LandingPage() {
             price={t('home.svc-storage-price')}
             cta={t('home.svc-cta-info')}
             delay={0.33}
-            accent="amber"
+
           />
           <ServiceCard
             href="/diensten/reparatie"
@@ -323,7 +327,7 @@ export default function LandingPage() {
             price={t('home.svc-repair-price')}
             cta={t('home.svc-cta-info')}
             delay={0.40}
-            accent="lavender"
+
           />
           <ServiceCard
             href="/diensten/inspectie"
@@ -334,11 +338,11 @@ export default function LandingPage() {
             price={t('home.svc-inspection-price')}
             cta={t('home.svc-cta-info')}
             delay={0.47}
-            accent="sea"
+
           />
         </div>
 
-        {/* Reassurance + contact */}
+        {/* Reassurance + contact — op cream canvas, dark text. */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -347,7 +351,7 @@ export default function LandingPage() {
         >
           <div
             className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[12px] sm:text-[13px]"
-            style={{ color: 'rgba(241,245,249,0.55)' }}
+            style={{ color: 'var(--color-text-muted)' }}
           >
             <span className="inline-flex items-center gap-1.5">
               <Sparkles size={11} aria-hidden /> {t('home.reassure-payment')}
@@ -362,55 +366,23 @@ export default function LandingPage() {
           <Link
             href="/contact"
             className="inline-block mt-6 text-[13px] underline-offset-4 hover:underline transition-colors"
-            style={{ color: 'rgba(241,245,249,0.7)' }}
+            style={{ color: 'var(--color-text)' }}
           >
             {t('home.contact-link')}
           </Link>
         </motion.div>
-      </div>
+        </div>
+      </section>
     </main>
   );
 }
 
-// Costa Brava paleet per kaart-accent. Glow voor outer hover, stripe-
-// gradient voor top-bar, text-tint voor eyebrow-tag, icon-bg voor icoon-
-// container.
-type Accent = 'amber' | 'sea' | 'coral' | 'lavender';
-
-const ACCENT_MAP: Record<Accent, {
-  glow: string;
-  stripe: string;
-  text: string;
-  iconBg: string;
-}> = {
-  amber: {
-    glow: 'rgba(242,169,59,0.20)',
-    stripe: 'linear-gradient(90deg, #F2A93B 0%, #FFC25A 100%)',
-    text: 'rgba(255,210,140,0.95)',
-    iconBg: 'rgba(242,169,59,0.14)',
-  },
-  sea: {
-    glow: 'rgba(79,168,184,0.22)',
-    stripe: 'linear-gradient(90deg, #4FA8B8 0%, #7FCFD9 100%)',
-    text: 'rgba(180,225,235,0.95)',
-    iconBg: 'rgba(79,168,184,0.14)',
-  },
-  coral: {
-    glow: 'rgba(232,132,94,0.20)',
-    stripe: 'linear-gradient(90deg, #E8845E 0%, #F5A57E 100%)',
-    text: 'rgba(255,210,190,0.95)',
-    iconBg: 'rgba(232,132,94,0.14)',
-  },
-  lavender: {
-    glow: 'rgba(180,154,232,0.20)',
-    stripe: 'linear-gradient(90deg, #B49AE8 0%, #D5C2F2 100%)',
-    text: 'rgba(220,205,250,0.95)',
-    iconBg: 'rgba(180,154,232,0.14)',
-  },
-};
+// Premium service-card: wit canvas, soft shadow, één accent (amber).
+// Geen vier kleuren meer per kaart — restraint = premium. Accent komt
+// alleen op CTA-pijl en hover-glow.
 
 function ServiceCard({
-  href, icon: Icon, tag, title, desc, price, cta, delay, accent,
+  href, icon: Icon, tag, title, desc, price, cta, delay,
   featured = false,
 }: {
   href: string;
@@ -421,12 +393,9 @@ function ServiceCard({
   price: string;
   cta: string;
   delay: number;
-  accent: Accent;
   /** Featured = grotere card, span 2 cols op md+. */
   featured?: boolean;
 }) {
-  const a = ACCENT_MAP[accent];
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
@@ -436,24 +405,19 @@ function ServiceCard({
     >
       <Link
         href={href}
-        className="cs-service-card group block h-full p-5 sm:p-6 rounded-[var(--radius-2xl)] relative overflow-hidden transition-all hover:-translate-y-0.5"
+        className="cs-card-light group block h-full p-5 sm:p-6 rounded-[var(--radius-2xl)] relative overflow-hidden transition-all hover:-translate-y-0.5"
         style={{
-          background: 'rgba(255,255,255,0.05)',
-          border: '1px solid rgba(255,255,255,0.10)',
-          backdropFilter: 'blur(8px)',
-          ['--cs-card-glow' as string]: a.glow,
-          ['--cs-card-accent' as string]: a.stripe,
+          background: 'var(--color-surface)',
+          border: '1px solid var(--color-border)',
+          boxShadow: '0 1px 2px rgba(20,14,5,0.04), 0 8px 24px -8px rgba(20,14,5,0.06)',
         }}
       >
-        {/* Top accent-stripe (cs-card-stripe class staat in globals.css) */}
-        <span aria-hidden className="cs-card-stripe" />
-
-        {/* Inner hover-glow */}
+        {/* Subtiele amber hover-glow van bovenaan — alleen op hover, zachtjes. */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
           style={{
-            background: `radial-gradient(60% 60% at 25% 0%, ${a.glow} 0%, transparent 70%)`,
+            background: 'radial-gradient(60% 50% at 50% 0%, rgba(242,169,59,0.08) 0%, transparent 70%)',
           }}
         />
 
@@ -463,16 +427,16 @@ function ServiceCard({
             <div
               className="w-11 h-11 sm:w-12 sm:h-12 rounded-[var(--radius-lg)] flex items-center justify-center shrink-0 transition-transform group-hover:scale-105"
               style={{
-                background: a.iconBg,
-                border: `1px solid ${a.glow}`,
-                color: '#F1F5F9',
+                background: 'var(--color-surface-2)',
+                border: '1px solid var(--color-border)',
+                color: 'var(--color-text)',
               }}
             >
               <Icon size={22} aria-hidden />
             </div>
             <div
               className="text-[10px] uppercase tracking-[0.18em] font-medium pt-1.5 text-right"
-              style={{ color: a.text }}
+              style={{ color: 'var(--color-text-subtle)' }}
             >
               {tag}
             </div>
@@ -483,7 +447,7 @@ function ServiceCard({
             <h2
               className="font-semibold leading-tight"
               style={{
-                color: '#FFFFFF',
+                color: 'var(--color-text)',
                 fontSize: featured ? 'clamp(1.25rem, 1.5vw + 0.6rem, 1.625rem)' : 'clamp(1.05rem, 0.6vw + 0.85rem, 1.25rem)',
                 letterSpacing: '-0.014em',
               }}
@@ -492,43 +456,37 @@ function ServiceCard({
             </h2>
             <p
               className="mt-2 text-[13px] sm:text-[14px] leading-relaxed"
-              style={{ color: 'rgba(251,245,236,0.68)' }}
+              style={{ color: 'var(--color-text-muted)' }}
             >
               {desc}
             </p>
           </div>
 
-          {/* Price + CTA-pijl — bottom-bar */}
-          <div className="relative flex items-end justify-between gap-3 pt-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+          {/* Price + CTA — bottom-bar, monochroom prijs, amber CTA-pijl. */}
+          <div
+            className="relative flex items-end justify-between gap-3 pt-4 border-t"
+            style={{ borderColor: 'var(--color-border)' }}
+          >
             <div className="min-w-0">
               <div
                 className="text-[10px] uppercase tracking-[0.18em] font-medium mb-0.5"
-                style={{ color: 'rgba(251,245,236,0.5)' }}
+                style={{ color: 'var(--color-text-subtle)' }}
               >
                 {price.startsWith('vanaf ') ? 'Vanaf' : 'Prijs'}
               </div>
               <div
                 className="text-[16px] sm:text-[17px] font-semibold tabular-nums truncate"
-                style={{ color: '#FFFFFF' }}
+                style={{ color: 'var(--color-text)' }}
               >
                 {price.replace(/^vanaf /, '')}
               </div>
             </div>
             <span
               className="inline-flex items-center gap-1.5 text-[13px] font-semibold transition-transform group-hover:translate-x-1 shrink-0"
-              style={{
-                background: 'var(--gradient-sunset)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
+              style={{ color: 'var(--color-amber-deep)' }}
             >
               {cta}
-              <ArrowRight
-                size={15}
-                aria-hidden
-                style={{ color: 'var(--color-amber-bright)' }}
-              />
+              <ArrowRight size={15} aria-hidden />
             </span>
           </div>
         </div>

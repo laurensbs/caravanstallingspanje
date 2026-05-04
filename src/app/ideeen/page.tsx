@@ -20,53 +20,22 @@ import type { z } from 'zod';
 
 // ──────────────────────────────────────────────────────────────
 // Categorieën met eigen accent-tint per item. Elk gebruikt een token
-// uit het Costa Brava paleet zodat ze als chips visueel onderscheidbaar
-// zijn maar niet luidruchtig.
+// Monochroom: alle categorieën gebruiken hetzelfde subtle base + amber
+// als actieve fill. Premium restraint — geen kleurensoep meer.
 // ──────────────────────────────────────────────────────────────
-type CatAccent = 'amber' | 'sea' | 'coral' | 'lavender' | 'amber-bright';
-
 const CATEGORIES: Array<{
   value: string;
   labelKey: StringKey;
   icon: typeof Wrench;
-  accent: CatAccent;
 }> = [
-  { value: 'service',  labelKey: 'ideas.cat-service',  icon: Wrench,   accent: 'sea' },
-  { value: 'camping',  labelKey: 'ideas.cat-camping',  icon: Tent,     accent: 'amber' },
-  { value: 'comfort',  labelKey: 'ideas.cat-comfort',  icon: Coffee,   accent: 'coral' },
-  { value: 'verhuur',  labelKey: 'ideas.cat-verhuur',  icon: Bike,     accent: 'lavender' },
-  { value: 'zomer',    labelKey: 'ideas.cat-zomer',    icon: Sun,      accent: 'amber-bright' },
-  { value: 'klimaat',  labelKey: 'ideas.cat-klimaat',  icon: Wind,     accent: 'sea' },
-  { value: 'anders',   labelKey: 'ideas.cat-anders',   icon: Sparkles, accent: 'lavender' },
+  { value: 'service',  labelKey: 'ideas.cat-service',  icon: Wrench   },
+  { value: 'camping',  labelKey: 'ideas.cat-camping',  icon: Tent     },
+  { value: 'comfort',  labelKey: 'ideas.cat-comfort',  icon: Coffee   },
+  { value: 'verhuur',  labelKey: 'ideas.cat-verhuur',  icon: Bike     },
+  { value: 'zomer',    labelKey: 'ideas.cat-zomer',    icon: Sun      },
+  { value: 'klimaat',  labelKey: 'ideas.cat-klimaat',  icon: Wind     },
+  { value: 'anders',   labelKey: 'ideas.cat-anders',   icon: Sparkles },
 ];
-
-const CAT_ACCENT_STYLES: Record<CatAccent, { bg: string; bgActive: string; border: string; borderActive: string; text: string; iconBg: string }> = {
-  amber: {
-    bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.10)',
-    bgActive: 'rgba(242,169,59,0.14)', borderActive: 'rgba(242,169,59,0.5)',
-    text: 'rgba(255,210,140,0.95)', iconBg: 'rgba(242,169,59,0.18)',
-  },
-  'amber-bright': {
-    bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.10)',
-    bgActive: 'rgba(255,194,90,0.16)', borderActive: 'rgba(255,194,90,0.55)',
-    text: 'rgba(255,220,160,0.95)', iconBg: 'rgba(255,194,90,0.18)',
-  },
-  sea: {
-    bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.10)',
-    bgActive: 'rgba(79,168,184,0.16)', borderActive: 'rgba(79,168,184,0.55)',
-    text: 'rgba(180,225,235,0.95)', iconBg: 'rgba(79,168,184,0.18)',
-  },
-  coral: {
-    bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.10)',
-    bgActive: 'rgba(232,132,94,0.16)', borderActive: 'rgba(232,132,94,0.55)',
-    text: 'rgba(255,210,190,0.95)', iconBg: 'rgba(232,132,94,0.18)',
-  },
-  lavender: {
-    bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.10)',
-    bgActive: 'rgba(180,154,232,0.16)', borderActive: 'rgba(180,154,232,0.55)',
-    text: 'rgba(220,205,250,0.95)', iconBg: 'rgba(180,154,232,0.18)',
-  },
-};
 
 // Inspiratie-prompts per categorie. NL-only — vertaald als gebruiker ze
 // kiest worden ze hun eigen tekst, geen i18n-burden.
@@ -130,46 +99,43 @@ export default function IdeeenPage() {
   const activeSuggestions = category && SUGGESTIONS[category] ? SUGGESTIONS[category] : [];
 
   return (
-    <main
-      id="main"
-      className="min-h-screen page-public page-public-dark relative overflow-hidden flex flex-col"
-      style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}
-    >
-      {/* Ambient orbs — Costa Brava sfeer, zacht ademend. */}
-      <div
-        aria-hidden
-        className="cs-orb-amber pointer-events-none absolute -top-24 -right-24 h-[480px] w-[480px] blur-3xl opacity-50"
-        style={{ background: 'var(--gradient-hero-glow-amber)' }}
-      />
-      <div
-        aria-hidden
-        className="cs-orb-cyan pointer-events-none absolute top-32 -left-32 h-[420px] w-[420px] blur-3xl opacity-40"
-        style={{ background: 'var(--gradient-hero-glow-cyan)' }}
-      />
-      <div
-        aria-hidden
-        className="cs-orb-pulse pointer-events-none absolute top-2/3 right-1/4 h-[300px] w-[300px] blur-3xl opacity-30"
-        style={{ background: 'radial-gradient(50% 50% at 50% 50%, rgba(180,154,232,0.16) 0%, transparent 70%)' }}
-      />
+    <main id="main" className="min-h-screen flex flex-col" style={{ background: 'var(--color-bg)' }}>
+      {/* HERO — alleen dit deel is donker. Twee subtiele orbs (geen lavender-pulse meer). */}
+      <header
+        className="page-public-dark relative overflow-hidden"
+        style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}
+      >
+        <div
+          aria-hidden
+          className="cs-orb-amber pointer-events-none absolute -top-24 -right-24 h-[480px] w-[480px] blur-3xl opacity-60"
+          style={{ background: 'var(--gradient-hero-glow-amber)' }}
+        />
+        <div
+          aria-hidden
+          className="cs-orb-cyan pointer-events-none absolute top-32 -left-32 h-[420px] w-[420px] blur-3xl opacity-50"
+          style={{ background: 'var(--gradient-hero-glow-cyan)' }}
+        />
 
-      {/* Top bar — minimaal, geen logo (header heeft 'm prominenter). */}
-      <div className="relative max-w-6xl mx-auto w-full px-5 sm:px-8 pt-5 sm:pt-7 flex items-center justify-between">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-[13px] transition-opacity hover:opacity-100"
-          style={{ color: 'rgba(241,245,249,0.6)' }}
-        >
-          <ArrowLeft size={14} aria-hidden /> {t('common.brand')}
-        </Link>
-        <LocaleSwitch />
-      </div>
+        {/* Top bar — minimaal, geen logo (header heeft 'm prominenter). */}
+        <div className="relative max-w-6xl mx-auto w-full px-5 sm:px-8 pt-5 sm:pt-7 flex items-center justify-between">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-[13px] transition-opacity hover:opacity-100"
+            style={{ color: 'rgba(241,245,249,0.6)' }}
+          >
+            <ArrowLeft size={14} aria-hidden /> {t('common.brand')}
+          </Link>
+          <LocaleSwitch />
+        </div>
 
-      {/* HERO — eigen ontwerp, niet PublicHero. App-feel: floating glyph
-          + live counter, asymmetrische layout. */}
-      <IdeasHero />
+        <IdeasHero />
+      </header>
 
-      {/* CONTENT — twee kolommen op lg+, stacked op mobile. */}
-      <section className="relative flex-1 max-w-6xl w-full mx-auto px-5 sm:px-8 pb-16 sm:pb-24">
+      {/* CONTENT — wit canvas, premium rust. Compose links + feed rechts. */}
+      <section
+        className="relative flex-1 max-w-6xl w-full mx-auto px-5 sm:px-8 py-12 sm:py-16"
+        style={{ color: 'var(--color-text)' }}
+      >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
 
           {/* LINKER KOLOM — compose card */}
@@ -198,27 +164,19 @@ export default function IdeeenPage() {
                   noValidate
                   className="cs-compose-card relative rounded-[var(--radius-2xl)] overflow-hidden"
                   style={{
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.10)',
-                    backdropFilter: 'blur(12px)',
-                    boxShadow: '0 24px 56px -16px rgba(0,0,0,0.4)',
+                    background: 'var(--color-surface)',
+                    border: '1px solid var(--color-border)',
+                    boxShadow: '0 1px 2px rgba(20,14,5,0.04), 0 24px 56px -16px rgba(20,14,5,0.10)',
                   }}
                 >
-                  {/* Top accent stripe */}
-                  <span
-                    aria-hidden
-                    className="absolute top-0 left-6 right-6 h-[2px] rounded-full"
-                    style={{ background: 'var(--gradient-sunset)', opacity: 0.7 }}
-                  />
-
                   <div className="p-5 sm:p-7 space-y-7">
 
                     {/* Header */}
                     <div>
-                      <div className="text-[10px] uppercase tracking-[0.18em] font-medium" style={{ color: 'rgba(255,210,140,0.85)' }}>
+                      <div className="text-[10px] uppercase tracking-[0.18em] font-medium" style={{ color: 'var(--color-text-subtle)' }}>
                         Stap 1 — {t('ideas.compose-step-cat')}
                       </div>
-                      <h2 className="mt-1 text-[18px] sm:text-[20px] font-semibold" style={{ color: '#FFFFFF', letterSpacing: '-0.014em' }}>
+                      <h2 className="mt-1 text-[18px] sm:text-[20px] font-semibold" style={{ color: 'var(--color-text)', letterSpacing: '-0.014em' }}>
                         {t('ideas.compose-title')}
                       </h2>
                       <p className="text-[13px] mt-1" style={{ color: 'rgba(251,245,236,0.6)' }}>
@@ -226,12 +184,12 @@ export default function IdeeenPage() {
                       </p>
                     </div>
 
-                    {/* Categorie-chips */}
+                    {/* Categorie-chips — monochroom op licht canvas; alleen
+                        de actieve chip krijgt amber-fill voor focus. */}
                     <div className="flex flex-wrap gap-2">
                       {CATEGORIES.map((c) => {
                         const Icon = c.icon;
                         const sel = category === c.value;
-                        const s = CAT_ACCENT_STYLES[c.accent];
                         return (
                           <motion.button
                             key={c.value}
@@ -241,13 +199,13 @@ export default function IdeeenPage() {
                             transition={{ type: 'spring', stiffness: 380, damping: 26 }}
                             className="press-spring inline-flex items-center gap-2 px-3 h-9 rounded-full text-[13px] font-medium transition-colors"
                             style={{
-                              background: sel ? s.bgActive : s.bg,
-                              border: `1px solid ${sel ? s.borderActive : s.border}`,
-                              color: sel ? s.text : 'rgba(251,245,236,0.78)',
+                              background: sel ? 'var(--color-amber-soft)' : 'var(--color-surface-2)',
+                              border: `1px solid ${sel ? 'var(--color-amber-border)' : 'var(--color-border)'}`,
+                              color: sel ? 'var(--color-amber-deep)' : 'var(--color-text-muted)',
                             }}
                             aria-pressed={sel}
                           >
-                            <Icon size={13} aria-hidden style={{ color: sel ? s.text : 'rgba(251,245,236,0.6)' }} />
+                            <Icon size={13} aria-hidden style={{ color: sel ? 'var(--color-amber-deep)' : 'var(--color-text-subtle)' }} />
                             {t(c.labelKey)}
                           </motion.button>
                         );
@@ -257,7 +215,7 @@ export default function IdeeenPage() {
                           type="button"
                           onClick={() => setValue('category', '', { shouldDirty: true })}
                           className="press-spring inline-flex items-center gap-1 px-3 h-9 rounded-full text-[12px] font-medium"
-                          style={{ color: 'rgba(251,245,236,0.5)' }}
+                          style={{ color: 'var(--color-text-subtle)' }}
                         >
                           <X size={12} aria-hidden /> {t('ideas.compose-step-cat-skip')}
                         </button>
@@ -277,13 +235,13 @@ export default function IdeeenPage() {
                           <div
                             className="rounded-[var(--radius-lg)] p-4"
                             style={{
-                              background: 'rgba(255,194,90,0.06)',
-                              border: '1px solid rgba(255,194,90,0.20)',
+                              background: 'var(--color-amber-soft)',
+                              border: '1px solid var(--color-amber-border)',
                             }}
                           >
                             <div className="flex items-center gap-2 mb-3">
-                              <Sparkles size={12} aria-hidden style={{ color: 'var(--color-amber-bright)' }} />
-                              <p className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: 'rgba(255,220,160,0.95)' }}>
+                              <Sparkles size={12} aria-hidden style={{ color: 'var(--color-amber-deep)' }} />
+                              <p className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: 'var(--color-amber-deep)' }}>
                                 {t('ideas.inspire-title')}
                               </p>
                             </div>
@@ -295,16 +253,16 @@ export default function IdeeenPage() {
                                   onClick={() => setValue('title', s, { shouldDirty: true, shouldValidate: true })}
                                   className="press-spring text-[12px] px-2.5 h-7 inline-flex items-center rounded-full transition-colors"
                                   style={{
-                                    background: 'rgba(255,255,255,0.06)',
-                                    border: '1px solid rgba(255,255,255,0.10)',
-                                    color: 'rgba(251,245,236,0.85)',
+                                    background: 'var(--color-surface)',
+                                    border: '1px solid var(--color-border)',
+                                    color: 'var(--color-text)',
                                   }}
                                 >
                                   {s}
                                 </button>
                               ))}
                             </div>
-                            <p className="text-[11px] mt-2" style={{ color: 'rgba(251,245,236,0.5)' }}>
+                            <p className="text-[11px] mt-2" style={{ color: 'var(--color-text-muted)' }}>
                               {t('ideas.inspire-hint')}
                             </p>
                           </div>
@@ -312,11 +270,11 @@ export default function IdeeenPage() {
                       )}
                     </AnimatePresence>
 
-                    <hr style={{ borderColor: 'rgba(255,255,255,0.08)' }} />
+                    <hr style={{ borderColor: 'var(--color-border)' }} />
 
                     {/* Stap 2 — idee */}
                     <div>
-                      <div className="text-[10px] uppercase tracking-[0.18em] font-medium mb-1" style={{ color: 'rgba(255,210,140,0.85)' }}>
+                      <div className="text-[10px] uppercase tracking-[0.18em] font-medium mb-1" style={{ color: 'var(--color-text-subtle)' }}>
                         Stap 2 — {t('ideas.compose-step-idea')}
                       </div>
                     </div>
@@ -352,14 +310,14 @@ export default function IdeeenPage() {
                       )}
                     </Field>
 
-                    <hr style={{ borderColor: 'rgba(255,255,255,0.08)' }} />
+                    <hr style={{ borderColor: 'var(--color-border)' }} />
 
                     {/* Stap 3 — wie */}
                     <div>
-                      <div className="text-[10px] uppercase tracking-[0.18em] font-medium mb-1" style={{ color: 'rgba(255,210,140,0.85)' }}>
+                      <div className="text-[10px] uppercase tracking-[0.18em] font-medium mb-1" style={{ color: 'var(--color-text-subtle)' }}>
                         Stap 3 — {t('ideas.compose-step-you')}
                       </div>
-                      <p className="text-[13px]" style={{ color: 'rgba(251,245,236,0.6)' }}>
+                      <p className="text-[13px]" style={{ color: 'var(--color-text-muted)' }}>
                         {t('ideas.compose-step-you-hint')}
                       </p>
                     </div>
@@ -390,7 +348,7 @@ export default function IdeeenPage() {
                       </Field>
                     </div>
 
-                    {/* Error-banner */}
+                    {/* Error-banner — danger-soft (zacht roze) ipv coral. */}
                     {(inlineSummary || serverError) && (
                       <MotionShake trigger={shakeTick + (serverError ? 1000 : 0)}>
                         <div
@@ -398,9 +356,9 @@ export default function IdeeenPage() {
                           aria-live="polite"
                           className="rounded-[var(--radius-md)] px-4 py-3 text-[14px] inline-flex items-start gap-2"
                           style={{
-                            background: 'rgba(232,132,94,0.12)',
-                            border: '1px solid rgba(232,132,94,0.30)',
-                            color: 'rgba(255,210,190,0.95)',
+                            background: 'var(--color-danger-soft)',
+                            border: '1px solid color-mix(in oklch, var(--color-danger), transparent 70%)',
+                            color: 'var(--color-danger)',
                           }}
                         >
                           <AlertCircle size={16} className="mt-0.5 shrink-0" aria-hidden />
@@ -409,20 +367,17 @@ export default function IdeeenPage() {
                       </MotionShake>
                     )}
 
-                    {/* Submit */}
+                    {/* Submit — donker accent (Stripe-stijl) op licht canvas. */}
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="cs-submit-button group relative w-full h-14 rounded-[var(--radius-lg)] font-semibold text-[15px] transition-all overflow-hidden"
+                      className="press-spring relative w-full h-14 rounded-[var(--radius-lg)] font-semibold text-[15px] transition-all overflow-hidden disabled:opacity-50 hover:bg-accent-hover"
                       style={{
-                        background: 'linear-gradient(135deg, #F2A93B 0%, #E8845E 100%)',
-                        color: '#FFFFFF',
-                        boxShadow: '0 8px 24px -8px rgba(242,169,59,0.5), 0 0 0 1px rgba(255,194,90,0.3) inset',
+                        background: 'var(--color-accent)',
+                        color: 'var(--color-accent-fg)',
+                        boxShadow: 'var(--shadow-md)',
                       }}
                     >
-                      <span aria-hidden className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 100%)' }}
-                      />
                       <span className="relative inline-flex items-center justify-center gap-2 w-full h-full">
                         {isSubmitting ? (
                           <Loader2 size={18} className="animate-spin" aria-hidden />
@@ -433,7 +388,7 @@ export default function IdeeenPage() {
                       </span>
                     </button>
 
-                    <p className="text-[11px] text-center" style={{ color: 'rgba(251,245,236,0.4)' }}>
+                    <p className="text-[11px] text-center" style={{ color: 'var(--color-text-subtle)' }}>
                       {t('ideas.compose-disclaimer')}
                     </p>
                   </div>
@@ -612,10 +567,10 @@ function FeaturedIdeasFeed() {
 
   return (
     <div>
-      {/* Sectie-kop */}
+      {/* Sectie-kop — op licht canvas, monochroom */}
       <div className="mb-4 flex items-center gap-2">
-        <Star size={13} aria-hidden style={{ color: 'var(--color-amber-bright)' }} />
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.20em]" style={{ color: 'rgba(251,245,236,0.6)' }}>
+        <Star size={13} aria-hidden style={{ color: 'var(--color-amber-deep)' }} />
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.20em]" style={{ color: 'var(--color-text-muted)' }}>
           {t('ideas.feed-title')}
         </h2>
       </div>
@@ -626,9 +581,9 @@ function FeaturedIdeasFeed() {
         <div
           className="rounded-[var(--radius-lg)] p-5 text-[13px]"
           style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px dashed rgba(255,255,255,0.10)',
-            color: 'rgba(251,245,236,0.55)',
+            background: 'var(--color-surface-2)',
+            border: '1px dashed var(--color-border)',
+            color: 'var(--color-text-muted)',
           }}
         >
           {t('ideas.feed-empty')}
@@ -647,8 +602,9 @@ function FeaturedIdeasFeed() {
                 transition={{ delay: i * 0.04, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                 className="relative rounded-[var(--radius-2xl)] overflow-hidden"
                 style={{
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.10)',
+                  background: 'var(--color-surface)',
+                  border: '1px solid var(--color-border)',
+                  boxShadow: '0 1px 2px rgba(20,14,5,0.04), 0 8px 24px -8px rgba(20,14,5,0.06)',
                   backdropFilter: 'blur(8px)',
                 }}
               >
@@ -656,7 +612,7 @@ function FeaturedIdeasFeed() {
                   <span
                     aria-hidden
                     className="absolute top-0 left-5 right-5 h-[2px] rounded-full"
-                    style={{ background: 'var(--gradient-sunset)', opacity: 0.85 }}
+                    style={{ background: 'var(--color-amber)', opacity: 0.6 }}
                   />
                 )}
 
@@ -665,28 +621,28 @@ function FeaturedIdeasFeed() {
                     <div
                       className="inline-flex items-center gap-1.5 mb-3 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-[0.18em]"
                       style={{
-                        background: 'rgba(255,194,90,0.14)',
-                        border: '1px solid rgba(255,194,90,0.28)',
-                        color: 'rgba(255,220,160,0.95)',
+                        background: 'var(--color-amber-soft)',
+                        border: '1px solid var(--color-amber-border)',
+                        color: 'var(--color-amber-deep)',
                       }}
                     >
                       <Star size={10} fill="currentColor" /> {t('ideas.feed-featured-pill')}
                     </div>
                   )}
 
-                  <h3 className="text-[16px] font-semibold mb-2 leading-snug" style={{ color: '#FFFFFF', letterSpacing: '-0.012em' }}>
+                  <h3 className="text-[16px] font-semibold mb-2 leading-snug" style={{ color: 'var(--color-text)', letterSpacing: '-0.012em' }}>
                     {idea.title}
                   </h3>
-                  <p className="text-[14px] leading-relaxed whitespace-pre-wrap mb-4" style={{ color: 'rgba(251,245,236,0.7)' }}>
+                  <p className="text-[14px] leading-relaxed whitespace-pre-wrap mb-4" style={{ color: 'var(--color-text-muted)' }}>
                     {idea.message}
                   </p>
 
-                  {/* Vote-balk: visuele verdeling pro/contra. */}
+                  {/* Vote-balk — monochroom, alleen amber als het positief is. */}
                   {totalVotes > 0 && (
                     <div className="mb-4">
                       <div
                         className="relative h-1.5 rounded-full overflow-hidden"
-                        style={{ background: 'rgba(255,255,255,0.06)' }}
+                        style={{ background: 'var(--color-surface-2)' }}
                         role="img"
                         aria-label={t('ideas.feed-votes-summary', totalVotes, upPct)}
                       >
@@ -696,20 +652,18 @@ function FeaturedIdeasFeed() {
                           animate={{ width: `${upPct}%` }}
                           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.2 + i * 0.04 }}
                           className="absolute inset-y-0 left-0"
-                          style={{
-                            background: 'linear-gradient(90deg, var(--color-sea) 0%, var(--color-amber-bright) 100%)',
-                          }}
+                          style={{ background: 'var(--color-amber)' }}
                         />
                       </div>
-                      <p className="text-[11px] mt-1.5" style={{ color: 'rgba(251,245,236,0.5)' }}>
+                      <p className="text-[11px] mt-1.5" style={{ color: 'var(--color-text-subtle)' }}>
                         {t('ideas.feed-votes-summary', totalVotes, upPct)}
                       </p>
                     </div>
                   )}
 
                   {/* Vote-buttons */}
-                  <div className="flex items-center gap-2 pt-3 border-t" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
-                    <p className="text-[12px] mr-auto" style={{ color: 'rgba(251,245,236,0.5)' }}>
+                  <div className="flex items-center gap-2 pt-3 border-t" style={{ borderColor: 'var(--color-border)' }}>
+                    <p className="text-[12px] mr-auto" style={{ color: 'var(--color-text-subtle)' }}>
                       {t('ideas.feed-vote-prompt')}
                     </p>
                     <VoteButton
@@ -735,7 +689,7 @@ function FeaturedIdeasFeed() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       className="text-[11px] mt-2 inline-flex items-center gap-1"
-                      style={{ color: 'rgba(180,225,235,0.85)' }}
+                      style={{ color: 'var(--color-success)' }}
                     >
                       <Check size={11} aria-hidden /> {t('ideeen.vote-thanks')}
                     </motion.p>
@@ -761,7 +715,10 @@ function VoteButton({
   onClick: () => void;
 }) {
   const Icon = direction === 'up' ? ThumbsUp : ThumbsDown;
-  const accentColor = direction === 'up' ? 'var(--color-sea)' : 'var(--color-coral)';
+  // Monochroom: success (zacht groen) voor up, danger (zacht rood) voor down.
+  // Semantisch correct én restraint — geen vier kleuren in een feed.
+  const accentColor = direction === 'up' ? 'var(--color-success)' : 'var(--color-danger)';
+  const accentSoft = direction === 'up' ? 'var(--color-success-soft)' : 'var(--color-danger-soft)';
   return (
     <motion.button
       type="button"
@@ -771,9 +728,9 @@ function VoteButton({
       onClick={onClick}
       className="press-spring inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-[13px] font-medium transition-colors"
       style={{
-        background: selected ? `color-mix(in oklch, ${accentColor}, transparent 75%)` : 'rgba(255,255,255,0.04)',
-        border: `1px solid ${selected ? accentColor : 'rgba(255,255,255,0.10)'}`,
-        color: selected ? accentColor : 'rgba(251,245,236,0.78)',
+        background: selected ? accentSoft : 'var(--color-surface-2)',
+        border: `1px solid ${selected ? accentColor : 'var(--color-border)'}`,
+        color: selected ? accentColor : 'var(--color-text-muted)',
         opacity: disabled && !selected ? 0.5 : 1,
       }}
       aria-pressed={selected}
@@ -793,14 +750,14 @@ function FeedSkeletons() {
           key={i}
           className="rounded-[var(--radius-2xl)] p-5"
           style={{
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.10)',
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
           }}
         >
           <div
             className="h-3 w-2/3 rounded mb-3"
             style={{
-              background: 'rgba(255,255,255,0.08)',
+              background: 'var(--color-surface-2)',
               animation: 'shimmer 1.6s ease-in-out infinite',
               animationDelay: `${i * 100}ms`,
             }}
@@ -840,40 +797,31 @@ function DoneCard({ onAnother }: { onAnother: () => void }) {
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       className="relative rounded-[var(--radius-2xl)] overflow-hidden text-center p-8 sm:p-12"
       style={{
-        background: 'rgba(255,255,255,0.04)',
-        border: '1px solid rgba(255,255,255,0.10)',
-        backdropFilter: 'blur(12px)',
-        boxShadow: '0 24px 56px -16px rgba(0,0,0,0.4)',
+        background: 'var(--color-surface)',
+        border: '1px solid var(--color-border)',
+        boxShadow: '0 1px 2px rgba(20,14,5,0.04), 0 24px 56px -16px rgba(20,14,5,0.10)',
       }}
     >
-      {/* Sunset top stripe */}
-      <span
-        aria-hidden
-        className="absolute top-0 left-0 right-0 h-[2px]"
-        style={{ background: 'var(--gradient-sunset)' }}
-      />
-
-      {/* Sparkle confetti — kleine zwevende glyph-ies, geen volle confetti. */}
-      <Sparkle x="20%" y="22%" size={14} delay={0.1} color="var(--color-amber-bright)" />
-      <Sparkle x="80%" y="18%" size={12} delay={0.3} color="var(--color-coral)" />
-      <Sparkle x="15%" y="78%" size={10} delay={0.5} color="var(--color-sea)" />
-      <Sparkle x="85%" y="72%" size={14} delay={0.7} color="var(--color-lavender)" />
+      {/* Subtiele sparkle-confetti — alleen amber-tinten, monochroom. */}
+      <Sparkle x="20%" y="22%" size={14} delay={0.1} color="var(--color-amber)" />
+      <Sparkle x="80%" y="18%" size={12} delay={0.3} color="var(--color-amber-bright)" />
+      <Sparkle x="15%" y="78%" size={10} delay={0.5} color="var(--color-amber-deep)" />
+      <Sparkle x="85%" y="72%" size={14} delay={0.7} color="var(--color-amber)" />
 
       <MotionBounce className="relative mx-auto mb-6" style={{ width: 72, height: 72 }}>
         <div
           aria-hidden
-          className="absolute inset-0 rounded-full blur-xl opacity-60"
-          style={{ background: 'var(--gradient-sunset)' }}
+          className="absolute inset-0 rounded-full blur-xl opacity-50"
+          style={{ background: 'var(--color-amber)' }}
         />
         <div
           className="relative w-full h-full rounded-full flex items-center justify-center"
           style={{
-            background: 'rgba(255,255,255,0.08)',
-            border: '1px solid rgba(242,169,59,0.5)',
-            boxShadow: '0 0 0 1px rgba(242,169,59,0.18) inset',
+            background: 'var(--color-amber-soft)',
+            border: '1px solid var(--color-amber-border)',
           }}
         >
-          <Check size={28} strokeWidth={2.5} style={{ color: 'var(--color-amber-bright)' }} />
+          <Check size={28} strokeWidth={2.5} style={{ color: 'var(--color-amber-deep)' }} />
         </div>
       </MotionBounce>
 
@@ -882,12 +830,12 @@ function DoneCard({ onAnother }: { onAnother: () => void }) {
         style={{
           fontSize: 'clamp(1.5rem, 1.5vw + 0.75rem, 2rem)',
           letterSpacing: '-0.018em',
-          color: '#FFFFFF',
+          color: 'var(--color-text)',
         }}
       >
         {t('ideas.done-title')}
       </h2>
-      <p className="leading-relaxed text-[15px] mb-7" style={{ color: 'rgba(251,245,236,0.72)' }}>
+      <p className="leading-relaxed text-[15px] mb-7" style={{ color: 'var(--color-text-muted)' }}>
         {t('ideas.done-body')}
       </p>
 
@@ -897,9 +845,9 @@ function DoneCard({ onAnother }: { onAnother: () => void }) {
           onClick={onAnother}
           className="press-spring inline-flex items-center justify-center gap-2 h-12 px-5 rounded-[var(--radius-md)] text-[14px] font-semibold transition-all"
           style={{
-            background: 'linear-gradient(135deg, #F2A93B 0%, #E8845E 100%)',
-            color: '#FFFFFF',
-            boxShadow: '0 8px 20px -8px rgba(242,169,59,0.45)',
+            background: 'var(--color-accent)',
+            color: 'var(--color-accent-fg)',
+            boxShadow: 'var(--shadow-md)',
           }}
         >
           <Sparkles size={14} aria-hidden /> {t('ideas.done-another')}
@@ -908,9 +856,9 @@ function DoneCard({ onAnother }: { onAnother: () => void }) {
           href="/"
           className="press-spring inline-flex items-center justify-center gap-2 h-12 px-5 rounded-[var(--radius-md)] text-[14px] font-medium transition-colors"
           style={{
-            background: 'rgba(255,255,255,0.06)',
-            border: '1px solid rgba(255,255,255,0.14)',
-            color: '#F1F5F9',
+            background: 'var(--color-surface-2)',
+            border: '1px solid var(--color-border)',
+            color: 'var(--color-text)',
           }}
         >
           <ArrowRight size={14} className="rotate-180" aria-hidden /> {t('ideas.done-back')}
