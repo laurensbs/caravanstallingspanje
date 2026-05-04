@@ -1174,112 +1174,188 @@ export function resetSchemaCache(): void {
 
 // ─── Lazy migratie voor contact_messages en uitbreidingen op transport/stalling.
 let _miscMigrationsApplied: Promise<void> | null = null;
+
+// Helper: voer één migratie-statement uit en log per-statement falen
+// zonder de hele chain te blokkeren. Postgres kan partial-indexes faliekant
+// laten falen ("column does not exist") als een eerdere ADD COLUMN niet
+// liep — door per stap te catchen kunnen latere stappen alsnog draaien.
+async function tryMigrate(label: string, fn: () => Promise<unknown>): Promise<void> {
+  try {
+    await fn();
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'unknown';
+    console.error(`[misc migration] ${label} failed: ${msg}`);
+  }
+}
+
 export async function ensureMiscSchema(): Promise<void> {
   if (_miscMigrationsApplied) return _miscMigrationsApplied;
   _miscMigrationsApplied = (async () => {
-    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS transport_mode TEXT`;
-    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS pickup_location TEXT`;
-    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS customer_notified_at TIMESTAMP`;
-    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS notified_status TEXT`;
+    // ─── Defensieve status-kolom recovery ──
+    // Op productie-DBs die ooit een oudere schema-staat hebben gehad kan
+    // de `status` kolom op fridge_bookings (en zustertabellen) ontbreken.
+    // Dat doet o.a. de partial index hieronder falen ("column status does
+    // not exist"). We voegen 'm idempotent toe vóór alles wat 'm gebruikt.
+    await tryMigrate('fridge_bookings.status', () =>
+      sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'compleet'`);
+    await tryMigrate('stalling_requests.status', () =>
+      sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'controleren'`);
+    await tryMigrate('transport_requests.status', () =>
+      sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'controleren'`);
+    await tryMigrate('contact_messages.status', () =>
+      sql`ALTER TABLE contact_messages ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'open'`);
+    await tryMigrate('ideas.status', () =>
+      sql`ALTER TABLE ideas ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'new'`);
+    await tryMigrate('fridge_waitlist.status', () =>
+      sql`ALTER TABLE fridge_waitlist ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'wachtend'`);
+
+    // ─── Bestaande migraties — nu allemaal resilient zodat één faalkolom
+    // niet het hele admin-portaal stuk kan zetten.
+    await tryMigrate('transport.transport_mode', () =>
+      sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS transport_mode TEXT`);
+    await tryMigrate('transport.pickup_location', () =>
+      sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS pickup_location TEXT`);
+    await tryMigrate('stalling.customer_notified_at', () =>
+      sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS customer_notified_at TIMESTAMP`);
+    await tryMigrate('stalling.notified_status', () =>
+      sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS notified_status TEXT`);
     // Holded-factuurstatus cache: paid / partial / unpaid / unknown.
-    // Periodiek bijgewerkt door /api/cron/holded-sync zodat admin niet
-    // zelf in Holded hoeft te kijken om te zien wie betaald heeft.
-    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_status TEXT`;
-    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_synced_at TIMESTAMP`;
-    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_url TEXT`;
-    // Per-period device_type — laat klanten met zowel een koelkast als een
-    // airco bij ons hetzelfde fridge-record delen, maar per booking zien wat
-    // 'm precies is. Als 't veld leeg is fallt UI terug op fridges.device_type.
-    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS device_type TEXT`;
-    // Holded-snapshot — bewaart de complete contact-payload zodat we alle
-    // velden die Holded heeft (kenteken in customFields, tags, internal code,
-    // bill/shipping addresses, IBAN, etc.) lokaal kunnen tonen zonder elke
-    // keer een API-call. Wordt ververst bij sync.
-    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS is_company BOOLEAN DEFAULT false`;
-    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_raw JSONB`;
-    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_custom_fields JSONB`;
-    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_tags JSONB`;
-    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_code TEXT`;
-    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_type TEXT`;
-    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_iban TEXT`;
-    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_web TEXT`;
-    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_secondary_email TEXT`;
-    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_default_currency TEXT`;
-    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_billing_address JSONB`;
-    await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_shipping_address JSONB`;
-    // Handmatige betaallink-flow: admin verstuurt een Stripe Checkout link
-    // per mail naar klanten die we eerder zelf in het systeem zetten.
-    // Bewaren we zodat we kunnen herversturen + zien aan wie/wanneer.
-    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_url TEXT`;
-    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_sent_at TIMESTAMP`;
-    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_email TEXT`;
-    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_amount_cents INTEGER`;
-    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS holded_invoice_status TEXT`;
-    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS holded_invoice_synced_at TIMESTAMP`;
-    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS holded_invoice_url TEXT`;
-    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_status TEXT`;
-    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_synced_at TIMESTAMP`;
-    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_url TEXT`;
-    // Composite index voor planning-view (getBookingsInRange) — voorkomt
-    // full-table scan op fridge_id+start_date filter.
-    await sql`CREATE INDEX IF NOT EXISTS idx_fridge_bookings_fridge_start
-      ON fridge_bookings(fridge_id, start_date)`;
-    // Partial index voor admin "review"-filter — heel hot pad.
-    await sql`CREATE INDEX IF NOT EXISTS idx_fridge_bookings_review
-      ON fridge_bookings(start_date) WHERE status = 'controleren'`;
+    await tryMigrate('fridge_bookings.holded_invoice_status', () =>
+      sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_status TEXT`);
+    await tryMigrate('fridge_bookings.holded_invoice_synced_at', () =>
+      sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_synced_at TIMESTAMP`);
+    await tryMigrate('fridge_bookings.holded_invoice_url', () =>
+      sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS holded_invoice_url TEXT`);
+    await tryMigrate('fridge_bookings.device_type', () =>
+      sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS device_type TEXT`);
+    // Holded-snapshot — bewaart de complete contact-payload.
+    await tryMigrate('customers.is_company', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS is_company BOOLEAN DEFAULT false`);
+    await tryMigrate('customers.holded_raw', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_raw JSONB`);
+    await tryMigrate('customers.holded_custom_fields', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_custom_fields JSONB`);
+    await tryMigrate('customers.holded_tags', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_tags JSONB`);
+    await tryMigrate('customers.holded_code', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_code TEXT`);
+    await tryMigrate('customers.holded_type', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_type TEXT`);
+    await tryMigrate('customers.holded_iban', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_iban TEXT`);
+    await tryMigrate('customers.holded_web', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_web TEXT`);
+    await tryMigrate('customers.holded_secondary_email', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_secondary_email TEXT`);
+    await tryMigrate('customers.holded_default_currency', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_default_currency TEXT`);
+    await tryMigrate('customers.holded_billing_address', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_billing_address JSONB`);
+    await tryMigrate('customers.holded_shipping_address', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_shipping_address JSONB`);
+    // Handmatige betaallink-flow.
+    await tryMigrate('fridge_bookings.payment_link_url', () =>
+      sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_url TEXT`);
+    await tryMigrate('fridge_bookings.payment_link_sent_at', () =>
+      sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_sent_at TIMESTAMP`);
+    await tryMigrate('fridge_bookings.payment_link_email', () =>
+      sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_email TEXT`);
+    await tryMigrate('fridge_bookings.payment_link_amount_cents', () =>
+      sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_amount_cents INTEGER`);
+    await tryMigrate('stalling.holded_invoice_status', () =>
+      sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS holded_invoice_status TEXT`);
+    await tryMigrate('stalling.holded_invoice_synced_at', () =>
+      sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS holded_invoice_synced_at TIMESTAMP`);
+    await tryMigrate('stalling.holded_invoice_url', () =>
+      sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS holded_invoice_url TEXT`);
+    await tryMigrate('transport.holded_invoice_status', () =>
+      sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_status TEXT`);
+    await tryMigrate('transport.holded_invoice_synced_at', () =>
+      sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_synced_at TIMESTAMP`);
+    await tryMigrate('transport.holded_invoice_url', () =>
+      sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS holded_invoice_url TEXT`);
+    // Composite index voor planning-view.
+    await tryMigrate('idx_fridge_bookings_fridge_start', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_fridge_bookings_fridge_start
+        ON fridge_bookings(fridge_id, start_date)`);
+    // Partial index voor admin "review"-filter — komt NA de status-kolom
+    // recovery zodat 'ie nooit faalt op een DB die status kwijt was.
+    await tryMigrate('idx_fridge_bookings_review', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_fridge_bookings_review
+        ON fridge_bookings(start_date) WHERE status = 'controleren'`);
     // Stripe paid_at + payment_intent_id én sales-invoice-conversion flag.
-    // Pro forma's blijven pro forma in Holded; dit vinkje markeert dat een
-    // admin 'm handmatig heeft omgezet naar een echte sales invoice in Holded.
-    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP`;
-    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS stripe_payment_intent_id TEXT`;
-    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS sales_invoice_converted_at TIMESTAMP`;
-    await sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS sales_invoice_converted_by TEXT`;
-    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP`;
-    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS stripe_payment_intent_id TEXT`;
-    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS sales_invoice_converted_at TIMESTAMP`;
-    await sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS sales_invoice_converted_by TEXT`;
-    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP`;
-    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS stripe_payment_intent_id TEXT`;
-    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS sales_invoice_converted_at TIMESTAMP`;
-    await sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS sales_invoice_converted_by TEXT`;
-    await sql`CREATE TABLE IF NOT EXISTS contact_messages (
-      id SERIAL PRIMARY KEY,
-      name TEXT NOT NULL,
-      email TEXT NOT NULL,
-      phone TEXT,
-      subject TEXT,
-      message TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'open',
-      handled_at TIMESTAMP,
-      created_at TIMESTAMP DEFAULT NOW(),
-      updated_at TIMESTAMP DEFAULT NOW()
-    )`;
-    await sql`CREATE INDEX IF NOT EXISTS idx_contact_messages_status ON contact_messages(status)`;
-    await sql`CREATE INDEX IF NOT EXISTS idx_contact_messages_created ON contact_messages(created_at DESC)`;
-    await sql`CREATE TABLE IF NOT EXISTS ideas (
-      id SERIAL PRIMARY KEY,
-      name TEXT,
-      email TEXT,
-      category TEXT,
-      title TEXT NOT NULL,
-      message TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'new',
-      votes_up INTEGER DEFAULT 0,
-      votes_down INTEGER DEFAULT 0,
-      featured BOOLEAN DEFAULT false,
-      created_at TIMESTAMP DEFAULT NOW(),
-      updated_at TIMESTAMP DEFAULT NOW()
-    )`;
-    await sql`ALTER TABLE ideas ADD COLUMN IF NOT EXISTS votes_up INTEGER DEFAULT 0`;
-    await sql`ALTER TABLE ideas ADD COLUMN IF NOT EXISTS votes_down INTEGER DEFAULT 0`;
-    await sql`ALTER TABLE ideas ADD COLUMN IF NOT EXISTS featured BOOLEAN DEFAULT false`;
-    await sql`CREATE INDEX IF NOT EXISTS idx_ideas_status ON ideas(status)`;
-    await sql`CREATE INDEX IF NOT EXISTS idx_ideas_created ON ideas(created_at DESC)`;
+    await tryMigrate('fridge_bookings.paid_at', () =>
+      sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP`);
+    await tryMigrate('fridge_bookings.stripe_payment_intent_id', () =>
+      sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS stripe_payment_intent_id TEXT`);
+    await tryMigrate('fridge_bookings.sales_invoice_converted_at', () =>
+      sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS sales_invoice_converted_at TIMESTAMP`);
+    await tryMigrate('fridge_bookings.sales_invoice_converted_by', () =>
+      sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS sales_invoice_converted_by TEXT`);
+    await tryMigrate('stalling.paid_at', () =>
+      sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP`);
+    await tryMigrate('stalling.stripe_payment_intent_id', () =>
+      sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS stripe_payment_intent_id TEXT`);
+    await tryMigrate('stalling.sales_invoice_converted_at', () =>
+      sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS sales_invoice_converted_at TIMESTAMP`);
+    await tryMigrate('stalling.sales_invoice_converted_by', () =>
+      sql`ALTER TABLE stalling_requests ADD COLUMN IF NOT EXISTS sales_invoice_converted_by TEXT`);
+    await tryMigrate('transport.paid_at', () =>
+      sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP`);
+    await tryMigrate('transport.stripe_payment_intent_id', () =>
+      sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS stripe_payment_intent_id TEXT`);
+    await tryMigrate('transport.sales_invoice_converted_at', () =>
+      sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS sales_invoice_converted_at TIMESTAMP`);
+    await tryMigrate('transport.sales_invoice_converted_by', () =>
+      sql`ALTER TABLE transport_requests ADD COLUMN IF NOT EXISTS sales_invoice_converted_by TEXT`);
+    await tryMigrate('contact_messages table', () =>
+      sql`CREATE TABLE IF NOT EXISTS contact_messages (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        phone TEXT,
+        subject TEXT,
+        message TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'open',
+        handled_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )`);
+    await tryMigrate('idx_contact_messages_status', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_contact_messages_status ON contact_messages(status)`);
+    await tryMigrate('idx_contact_messages_created', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_contact_messages_created ON contact_messages(created_at DESC)`);
+    await tryMigrate('ideas table', () =>
+      sql`CREATE TABLE IF NOT EXISTS ideas (
+        id SERIAL PRIMARY KEY,
+        name TEXT,
+        email TEXT,
+        category TEXT,
+        title TEXT NOT NULL,
+        message TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'new',
+        votes_up INTEGER DEFAULT 0,
+        votes_down INTEGER DEFAULT 0,
+        featured BOOLEAN DEFAULT false,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )`);
+    await tryMigrate('ideas.votes_up', () =>
+      sql`ALTER TABLE ideas ADD COLUMN IF NOT EXISTS votes_up INTEGER DEFAULT 0`);
+    await tryMigrate('ideas.votes_down', () =>
+      sql`ALTER TABLE ideas ADD COLUMN IF NOT EXISTS votes_down INTEGER DEFAULT 0`);
+    await tryMigrate('ideas.featured', () =>
+      sql`ALTER TABLE ideas ADD COLUMN IF NOT EXISTS featured BOOLEAN DEFAULT false`);
+    await tryMigrate('idx_ideas_status', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_ideas_status ON ideas(status)`);
+    await tryMigrate('idx_ideas_created', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_ideas_created ON ideas(created_at DESC)`);
     // Seed featured "watermachine" idee — pilot waar we feedback op willen.
-    await sql`INSERT INTO ideas (category, title, message, status, featured)
-      SELECT 'verhuur',
-        'Interesse in een watermachine?',
-        'We onderzoeken of er interesse is in het huren van een watermachine voor op de camping. Met een watermachine heb je altijd koud drinkwater bij de hand, zonder steeds te hoeven sjouwen met zware flessen.
+    await tryMigrate('seed watermachine idea', () =>
+      sql`INSERT INTO ideas (category, title, message, status, featured)
+        SELECT 'verhuur',
+          'Interesse in een watermachine?',
+          'We onderzoeken of er interesse is in het huren van een watermachine voor op de camping. Met een watermachine heb je altijd koud drinkwater bij de hand, zonder steeds te hoeven sjouwen met zware flessen.
 
 De verhuur zou bestaan uit:
 • Een watermachine
@@ -1287,10 +1363,10 @@ De verhuur zou bestaan uit:
 • Schoonmaaktabletten voor goed onderhoud
 
 Altijd koud en schoon drinkwater — makkelijk en praktisch tijdens de vakantie.',
-        'shortlist', true
-      WHERE NOT EXISTS (SELECT 1 FROM ideas WHERE featured = true AND title ILIKE '%watermachine%')`;
+          'shortlist', true
+        WHERE NOT EXISTS (SELECT 1 FROM ideas WHERE featured = true AND title ILIKE '%watermachine%')`);
   })().catch((err) => {
-    console.error('[misc migrations] failed:', err);
+    console.error('[misc migrations] outer wrapper failed:', err);
     _miscMigrationsApplied = null;
     throw err;
   });

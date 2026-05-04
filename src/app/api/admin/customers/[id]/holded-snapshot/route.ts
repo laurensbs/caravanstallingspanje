@@ -50,8 +50,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     return NextResponse.json({ ok: true, holded: contact });
   } catch (err) {
+    // Log volledige error (incl. stack + Postgres-detail) zodat we in Vercel-
+    // logs precies zien welke kolom/SQL-statement faalt — niet alleen 'unknown'.
     const msg = err instanceof Error ? err.message : 'unknown';
-    console.error('[holded-snapshot] error:', msg);
-    return NextResponse.json({ error: msg }, { status: 500 });
+    const detail = err instanceof Error ? err.stack : undefined;
+    const code = (err as { code?: string } | null)?.code;
+    console.error('[holded-snapshot] error:', { msg, code, detail });
+    return NextResponse.json({ error: msg, code }, { status: 500 });
   }
 }
