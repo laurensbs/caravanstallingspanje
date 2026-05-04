@@ -1969,7 +1969,10 @@ function BookingPricePreview({ fridge, start, end, weekPrices }: {
   weekPrices: Record<string, number> | null;
 }) {
   if (!fridge || !start || !end) return null;
-  const dt = (fridge.device_type || '') as DeviceType;
+  // Gebruik resolveDeviceType zodat legacy/free-text device_type-strings
+  // (bv. "Grote koelkast + airco") gewoon naar 'Airco'/'Grote koelkast'
+  // mappen ipv naar undefined in weekPrices.
+  const dt = resolveDeviceType(fridge.device_type);
   const weekPrice = weekPrices ? weekPrices[dt] : null;
   const result = priceForDates(dt, weekPrice ?? null, start, end);
   if (!result) {

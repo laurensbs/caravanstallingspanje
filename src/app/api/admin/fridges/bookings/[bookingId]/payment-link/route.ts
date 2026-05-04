@@ -20,6 +20,7 @@ import {
 import { sendMail, paymentLinkHtml } from '@/lib/email';
 import { createCheckoutSession } from '@/lib/stripe';
 import { formatRef, refKindForFridge } from '@/lib/refs';
+import { createHash } from 'crypto';
 
 // Admin verstuurt een betaallink naar een klant die handmatig in het systeem
 // is gezet (bv. een bestaande huurder waar we offline met afgesproken hebben).
@@ -146,9 +147,21 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
       // Stripe Checkout Sessions zijn max 24u geldig. Klant betaalt
       // doorgaans dezelfde dag; admin kan altijd opnieuw versturen.
       expiresInHours: 23,
-      // Idempotency: dezelfde booking + dag + bedrag-cents = dezelfde session.
-      // Bij her-versturen met ander bedrag krijg je wel een nieuwe.
-      idempotencyKey: `paylink_${id}_${Math.round(amountEur * 100)}_${new Date().toISOString().slice(0, 10)}`,
+      // Idempotency: combinatie van booking + bedrag + dag + hash van
+      // overige parameters (description, email, tax). Stripe weigert
+      // dezelfde key te hergebruiken met andere body-params, dus we
+      // includen alle params die de session beïnvloeden in de key.
+      // Zelfde input → zelfde key (true idempotent retry).
+      // Andere input → andere key (= nieuwe session).
+      idempotencyKey: (() => {
+        const cents = Math.round(amountEur * 100);
+        const day = new Date().toISOString().slice(0, 10);
+        const fingerprint = createHash('sha1')
+          .update(`${description}|${customerEmail}|${taxPercent}`)
+          .digest('hex')
+          .slice(0, 10);
+        return `paylink_${id}_${cents}_${day}_${fingerprint}`;
+      })(),
       metadata: {
         kind: 'fridge_booking_manual',
         refId: String(id),
