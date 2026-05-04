@@ -516,6 +516,322 @@ export const STRINGS = {
   'home.reassure-team': { nl: 'Vast team aan de Costa Brava', en: 'Fixed team on the Costa Brava' },
   'home.contact-link': { nl: 'Vragen? Stuur ons een bericht →', en: 'Questions? Send us a message →' },
 
+  // ─── Header navigation ───────────────────────────────────
+  'nav.home': { nl: 'Home', en: 'Home' },
+  'nav.services': { nl: 'Diensten', en: 'Services' },
+  'nav.fridge-rental': { nl: 'Koelkast huren', en: 'Rent a fridge' },
+  'nav.contact': { nl: 'Contact', en: 'Contact' },
+  'nav.ideas': { nl: 'Ideeën', en: 'Ideas' },
+  'nav.cta-services': { nl: 'Bekijk diensten', en: 'View services' },
+  'nav.menu-open': { nl: 'Open menu', en: 'Open menu' },
+  'nav.menu-close': { nl: 'Sluit menu', en: 'Close menu' },
+
+  // ─── Marketing homepage ──────────────────────────────────
+  'home2.hero-eyebrow': { nl: 'Costa Brava · Sant Climent de Peralta', en: 'Costa Brava · Sant Climent de Peralta' },
+  'home2.hero-h1-line1': { nl: 'Meer dan alleen', en: 'More than just' },
+  'home2.hero-h1-line2': { nl: 'caravanstalling.', en: 'caravan storage.' },
+  'home2.hero-intro': {
+    nl: 'Stalling, reparatie, onderhoud, transport en verhuur — al meer dan 25 jaar door een vast familieteam aan de Costa Brava.',
+    en: 'Storage, repair, maintenance, transport and rentals — by a fixed family team on the Costa Brava for over 25 years.',
+  },
+  'home2.cta-primary': { nl: 'Bekijk onze diensten', en: 'View our services' },
+  'home2.cta-call': { nl: 'Bel +34 633 77 86 99', en: 'Call +34 633 77 86 99' },
+  'home2.trust-reviews': { nl: '4.9 · 25 Google reviews', en: '4.9 · 25 Google reviews' },
+  'home2.trust-experience': { nl: '25 jaar ervaring', en: '25 years experience' },
+  'home2.trust-security': { nl: '24/7 Securitas Direct', en: '24/7 Securitas Direct' },
+
+  // Wie zijn we
+  'home2.about-eyebrow': { nl: 'Over ons', en: 'About us' },
+  'home2.about-h2': { nl: 'Familiebedrijf aan de Costa Brava', en: 'Family business on the Costa Brava' },
+  'home2.about-p1': {
+    nl: 'Caravanstalling Spanje is meer dan een opslagplek. We zijn een familiebedrijf met een vast team van zo\'n twaalf medewerkers in het seizoen, een eigen wagenpark, en een werkplaats waar we caravans onderhouden, repareren en klaarmaken voor de zomer.',
+    en: 'Caravanstalling Spanje is more than a storage facility. We\'re a family business with a fixed team of around twelve people during the season, our own fleet, and a workshop where we maintain, repair and prepare caravans for summer.',
+  },
+  'home2.about-p2': {
+    nl: 'Onze klanten — vaak Nederlandse en Belgische vakantiegangers — komen jaar na jaar terug. Dat komt omdat we doen wat we beloven: persoonlijk contact, transparante prijzen, en oog voor detail.',
+    en: 'Our customers — often Dutch and Belgian travellers — come back year after year. Why? We do what we promise: personal contact, transparent pricing, and attention to detail.',
+  },
+  'home2.about-p3': {
+    nl: 'En als er iets is, weet je bij wie je bent: hetzelfde team, hetzelfde verhaal, elk seizoen.',
+    en: 'And if something comes up, you know who you\'re dealing with: same team, same story, every season.',
+  },
+
+  // Wat doen we (preview op homepage — 4 hoofdgroepen)
+  'home2.services-eyebrow': { nl: 'Wat we doen', en: 'What we do' },
+  'home2.services-h2': { nl: 'Alles op één plek', en: 'Everything in one place' },
+  'home2.services-intro': {
+    nl: 'Vier kerngebieden, naadloos op elkaar afgestemd zodat je nooit meer hoeft te zoeken.',
+    en: 'Four core areas, smoothly aligned so you never have to search again.',
+  },
+  'home2.svc-storage-title': { nl: 'Stalling', en: 'Storage' },
+  'home2.svc-storage-desc': { nl: 'Binnen overdekt of buiten op vaste plek — 24/7 beveiligd.', en: 'Indoor covered or outside on a fixed spot — 24/7 secured.' },
+  'home2.svc-repair-title': { nl: 'Reparatie & onderhoud', en: 'Repair & maintenance' },
+  'home2.svc-repair-desc': { nl: 'Eigen werkplaats, vaste monteurs, transparante factuur.', en: 'On-site workshop, fixed mechanics, transparent invoicing.' },
+  'home2.svc-rentals-title': { nl: 'Verhuur', en: 'Rentals' },
+  'home2.svc-rentals-desc': { nl: 'Koelkasten, airco, fietsen — bezorgd op je staanplaats.', en: 'Fridges, AC, bikes — delivered to your pitch.' },
+  'home2.svc-transport-title': { nl: 'Transport', en: 'Transport' },
+  'home2.svc-transport-desc': { nl: 'Wij brengen je caravan van stalling naar camping en weer terug.', en: 'We move your caravan from storage to campsite and back.' },
+  'home2.services-cta-all': { nl: 'Bekijk alle diensten', en: 'View all services' },
+  'home2.svc-link-more': { nl: 'Meer info', en: 'Learn more' },
+
+  // Waarom ons (USPs)
+  'home2.why-eyebrow': { nl: 'Waarom ons', en: 'Why us' },
+  'home2.why-h2': { nl: 'Vier redenen waarom je terugkomt', en: 'Four reasons you keep coming back' },
+  'home2.usp-secure-title': { nl: '24/7 beveiligd', en: '24/7 secured' },
+  'home2.usp-secure-body': {
+    nl: 'Camera\'s, alarm en Securitas Direct. Standaard verzekerd op locatie.',
+    en: 'Cameras, alarm and Securitas Direct. Standard insurance on-site.',
+  },
+  'home2.usp-workshop-title': { nl: 'Eigen werkplaats', en: 'On-site workshop' },
+  'home2.usp-workshop-body': {
+    nl: 'Reparatie, schoonmaak, ozonbehandeling — alles ter plekke.',
+    en: 'Repair, cleaning, ozone treatment — everything on the spot.',
+  },
+  'home2.usp-team-title': { nl: 'Vast team', en: 'Fixed team' },
+  'home2.usp-team-body': {
+    nl: 'Twaalf medewerkers in het seizoen. Je weet bij wie je bent.',
+    en: 'Twelve people during the season. You know who you\'re dealing with.',
+  },
+  'home2.usp-care-title': { nl: 'Aandacht voor detail', en: 'Attention to detail' },
+  'home2.usp-care-body': {
+    nl: 'Tweewekelijkse controles, jaarlijkse keuring, stoomreiniging en waxen.',
+    en: 'Bi-weekly checks, annual inspection, steam-cleaning and waxing.',
+  },
+
+  // Reviews-strip
+  'home2.reviews-eyebrow': { nl: 'Reviews', en: 'Reviews' },
+  'home2.reviews-h2': { nl: 'Onze klanten over ons', en: 'What customers say' },
+  'home2.reviews-cta': { nl: 'Lees alle reviews op Google', en: 'Read all reviews on Google' },
+
+  // Contact
+  'home2.contact-eyebrow': { nl: 'Contact', en: 'Contact' },
+  'home2.contact-h2': { nl: 'Een belletje of bericht is genoeg', en: 'A call or message is all it takes' },
+  'home2.contact-intro': {
+    nl: 'We spreken Nederlands, Engels en Spaans. Reageren binnen één werkdag.',
+    en: 'We speak Dutch, English and Spanish. We respond within one business day.',
+  },
+  'home2.contact-address-label': { nl: 'Adres', en: 'Address' },
+  'home2.contact-phone-label': { nl: 'Telefoon', en: 'Phone' },
+  'home2.contact-email-label': { nl: 'E-mail', en: 'Email' },
+  'home2.contact-hours-label': { nl: 'Openingstijden', en: 'Opening hours' },
+  'home2.contact-hours-week': { nl: 'Maandag t/m vrijdag · 09:30 – 16:30', en: 'Monday to Friday · 09:30 – 16:30' },
+  'home2.contact-hours-weekend': { nl: 'Zaterdag & zondag · gesloten', en: 'Saturday & Sunday · closed' },
+  'home2.contact-cta': { nl: 'Stuur een bericht', en: 'Send a message' },
+
+  // ─── Marketing homepage v2 (premium-stijl) ──────────────
+  'mk.hero-eyebrow': { nl: 'Sinds 2009 · Costa Brava', en: 'Since 2009 · Costa Brava' },
+  'mk.hero-h1-prefix': { nl: 'Veilig', en: 'Safely' },
+  'mk.hero-h1-accent': { nl: 'stallen', en: 'stored' },
+  'mk.hero-h1-suffix': { nl: 'aan de Costa Brava — alsof je caravan thuiskomt.', en: 'on the Costa Brava — as if your caravan came home.' },
+  'mk.hero-lead': {
+    nl: 'Binnen- en buitenstalling voor caravan, camper en boot. Standaard verzekerd, 24/7 bewaakt en compleet onderhouden door onze eigen werkplaats. Op 15 minuten van Palamós, op het rustige binnenland van de Costa Brava.',
+    en: 'Indoor and outdoor storage for caravan, motorhome and boat. Standard insurance, 24/7 surveillance and complete maintenance by our own workshop. 15 minutes from Palamós, in the quiet inland of the Costa Brava.',
+  },
+  'mk.hero-cta-primary': { nl: 'Bekijk diensten', en: 'View services' },
+  'mk.hero-cta-secondary': { nl: 'Vraag offerte aan', en: 'Request a quote' },
+  'mk.hero-trust-rating': { nl: '4,9 / 5', en: '4.9 / 5' },
+  'mk.hero-trust-rating-sub': { nl: '25 Google reviews', en: '25 Google reviews' },
+  'mk.hero-trust-securitas': { nl: 'Securitas Direct', en: 'Securitas Direct' },
+  'mk.hero-trust-securitas-sub': { nl: '24/7 alarm & camera\'s', en: '24/7 alarm & cameras' },
+  'mk.hero-trust-team': { nl: 'Vast team', en: 'Fixed team' },
+  'mk.hero-trust-team-sub': { nl: '~12 medewerkers in seizoen', en: '~12 staff during season' },
+
+  // Stats-strip
+  'mk.stat-customers': { nl: 'Caravans in beheer', en: 'Caravans in care' },
+  'mk.stat-years': { nl: 'Jaar ervaring', en: 'Years experience' },
+  'mk.stat-insured': { nl: 'Standaard verzekerd', en: 'Standard insured' },
+  'mk.stat-guarded': { nl: 'Bewaakt terrein', en: 'Guarded grounds' },
+
+  // Stalling overview (zonder prijzen — gebruiker geeft die niet publiek)
+  'mk.storage-eyebrow': { nl: 'Stalling', en: 'Storage' },
+  'mk.storage-h2': { nl: 'Drie manieren om je caravan veilig te stallen', en: 'Three ways to safely store your caravan' },
+  'mk.storage-intro': {
+    nl: 'Inclusief verzekering, tweewekelijkse damage-check en jaarlijkse technische inspectie. Vraag een persoonlijke offerte aan — geen verborgen kosten.',
+    en: 'Includes insurance, bi-weekly damage check and annual technical inspection. Request a personal quote — no hidden fees.',
+  },
+  'mk.storage-outdoor-title': { nl: 'Buitenstalling', en: 'Outdoor storage' },
+  'mk.storage-outdoor-desc': {
+    nl: 'Open verharde plek op afgesloten terrein. Voor wie z\'n caravan flink gebruikt en makkelijk wil oppakken.',
+    en: 'Open paved spot on secured grounds. For frequent users who want easy access.',
+  },
+  'mk.storage-covered-title': { nl: 'Overdekte stalling', en: 'Covered storage' },
+  'mk.storage-covered-desc': {
+    nl: 'Onder eigen dak, beschermd tegen regen, hagel en de Spaanse zon. Beste prijs-kwaliteit voor langere termijn.',
+    en: 'Under our own roof, protected from rain, hail and the Spanish sun. Best value for the long term.',
+  },
+  'mk.storage-covered-badge': { nl: 'Meest gekozen', en: 'Most chosen' },
+  'mk.storage-indoor-title': { nl: 'Binnenstalling', en: 'Indoor storage' },
+  'mk.storage-indoor-desc': {
+    nl: 'Volledig in de loods, klimaatstabiel. Voor exclusieve caravans, oldtimers en wie de kleinste schade wil voorkomen.',
+    en: 'Fully indoors, climate-stable. For premium caravans, oldtimers and those who want to prevent the smallest damage.',
+  },
+  'mk.storage-feat-securitas': { nl: 'Securitas + camerabewaking', en: 'Securitas + camera surveillance' },
+  'mk.storage-feat-insurance': { nl: 'Verzekering inbegrepen', en: 'Insurance included' },
+  'mk.storage-feat-check': { nl: '2-wekelijkse schadecontrole', en: 'Bi-weekly damage check' },
+  'mk.storage-feat-uv': { nl: 'Bescherming tegen UV & weer', en: 'UV & weather protection' },
+  'mk.storage-feat-tech': { nl: 'Jaarlijkse technische check', en: 'Annual technical check' },
+  'mk.storage-feat-priority': { nl: 'Voorrang bij vakantieservice', en: 'Priority for holiday service' },
+  'mk.storage-feat-climate': { nl: 'Constante temperatuur', en: 'Constant temperature' },
+  'mk.storage-feat-staff': { nl: 'Alleen toegang door personeel', en: 'Staff-only access' },
+  'mk.storage-cta': { nl: 'Vraag offerte aan', en: 'Request a quote' },
+  'mk.storage-note': {
+    nl: 'Specifieke maten of XXL caravan? Neem contact op voor een persoonlijke offerte.',
+    en: 'Specific dimensions or XXL caravan? Get in touch for a personal quote.',
+  },
+
+  // Services-grid
+  'mk.svc-eyebrow': { nl: 'Onze diensten', en: 'Our services' },
+  'mk.svc-h2': { nl: 'Meer dan een stalling — een volledige werkplaats', en: 'More than storage — a full workshop' },
+  'mk.svc-intro': {
+    nl: 'Van een lekke band tot reparatie van hagelschade: we lossen het op zonder dat je zelf hoeft over te komen.',
+    en: 'From a flat tire to hail damage repair: we solve it without you having to come over.',
+  },
+  'mk.svc-repair-title': { nl: 'Reparatie', en: 'Repair' },
+  'mk.svc-repair-desc': {
+    nl: 'Carrosserieschade, hagel, vocht, beading en gescheurde wanden. Foto-rapport vóór en na.',
+    en: 'Bodywork damage, hail, moisture, beading and torn walls. Photo report before and after.',
+  },
+  'mk.svc-transport-title': { nl: 'Transport', en: 'Transport' },
+  'mk.svc-transport-desc': {
+    nl: 'We brengen je caravan op afgesproken dag naar de camping. Volledig verzekerd tijdens transport.',
+    en: 'We bring your caravan to the campsite on the agreed day. Fully insured during transport.',
+  },
+  'mk.svc-cleaning-title': { nl: 'Was & wax', en: 'Wash & wax' },
+  'mk.svc-cleaning-desc': {
+    nl: 'Hogedrukreiniging, polijsten en wax-behandeling tegen de zoute zeelucht.',
+    en: 'High-pressure cleaning, polishing and wax treatment against salty sea air.',
+  },
+  'mk.svc-airco-title': { nl: 'Airco-verhuur', en: 'AC rental' },
+  'mk.svc-airco-desc': {
+    nl: 'Mobiele airco-units bezorgd op je staanplaats. Onmisbaar in de Spaanse zomer.',
+    en: 'Mobile AC units delivered to your pitch. Essential in the Spanish summer.',
+  },
+  'mk.svc-fridge-title': { nl: 'Koelkast-verhuur', en: 'Fridge rental' },
+  'mk.svc-fridge-desc': {
+    nl: 'Grote koelkast of tafelmodel — bezorgd op je staanplaats. Vanaf één week.',
+    en: 'Large fridge or tabletop — delivered to your pitch. From one week.',
+  },
+  'mk.svc-inspection-title': { nl: 'Technische inspectie', en: 'Technical inspection' },
+  'mk.svc-inspection-desc': {
+    nl: 'Jaarlijkse keuring met checklist en foto-rapport. Handig voor verzekering of verkoop.',
+    en: 'Annual inspection with checklist and photo report. Useful for insurance or sale.',
+  },
+  'mk.svc-link-more': { nl: 'Meer info', en: 'Learn more' },
+
+  // Vakantieservice
+  'mk.vac-eyebrow': { nl: 'Sleutelklaar pakket', en: 'Turnkey package' },
+  'mk.vac-h2': { nl: 'Stap uit het vliegtuig — stap je vakantie in', en: 'Step off the plane — step into your holiday' },
+  'mk.vac-intro': {
+    nl: 'Met onze Vakantieservice staat je caravan klaar op je gekozen camping zodra jij landt. Wij regelen alles, jij hoeft alleen nog te genieten.',
+    en: 'With our Holiday Service your caravan is ready at your chosen campsite the moment you land. We handle everything, you just enjoy.',
+  },
+  'mk.vac-feat-onsite': { nl: 'Caravan op je plek vóór aankomst', en: 'Caravan at your spot before arrival' },
+  'mk.vac-feat-utilities': { nl: 'Aangesloten op water & stroom', en: 'Connected to water & power' },
+  'mk.vac-feat-fridge': { nl: 'Koelkast aan op verzoek', en: 'Fridge on by request' },
+  'mk.vac-feat-beds': { nl: 'Bedden opgemaakt', en: 'Beds made' },
+  'mk.vac-feat-tent': { nl: 'Voortent geplaatst', en: 'Awning set up' },
+  'mk.vac-feat-cleaning': { nl: 'Eindschoonmaak na vertrek', en: 'Final cleaning after departure' },
+  'mk.vac-cta': { nl: 'Vraag de vakantieservice aan', en: 'Request the holiday service' },
+
+  // Security
+  'mk.sec-eyebrow': { nl: 'Beveiliging & verzekering', en: 'Security & insurance' },
+  'mk.sec-h2': { nl: 'Vier lagen bescherming, 365 dagen per jaar', en: 'Four layers of protection, 365 days a year' },
+  'mk.sec-intro': {
+    nl: 'Niet één feature, maar een volledig systeem dat samenwerkt om jouw caravan te beschermen — ook in de winter wanneer je niet in Spanje bent.',
+    en: 'Not just one feature, but a full system that works together to protect your caravan — also in winter when you\'re not in Spain.',
+  },
+  'mk.sec-cam-title': { nl: 'Camera\'s & alarm', en: 'Cameras & alarm' },
+  'mk.sec-cam-desc': {
+    nl: 'Volledig terrein bewaakt door Securitas Direct. Bewegingsdetectie en directe alarm-melding.',
+    en: 'Entire grounds monitored by Securitas Direct. Motion detection and direct alarm response.',
+  },
+  'mk.sec-fence-title': { nl: 'Afgesloten terrein', en: 'Enclosed grounds' },
+  'mk.sec-fence-desc': {
+    nl: 'Toegang alleen voor personeel of na afspraak. Hekwerk en code-toegang aan elke poort.',
+    en: 'Access only for staff or by appointment. Fencing and code access at every gate.',
+  },
+  'mk.sec-insurance-title': { nl: 'Verzekering inbegrepen', en: 'Insurance included' },
+  'mk.sec-insurance-desc': {
+    nl: 'Standaard gedekt: brand, water, hagel, storm, inbraak en diefstal. Geen losse polis nodig.',
+    en: 'Standard cover: fire, water, hail, storm, break-in and theft. No separate policy needed.',
+  },
+  'mk.sec-check-title': { nl: 'Schadecontrole', en: 'Damage check' },
+  'mk.sec-check-desc': {
+    nl: 'Elke twee weken visuele check door ons team. Jaarlijkse technische inspectie voor het rijseizoen.',
+    en: 'Bi-weekly visual check by our team. Annual technical inspection before the driving season.',
+  },
+
+  // Reviews
+  'mk.rev-eyebrow': { nl: 'Wat klanten zeggen', en: 'What customers say' },
+  'mk.rev-h2': { nl: 'Vier sterren plus negen tienden van een ster', en: 'Four stars plus nine tenths of a star' },
+  'mk.rev-score-num': { nl: '4,9', en: '4.9' },
+  'mk.rev-score-base': { nl: 'Gebaseerd op', en: 'Based on' },
+  'mk.rev-score-count': { nl: '25 Google reviews', en: '25 Google reviews' },
+
+  // About
+  'mk.about-eyebrow': { nl: 'Over ons', en: 'About us' },
+  'mk.about-h2': { nl: 'Een Nederlands familiebedrijf in het hart van Catalonië', en: 'A Dutch family business in the heart of Catalonia' },
+  'mk.about-p1': {
+    nl: 'Sinds 2009 zorgen wij — een Nederlandse familie — voor de caravans, campers en boten van Nederlandse en Belgische gasten. Onze aanpak: persoonlijk, eerlijk, oog voor detail.',
+    en: 'Since 2009, we — a Dutch family — care for the caravans, motorhomes and boats of Dutch and Belgian guests. Our approach: personal, honest, attentive.',
+  },
+  'mk.about-p2': {
+    nl: 'Onze locatie ligt rustig in het binnenland, op 15 minuten van het strand bij Palamós en op een halfuur van Girona. Op het terrein heb je alles bij elkaar: stalling, werkplaats, transport en verkoop.',
+    en: 'Our location is quiet inland, 15 minutes from the beach at Palamós and half an hour from Girona. On-site you have everything: storage, workshop, transport and sales.',
+  },
+  'mk.about-quote': {
+    nl: '"Sinds 2009 hebben we het privilege om de zorg voor jouw caravan over te nemen."',
+    en: '"Since 2009 we\'ve had the privilege of caring for your caravan."',
+  },
+  'mk.about-cta-tour': { nl: 'Plan een rondleiding', en: 'Schedule a tour' },
+  'mk.about-cta-story': { nl: 'Lees ons verhaal', en: 'Read our story' },
+
+  // FAQ
+  'mk.faq-eyebrow': { nl: 'Veelgestelde vragen', en: 'Frequently asked' },
+  'mk.faq-h2': { nl: 'Antwoorden op wat onze klanten vragen', en: 'Answers to what our customers ask' },
+  'mk.faq-q1': { nl: 'Wat is er inbegrepen in de prijs?', en: 'What\'s included in the price?' },
+  'mk.faq-a1': {
+    nl: 'Een opslagplaats, 24/7 bewaking, verzekering tegen brand, water, weer en diefstal, een tweewekelijkse damage-check en een jaarlijkse technische inspectie. Aanvullende diensten zoals transport, schoonmaak of reparatie reken je per keer af.',
+    en: 'A storage spot, 24/7 surveillance, insurance against fire, water, weather and theft, a bi-weekly damage check and an annual technical inspection. Additional services such as transport, cleaning or repair are billed per use.',
+  },
+  'mk.faq-q2': { nl: 'Hoe lang van tevoren moet ik reserveren?', en: 'How far in advance should I book?' },
+  'mk.faq-a2': {
+    nl: 'Voor het zomerseizoen raden we minimaal 4 weken aan. Buiten het seizoen is er meestal direct beschikbaarheid. Vraag een offerte aan en je krijgt binnen 24 uur uitsluitsel.',
+    en: 'For the summer season we recommend at least 4 weeks. Off-season usually has immediate availability. Request a quote and we\'ll respond within 24 hours.',
+  },
+  'mk.faq-q3': { nl: 'Kan ik mijn caravan op elk moment ophalen?', en: 'Can I pick up my caravan anytime?' },
+  'mk.faq-a3': {
+    nl: 'Ja, op afspraak. We werken op afspraak omdat we dan zorgen dat je caravan klaar staat (banden gecontroleerd, dak schoongemaakt, koelkast aan). Meld je 48 uur van tevoren.',
+    en: 'Yes, by appointment. We work by appointment so we can make sure your caravan is ready (tires checked, roof cleaned, fridge on). Notify us 48 hours in advance.',
+  },
+  'mk.faq-q4': { nl: 'Doen jullie ook onderhoud terwijl ik in Nederland ben?', en: 'Do you also do maintenance while I\'m abroad?' },
+  'mk.faq-a4': {
+    nl: 'Ja, dat is precies onze kracht. Spreek af wat er moet gebeuren — banden, remmen, hagelschade, airco — en wij sturen foto\'s van het werk naar je toe. Bij aankomst is alles klaar.',
+    en: 'Yes, that\'s our strength. Agree on what needs to happen — tires, brakes, hail damage, AC — and we send photos of the work. By arrival everything is ready.',
+  },
+  'mk.faq-q5': { nl: 'Kan ik mijn boot ook stallen?', en: 'Can I store my boat too?' },
+  'mk.faq-a5': {
+    nl: 'Zeker. We hebben overdekte en buitenplaatsen voor boten op trailer. Vraag een specifieke offerte aan met de afmetingen van je boot.',
+    en: 'Of course. We have covered and outdoor spots for boats on trailers. Request a specific quote with the dimensions of your boat.',
+  },
+
+  // CTA-strip
+  'mk.cta-h2': { nl: 'Klaar om je caravan in goede handen te geven?', en: 'Ready to put your caravan in good hands?' },
+  'mk.cta-sub': { nl: 'Bel ons direct of vraag online een offerte aan.', en: 'Call us directly or request a quote online.' },
+  'mk.cta-call': { nl: '+34 633 77 86 99', en: '+34 633 77 86 99' },
+  'mk.cta-quote': { nl: 'Vraag offerte aan', en: 'Request a quote' },
+
+  // Diensten-hub (de oude homepage-content)
+  'diensten.hub-eyebrow': { nl: 'Diensten', en: 'Services' },
+  'diensten.hub-h1': { nl: 'Direct online boekbaar', en: 'Book online directly' },
+  'diensten.hub-intro': {
+    nl: 'Kies een dienst, vul je gegevens in, betaal veilig via Stripe — wij gaan ermee aan de slag.',
+    en: 'Pick a service, fill in your details, pay securely via Stripe — we get to work.',
+  },
+  'diensten.hub-reassure-payment': { nl: 'Beveiligde betaling via Stripe', en: 'Secure payment via Stripe' },
+  'diensten.hub-reassure-confirm': { nl: 'Bevestiging direct in je inbox', en: 'Confirmation straight to your inbox' },
+  'diensten.hub-reassure-team': { nl: 'Vast team aan de Costa Brava', en: 'Fixed team on the Costa Brava' },
+
   // ─── Footer ──────────────────────────────────────────────
   'footer.tagline': {
     nl: 'Stalling, reparatie, verkoop en verhuur aan de Costa Brava. Familiebedrijf, 24/7 beveiligd, volledig verzekerd.',

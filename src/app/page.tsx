@@ -1,496 +1,714 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ArrowRight, ChevronDown, Refrigerator, Wind, Truck, Sun, Sparkles, Star, Wrench, Warehouse, ClipboardCheck } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import {
+  Phone, ArrowRight,
+  Shield, Lock, FileCheck2, Search,
+  Wrench, Truck, Sparkles, Wind, Refrigerator, ClipboardCheck,
+} from 'lucide-react';
 import { useLocale } from '@/components/LocaleProvider';
-import LocaleSwitch from '@/components/LocaleSwitch';
+import Topbar from '@/components/marketing/Topbar';
+import PublicHeader from '@/components/PublicHeader';
+import PublicFooter from '@/components/PublicFooter';
 import PhotoSlot from '@/components/PhotoSlot';
-import { PRICES } from '@/lib/pricing';
-import { formatEur } from '@/lib/format';
-
-// Mollie-meets-Stripe deep navy met subtiele warme glow voor zomer-vibe.
-const NAVY_GRAD =
-  'radial-gradient(120% 80% at 50% 0%, #142F4D 0%, #0A1929 60%, #050D18 100%)';
+import type { StringKey } from '@/lib/i18n';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-type LivePrices = {
-  fridgeLarge: number;
-  fridgeTable: number;
-  airco: number;
-  transportWij: number;
-  transportZelf: number;
-};
-
-const FALLBACK: LivePrices = {
-  fridgeLarge: PRICES['Grote koelkast'],
-  fridgeTable: PRICES['Tafelmodel koelkast'],
-  airco: PRICES.Airco,
-  transportWij: 100,
-  transportZelf: 50,
-};
-
-export default function LandingPage() {
-  const { locale, t } = useLocale();
-  const [prices, setPrices] = useState<LivePrices>(FALLBACK);
-
-  useEffect(() => {
-    fetch('/api/order/prices')
-      .then((r) => r.ok ? r.json() : null)
-      .then((d) => {
-        if (!d?.fridge) return;
-        setPrices({
-          fridgeLarge: Number(d.fridge['Grote koelkast'] ?? FALLBACK.fridgeLarge),
-          fridgeTable: Number(d.fridge['Tafelmodel koelkast'] ?? FALLBACK.fridgeTable),
-          airco: Number(d.fridge['Airco'] ?? FALLBACK.airco),
-          transportWij: Number(d.transport_price_wij_rijden ?? FALLBACK.transportWij),
-          transportZelf: Number(d.transport_price_zelf ?? FALLBACK.transportZelf),
-        });
-      })
-      .catch(() => { /* fallback blijft */ });
-  }, []);
-
-  const fmt = (eur: number) => formatEur(eur, locale);
-
+export default function MarketingHomepage() {
+  const { t } = useLocale();
   return (
-    <main id="main" className="min-h-screen" style={{ background: 'var(--color-bg)' }}>
-      {/* HERO — navy met ambient orbs. Alleen dit deel is donker; daarna
-          wordt de pagina rustig wit canvas. */}
-      <header
-        className="relative overflow-hidden"
-        style={{ background: NAVY_GRAD, color: '#F1F5F9' }}
-      >
-        {/* Twee subtiele ambient orbs — minder druk dan voorheen.
-            Lavender pulse weg om kleur-restraint te krijgen. */}
-        <div
-          aria-hidden
-          className="cs-orb-cyan pointer-events-none absolute inset-x-0 top-0 h-[520px] blur-3xl opacity-70"
-          style={{ background: 'var(--gradient-hero-glow-cyan)' }}
-        />
-        <div
-          aria-hidden
-          className="cs-orb-amber pointer-events-none absolute -bottom-32 -right-20 h-[520px] w-[520px] blur-3xl opacity-70"
-          style={{ background: 'var(--gradient-hero-glow-amber)' }}
-        />
+    <div className="mk-page min-h-screen flex flex-col">
+      <Topbar />
+      <PublicHeader variant="marketing-cream" />
 
-        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
-          <LocaleSwitch />
-        </div>
+      <main id="main" className="flex-1">
+        <Hero t={t} />
+        <StatsStrip t={t} />
+        <StorageOverview t={t} />
+        <ServicesGrid t={t} />
+        <VacationService t={t} />
+        <Security t={t} />
+        <Reviews t={t} />
+        <About t={t} />
+        <FaqSection t={t} />
+        <CtaStrip t={t} />
+      </main>
 
-      <div className="relative max-w-6xl mx-auto px-5 sm:px-8 pt-10 sm:pt-16 pb-12 sm:pb-20">
-        {/* Hero — 12-kolom grid op lg+. Tekst links (col-span-7), PhotoSlot
-            rechts (col-span-5). Op md- centered single-column zonder slot. */}
+      <PublicFooter />
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// HERO
+// ──────────────────────────────────────────────────────────────
+function Hero({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
+  return (
+    <section className="mk-hero-bg relative overflow-hidden" style={{ paddingTop: '4rem', paddingBottom: '3.5rem' }}>
+      <div className="relative max-w-[1180px] mx-auto px-5 sm:px-8">
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, ease: EASE }}
-          className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center mb-10 sm:mb-14"
+          className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.9fr] gap-10 lg:gap-16 items-center"
         >
-          <div className="lg:col-span-7 text-center lg:text-left">
-            <Image
-              src="/images/logo.png"
-              alt="Caravanstalling Spanje"
-              width={420}
-              height={95}
-              priority
-              className="mx-auto lg:mx-0 h-14 sm:h-20 w-auto mb-7 sm:mb-9"
-              style={{
-                filter:
-                  'drop-shadow(0 0 32px rgba(242,169,59,0.22)) drop-shadow(0 2px 6px rgba(0,0,0,0.35))',
-              }}
-            />
-            <div className="cs-brand-eyebrow mb-5">
-              <Sun size={12} aria-hidden /> {t('home.eyebrow')}
-            </div>
+          {/* Tekst-kolom */}
+          <div>
+            <span
+              className="mk-eyebrow inline-block mb-4"
+              style={{ color: '#ffd29b' }}
+            >
+              {t('mk.hero-eyebrow')}
+            </span>
             <h1
-              className="font-semibold tracking-tight"
+              className="font-display"
               style={{
                 color: '#FFFFFF',
-                fontSize: 'clamp(2rem, 4vw + 1rem, 3.5rem)',
-                lineHeight: 1.08,
-                letterSpacing: '-0.022em',
+                fontSize: 'clamp(2.1rem, 4.6vw, 3.6rem)',
+                fontWeight: 700,
+                lineHeight: 1.12,
+                letterSpacing: '-0.012em',
+                margin: '0 0 0.4em',
               }}
             >
-              {t('home.h1-line1')}
-              <br className="hidden sm:block" />{' '}
-              <span
-                style={{
-                  background: 'linear-gradient(135deg, #FFFFFF 0%, #FBF5EC 60%, #FFC25A 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                {t('home.h1-line2')}
-              </span>
+              {t('mk.hero-h1-prefix')}{' '}
+              <span style={{ color: '#ffd29b', fontStyle: 'italic' }}>
+                {t('mk.hero-h1-accent')}
+              </span>{' '}
+              {t('mk.hero-h1-suffix')}
             </h1>
             <p
-              className="mt-4 leading-relaxed max-w-lg mx-auto lg:mx-0 text-[15px] sm:text-[17px]"
-              style={{ color: 'rgba(251,245,236,0.78)' }}
+              className="text-[1.05rem] sm:text-[1.15rem] leading-relaxed max-w-xl mb-7"
+              style={{ color: 'rgba(255,255,255,0.85)' }}
             >
-              {t('home.intro')}
+              {t('mk.hero-lead')}
             </p>
 
-            {/* Trust-triplet met accent-tints per pill */}
-            <motion.div
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.4 }}
-              className="mt-6 flex flex-wrap items-center justify-center lg:justify-start gap-2"
-            >
-              <a
-                href="https://g.co/kgs/caravanstalling"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="press-spring inline-flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors"
-                style={{
-                  background: 'rgba(242,169,59,0.10)',
-                  border: '1px solid rgba(242,169,59,0.28)',
-                  color: '#F1F5F9',
-                }}
-                aria-label={t('home.trust-aria')}
-              >
-                <span aria-hidden className="flex items-center gap-0.5">
-                  {[0, 1, 2, 3, 4].map((i) => (
-                    <Star key={i} size={11} fill="currentColor" style={{ color: 'var(--color-amber-bright)' }} />
-                  ))}
-                </span>
-                <span className="text-[11px] font-medium tabular-nums">4.9</span>
-                <span className="text-[11px]" style={{ color: 'rgba(241,245,249,0.65)' }}>
-                  {t('home.trust-reviews')}
-                </span>
-              </a>
-              <span
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium"
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  color: 'rgba(251,245,236,0.85)',
-                }}
-              >
-                <Sparkles size={11} aria-hidden style={{ color: 'rgba(251,245,236,0.55)' }} />
-                {t('home.trust-experience')}
-              </span>
-              <span
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium"
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  color: 'rgba(251,245,236,0.85)',
-                }}
-              >
-                <Wrench size={11} aria-hidden style={{ color: 'rgba(251,245,236,0.55)' }} />
-                {t('home.trust-workshop')}
-              </span>
-            </motion.div>
+            <div className="flex gap-3 flex-wrap">
+              <Link href="/diensten" className="mk-btn-primary">
+                {t('mk.hero-cta-primary')}
+                <ArrowRight size={16} aria-hidden />
+              </Link>
+              <Link href="/contact" className="mk-btn-ghost">
+                {t('mk.hero-cta-secondary')}
+              </Link>
+            </div>
+
+            {/* Trust-row */}
+            <div className="mt-9 flex flex-wrap gap-7 items-start">
+              <div>
+                <div style={{ color: '#ffc04d', letterSpacing: '2px', fontSize: '1.05rem' }}>★★★★★</div>
+                <small className="block text-[0.82rem]" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                  <strong style={{ color: '#fff' }}>{t('mk.hero-trust-rating')}</strong> · {t('mk.hero-trust-rating-sub')}
+                </small>
+              </div>
+              <div>
+                <strong className="block text-[0.95rem]" style={{ color: '#fff' }}>{t('mk.hero-trust-securitas')}</strong>
+                <small className="block text-[0.82rem]" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                  {t('mk.hero-trust-securitas-sub')}
+                </small>
+              </div>
+              <div>
+                <strong className="block text-[0.95rem]" style={{ color: '#fff' }}>{t('mk.hero-trust-team')}</strong>
+                <small className="block text-[0.82rem]" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                  {t('mk.hero-trust-team-sub')}
+                </small>
+              </div>
+            </div>
           </div>
 
-          {/* Foto-slot rechts — alleen op lg+. Onzichtbare placeholder
-              tot src wordt ingevuld; dan vervang met:
-              <PhotoSlot ratio="hero" src="/brand/hero.jpg" alt="..." priority /> */}
-          <div className="hidden lg:block lg:col-span-5">
+          {/* Foto-slot rechts (lg+). Tot URL geleverd: aspect-ratio bewaard. */}
+          <div className="hidden lg:block">
             <PhotoSlot
               ratio="hero"
-              src="https://u.cubeupload.com/laurensbos/IMG3797.jpg"
-              alt="Onze caravanstalling aan de Costa Brava"
-              priority
-              className="rounded-[var(--radius-2xl)]"
+              ariaLabel="Caravanstalling Spanje terrein"
+              className="rounded-[22px]"
               style={{
-                border: '1px solid rgba(255,255,255,0.10)',
-                boxShadow: '0 24px 56px -12px rgba(0,0,0,0.5)',
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.18)',
+                boxShadow: '0 20px 60px rgba(8, 38, 56, 0.30)',
               }}
             />
           </div>
         </motion.div>
+      </div>
+    </section>
+  );
+}
 
-        {/* Scroll-indicator — leidt naar service-cards. Decoratief, op
-            mobiel verborgen want daar staan de cards al direct onder. */}
-        <motion.div
-          aria-hidden
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.55 }}
-          transition={{ delay: 0.6, duration: 0.6 }}
-          className="hidden sm:flex flex-col items-center gap-1 mb-8 sm:mb-12"
-          style={{ color: 'rgba(241,245,249,0.5)' }}
-        >
-          <span className="text-[10px] uppercase tracking-[0.22em] font-medium">Bekijk diensten</span>
-          <ChevronDown size={16} className="animate-bounce" />
-        </motion.div>
+// ──────────────────────────────────────────────────────────────
+// STATS-STRIP
+// ──────────────────────────────────────────────────────────────
+function StatsStrip({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
+  const stats = [
+    { num: '650+',  labelKey: 'mk.stat-customers' as StringKey },
+    { num: '15+',   labelKey: 'mk.stat-years'     as StringKey },
+    { num: '100%',  labelKey: 'mk.stat-insured'   as StringKey },
+    { num: '24/7',  labelKey: 'mk.stat-guarded'   as StringKey },
+  ];
+  return (
+    <section
+      className="border-t border-b"
+      style={{ background: 'var(--color-sand)', borderColor: 'var(--color-marketing-line)' }}
+    >
+      <div className="max-w-[1180px] mx-auto px-5 sm:px-8 py-9 grid grid-cols-2 md:grid-cols-4 gap-6">
+        {stats.map((s) => (
+          <div key={s.num} className="text-center">
+            <div className="mk-stat-num">{s.num}</div>
+            <div
+              className="mt-1 text-[0.82rem] font-semibold uppercase"
+              style={{ color: 'var(--color-marketing-ink-soft)', letterSpacing: '0.04em' }}
+            >
+              {t(s.labelKey)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// STORAGE OVERVIEW (zonder prijzen — gebruiker geeft die niet publiek)
+// ──────────────────────────────────────────────────────────────
+function StorageOverview({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
+  const tiers = [
+    {
+      titleKey: 'mk.storage-outdoor-title' as StringKey,
+      descKey: 'mk.storage-outdoor-desc' as StringKey,
+      featured: false,
+      featureKeys: ['mk.storage-feat-securitas', 'mk.storage-feat-insurance', 'mk.storage-feat-check'] as StringKey[],
+    },
+    {
+      titleKey: 'mk.storage-covered-title' as StringKey,
+      descKey: 'mk.storage-covered-desc' as StringKey,
+      featured: true,
+      featureKeys: ['mk.storage-feat-securitas', 'mk.storage-feat-insurance', 'mk.storage-feat-uv', 'mk.storage-feat-tech', 'mk.storage-feat-priority'] as StringKey[],
+    },
+    {
+      titleKey: 'mk.storage-indoor-title' as StringKey,
+      descKey: 'mk.storage-indoor-desc' as StringKey,
+      featured: false,
+      featureKeys: ['mk.storage-feat-securitas', 'mk.storage-feat-insurance', 'mk.storage-feat-climate', 'mk.storage-feat-staff'] as StringKey[],
+    },
+  ];
+
+  return (
+    <section id="stalling" className="py-16 sm:py-20">
+      <div className="max-w-[1180px] mx-auto px-5 sm:px-8">
+        <div className="text-center max-w-[720px] mx-auto mb-12">
+          <span className="mk-eyebrow mb-3 block">{t('mk.storage-eyebrow')}</span>
+          <h2>{t('mk.storage-h2')}</h2>
+          <p className="mt-3">{t('mk.storage-intro')}</p>
         </div>
-      </header>
 
-      {/* CONTENT — wit canvas, rust en witruimte. Geen ambient orbs hier;
-          de premium-feel komt van schaduw + typografie + gerichte amber-CTA's. */}
-      <section
-        className="relative"
-        style={{ background: 'var(--color-bg)', color: 'var(--color-text)' }}
-      >
-        <div className="relative max-w-6xl mx-auto px-5 sm:px-8 pt-12 sm:pt-20 pb-12 sm:pb-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {tiers.map((tier) => (
+            <div
+              key={tier.titleKey}
+              className="relative rounded-[22px] p-7 transition-all hover:-translate-y-1"
+              style={{
+                background: '#fff',
+                border: tier.featured ? '2px solid var(--color-terracotta)' : '1px solid var(--color-marketing-line)',
+                boxShadow: tier.featured ? 'var(--shadow-md)' : 'var(--shadow-sm)',
+              }}
+            >
+              {tier.featured && (
+                <span
+                  aria-hidden
+                  className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[0.72rem] font-bold uppercase tracking-[0.05em]"
+                  style={{ background: 'var(--color-terracotta)', color: '#fff' }}
+                >
+                  {t('mk.storage-covered-badge')}
+                </span>
+              )}
+              <h3
+                className="font-sans"
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '1.05rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  color: 'var(--color-terracotta-deep)',
+                  fontWeight: 700,
+                  margin: '0 0 0.4rem',
+                }}
+              >
+                {t(tier.titleKey)}
+              </h3>
+              <p className="text-[0.92rem]" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+                {t(tier.descKey)}
+              </p>
+              <ul className="list-none p-0 mt-4 mb-6 space-y-2">
+                {tier.featureKeys.map((fk) => (
+                  <li
+                    key={fk}
+                    className="relative pl-7 text-[0.9rem]"
+                    style={{ color: 'var(--color-marketing-ink)' }}
+                  >
+                    <span
+                      aria-hidden
+                      className="absolute left-0 top-[0.55rem] block"
+                      style={{
+                        width: 14, height: 8,
+                        borderLeft: '2px solid #3d6e4c',
+                        borderBottom: '2px solid #3d6e4c',
+                        transform: 'rotate(-45deg)',
+                      }}
+                    />
+                    {t(fk)}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/contact?subject=Stalling-aanvraag"
+                className={tier.featured ? 'mk-btn-primary w-full justify-center' : 'mk-btn-secondary w-full justify-center'}
+                style={{ display: 'inline-flex', width: '100%' }}
+              >
+                {t('mk.storage-cta')}
+              </Link>
+            </div>
+          ))}
+        </div>
 
-        {/* Sectie-koptekst — context vóór de service-grid. */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: 0.4, ease: EASE }}
-          className="mb-6 sm:mb-8 text-center lg:text-left"
-        >
-          <span aria-hidden className="cs-accent-stripe mb-3 lg:hidden" style={{ display: 'block', margin: '0 auto 12px' }} />
-          <span aria-hidden className="cs-accent-stripe mb-3 hidden lg:inline-block" />
-          <h2
-            className="font-semibold tracking-tight"
+        <p className="text-center mt-6 text-[0.85rem]" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+          {t('mk.storage-note')}
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// SERVICES GRID
+// ──────────────────────────────────────────────────────────────
+function ServicesGrid({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
+  const services: Array<{ icon: typeof Wrench; titleKey: StringKey; descKey: StringKey; href: string }> = [
+    { icon: Wrench, titleKey: 'mk.svc-repair-title', descKey: 'mk.svc-repair-desc', href: '/diensten/reparatie' },
+    { icon: Truck,  titleKey: 'mk.svc-transport-title', descKey: 'mk.svc-transport-desc', href: '/diensten/transport' },
+    { icon: Sparkles, titleKey: 'mk.svc-cleaning-title', descKey: 'mk.svc-cleaning-desc', href: '/diensten/service' },
+    { icon: Wind, titleKey: 'mk.svc-airco-title', descKey: 'mk.svc-airco-desc', href: '/diensten/airco' },
+    { icon: Refrigerator, titleKey: 'mk.svc-fridge-title', descKey: 'mk.svc-fridge-desc', href: '/koelkast' },
+    { icon: ClipboardCheck, titleKey: 'mk.svc-inspection-title', descKey: 'mk.svc-inspection-desc', href: '/diensten/inspectie' },
+  ];
+
+  return (
+    <section id="diensten" className="py-16 sm:py-20" style={{ background: 'var(--color-sand)' }}>
+      <div className="max-w-[1180px] mx-auto px-5 sm:px-8">
+        <div className="text-center max-w-[720px] mx-auto mb-12">
+          <span className="mk-eyebrow mb-3 block">{t('mk.svc-eyebrow')}</span>
+          <h2>{t('mk.svc-h2')}</h2>
+          <p className="mt-3">{t('mk.svc-intro')}</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {services.map((s) => {
+            const Icon = s.icon;
+            return (
+              <Link
+                key={s.href}
+                href={s.href}
+                className="group block p-6 rounded-[14px] transition-transform hover:-translate-y-0.5"
+                style={{
+                  background: '#fff',
+                  border: '1px solid var(--color-marketing-line)',
+                }}
+              >
+                <div
+                  className="w-13 h-13 rounded-xl flex items-center justify-center mb-4"
+                  style={{ background: 'var(--color-sand-2)', width: 52, height: 52 }}
+                >
+                  <Icon size={22} style={{ color: 'var(--color-navy)' }} aria-hidden />
+                </div>
+                <h3
+                  className="font-sans text-[1.1rem] mb-1"
+                  style={{ fontFamily: 'var(--font-sans)', color: 'var(--color-navy)', margin: '0 0 0.3rem' }}
+                >
+                  {t(s.titleKey)}
+                </h3>
+                <p className="text-[0.92rem]" style={{ color: 'var(--color-marketing-ink-soft)', margin: 0 }}>
+                  {t(s.descKey)}
+                </p>
+                <span
+                  className="inline-flex items-center gap-1 mt-3 text-[0.9rem] font-semibold transition-transform group-hover:translate-x-0.5"
+                  style={{ color: 'var(--color-terracotta-deep)' }}
+                >
+                  {t('mk.svc-link-more')} <ArrowRight size={14} aria-hidden />
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// VACATION SERVICE
+// ──────────────────────────────────────────────────────────────
+function VacationService({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
+  const features: StringKey[] = [
+    'mk.vac-feat-onsite',
+    'mk.vac-feat-utilities',
+    'mk.vac-feat-fridge',
+    'mk.vac-feat-beds',
+    'mk.vac-feat-tent',
+    'mk.vac-feat-cleaning',
+  ];
+
+  return (
+    <section
+      id="vakantie"
+      className="py-16 sm:py-20"
+      style={{
+        background: 'linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-deep) 100%)',
+        color: '#fff',
+      }}
+    >
+      <div className="max-w-[1180px] mx-auto px-5 sm:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
+          <div>
+            <span className="mk-eyebrow mb-3 block" style={{ color: '#ffd29b' }}>
+              {t('mk.vac-eyebrow')}
+            </span>
+            <h2 style={{ color: '#fff' }}>{t('mk.vac-h2')}</h2>
+            <p className="mt-3" style={{ color: 'rgba(255,255,255,0.82)' }}>
+              {t('mk.vac-intro')}
+            </p>
+            <ul className="list-none p-0 mt-6 mb-7 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {features.map((fk) => (
+                <li key={fk} className="relative pl-8 text-[0.95rem]" style={{ color: 'rgba(255,255,255,0.92)' }}>
+                  <span
+                    aria-hidden
+                    className="absolute left-0 top-[-1px] inline-grid place-items-center text-[0.78rem] font-bold"
+                    style={{
+                      width: 22, height: 22, borderRadius: '50%',
+                      background: 'var(--color-terracotta)', color: '#fff',
+                    }}
+                  >
+                    ✓
+                  </span>
+                  {t(fk)}
+                </li>
+              ))}
+            </ul>
+            <Link href="/contact?subject=Vakantieservice" className="mk-btn-primary">
+              {t('mk.vac-cta')}
+            </Link>
+          </div>
+
+          <div
+            className="rounded-[22px] p-7"
             style={{
-              color: 'var(--color-text)',
-              fontSize: 'clamp(1.5rem, 2vw + 0.75rem, 2.125rem)',
-              letterSpacing: '-0.018em',
-              lineHeight: 1.15,
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.18)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
             }}
           >
-            {t('home.section-services')}
-          </h2>
-          <p
-            className="mt-2 max-w-xl mx-auto lg:mx-0 text-[14px] sm:text-[15px] leading-relaxed"
-            style={{ color: 'var(--color-text-muted)' }}
-          >
-            {t('home.section-services-intro')}
+            <PhotoSlot
+              ratio="4/3"
+              ariaLabel="Vakantieservice"
+              className="rounded-[14px]"
+              style={{ background: 'rgba(255,255,255,0.04)' }}
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// SECURITY
+// ──────────────────────────────────────────────────────────────
+function Security({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
+  const items: Array<{ icon: typeof Shield; titleKey: StringKey; descKey: StringKey }> = [
+    { icon: Shield, titleKey: 'mk.sec-cam-title', descKey: 'mk.sec-cam-desc' },
+    { icon: Lock, titleKey: 'mk.sec-fence-title', descKey: 'mk.sec-fence-desc' },
+    { icon: FileCheck2, titleKey: 'mk.sec-insurance-title', descKey: 'mk.sec-insurance-desc' },
+    { icon: Search, titleKey: 'mk.sec-check-title', descKey: 'mk.sec-check-desc' },
+  ];
+
+  return (
+    <section
+      className="relative overflow-hidden py-16 sm:py-20"
+      style={{ background: 'var(--color-navy)', color: '#fff' }}
+    >
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: 'radial-gradient(circle at 80% 20%, rgba(217,110,60,0.15), transparent 50%)',
+        }}
+      />
+      <div className="relative max-w-[1180px] mx-auto px-5 sm:px-8">
+        <div className="text-center max-w-[720px] mx-auto mb-12">
+          <span className="mk-eyebrow mb-3 block" style={{ color: '#ffd29b' }}>
+            {t('mk.sec-eyebrow')}
+          </span>
+          <h2 style={{ color: '#fff' }}>{t('mk.sec-h2')}</h2>
+          <p className="mt-3" style={{ color: 'rgba(255,255,255,0.82)' }}>
+            {t('mk.sec-intro')}
           </p>
-        </motion.div>
-
-        {/* Service-grid — featured-card span 3 cols op lg, anderen 1.
-            Mobile: stacked. md: 2 cols. lg: 3 cols. */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-          <ServiceCard
-            href="/koelkast"
-            icon={Refrigerator}
-            tag={t('home.svc-fridge-tag')}
-            title={t('home.svc-fridge-title')}
-            desc={t('home.svc-fridge-desc')}
-            price={t('home.svc-fridge-price', fmt(prices.fridgeTable))}
-            cta={t('home.svc-cta-order')}
-            delay={0.05}
-
-            featured
-          />
-          <ServiceCard
-            href="/diensten/airco"
-            icon={Wind}
-            tag={t('home.svc-airco-tag')}
-            title={t('home.svc-airco-title')}
-            desc={t('home.svc-airco-desc')}
-            price={t('home.svc-airco-price', fmt(prices.airco))}
-            cta={t('home.svc-cta-order')}
-            delay={0.12}
-
-          />
-          <ServiceCard
-            href="/diensten/transport"
-            icon={Truck}
-            tag={t('home.svc-transport-tag')}
-            title={t('home.svc-transport-title')}
-            desc={t('home.svc-transport-desc')}
-            price={`${fmt(prices.transportZelf)} – ${fmt(prices.transportWij)}`}
-            cta={t('home.svc-cta-order')}
-            delay={0.19}
-
-          />
-          <ServiceCard
-            href="/diensten/service"
-            icon={Sparkles}
-            tag={t('home.svc-service-tag')}
-            title={t('home.svc-service-title')}
-            desc={t('home.svc-service-desc')}
-            price={t('home.svc-service-price')}
-            cta={t('home.svc-cta-order')}
-            delay={0.26}
-
-          />
-          <ServiceCard
-            href="/diensten/stalling"
-            icon={Warehouse}
-            tag={t('home.svc-storage-tag')}
-            title={t('home.svc-storage-title')}
-            desc={t('home.svc-storage-desc')}
-            price={t('home.svc-storage-price')}
-            cta={t('home.svc-cta-info')}
-            delay={0.33}
-
-          />
-          <ServiceCard
-            href="/diensten/reparatie"
-            icon={Wrench}
-            tag={t('home.svc-repair-tag')}
-            title={t('home.svc-repair-title')}
-            desc={t('home.svc-repair-desc')}
-            price={t('home.svc-repair-price')}
-            cta={t('home.svc-cta-info')}
-            delay={0.40}
-
-          />
-          <ServiceCard
-            href="/diensten/inspectie"
-            icon={ClipboardCheck}
-            tag={t('home.svc-inspection-tag')}
-            title={t('home.svc-inspection-title')}
-            desc={t('home.svc-inspection-desc')}
-            price={t('home.svc-inspection-price')}
-            cta={t('home.svc-cta-info')}
-            delay={0.47}
-
-          />
         </div>
 
-        {/* Reassurance + contact — op cream canvas, dark text. */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-          className="mt-10 sm:mt-14 text-center"
-        >
-          <div
-            className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[12px] sm:text-[13px]"
-            style={{ color: 'var(--color-text-muted)' }}
-          >
-            <span className="inline-flex items-center gap-1.5">
-              <Sparkles size={11} aria-hidden /> {t('home.reassure-payment')}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Sparkles size={11} aria-hidden /> {t('home.reassure-confirm')}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Sparkles size={11} aria-hidden /> {t('home.reassure-team')}
-            </span>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          {items.map((it) => {
+            const Icon = it.icon;
+            return (
+              <div key={it.titleKey} className="text-center px-4 py-6">
+                <div
+                  className="mx-auto mb-4 grid place-items-center"
+                  style={{
+                    width: 64, height: 64, borderRadius: '50%',
+                    background: 'rgba(255,255,255,0.08)',
+                    border: '1.5px solid rgba(255,255,255,0.18)',
+                  }}
+                >
+                  <Icon size={26} aria-hidden style={{ color: '#ffd29b' }} />
+                </div>
+                <h4
+                  className="font-sans text-[1rem] mb-1"
+                  style={{ fontFamily: 'var(--font-sans)', color: '#fff', margin: '0 0 0.3rem' }}
+                >
+                  {t(it.titleKey)}
+                </h4>
+                <p className="text-[0.88rem]" style={{ color: 'rgba(255,255,255,0.82)', margin: 0 }}>
+                  {t(it.descKey)}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// REVIEWS — placeholder met 3 quotes; later vervangen door echte
+// Google review snippets als die er komen.
+// ──────────────────────────────────────────────────────────────
+function Reviews({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
+  // Placeholder testimonials — later vervangen door echte Google reviews.
+  const reviews = [
+    {
+      stars: 5,
+      text: '"Onze caravan stond perfect schoon en gerepareerd voor onze aankomst. Wat een service en wat fijne mensen. Bij aankomst zelfs een welkomstpakket. Echt top."',
+      author: 'Martine V.',
+      sub: 'Vaste klant sinds 2018',
+      avatar: 'MV',
+    },
+    {
+      stars: 5,
+      text: '"Hagelschade aan ons dak in twee dagen onzichtbaar gerepareerd terwijl wij in Nederland waren. Alles in foto\'s gedocumenteerd. Dit is hoe je een bedrijf runt."',
+      author: 'Jan D.',
+      sub: 'Reparatie-klant',
+      avatar: 'JD',
+    },
+    {
+      stars: 5,
+      text: '"Persoonlijk, betrouwbaar en altijd bereikbaar in het Nederlands. We laten onze camper hier al vier jaar staan en het voelt elke keer als thuiskomen."',
+      author: 'Peter & Brigitte',
+      sub: 'Camper-klant uit Hilversum',
+      avatar: 'PB',
+    },
+  ];
+
+  return (
+    <section className="py-16 sm:py-20" style={{ background: 'var(--color-sand)' }}>
+      <div className="max-w-[1180px] mx-auto px-5 sm:px-8">
+        <div className="flex justify-between items-end flex-wrap gap-6 mb-10">
+          <div>
+            <span className="mk-eyebrow mb-3 block">{t('mk.rev-eyebrow')}</span>
+            <h2>{t('mk.rev-h2')}</h2>
           </div>
+          <div
+            className="flex items-center gap-4 px-5 py-4 rounded-[14px]"
+            style={{
+              background: '#fff',
+              border: '1px solid var(--color-marketing-line)',
+              boxShadow: 'var(--shadow-sm)',
+            }}
+          >
+            <div>
+              <div className="mk-stat-num" style={{ fontSize: '2.4rem' }}>{t('mk.rev-score-num')}</div>
+              <div style={{ color: '#f5b94a', fontSize: '0.9rem', letterSpacing: '1px' }}>★★★★★</div>
+            </div>
+            <div>
+              <small className="block text-[0.8rem]" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+                {t('mk.rev-score-base')}
+              </small>
+              <strong className="block text-[1rem]" style={{ color: 'var(--color-navy)' }}>
+                {t('mk.rev-score-count')}
+              </strong>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          {reviews.map((r, i) => (
+            <div
+              key={i}
+              className="p-6 rounded-[14px]"
+              style={{ background: '#fff', border: '1px solid var(--color-marketing-line)' }}
+            >
+              <div style={{ color: '#f5b94a', fontSize: '1rem', letterSpacing: '1px', marginBottom: '0.8rem' }}>
+                {'★'.repeat(r.stars)}
+              </div>
+              <p className="italic text-[0.95rem] mb-4" style={{ color: 'var(--color-marketing-ink)' }}>
+                {r.text}
+              </p>
+              <div className="flex items-center gap-3">
+                <div
+                  className="grid place-items-center font-bold text-[0.9rem]"
+                  style={{
+                    width: 38, height: 38, borderRadius: '50%',
+                    background: 'var(--color-terracotta)', color: '#fff',
+                  }}
+                >
+                  {r.avatar}
+                </div>
+                <div>
+                  <strong className="block text-[0.9rem]" style={{ color: 'var(--color-navy)' }}>{r.author}</strong>
+                  <small className="text-[0.8rem]" style={{ color: 'var(--color-marketing-ink-soft)' }}>{r.sub}</small>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// ABOUT
+// ──────────────────────────────────────────────────────────────
+function About({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
+  return (
+    <section id="about" className="py-16 sm:py-20">
+      <div className="max-w-[1180px] mx-auto px-5 sm:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
+          {/* Visual met overlay-quote */}
+          <div
+            className="relative rounded-[22px] overflow-hidden"
+            style={{
+              aspectRatio: '4 / 5',
+              background:
+                'linear-gradient(135deg, rgba(14,58,85,0.5), rgba(217,110,60,0.4)), linear-gradient(180deg, #4d8fb3 0%, #f0c89a 60%, #d96e3c 100%)',
+              boxShadow: 'var(--shadow-md)',
+            }}
+          >
+            <PhotoSlot
+              ratio="4/3"
+              ariaLabel="Onze locatie"
+              className="absolute inset-0"
+              style={{ background: 'transparent' }}
+            />
+            <div
+              className="absolute bottom-6 left-6 right-6 italic text-[1.05rem]"
+              style={{
+                color: '#fff',
+                fontFamily: 'var(--font-display)',
+                lineHeight: 1.4,
+                textShadow: '0 2px 12px rgba(0,0,0,0.3)',
+              }}
+            >
+              {t('mk.about-quote')}
+            </div>
+          </div>
+
+          {/* Tekst */}
+          <div>
+            <span className="mk-eyebrow mb-3 block">{t('mk.about-eyebrow')}</span>
+            <h2>{t('mk.about-h2')}</h2>
+            <p className="mt-3">{t('mk.about-p1')}</p>
+            <p>{t('mk.about-p2')}</p>
+            <div className="flex gap-3 flex-wrap mt-6">
+              <Link href="/contact" className="mk-btn-primary">
+                {t('mk.about-cta-tour')}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// FAQ
+// ──────────────────────────────────────────────────────────────
+function FaqSection({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
+  const items: Array<{ qKey: StringKey; aKey: StringKey }> = [
+    { qKey: 'mk.faq-q1', aKey: 'mk.faq-a1' },
+    { qKey: 'mk.faq-q2', aKey: 'mk.faq-a2' },
+    { qKey: 'mk.faq-q3', aKey: 'mk.faq-a3' },
+    { qKey: 'mk.faq-q4', aKey: 'mk.faq-a4' },
+    { qKey: 'mk.faq-q5', aKey: 'mk.faq-a5' },
+  ];
+  return (
+    <section className="py-16 sm:py-20" style={{ background: 'var(--color-sand)' }}>
+      <div className="max-w-[1180px] mx-auto px-5 sm:px-8">
+        <div className="text-center max-w-[720px] mx-auto mb-12">
+          <span className="mk-eyebrow mb-3 block">{t('mk.faq-eyebrow')}</span>
+          <h2>{t('mk.faq-h2')}</h2>
+        </div>
+        <div className="max-w-[820px] mx-auto">
+          {items.map((it) => (
+            <details key={it.qKey} className="mk-faq-item">
+              <summary>{t(it.qKey)}</summary>
+              <div className="mk-faq-answer">{t(it.aKey)}</div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────
+// CTA-STRIP (terracotta)
+// ──────────────────────────────────────────────────────────────
+function CtaStrip({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
+  return (
+    <section
+      id="contact"
+      className="py-12 sm:py-14"
+      style={{ background: 'var(--color-terracotta)', color: '#fff' }}
+    >
+      <div className="max-w-[1180px] mx-auto px-5 sm:px-8 flex justify-between items-center gap-6 flex-wrap">
+        <div>
+          <h2 className="font-display" style={{ color: '#fff', margin: 0, fontSize: 'clamp(1.4rem, 2.4vw, 2rem)' }}>
+            {t('mk.cta-h2')}
+          </h2>
+          <p className="mt-1" style={{ color: 'rgba(255,255,255,0.92)', margin: 0 }}>
+            {t('mk.cta-sub')}
+          </p>
+        </div>
+        <div className="flex gap-3 flex-wrap">
+          <a
+            href="tel:+34633778699"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-[0.95rem] font-semibold"
+            style={{ background: '#fff', color: 'var(--color-terracotta-deep)' }}
+          >
+            <Phone size={16} aria-hidden /> {t('mk.cta-call')}
+          </a>
           <Link
             href="/contact"
-            className="inline-block mt-6 text-[13px] underline-offset-4 hover:underline transition-colors"
-            style={{ color: 'var(--color-text)' }}
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-[0.95rem] font-semibold"
+            style={{ background: 'var(--color-marketing-cream)', color: 'var(--color-terracotta-deep)' }}
           >
-            {t('home.contact-link')}
+            {t('mk.cta-quote')}
           </Link>
-        </motion.div>
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
   );
 }
 
-// Premium service-card: wit canvas, soft shadow, één accent (amber).
-// Geen vier kleuren meer per kaart — restraint = premium. Accent komt
-// alleen op CTA-pijl en hover-glow.
-
-function ServiceCard({
-  href, icon: Icon, tag, title, desc, price, cta, delay,
-  featured = false,
-}: {
-  href: string;
-  icon: typeof Refrigerator;
-  tag: string;
-  title: string;
-  desc: string;
-  price: string;
-  cta: string;
-  delay: number;
-  /** Featured = grotere card, span 2 cols op md+. */
-  featured?: boolean;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.45, ease: EASE }}
-      className={featured ? 'md:col-span-2 lg:col-span-3' : ''}
-    >
-      <Link
-        href={href}
-        className="cs-card-light group block h-full p-5 sm:p-6 rounded-[var(--radius-2xl)] relative overflow-hidden transition-all hover:-translate-y-0.5"
-        style={{
-          background: 'var(--color-surface)',
-          border: '1px solid var(--color-border)',
-          boxShadow: '0 1px 2px rgba(20,14,5,0.04), 0 8px 24px -8px rgba(20,14,5,0.06)',
-        }}
-      >
-        {/* Subtiele amber hover-glow van bovenaan — alleen op hover, zachtjes. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{
-            background: 'radial-gradient(60% 50% at 50% 0%, rgba(242,169,59,0.08) 0%, transparent 70%)',
-          }}
-        />
-
-        <div className="relative flex flex-col h-full">
-          {/* Icon + tag */}
-          <div className="flex items-start justify-between gap-3 mb-4">
-            <div
-              className="w-11 h-11 sm:w-12 sm:h-12 rounded-[var(--radius-lg)] flex items-center justify-center shrink-0 transition-transform group-hover:scale-105"
-              style={{
-                background: 'var(--color-surface-2)',
-                border: '1px solid var(--color-border)',
-                color: 'var(--color-text)',
-              }}
-            >
-              <Icon size={22} aria-hidden />
-            </div>
-            <div
-              className="text-[10px] uppercase tracking-[0.18em] font-medium pt-1.5 text-right"
-              style={{ color: 'var(--color-text-subtle)' }}
-            >
-              {tag}
-            </div>
-          </div>
-
-          {/* Title + desc — beslaat de flex-grow zodat price/cta bottom-aligned. */}
-          <div className="flex-1 mb-5">
-            <h2
-              className="font-semibold leading-tight"
-              style={{
-                color: 'var(--color-text)',
-                fontSize: featured ? 'clamp(1.25rem, 1.5vw + 0.6rem, 1.625rem)' : 'clamp(1.05rem, 0.6vw + 0.85rem, 1.25rem)',
-                letterSpacing: '-0.014em',
-              }}
-            >
-              {title}
-            </h2>
-            <p
-              className="mt-2 text-[13px] sm:text-[14px] leading-relaxed"
-              style={{ color: 'var(--color-text-muted)' }}
-            >
-              {desc}
-            </p>
-          </div>
-
-          {/* Price + CTA — bottom-bar, monochroom prijs, amber CTA-pijl. */}
-          <div
-            className="relative flex items-end justify-between gap-3 pt-4 border-t"
-            style={{ borderColor: 'var(--color-border)' }}
-          >
-            <div className="min-w-0">
-              <div
-                className="text-[10px] uppercase tracking-[0.18em] font-medium mb-0.5"
-                style={{ color: 'var(--color-text-subtle)' }}
-              >
-                {price.startsWith('vanaf ') ? 'Vanaf' : 'Prijs'}
-              </div>
-              <div
-                className="text-[16px] sm:text-[17px] font-semibold tabular-nums truncate"
-                style={{ color: 'var(--color-text)' }}
-              >
-                {price.replace(/^vanaf /, '')}
-              </div>
-            </div>
-            <span
-              className="inline-flex items-center gap-1.5 text-[13px] font-semibold transition-transform group-hover:translate-x-1 shrink-0"
-              style={{ color: 'var(--color-amber-deep)' }}
-            >
-              {cta}
-              <ArrowRight size={15} aria-hidden />
-            </span>
-          </div>
-        </div>
-      </Link>
-    </motion.div>
-  );
-}

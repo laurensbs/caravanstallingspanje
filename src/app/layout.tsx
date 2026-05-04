@@ -1,6 +1,17 @@
 import type { Metadata, Viewport } from 'next';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
+import { Playfair_Display } from 'next/font/google';
+
+// Premium serif voor headings — Playfair Display met 600/700 weights.
+// Body blijft Geist Sans. Variable wordt op <html> gezet zodat we 'm via
+// font-family: var(--font-display) kunnen gebruiken in CSS.
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['600', '700'],
+  variable: '--font-display',
+  display: 'swap',
+});
 import { Toaster } from 'sonner';
 import { LocaleProvider } from '@/components/LocaleProvider';
 import PublicChrome from '@/components/PublicChrome';
@@ -47,7 +58,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="nl" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+    <html lang="nl" className={`${GeistSans.variable} ${GeistMono.variable} ${playfair.variable}`}>
       <body>
         <JsonLd id="org" payload={organizationLd()} />
         <JsonLd id="local" payload={localBusinessLd()} />

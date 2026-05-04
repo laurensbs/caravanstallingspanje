@@ -58,6 +58,7 @@
 
   --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-display: var(--font-playfair-display, var(--font-geist-sans)), Georgia, serif;
 
   /* Type-scale — als @theme font-sizes zodat `text-micro|small|body|h3|h2|h1|display`
      als Tailwind-utility werkt. line-height verhouding tunet leesbaarheid. */
@@ -149,6 +150,22 @@
      Vervangt het 'koudere' rgba(167,139,250) wat nu in gebruik is. */
   --color-lavender: #B49AE8;
   --color-lavender-soft: rgba(180, 154, 232, 0.14);
+
+  /* ─── Premium-marketing paleet (homepage v2) ─────────────────
+     Specifiek voor de marketing-homepage. Niet door admin/forms gebruikt. */
+  --color-navy: #0e3a55;
+  --color-navy-mid: #155674;
+  --color-navy-deep: #082638;
+  --color-terracotta: #d96e3c;
+  --color-terracotta-deep: #b85728;
+  --color-terracotta-soft: rgba(217, 110, 60, 0.12);
+  --color-terracotta-glow: rgba(217, 110, 60, 0.35);
+  --color-sand: #f6efe3;
+  --color-sand-2: #ebe1ce;
+  --color-marketing-cream: #fbf7f0;
+  --color-marketing-ink: #1a232b;
+  --color-marketing-ink-soft: #4a5965;
+  --color-marketing-line: #e3d9c6;
 
   /* Legacy (nu via paletten hierboven gedefinieerd). */
   --color-cyan-soft: var(--color-sea-soft);
@@ -660,4 +677,172 @@ html[data-density="compact"] .page-admin table tbody tr td {
   color: #fff;
   font-weight: 600;
   background: rgba(255, 255, 255, 0.04);
+}
+
+/* ─── Premium-marketing utilities ─────────────────────────────
+   Specifiek voor de homepage v2. Geen brede inzet op andere pages. */
+
+/* Display-headings krijgen Playfair Display via .font-display class.
+   Eyebrow uppercase tracking, ink-color of terracotta-deep. */
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.012em;
+  line-height: 1.12;
+}
+
+.mk-eyebrow {
+  display: inline-block;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-terracotta-deep);
+  font-weight: 700;
+}
+
+/* Marketing button — gevulde terracotta met soft shadow */
+.mk-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.85rem 1.4rem;
+  border-radius: 9999px;
+  background: var(--color-terracotta);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.98rem;
+  box-shadow: 0 6px 18px rgba(217, 110, 60, 0.35);
+  transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+  border: none;
+}
+.mk-btn-primary:hover {
+  background: var(--color-terracotta-deep);
+  transform: translateY(-1px);
+  text-decoration: none;
+  color: #fff;
+}
+
+/* Marketing button — secundair (outline navy op licht, wit-outline op donker) */
+.mk-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.85rem 1.4rem;
+  border-radius: 9999px;
+  background: #fff;
+  color: var(--color-navy);
+  font-weight: 600;
+  font-size: 0.98rem;
+  border: 1.5px solid var(--color-navy);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.mk-btn-secondary:hover {
+  background: var(--color-navy);
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Ghost button voor over-dark contexten (hero) */
+.mk-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.85rem 1.4rem;
+  border-radius: 9999px;
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  background: transparent;
+  font-weight: 600;
+  font-size: 0.98rem;
+  transition: background 0.2s ease;
+}
+.mk-btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.12);
+  text-decoration: none;
+  color: #fff;
+}
+
+/* Marketing-only body-context (cream bg, ink color) — wrap rond <main> */
+.mk-page {
+  background: var(--color-marketing-cream);
+  color: var(--color-marketing-ink);
+}
+.mk-page p { color: var(--color-marketing-ink-soft); margin: 0 0 1em; }
+.mk-page h1, .mk-page h2, .mk-page h3, .mk-page h4 {
+  font-family: var(--font-display);
+  color: var(--color-navy);
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  margin: 0 0 0.4em;
+}
+.mk-page h1 { font-weight: 700; font-size: clamp(2.1rem, 4.6vw, 3.6rem); }
+.mk-page h2 { font-weight: 700; font-size: clamp(1.7rem, 3vw, 2.4rem); }
+.mk-page h3 { font-weight: 700; font-size: 1.2rem; }
+
+/* Utility color classes voor marketing-context (geen Tailwind override) */
+.mk-text-navy { color: var(--color-navy); }
+.mk-text-terracotta { color: var(--color-terracotta-deep); }
+.mk-text-soft { color: var(--color-marketing-ink-soft); }
+.mk-bg-sand { background: var(--color-sand); }
+.mk-bg-cream { background: var(--color-marketing-cream); }
+.mk-border { border-color: var(--color-marketing-line); }
+
+/* Hero-gradient (marketing) */
+.mk-hero-bg {
+  background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-mid) 50%, #1a6c8a 100%);
+  color: #fff;
+}
+.mk-hero-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 90%, rgba(217, 110, 60, 0.22), transparent 50%),
+    radial-gradient(circle at 85% 10%, rgba(255, 255, 255, 0.08), transparent 40%);
+  pointer-events: none;
+}
+
+/* Stat-num display style */
+.mk-stat-num {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--color-navy);
+  line-height: 1;
+}
+
+/* FAQ accordion — geen JS, native <details> */
+.mk-faq-item {
+  background: #fff;
+  border: 1px solid var(--color-marketing-line);
+  border-radius: 14px;
+  margin-bottom: 0.6rem;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+.mk-faq-item:hover { box-shadow: var(--shadow-sm); }
+.mk-faq-item summary {
+  padding: 1.1rem 1.4rem;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-navy);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  list-style: none;
+}
+.mk-faq-item summary::-webkit-details-marker { display: none; }
+.mk-faq-item summary::after {
+  content: '+';
+  font-size: 1.6rem;
+  font-weight: 300;
+  color: var(--color-terracotta);
+  transition: transform 0.2s ease;
+  margin-left: 1rem;
+}
+.mk-faq-item[open] summary::after { transform: rotate(45deg); }
+.mk-faq-item .mk-faq-answer {
+  padding: 0 1.4rem 1.2rem;
+  color: var(--color-marketing-ink-soft);
+  font-size: 0.95rem;
+  line-height: 1.55;
 }
