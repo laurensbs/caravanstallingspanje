@@ -174,6 +174,7 @@ export function ContactFields({
 export function ServicePageShell({
   title,
   intro,
+  icon,
   onSubmit,
   submitting,
   error,
@@ -186,6 +187,7 @@ export function ServicePageShell({
 }: {
   title: string;
   intro: string;
+  icon?: import('lucide-react').LucideIcon;
   onSubmit: (e: React.FormEvent) => void;
   submitting: boolean;
   error: string;
@@ -214,6 +216,7 @@ export function ServicePageShell({
         title,
         intro,
         back: { href: '/', label: t('common.brand') },
+        icon,
       }}
     >
       <section className="max-w-2xl w-full mx-auto px-5 sm:px-6 py-10 sm:py-14">
@@ -303,6 +306,8 @@ interface MultiStepProps {
   eyebrow?: string;
   /** Lucide-icoon vóór de eyebrow. */
   eyebrowIcon?: ReactNode;
+  /** Sfeer-icoon rechts in de hero (cream-disc met glow). */
+  icon?: import('lucide-react').LucideIcon;
   /** Kleur-accent voor hero glow + tag. */
   accent?: 'cyan' | 'amber' | 'violet' | 'default';
   /** Inline samenvatting van form-validatie-errors (rhf, klant-vriendelijk).
@@ -316,7 +321,7 @@ interface MultiStepProps {
 export function MultiStepShell({
   title, intro, step1, step2, step1Valid,
   onSubmit, submitting, error, done, doneTitle, doneBody, publicCode,
-  paid = false, summary, eyebrow, eyebrowIcon, accent = 'default',
+  paid = false, summary, eyebrow, eyebrowIcon, icon, accent = 'default',
   inlineError, errorTrigger = 0,
 }: MultiStepProps) {
   const { t } = useLocale();
@@ -351,6 +356,7 @@ export function MultiStepShell({
         intro,
         eyebrow,
         back: { href: '/', label: t('common.brand') },
+        icon,
       }}
     >
       <section className="max-w-2xl w-full mx-auto px-5 sm:px-6 py-10 sm:py-14">

@@ -279,6 +279,7 @@ export default function KoelkastBestelPagina() {
         hero={{
           title: t('fridge.sold-out'),
           back: { href: '/diensten', label: t('common.services-link') },
+          icon: Refrigerator,
         }}
       >
         <section className="max-w-md mx-auto px-5 sm:px-6 py-10 sm:py-14">

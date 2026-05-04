@@ -78,12 +78,14 @@ export default function PublicHeader({ variant = 'marketing-cream' }: PublicHead
       };
     }
     if (variant === 'marketing-cream') {
-      // Navy bar zodat witte logo zichtbaar is op marketing-pages
+      // Zelfde navy-deep als Topbar zodat ze visueel één blok vormen
+      // (gebruiker: "header in dezelfde kleur als de top bar"). Geen
+      // border-bottom — naadloze overgang naar het content-canvas.
       return {
-        background: 'var(--color-navy)',
+        background: 'var(--color-navy-deep)',
         backdropFilter: 'none' as const,
         WebkitBackdropFilter: 'none' as const,
-        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        borderBottom: 'none',
         color: '#F1F5F9',
       };
     }

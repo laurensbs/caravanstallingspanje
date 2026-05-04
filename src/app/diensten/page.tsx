@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
-  Refrigerator, Wind, Warehouse, Truck, Wrench, ClipboardCheck, Sparkles, ArrowRight,
+  Refrigerator, Wind, Warehouse, Truck, Wrench, ClipboardCheck, Sparkles, ArrowRight, Compass,
 } from 'lucide-react';
 import MarketingPage from '@/components/marketing/MarketingPage';
 import { useLocale } from '@/components/LocaleProvider';
@@ -50,6 +50,7 @@ export default function DienstenIndex() {
         intro: t('services.index-intro'),
         eyebrow: t('services.eyebrow'),
         back: { href: '/', label: t('common.brand') },
+        icon: Compass,
       }}
     >
       <section className="max-w-[1180px] w-full mx-auto px-5 sm:px-8 py-10 sm:py-14">

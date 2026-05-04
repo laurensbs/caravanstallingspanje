@@ -30,7 +30,6 @@ export default function ServiceInfoPage({
   titleKey, introKey, eyebrowKey, bullets, subjectKey, icon, accent,
 }: Props) {
   const { t } = useLocale();
-  void icon;
   void accent;
   const subject = t(subjectKey);
 
@@ -41,6 +40,7 @@ export default function ServiceInfoPage({
         intro: t(introKey),
         eyebrowKey,
         back: { href: '/', label: t('common.brand') },
+        icon,
       }}
     >
       <section className="max-w-2xl w-full mx-auto px-5 sm:px-8 py-10 sm:py-14">

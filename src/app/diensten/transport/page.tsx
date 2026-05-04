@@ -257,6 +257,7 @@ export default function TransportPage() {
       intro={t('transport.intro')}
       eyebrow="Stalling ↔ camping"
       eyebrowIcon={<Truck size={11} />}
+      icon={Truck}
       accent="violet"
       step1={step1}
       step2={step2}

@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Mail, Send, Loader2, AlertCircle } from 'lucide-react';
+import { Mail, Send, Loader2, AlertCircle, MessageSquare } from 'lucide-react';
 import MarketingPage from '@/components/marketing/MarketingPage';
 import { Field, fieldCls, Section } from '@/components/ServiceForm';
 import { useLocale } from '@/components/LocaleProvider';
@@ -74,6 +74,7 @@ function ContactPageInner() {
         title: t('contact.heading'),
         intro: t('contact.intro'),
         back: { href: '/', label: t('common.brand') },
+        icon: MessageSquare,
       }}
     >
       <div className="max-w-2xl mx-auto px-5 sm:px-6 py-10 sm:py-14 w-full">

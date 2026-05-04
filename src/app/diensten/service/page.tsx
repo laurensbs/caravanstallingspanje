@@ -160,6 +160,7 @@ export default function ServicePage() {
       intro={t('service.intro')}
       eyebrow="Onderhoud & verzorging"
       eyebrowIcon={<Sparkles size={11} />}
+      icon={Sparkles}
       accent="cyan"
       step1={step1}
       step2={step2}

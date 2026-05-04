@@ -711,20 +711,13 @@ export const STRINGS = {
   },
   'mk.svc-link-more': { nl: 'Meer info', en: 'Learn more' },
 
-  // Vakantieservice
-  'mk.vac-eyebrow': { nl: 'Sleutelklaar pakket', en: 'Turnkey package' },
+  // Vakantie-tagline (sfeer-strip, geen aparte dienst meer)
+  'mk.vac-eyebrow': { nl: 'Onze belofte', en: 'Our promise' },
   'mk.vac-h2': { nl: 'Stap uit het vliegtuig — stap je vakantie in', en: 'Step off the plane — step into your holiday' },
   'mk.vac-intro': {
-    nl: 'Met onze Vakantieservice staat je caravan klaar op je gekozen camping zodra jij landt. Wij regelen alles, jij hoeft alleen nog te genieten.',
-    en: 'With our Holiday Service your caravan is ready at your chosen campsite the moment you land. We handle everything, you just enjoy.',
+    nl: 'Wij zorgen het hele jaar voor je caravan, zodat alles op zijn plek staat zodra jij in Spanje landt. Geen klusjes, geen wachtrij — gewoon vakantie vanaf minuut één.',
+    en: 'We care for your caravan all year long, so everything is in place the moment you land in Spain. No chores, no queue — just holiday from minute one.',
   },
-  'mk.vac-feat-onsite': { nl: 'Caravan op je plek vóór aankomst', en: 'Caravan at your spot before arrival' },
-  'mk.vac-feat-utilities': { nl: 'Aangesloten op water & stroom', en: 'Connected to water & power' },
-  'mk.vac-feat-fridge': { nl: 'Koelkast aan op verzoek', en: 'Fridge on by request' },
-  'mk.vac-feat-beds': { nl: 'Bedden opgemaakt', en: 'Beds made' },
-  'mk.vac-feat-tent': { nl: 'Voortent geplaatst', en: 'Awning set up' },
-  'mk.vac-feat-cleaning': { nl: 'Eindschoonmaak na vertrek', en: 'Final cleaning after departure' },
-  'mk.vac-cta': { nl: 'Vraag de vakantieservice aan', en: 'Request the holiday service' },
 
   // Security
   'mk.sec-eyebrow': { nl: 'Beveiliging & verzekering', en: 'Security & insurance' },

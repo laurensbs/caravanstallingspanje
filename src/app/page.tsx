@@ -26,9 +26,9 @@ export default function MarketingHomepage() {
       <main id="main" className="flex-1">
         <Hero t={t} />
         <StatsStrip t={t} />
+        <VacationTagline t={t} />
         <StorageOverview t={t} />
         <ServicesGrid t={t} />
-        <VacationService t={t} />
         <Security t={t} />
         <Reviews t={t} />
         <About t={t} />
@@ -341,77 +341,63 @@ function ServicesGrid({ t }: { t: (k: StringKey, ...a: (string | number)[]) => s
 }
 
 // ──────────────────────────────────────────────────────────────
-// VACATION SERVICE
+// VACATION TAGLINE — sfeer-strip, geen aparte dienst meer.
+// "Stap uit het vliegtuig — stap je vakantie in" als emotioneel anker
+// over wat onze stalling + service samen mogelijk maakt.
 // ──────────────────────────────────────────────────────────────
-function VacationService({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
-  const features: StringKey[] = [
-    'mk.vac-feat-onsite',
-    'mk.vac-feat-utilities',
-    'mk.vac-feat-fridge',
-    'mk.vac-feat-beds',
-    'mk.vac-feat-tent',
-    'mk.vac-feat-cleaning',
-  ];
-
+function VacationTagline({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
   return (
     <section
       id="vakantie"
-      className="py-16 sm:py-20"
+      className="relative overflow-hidden py-14 sm:py-20"
       style={{
         background: 'linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-deep) 100%)',
         color: '#fff',
       }}
     >
-      <div className="max-w-[1180px] mx-auto px-5 sm:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
-          <div>
-            <span className="mk-eyebrow mb-3 block" style={{ color: '#ffd29b' }}>
-              {t('mk.vac-eyebrow')}
-            </span>
-            <h2 style={{ color: '#fff' }}>{t('mk.vac-h2')}</h2>
-            <p className="mt-3" style={{ color: 'rgba(255,255,255,0.82)' }}>
-              {t('mk.vac-intro')}
-            </p>
-            <ul className="list-none p-0 mt-6 mb-7 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              {features.map((fk) => (
-                <li key={fk} className="relative pl-8 text-[0.95rem]" style={{ color: 'rgba(255,255,255,0.92)' }}>
-                  <span
-                    aria-hidden
-                    className="absolute left-0 top-[-1px] inline-grid place-items-center text-[0.78rem] font-bold"
-                    style={{
-                      width: 22, height: 22, borderRadius: '50%',
-                      background: 'var(--color-terracotta)', color: '#fff',
-                    }}
-                  >
-                    ✓
-                  </span>
-                  {t(fk)}
-                </li>
-              ))}
-            </ul>
-            <Link href="/contact?subject=Vakantieservice" className="mk-btn-primary">
-              {t('mk.vac-cta')}
-            </Link>
-          </div>
-
-          <div
-            className="rounded-[22px] p-7"
-            style={{
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.18)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-            }}
-          >
-            <PhotoSlot
-              ratio="4/3"
-              ariaLabel="Vakantieservice"
-              className="rounded-[14px]"
-              style={{ background: 'rgba(255,255,255,0.04)' }}
-            />
-          </div>
-        </div>
-      </div>
+      {/* Zachte terracotta orb-glow rechtsboven voor warmte op de navy */}
+      <div
+        aria-hidden
+        className="absolute -top-32 -right-24 w-[420px] h-[420px] rounded-full pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle, rgba(217,110,60,0.22) 0%, transparent 65%)',
+          filter: 'blur(8px)',
+        }}
+      />
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-80px' }}
+        transition={{ duration: 0.7, ease: EASE }}
+        className="relative max-w-[1180px] mx-auto px-5 sm:px-8 text-center"
+      >
+        <span
+          className="mk-eyebrow inline-block mb-5"
+          style={{ color: '#ffd29b' }}
+        >
+          {t('mk.vac-eyebrow')}
+        </span>
+        <h2
+          className="font-display"
+          style={{
+            color: '#fff',
+            fontSize: 'clamp(2rem, 4vw + 0.5rem, 3.4rem)',
+            lineHeight: 1.08,
+            letterSpacing: '-0.012em',
+            fontWeight: 700,
+            margin: '0 auto 0.5em',
+            maxWidth: '20ch',
+          }}
+        >
+          {t('mk.vac-h2')}
+        </h2>
+        <p
+          className="mx-auto leading-relaxed text-[1.05rem] sm:text-[1.15rem]"
+          style={{ color: 'rgba(255,255,255,0.82)', maxWidth: '60ch' }}
+        >
+          {t('mk.vac-intro')}
+        </p>
+      </motion.div>
     </section>
   );
 }

@@ -275,6 +275,7 @@ export default function AircoPage() {
       intro={t('airco.intro')}
       eyebrow="Direct verkoeling"
       eyebrowIcon={<Wind size={11} />}
+      icon={Wind}
       accent="amber"
       step1={step1}
       step2={step2}
