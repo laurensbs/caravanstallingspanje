@@ -38,7 +38,10 @@ export default function PublicHeader({ variant = 'marketing-cream' }: PublicHead
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const isOverDark = variant === 'over-dark' && !scrolled;
+  // Header is "donker" (witte tekst + witte logo) op:
+  //  - over-dark variant zolang nog niet gescrold (transparant op hero)
+  //  - marketing-cream: navy bar zodat witte logo zichtbaar is
+  const isOverDark = (variant === 'over-dark' && !scrolled) || variant === 'marketing-cream';
 
   useEffect(() => {
     if (variant !== 'over-dark') return;
@@ -64,7 +67,8 @@ export default function PublicHeader({ variant = 'marketing-cream' }: PublicHead
   useFocusTrap(menuRef, { active: menuOpen });
 
   const headerStyle = (() => {
-    if (isOverDark) {
+    if (variant === 'over-dark' && !scrolled) {
+      // Transparant boven donkere hero
       return {
         background: 'transparent',
         backdropFilter: 'none' as const,
@@ -74,15 +78,16 @@ export default function PublicHeader({ variant = 'marketing-cream' }: PublicHead
       };
     }
     if (variant === 'marketing-cream') {
+      // Navy bar zodat witte logo zichtbaar is op marketing-pages
       return {
-        background: 'rgba(251, 247, 240, 0.96)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        borderBottom: '1px solid var(--color-marketing-line)',
-        color: 'var(--color-marketing-ink)',
+        background: 'var(--color-navy)',
+        backdropFilter: 'none' as const,
+        WebkitBackdropFilter: 'none' as const,
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        color: '#F1F5F9',
       };
     }
-    // 'light' or scrolled over-dark
+    // 'light' of scrolled over-dark
     return {
       background: 'rgba(255,255,255,0.92)',
       backdropFilter: 'blur(12px)',
@@ -178,11 +183,9 @@ export default function PublicHeader({ variant = 'marketing-cream' }: PublicHead
 
         {/* Right cluster */}
         <div className="flex items-center gap-2 shrink-0">
-          {variant !== 'marketing-cream' && (
-            <div className="hidden sm:block">
-              <LocaleSwitch variant={isOverDark ? 'dark' : 'light'} />
-            </div>
-          )}
+          <div className="hidden sm:block">
+            <LocaleSwitch variant={isOverDark ? 'dark' : 'light'} />
+          </div>
 
           {/* Primary CTA — marketing varianten gebruiken terracotta-pill,
               over-dark gebruikt wit pill, light gebruikt accent-near-black. */}
