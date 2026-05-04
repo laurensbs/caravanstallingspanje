@@ -13,7 +13,7 @@ import CampingPicker from '@/components/CampingPicker';
 import PublicHero from '@/components/PublicHero';
 import { useLocale } from '@/components/LocaleProvider';
 import { formatEur as fmtEur } from '@/lib/format';
-import { useZodForm } from '@/lib/forms';
+import { useZodForm, focusFirstError, summaryError } from '@/lib/forms';
 import { fridgeOrderSchema } from '@/lib/validations';
 import type { z } from 'zod';
 
@@ -34,7 +34,9 @@ export default function AircoPage() {
       notes: '',
     },
   });
-  const { register, handleSubmit, setValue, watch, control, formState: { errors } } = form;
+  const { register, handleSubmit, setValue, watch, control, formState: { errors, isSubmitted } } = form;
+  const inlineError = isSubmitted ? summaryError(form) : null;
+  const [shakeTick, setShakeTick] = useState(0);
 
   const startDate = watch('start_date') || '';
   const endDate = watch('end_date') || '';
@@ -277,9 +279,14 @@ export default function AircoPage() {
       step1={step1}
       step2={step2}
       step1Valid={step1Valid}
-      onSubmit={handleSubmit(submit)}
+      onSubmit={handleSubmit(submit, () => {
+        setShakeTick((n) => n + 1);
+        focusFirstError(form);
+      })}
       submitting={submitting}
       error={serverError}
+      inlineError={inlineError}
+      errorTrigger={shakeTick}
       done={false}
       paid
     />

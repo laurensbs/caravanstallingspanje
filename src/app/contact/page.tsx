@@ -8,8 +8,9 @@ import PublicFooter from '@/components/PublicFooter';
 import { Field, fieldCls, Section } from '@/components/ServiceForm';
 import { useLocale } from '@/components/LocaleProvider';
 import { MotionFade } from '@/components/motion/MotionPrimitives';
-import { useZodForm } from '@/lib/forms';
+import { useZodForm, focusFirstError, summaryError } from '@/lib/forms';
 import { contactMessageSchema } from '@/lib/validations';
+import { MotionShake } from '@/components/motion/MotionPrimitives';
 import type { z } from 'zod';
 
 type FormValues = z.input<typeof contactMessageSchema>;
@@ -43,8 +44,11 @@ function ContactPageInner() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isSubmitted },
   } = form;
+
+  const inlineSummary = isSubmitted ? summaryError(form) : null;
+  const [shakeTick, setShakeTick] = useState(0);
 
   const submit = async (values: FormValues) => {
     setServerError('');
@@ -78,7 +82,14 @@ function ContactPageInner() {
       />
       <div className="max-w-2xl mx-auto px-5 sm:px-6 py-8 sm:py-14 w-full">
         <MotionFade>
-          <form onSubmit={handleSubmit(submit)} noValidate className="space-y-7">
+          <form
+            onSubmit={handleSubmit(submit, () => {
+              setShakeTick((n) => n + 1);
+              focusFirstError(form);
+            })}
+            noValidate
+            className="space-y-7"
+          >
             <Section title={t('contact.section-details')}>
               <Field label={t('common.name')} required>
                 <input
@@ -140,15 +151,17 @@ function ContactPageInner() {
               </Field>
             </Section>
 
-            {serverError && (
-              <div
-                role="alert"
-                aria-live="polite"
-                className="rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-[14px] inline-flex items-start gap-2"
-              >
-                <AlertCircle size={16} className="mt-0.5 shrink-0" />
-                <span>{serverError}</span>
-              </div>
+            {(inlineSummary || serverError) && (
+              <MotionShake trigger={shakeTick + (serverError ? 1000 : 0)}>
+                <div
+                  role="alert"
+                  aria-live="polite"
+                  className="rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-[14px] inline-flex items-start gap-2"
+                >
+                  <AlertCircle size={16} className="mt-0.5 shrink-0" aria-hidden />
+                  <span>{serverError || inlineSummary}</span>
+                </div>
+              </MotionShake>
             )}
 
             <button

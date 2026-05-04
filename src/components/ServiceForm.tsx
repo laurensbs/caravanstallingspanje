@@ -10,6 +10,7 @@ import Stepper from './Stepper';
 import SuccessScreen from './SuccessScreen';
 import { useLocale } from './LocaleProvider';
 import PublicFooter from './PublicFooter';
+import { MotionShake } from './motion/MotionPrimitives';
 
 export type ContactState = {
   name: string;
@@ -308,12 +309,19 @@ interface MultiStepProps {
   eyebrowIcon?: ReactNode;
   /** Kleur-accent voor hero glow + tag. */
   accent?: 'cyan' | 'amber' | 'violet' | 'default';
+  /** Inline samenvatting van form-validatie-errors (rhf, klant-vriendelijk).
+   *  Verschijnt onder summary, boven de submit-knop. Onafhankelijk van
+   *  `error` (server-side). */
+  inlineError?: string | null;
+  /** Increment-trigger om MotionShake opnieuw te firen op de error-banner. */
+  errorTrigger?: number;
 }
 
 export function MultiStepShell({
   title, intro, step1, step2, step1Valid,
   onSubmit, submitting, error, done, doneTitle, doneBody, publicCode,
   paid = false, summary, eyebrow, eyebrowIcon, accent = 'default',
+  inlineError, errorTrigger = 0,
 }: MultiStepProps) {
   const { t } = useLocale();
   const [step, setStep] = useState(0);
@@ -399,14 +407,16 @@ export function MultiStepShell({
             </motion.div>
           )}
 
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-6 rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-[14px]"
-            >
-              {error}
-            </motion.div>
+          {(error || inlineError) && (
+            <MotionShake trigger={errorTrigger + (error ? 1000 : 0)}>
+              <div
+                role="alert"
+                aria-live="polite"
+                className="mt-6 rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-[14px]"
+              >
+                {error || inlineError}
+              </div>
+            </MotionShake>
           )}
 
           <div className="mt-10 flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between">

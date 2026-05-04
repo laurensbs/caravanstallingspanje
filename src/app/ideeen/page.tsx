@@ -11,8 +11,9 @@ import PublicHero from '@/components/PublicHero';
 import PublicFooter from '@/components/PublicFooter';
 import { Field, fieldCls, Section } from '@/components/ServiceForm';
 import { useLocale } from '@/components/LocaleProvider';
-import { useZodForm } from '@/lib/forms';
+import { useZodForm, focusFirstError, summaryError } from '@/lib/forms';
 import { ideaSchema } from '@/lib/validations';
+import { MotionShake } from '@/components/motion/MotionPrimitives';
 import type { z } from 'zod';
 
 const CATEGORIES = [
@@ -79,11 +80,13 @@ export default function IdeeenPage() {
     setValue,
     reset,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isSubmitted },
   } = form;
 
   const category = watch('category') || '';
   const title = watch('title') || '';
+  const inlineSummary = isSubmitted ? summaryError(form) : null;
+  const [shakeTick, setShakeTick] = useState(0);
 
   const submit = async (values: IdeaForm) => {
     setServerError('');
@@ -167,7 +170,10 @@ export default function IdeeenPage() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          onSubmit={handleSubmit(submit)}
+          onSubmit={handleSubmit(submit, () => {
+            setShakeTick((n) => n + 1);
+            focusFirstError(form);
+          })}
           noValidate
           className="space-y-7"
         >
@@ -299,15 +305,17 @@ export default function IdeeenPage() {
             </div>
           </Section>
 
-          {serverError && (
-            <div
-              role="alert"
-              aria-live="polite"
-              className="rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-[14px] inline-flex items-start gap-2"
-            >
-              <AlertCircle size={16} className="mt-0.5 shrink-0" />
-              <span>{serverError}</span>
-            </div>
+          {(inlineSummary || serverError) && (
+            <MotionShake trigger={shakeTick + (serverError ? 1000 : 0)}>
+              <div
+                role="alert"
+                aria-live="polite"
+                className="rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-[14px] inline-flex items-start gap-2"
+              >
+                <AlertCircle size={16} className="mt-0.5 shrink-0" aria-hidden />
+                <span>{serverError || inlineSummary}</span>
+              </div>
+            </MotionShake>
           )}
 
           <button

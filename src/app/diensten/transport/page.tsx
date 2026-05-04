@@ -13,7 +13,7 @@ import { useLocale } from '@/components/LocaleProvider';
 import { ArrowRight as ArrowRightIcon } from 'lucide-react';
 import AnimatedServiceIcon from '@/components/AnimatedServiceIcon';
 import { formatEur as fmtEur } from '@/lib/format';
-import { useZodForm } from '@/lib/forms';
+import { useZodForm, focusFirstError, summaryError } from '@/lib/forms';
 import { transportOrderSchema } from '@/lib/validations';
 import type { z } from 'zod';
 
@@ -38,8 +38,11 @@ export default function TransportPage() {
     },
   });
   const {
-    register, handleSubmit, control, watch, setValue, formState: { errors },
+    register, handleSubmit, control, watch, setValue, formState: { errors, isSubmitted },
   } = form;
+
+  const inlineError = isSubmitted ? summaryError(form) : null;
+  const [shakeTick, setShakeTick] = useState(0);
 
   // useController voor mode (we starten met null-state via een sentinel: lege string).
   // Mode is required volgens schema; we forceren een keuze via UI-validation.
@@ -258,9 +261,14 @@ export default function TransportPage() {
       step1={step1}
       step2={step2}
       step1Valid={step1Valid}
-      onSubmit={handleSubmit((values) => submit(values))}
+      onSubmit={handleSubmit((values) => submit(values), () => {
+        setShakeTick((n) => n + 1);
+        focusFirstError(form);
+      })}
       submitting={submitting}
       error={error}
+      inlineError={inlineError}
+      errorTrigger={shakeTick}
       done={done}
       publicCode={publicCode}
     />

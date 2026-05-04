@@ -11,7 +11,7 @@ import RhfContactFields from '@/components/RhfContactFields';
 import { Skeleton } from '@/components/ui';
 import { useLocale } from '@/components/LocaleProvider';
 import { formatEur as fmtEur } from '@/lib/format';
-import { useZodForm } from '@/lib/forms';
+import { useZodForm, focusFirstError, summaryError } from '@/lib/forms';
 import { serviceOrderSchema } from '@/lib/validations';
 import type { z } from 'zod';
 
@@ -37,7 +37,9 @@ export default function ServicePage() {
       description: '',
     },
   });
-  const { register, handleSubmit, control, watch, setValue, formState: { errors } } = form;
+  const { register, handleSubmit, control, watch, setValue, formState: { errors, isSubmitted } } = form;
+  const inlineError = isSubmitted ? summaryError(form) : null;
+  const [shakeTick, setShakeTick] = useState(0);
 
   const serviceSlug = watch('serviceCategory') || '';
   const description = watch('description') || '';
@@ -162,9 +164,14 @@ export default function ServicePage() {
       step1={step1}
       step2={step2}
       step1Valid={step1Valid}
-      onSubmit={handleSubmit((values) => submit(values))}
+      onSubmit={handleSubmit((values) => submit(values), () => {
+        setShakeTick((n) => n + 1);
+        focusFirstError(form);
+      })}
       submitting={submitting}
       error={error}
+      inlineError={inlineError}
+      errorTrigger={shakeTick}
       done={done}
       doneTitle={t('service.done-title')}
     />

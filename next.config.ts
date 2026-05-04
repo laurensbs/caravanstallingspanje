@@ -18,6 +18,16 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 60,
   },
 
+  async redirects() {
+    return [
+      // Sinds de homepage alle 7 diensten toont is /diensten een duplicate
+      // landing-page. Permanent redirecten zodat zoekmachines de juice
+      // consolideren naar /. We laten de dienst-detail-pagina's
+      // (/diensten/airco, etc.) intact — die hebben echte content.
+      { source: '/diensten', destination: '/', permanent: true },
+    ];
+  },
+
   async headers() {
     return [
       {
