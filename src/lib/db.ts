@@ -1591,11 +1591,32 @@ export async function setCustomerHoldedSnapshot(
   await ensureMiscSchema();
   const customFields = raw.customFields ?? null;
   const tags = raw.tags ?? null;
-  const billing = raw.billAddress ?? null;
-  const shipping = raw.shippingAddress ?? null;
+  const billingRaw = raw.billAddress ?? null;
+  const shippingRaw = raw.shippingAddress ?? null;
+  const addressRaw = raw.address ?? null;
   const isperson = raw.isperson;
   // Holded geeft soms 0/1, soms true/false, soms '0'/'1'.
   const isCompany = isperson === 0 || isperson === false || isperson === '0';
+
+  // Adres-mainline mapping. Holded levert het adres soms in `address`, soms
+  // in `billAddress`. We picken in volgorde: billing → address → shipping.
+  // Dat is hetzelfde adres dat de UI als "Billing address" laat zien — die
+  // hoort ook in de hoofd customers.address/city/... kolommen te staan zodat
+  // ie verschijnt waar admin het verwacht.
+  type Addr = { address?: string; city?: string; postalCode?: string; country?: string; countryCode?: string };
+  const pickAddr = (a: unknown): Addr | null => (a && typeof a === 'object' ? (a as Addr) : null);
+  const primary = pickAddr(billingRaw) || pickAddr(addressRaw) || pickAddr(shippingRaw);
+  const mainAddress = primary?.address ?? null;
+  const mainCity = primary?.city ?? null;
+  const mainPostal = primary?.postalCode ?? null;
+  // Country: gebruik countryCode (ISO) als fallback voor lege country-string.
+  const mainCountry = (primary?.country || primary?.countryCode) ?? null;
+
+  // Phone/mobile uit Holded — alleen vullen als lokaal nog leeg, om
+  // admin-edits niet te overschrijven. Daarom COALESCE op alle velden.
+  const phone = (raw.phone as string) ?? null;
+  const mobile = (raw.mobile as string) ?? null;
+
   await sql`UPDATE customers SET
     is_company = ${isCompany},
     holded_raw = ${JSON.stringify(raw)}::jsonb,
@@ -1607,8 +1628,17 @@ export async function setCustomerHoldedSnapshot(
     holded_web = ${(raw.web as string) ?? null},
     holded_secondary_email = ${(raw.secondaryEmail as string) ?? null},
     holded_default_currency = ${(raw.defaultCurrency as string) ?? null},
-    holded_billing_address = ${billing ? JSON.stringify(billing) : null}::jsonb,
-    holded_shipping_address = ${shipping ? JSON.stringify(shipping) : null}::jsonb,
+    holded_billing_address = ${billingRaw ? JSON.stringify(billingRaw) : null}::jsonb,
+    holded_shipping_address = ${shippingRaw ? JSON.stringify(shippingRaw) : null}::jsonb,
+    -- Hoofd-velden vullen vanuit Holded, maar alleen als lokaal leeg/NULL.
+    -- NULLIF zorgt dat een lege Holded-string ('') als NULL telt zodat
+    -- COALESCE doorvalt naar de bestaande lokale waarde.
+    address = COALESCE(NULLIF(address, ''), NULLIF(${mainAddress}, '')),
+    city = COALESCE(NULLIF(city, ''), NULLIF(${mainCity}, '')),
+    postal_code = COALESCE(NULLIF(postal_code, ''), NULLIF(${mainPostal}, '')),
+    country = COALESCE(NULLIF(country, ''), NULLIF(${mainCountry}, '')),
+    phone = COALESCE(NULLIF(phone, ''), NULLIF(${phone}, '')),
+    mobile = COALESCE(NULLIF(mobile, ''), NULLIF(${mobile}, '')),
     holded_synced_at = NOW(),
     updated_at = NOW()
     WHERE id = ${id}`;
