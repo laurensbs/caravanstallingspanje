@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
   ArrowLeft, Trash2, RefreshCw, AlertTriangle, Refrigerator, Warehouse, Truck,
-  Activity, Loader2, ExternalLink,
+  Activity, Loader2, ExternalLink, KeyRound, Copy, Check, X, Mail,
 } from 'lucide-react';
 import { Button, Badge } from '@/components/ui';
 import InlineField from '@/components/InlineField';
@@ -136,6 +136,11 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
   const [activity, setActivity] = useState<ActivityEvent[] | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [resettingPassword, setResettingPassword] = useState(false);
+  // Resultaat van een wachtwoord-reset — toont een modal met het temp-
+  // password zodat admin het kan kopiëren als de mail niet aankomt.
+  const [resetResult, setResetResult] = useState<null | { tempPassword: string; mailSent: boolean; mailError: string | null; email: string }>(null);
+  const [copied, setCopied] = useState(false);
 
   // setFridges/setStalling/setTransports zijn intentioneel niet hot-reloading;
   // we laden bij update alleen de customer terug. Reload-helper kan later
@@ -207,6 +212,38 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
     }
   };
 
+  const resetPortalPassword = async () => {
+    if (!customer.email) {
+      toast.error('Klant heeft geen e-mailadres.');
+      return;
+    }
+    if (!confirm(`Genereer een nieuw eenmalig wachtwoord voor ${customer.name}? Het oude wachtwoord werkt daarna niet meer.`)) {
+      return;
+    }
+    setResettingPassword(true);
+    try {
+      const res = await fetch(`/api/admin/customers/${customer.id}/reset-password`, {
+        method: 'POST', credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || 'Reset mislukt');
+        return;
+      }
+      setResetResult({
+        tempPassword: data.tempPassword,
+        mailSent: data.mailSent,
+        mailError: data.mailError,
+        email: data.email,
+      });
+      setCopied(false);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Reset mislukt');
+    } finally {
+      setResettingPassword(false);
+    }
+  };
+
   const deleteCustomer = async () => {
     const res = await fetch(`/api/admin/customers/${customer.id}`, {
       method: 'DELETE', credentials: 'include',
@@ -251,13 +288,17 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
             )}
           </div>
         </div>
-        <div className="flex gap-2 shrink-0">
+        <div className="flex gap-2 shrink-0 flex-wrap">
           <Button variant="secondary" onClick={refreshHoldedSnapshot} disabled={syncing}>
             {syncing ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
             Pull Holded data
           </Button>
           <Button variant="secondary" onClick={syncToHolded} disabled={syncing}>
             <RefreshCw size={14} /> Push to Holded
+          </Button>
+          <Button variant="secondary" onClick={resetPortalPassword} disabled={resettingPassword || !customer.email}>
+            {resettingPassword ? <Loader2 size={14} className="animate-spin" /> : <KeyRound size={14} />}
+            Reset portal-wachtwoord
           </Button>
           <Button variant="ghost" onClick={() => setConfirmingDelete(true)}>
             <Trash2 size={14} /> Delete
@@ -424,6 +465,80 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
         onConfirm={async () => { await deleteCustomer(); }}
         onCancel={() => setConfirmingDelete(false)}
       />
+
+      {/* Reset-password resultaat modal — toont temp-password éénmalig
+          zodat admin het kan kopiëren of doorbellen aan klant. */}
+      {resetResult && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.5)' }}
+          onClick={() => setResetResult(null)}
+        >
+          <div
+            className="bg-bg border border-border rounded-[var(--radius-xl)] shadow-lg max-w-md w-full p-6 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <h2 className="text-base font-medium text-text inline-flex items-center gap-2">
+                <KeyRound size={18} /> Nieuw eenmalig wachtwoord
+              </h2>
+              <button
+                type="button"
+                onClick={() => setResetResult(null)}
+                className="text-text-muted hover:text-text"
+                aria-label="Sluiten"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <p className="text-[13px] text-text-muted">
+              Wachtwoord voor <strong>{resetResult.email}</strong>. Dit zie je <strong>maar één keer</strong> — kopieer of mail het direct.
+            </p>
+
+            <div className="rounded-[var(--radius-md)] bg-surface-2 border border-border p-3 flex items-center justify-between gap-3">
+              <code className="text-[16px] font-mono tracking-wide text-text break-all">
+                {resetResult.tempPassword}
+              </code>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  navigator.clipboard.writeText(resetResult.tempPassword);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+              >
+                {copied ? <Check size={13} /> : <Copy size={13} />}
+                {copied ? 'Gekopieerd' : 'Kopiëren'}
+              </Button>
+            </div>
+
+            {resetResult.mailSent ? (
+              <div className="flex items-start gap-2 rounded-[var(--radius-md)] px-3 py-2.5 text-[12px] bg-success-soft text-success">
+                <Mail size={13} className="mt-0.5 shrink-0" />
+                <span>Welkomst-mail verstuurd naar {resetResult.email}.</span>
+              </div>
+            ) : (
+              <div className="flex items-start gap-2 rounded-[var(--radius-md)] px-3 py-2.5 text-[12px] bg-warning-soft text-warning">
+                <AlertTriangle size={13} className="mt-0.5 shrink-0" />
+                <span>
+                  Mail niet verstuurd{resetResult.mailError ? ` (${resetResult.mailError})` : ''}.
+                  Geef het wachtwoord handmatig door aan de klant.
+                </span>
+              </div>
+            )}
+
+            <p className="text-[12px] text-text-muted">
+              Klant logt in op <code className="text-text">/account/login</code> en wordt direct naar het wachtwoord-wijzig-scherm gestuurd.
+            </p>
+
+            <div className="flex justify-end pt-2">
+              <Button onClick={() => setResetResult(null)}>Klaar</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
