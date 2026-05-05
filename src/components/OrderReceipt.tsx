@@ -3,7 +3,10 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Check, Clock, Mail, Sparkles } from 'lucide-react';
+import { Check, Clock, Mail, ArrowRight, Phone } from 'lucide-react';
+import Topbar from './marketing/Topbar';
+import PublicHeader from './PublicHeader';
+import PublicFooter from './PublicFooter';
 import { useLocale } from './LocaleProvider';
 
 type Lookup = {
@@ -30,13 +33,13 @@ interface Props {
 
 const SPARKS = Array.from({ length: 12 }, (_, i) => {
   const angle = (i / 12) * Math.PI * 2;
-  const distance = 60 + (i % 3) * 8;
+  const distance = 70 + (i % 3) * 10;
   return {
     x: Math.cos(angle) * distance,
     y: Math.sin(angle) * distance,
-    size: 4 + (i % 3) * 2,
+    size: 5 + (i % 3) * 2,
     delay: 0.2 + (i % 4) * 0.04,
-    color: i % 3 === 0 ? 'var(--color-warning)' : 'var(--color-success)',
+    color: i % 3 === 0 ? 'var(--orange)' : 'var(--green)',
   };
 });
 
@@ -63,163 +66,200 @@ export default function OrderReceipt({ refCode, fallbackTitle, fallbackBody }: P
   const steps = buildSteps(data, t as unknown as TFn);
 
   return (
-    <main
-      className="min-h-screen flex items-start justify-center page-public page-public-dark px-5 sm:px-6 py-10 sm:py-16"
-      style={{ background: 'linear-gradient(180deg, #0A1929 0%, #050D18 100%)' }}
-    >
-      <div className="max-w-lg w-full">
-        {/* Confetti badge */}
-        <div className="relative w-24 h-24 mx-auto mb-7">
-          {!reduce && SPARKS.map((s, i) => (
-            <motion.span
-              key={i}
-              aria-hidden
-              initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
-              animate={{ opacity: [0, 1, 0], x: s.x, y: s.y, scale: [0, 1, 0.8] }}
-              transition={{ duration: 1.1, delay: s.delay, ease: 'easeOut' }}
-              className="absolute left-1/2 top-1/2 rounded-full"
-              style={{
-                width: s.size, height: s.size,
-                marginLeft: -s.size / 2, marginTop: -s.size / 2,
-                background: s.color,
-              }}
-            />
-          ))}
-          <motion.div
-            initial={{ scale: 0.6, opacity: 0 }}
-            animate={{ scale: [0.6, 1.5, 1.5], opacity: [0, 0.45, 0] }}
-            transition={{ duration: 1.6, ease: 'easeOut', times: [0, 0.4, 1] }}
-            className="absolute inset-0 rounded-full"
-            style={{ background: 'var(--color-success)', opacity: 0.18 }}
-          />
-          <motion.div
-            initial={{ scale: 0.7, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5, ease: EASE, delay: 0.05 }}
-            className="absolute inset-2 rounded-full flex items-center justify-center"
-            style={{ background: 'var(--color-success-soft)' }}
-          >
-            <motion.div
-              initial={{ scale: 0, rotate: -10 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.25, type: 'spring', stiffness: 380, damping: 20 }}
-              style={{ color: 'var(--color-success)' }}
-            >
-              <Check size={32} strokeWidth={3} />
-            </motion.div>
-          </motion.div>
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.4, ease: EASE }}
-          className="text-center mb-8"
-        >
-          <div className="inline-flex items-center gap-1.5 mb-3 px-2.5 py-1 rounded-full text-[11px] font-medium uppercase tracking-[0.18em]"
-            style={{ background: 'var(--color-success-soft)', color: 'var(--color-success)' }}>
-            <Sparkles size={11} /> {data?.status ?? 'Ontvangen'}
-          </div>
-          <h1 className="text-[28px] sm:text-3xl font-semibold tracking-tight mb-2 leading-tight">{title}</h1>
-          {fallbackBody && !data && (
-            <p className="text-text-muted leading-relaxed text-[15px]">{fallbackBody}</p>
-          )}
-          {refCode && (
-            <p className="text-[13px] text-text-muted mt-3 font-mono">
-              {t('common.reference')} <span className="text-text font-semibold">{refCode}</span>
-            </p>
-          )}
-        </motion.div>
-
-        {/* Detail-blok */}
-        {data && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.4, ease: EASE }}
-            className="card-surface p-5 mb-6"
-          >
-            <div className="space-y-2.5">
-              <DetailRow label="Dienst" value={data.service} />
-              {data.period && <DetailRow label="Periode" value={data.period} />}
-              {data.customerName && <DetailRow label="Naam" value={data.customerName} />}
-              {data.customerEmail && <DetailRow label="E-mail" value={data.customerEmail} />}
-            </div>
-          </motion.div>
-        )}
-
-        {/* Wat gebeurt er nu? */}
-        {loaded && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.4, ease: EASE }}
-            className="card-surface p-5 mb-8"
-          >
-            <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted mb-2">
-              Wat gebeurt er nu?
-            </h2>
-            <p className="text-[14px] text-text mb-4 leading-relaxed">
-              We gaan aan de slag — we koppelen terug zodra het klaar is.
-            </p>
-            <ul className="space-y-3">
-              {steps.map((s, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <div
-                    className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5"
-                    style={{
-                      background: s.done ? 'var(--color-success-soft)' : 'var(--color-surface-2)',
-                      color: s.done ? 'var(--color-success)' : 'var(--color-text-muted)',
-                    }}
-                  >
-                    {s.done ? <Check size={13} strokeWidth={3} /> : <Clock size={12} />}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className={`text-[14px] ${s.done ? 'text-text' : 'text-text-muted'}`}>{s.label}</div>
-                    {s.detail && (
-                      <div className="text-[12px] text-text-subtle mt-0.5">{s.detail}</div>
-                    )}
-                  </div>
-                </li>
+    <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
+      <Topbar />
+      <PublicHeader />
+      <main id="main" className="flex-1">
+        {/* Sky-soft hero met big checkmark + reservering-nummer */}
+        <section className="section-bg-sky-soft">
+          <div className="max-w-[820px] mx-auto px-5 sm:px-10 py-14 sm:py-20 text-center">
+            <div className="relative mx-auto mb-10" style={{ width: 120, height: 120 }}>
+              {!reduce && SPARKS.map((s, i) => (
+                <motion.span
+                  key={i}
+                  aria-hidden
+                  initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
+                  animate={{ opacity: [0, 1, 0], x: s.x, y: s.y, scale: [0, 1, 0.8] }}
+                  transition={{ duration: 1.1, delay: s.delay, ease: 'easeOut' }}
+                  className="absolute left-1/2 top-1/2 rounded-full"
+                  style={{
+                    width: s.size, height: s.size,
+                    marginLeft: -s.size / 2, marginTop: -s.size / 2,
+                    background: s.color,
+                  }}
+                />
               ))}
-            </ul>
-          </motion.div>
-        )}
+              <motion.div
+                initial={{ scale: 0.6, opacity: 0 }}
+                animate={{ scale: [0.6, 1.4, 1.4], opacity: [0, 0.35, 0] }}
+                transition={{ duration: 1.6, ease: 'easeOut', times: [0, 0.4, 1] }}
+                className="absolute inset-0 rounded-full"
+                style={{ background: 'var(--green)', opacity: 0.18 }}
+              />
+              <motion.div
+                initial={{ scale: 0.7, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5, ease: EASE, delay: 0.05 }}
+                className="absolute inset-3 rounded-full flex items-center justify-center"
+                style={{ background: 'var(--green-soft)', border: '2px solid var(--green)' }}
+              >
+                <motion.div
+                  initial={{ scale: 0, rotate: -10 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.25, type: 'spring', stiffness: 380, damping: 20 }}
+                  style={{ color: 'var(--green)' }}
+                >
+                  <Check size={48} strokeWidth={3} />
+                </motion.div>
+              </motion.div>
+            </div>
 
-        {/* Contact */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.4, ease: EASE }}
-          className="text-center pt-5 border-t border-border space-y-3"
-        >
-          <p className="text-[13px] text-text-muted">Vragen? We helpen je graag verder.</p>
-          <p className="text-[12px] text-text-muted inline-flex items-center justify-center gap-1.5 pt-1">
-            <Mail size={12} />
-            <a href="mailto:info@caravanstalling-spanje.com" className="text-text-muted hover:text-text underline-offset-4 hover:underline">
-              info@caravanstalling-spanje.com
-            </a>
-          </p>
-          <div className="pt-2">
-            <Link
-              href="/"
-              className="inline-block text-[13px] text-text-muted hover:text-text underline-offset-4 hover:underline transition-colors"
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35, duration: 0.4, ease: EASE }}
             >
-              {t('common.back-to-website')}
-            </Link>
+              <span className="eyebrow-mk" style={{ display: 'inline-flex', justifyContent: 'center' }}>
+                {data?.status ?? 'Ontvangen'}
+              </span>
+              <h1 className="h1-mk" style={{ marginTop: 4, fontSize: 'clamp(1.8rem, 3.6vw, 2.6rem)' }}>{title}</h1>
+              {fallbackBody && !data && (
+                <p className="lead-mk" style={{ marginTop: 14 }}>{fallbackBody}</p>
+              )}
+              {refCode && (
+                <div
+                  style={{
+                    marginTop: 28,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '14px 22px',
+                    borderRadius: 14,
+                    background: '#fff',
+                    border: '1px solid var(--line)',
+                    boxShadow: 'var(--shadow-card-mk)',
+                  }}
+                >
+                  <span style={{ fontSize: 11.5, fontFamily: 'var(--sora)', fontWeight: 600, color: 'var(--muted)', letterSpacing: 1 }}>
+                    {t('common.reference')}
+                  </span>
+                  <span style={{ fontFamily: 'var(--sora)', fontWeight: 700, fontSize: 18, color: 'var(--navy)', letterSpacing: 0.5 }}>
+                    {refCode}
+                  </span>
+                </div>
+              )}
+            </motion.div>
           </div>
-        </motion.div>
-      </div>
-    </main>
+        </section>
+
+        {/* Detail + steps + contact */}
+        <section className="py-14">
+          <div className="max-w-[820px] mx-auto px-5 sm:px-10 space-y-5">
+            {data && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.4, ease: EASE }}
+                className="card-mk"
+                style={{ padding: 24 }}
+              >
+                <h2 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 11, letterSpacing: 2.4, textTransform: 'uppercase', color: 'var(--muted)', margin: '0 0 12px' }}>
+                  Reservering
+                </h2>
+                <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: '140px 1fr', rowGap: 10, columnGap: 14, fontSize: 13.5 }}>
+                  <DetailRow label="Dienst" value={data.service} />
+                  {data.period && <DetailRow label="Periode" value={data.period} />}
+                  {data.customerName && <DetailRow label="Naam" value={data.customerName} />}
+                  {data.customerEmail && <DetailRow label="E-mail" value={data.customerEmail} />}
+                </dl>
+              </motion.div>
+            )}
+
+            {loaded && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.4, ease: EASE }}
+                className="card-mk"
+                style={{ padding: 24 }}
+              >
+                <h2 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 11, letterSpacing: 2.4, textTransform: 'uppercase', color: 'var(--muted)', margin: '0 0 6px' }}>
+                  Wat gebeurt er nu?
+                </h2>
+                <p style={{ fontSize: 14, color: 'var(--ink-2)', margin: '0 0 16px', lineHeight: 1.6 }}>
+                  We gaan aan de slag — we koppelen terug zodra het klaar is.
+                </p>
+                <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  {steps.map((s, i) => (
+                    <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                      <span
+                        aria-hidden
+                        style={{
+                          width: 26, height: 26, borderRadius: 999,
+                          display: 'grid', placeItems: 'center', flexShrink: 0, marginTop: 1,
+                          background: s.done ? 'var(--green-soft)' : 'var(--bg)',
+                          color: s.done ? 'var(--green)' : 'var(--muted)',
+                          border: s.done ? 'none' : '1px solid var(--line)',
+                        }}
+                      >
+                        {s.done ? <Check size={14} strokeWidth={3} /> : <Clock size={13} />}
+                      </span>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div style={{ fontSize: 14, color: s.done ? 'var(--ink)' : 'var(--ink-2)', lineHeight: 1.5 }}>{s.label}</div>
+                        {s.detail && (
+                          <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 3 }}>{s.detail}</div>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            )}
+
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.4, ease: EASE }}
+              className="card-mk"
+              style={{ padding: 24 }}
+            >
+              <h2 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 16, color: 'var(--navy)', margin: '0 0 14px' }}>
+                Vragen of toelichting?
+              </h2>
+              <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <li style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontSize: 14 }}>
+                  <Mail size={15} aria-hidden style={{ color: 'var(--orange)' }} />
+                  <a href="mailto:info@caravanstalling-spanje.com" style={{ color: 'var(--ink)', textDecoration: 'none' }}>
+                    info@caravanstalling-spanje.com
+                  </a>
+                </li>
+                <li style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontSize: 14 }}>
+                  <Phone size={15} aria-hidden style={{ color: 'var(--orange)' }} />
+                  <a href="tel:+34633778699" style={{ color: 'var(--ink)', textDecoration: 'none' }}>
+                    +34 633 77 86 99
+                  </a>
+                </li>
+              </ul>
+              <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--line)' }}>
+                <Link href="/" className="btn btn-ghost">
+                  {t('common.back-to-website')} <ArrowRight size={14} aria-hidden />
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      </main>
+      <PublicFooter />
+    </div>
   );
 }
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between items-baseline gap-3">
-      <span className="text-[12px] text-text-muted uppercase tracking-[0.14em]">{label}</span>
-      <span className="text-[14px] text-text text-right">{value}</span>
-    </div>
+    <>
+      <dt style={{ color: 'var(--muted)', textTransform: 'uppercase', fontSize: 11, letterSpacing: 1.4, fontFamily: 'var(--sora)', fontWeight: 600 }}>{label}</dt>
+      <dd style={{ color: 'var(--ink)', margin: 0, textAlign: 'right' }}>{value}</dd>
+    </>
   );
 }
 

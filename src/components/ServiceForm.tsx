@@ -41,12 +41,11 @@ export const emptyContact: ContactState = {
   locationHint: '',
 };
 
-// Form-input voor marketing/cream-canvas: witte fill, marketing-line border,
-// terracotta focus-ring. Komt op /koelkast, /contact, /ideeen, en in alle
-// MultiStepShell/ServicePageShell forms terecht. Admin-forms gebruiken dit
-// niet (die hebben hun eigen Input component).
+// Form-input in mockup-stijl (matched met .field-mk uit globals.css):
+// witte fill, line-2 border, navy focus-ring. Komt op /koelkast, /contact,
+// /ideeen, en in alle MultiStepShell/ServicePageShell forms terecht.
 const inputCls =
-  'w-full h-12 px-3.5 text-[15px] bg-white text-[var(--color-marketing-ink)] border border-[var(--color-marketing-line)] rounded-[var(--radius-md)] transition-colors placeholder:opacity-60 focus:outline-none focus:ring-2 focus:border-[color:var(--color-terracotta)] focus:ring-[color:var(--color-terracotta-soft)]';
+  'cs-mk-input w-full h-12 px-3.5 text-[14px] bg-white text-[color:var(--ink)] border border-[color:var(--line-2)] rounded-[8px] transition-colors placeholder:text-[color:var(--muted-2)] focus:outline-none focus:border-[color:var(--navy)] focus:ring-[3px] focus:ring-[color:rgba(47,66,84,0.10)]';
 
 export const fieldCls = inputCls;
 
@@ -54,17 +53,24 @@ export function Field({ label, required, children, hint }: { label: string; requ
   return (
     <div className="space-y-2">
       <label
-        className="block text-[13px] font-medium"
-        style={{ color: 'var(--color-marketing-ink)' }}
+        className="block"
+        style={{
+          fontFamily: 'var(--sora)',
+          fontWeight: 600,
+          fontSize: 12,
+          color: 'var(--navy)',
+          letterSpacing: 0.2,
+          marginBottom: 4,
+        }}
       >
         {label}
         {required && (
-          <span className="ml-0.5" style={{ color: 'var(--color-terracotta)' }}>*</span>
+          <span className="ml-0.5" style={{ color: 'var(--orange-d)' }}>*</span>
         )}
       </label>
       {children}
       {hint && (
-        <p className="text-[12px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+        <p style={{ fontSize: 11.5, color: 'var(--muted)', fontFamily: 'var(--inter)', marginTop: 4 }}>
           {hint}
         </p>
       )}
@@ -76,8 +82,14 @@ export function Section({ title, children }: { title: string; children: ReactNod
   return (
     <section className="space-y-4">
       <h2
-        className="text-[11px] font-semibold uppercase tracking-[0.18em]"
-        style={{ color: 'var(--color-marketing-ink-soft)' }}
+        style={{
+          fontFamily: 'var(--sora)',
+          fontWeight: 600,
+          fontSize: 11,
+          letterSpacing: 2.4,
+          textTransform: 'uppercase',
+          color: 'var(--muted)',
+        }}
       >
         {title}
       </h2>
@@ -244,7 +256,8 @@ export function ServicePageShell({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: E }}
           onSubmit={onSubmit}
-          className="mk-card p-6 sm:p-8 space-y-8"
+          className="card-mk space-y-8"
+          style={{ padding: 28 }}
         >
           <InfoBanner>
             <strong>{t('banner.important')}</strong> {t('banner.match-hint')}
@@ -256,17 +269,25 @@ export function ServicePageShell({
             <motion.div
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-[14px]"
+              role="alert"
+              style={{
+                background: '#FEF2F2',
+                border: '1px solid #FECACA',
+                color: '#991B1B',
+                padding: 14,
+                borderRadius: 10,
+                fontSize: 13.5,
+              }}
             >
               {error}
             </motion.div>
           )}
 
-          <div className="pt-6 border-t" style={{ borderColor: 'var(--color-marketing-line)' }}>
+          <div className="pt-6 border-t" style={{ borderColor: 'var(--line)' }}>
             <button
               type="submit"
               disabled={submitting}
-              className="mk-btn-primary w-full justify-center disabled:opacity-50"
+              className="btn btn-primary btn-block disabled:opacity-50"
             >
               {submitting ? <Loader2 size={18} className="animate-spin" aria-hidden /> : null}
               {submitting
@@ -274,7 +295,7 @@ export function ServicePageShell({
                 : (paid ? t('common.continue-to-pay') : t('common.send-request'))}
               {!submitting && <ArrowRight size={17} aria-hidden />}
             </button>
-            <p className="text-[12px] text-center mt-3" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+            <p className="text-center mt-3" style={{ fontSize: 11.5, color: 'var(--muted)', fontFamily: 'var(--inter)' }}>
               {paid ? t('common.stripe-footer-paid') : t('common.email-confirmation-footer')}
             </p>
           </div>
@@ -386,7 +407,8 @@ export function MultiStepShell({
             }
             onSubmit(e);
           }}
-          className="mk-card p-6 sm:p-8"
+          className="card-mk"
+          style={{ padding: 28 }}
         >
           <Stepper current={step} steps={stepLabels} />
 
@@ -429,19 +451,27 @@ export function MultiStepShell({
               <div
                 role="alert"
                 aria-live="polite"
-                className="mt-6 rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-[14px]"
+                className="mt-6"
+                style={{
+                  background: '#FEF2F2',
+                  border: '1px solid #FECACA',
+                  color: '#991B1B',
+                  padding: 14,
+                  borderRadius: 10,
+                  fontSize: 13.5,
+                }}
               >
                 {error || inlineError}
               </div>
             </MotionShake>
           )}
 
-          <div className="mt-9 pt-6 border-t flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between" style={{ borderColor: 'var(--color-marketing-line)' }}>
+          <div className="mt-9 pt-6 border-t flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between" style={{ borderColor: 'var(--line)' }}>
             {step === 1 ? (
               <button
                 type="button"
                 onClick={() => setStep(0)}
-                className="mk-btn-secondary w-full sm:w-auto justify-center"
+                className="btn btn-ghost w-full sm:w-auto"
               >
                 <ArrowLeft size={15} aria-hidden /> {t('common.back')}
               </button>
@@ -453,7 +483,7 @@ export function MultiStepShell({
                 type="button"
                 disabled={!step1Valid}
                 onClick={goNext}
-                className="mk-btn-primary w-full sm:w-auto sm:ml-auto justify-center disabled:opacity-50"
+                className="btn btn-primary w-full sm:w-auto sm:ml-auto disabled:opacity-50"
               >
                 {t('common.next')} <ArrowRight size={17} aria-hidden />
               </button>
@@ -461,7 +491,7 @@ export function MultiStepShell({
               <button
                 type="submit"
                 disabled={submitting}
-                className="mk-btn-primary w-full sm:w-auto sm:ml-auto justify-center disabled:opacity-50"
+                className="btn btn-primary w-full sm:w-auto sm:ml-auto disabled:opacity-50"
               >
                 {submitting ? <Loader2 size={18} className="animate-spin" aria-hidden /> : null}
                 {submitting
@@ -471,7 +501,7 @@ export function MultiStepShell({
               </button>
             )}
           </div>
-          <p className="text-[12px] text-center mt-4" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+          <p className="text-center mt-4" style={{ fontSize: 11.5, color: 'var(--muted)', fontFamily: 'var(--inter)' }}>
             {step === 1 ? (paid ? t('common.stripe-footer-paid') : t('common.email-confirmation-footer')) : ' '}
           </p>
         </form>
