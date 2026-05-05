@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminToken } from '@/lib/auth';
+import { verifyAdminToken, verifyCustomerToken } from '@/lib/auth';
 
 const rateMap = new Map<string, { count: number; reset: number }>();
 const RATE_LIMIT = 60;
@@ -62,6 +62,36 @@ export async function middleware(request: NextRequest) {
     response.headers.set('x-admin-name', session.name);
     response.headers.set('x-admin-role', session.role);
     return addSecurityHeaders(response);
+  }
+
+  // Customer-portal page-routes: redirect naar /account/login als geen
+  // geldige customer-sessie. /login en /wachtwoord-wijzigen zelf zijn vrij.
+  if (
+    pathname.startsWith('/account')
+    && !pathname.startsWith('/account/login')
+    && !pathname.startsWith('/account/wachtwoord-wijzigen')
+  ) {
+    const token = request.cookies.get('customer_token')?.value;
+    const session = token ? await verifyCustomerToken(token) : null;
+    if (!session) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/account/login';
+      url.search = '';
+      return NextResponse.redirect(url);
+    }
+  }
+
+  // Customer-portal API: alle endpoints vereisen sessie behalve /login
+  // en /logout. /me en /change-password etc. checken zelf nog een keer
+  // (defense in depth) maar middleware geeft een snelle 401 zonder DB-hit.
+  if (
+    pathname.startsWith('/api/account')
+    && !pathname.startsWith('/api/account/login')
+    && !pathname.startsWith('/api/account/logout')
+  ) {
+    const token = request.cookies.get('customer_token')?.value;
+    const session = token ? await verifyCustomerToken(token) : null;
+    if (!session) return NextResponse.json({ error: 'Niet ingelogd' }, { status: 401 });
   }
 
   return addSecurityHeaders(NextResponse.next());

@@ -47,6 +47,52 @@ export function webhookSecret(): string {
   return secret;
 }
 
+// Klant-portaal: zoek alle invoices (incl. checkout-gegenereerde) via
+// e-mail. We zoeken eerst de Stripe Customer-id op via email; daarna
+// invoices voor die customer. Stripe heeft geen ?email= filter op
+// /invoices — moet via customer-id.
+export async function listInvoicesForEmail(email: string, limit = 25): Promise<{
+  id: string;
+  number: string | null;
+  amount_paid: number;
+  currency: string;
+  status: string | null;
+  hosted_invoice_url: string | null;
+  invoice_pdf: string | null;
+  created: number;
+}[]> {
+  if (!email) return [];
+  const s = stripe();
+  // Stripe customers.list filtert op email. Kan meerdere records geven
+  // (één per Checkout met customer_creation: 'always') — we pakken alle
+  // invoices van alle matches en deduperen op id.
+  const customers = await s.customers.list({ email, limit: 10 });
+  const seen = new Set<string>();
+  const out: Awaited<ReturnType<typeof listInvoicesForEmail>> = [];
+  for (const c of customers.data) {
+    const inv = await s.invoices.list({ customer: c.id, limit }).catch(() => null);
+    if (!inv?.data) continue;
+    for (const i of inv.data) {
+      if (seen.has(i.id ?? '')) continue;
+      if (!i.id) continue;
+      seen.add(i.id);
+      out.push({
+        id: i.id,
+        number: i.number || null,
+        amount_paid: i.amount_paid ?? 0,
+        currency: i.currency ?? 'eur',
+        status: i.status ?? null,
+        hosted_invoice_url: i.hosted_invoice_url ?? null,
+        invoice_pdf: i.invoice_pdf ?? null,
+        created: i.created,
+      });
+    }
+  }
+  // Sorteer nieuwste-eerst.
+  out.sort((a, b) => b.created - a.created);
+  return out.slice(0, limit);
+}
+
 // Stripe Checkout session shorthand for our flow.
 // Always passes our internal id back via metadata so the webhook can match
 // the payment to the right booking/request without trusting client input.
