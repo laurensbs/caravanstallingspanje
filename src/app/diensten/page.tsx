@@ -76,19 +76,22 @@ function Hero({ t }: { t: T }) {
 
 // ─── SPECIALTIES — schoonmaken + onderhoud naast elkaar ────
 function Specialties({ t }: { t: T }) {
+  // Schoonmaak- en onderhouds-tarieven verschillen per caravan-maat en
+  // gevraagd pakket; we tonen "Op aanvraag" en sturen klanten naar offerte.
+  const onRequest = t('pri1.on-request');
   const cleaning = [
-    { keyL: 'svc1.clean-row-1' as StringKey, price: '€85', featured: false },
-    { keyL: 'svc1.clean-row-2' as StringKey, price: '€95', featured: false },
-    { keyL: 'svc1.clean-row-3' as StringKey, price: '€55', featured: false },
-    { keyL: 'svc1.clean-row-4' as StringKey, price: '€75', featured: false },
-    { keyL: 'svc1.clean-row-5' as StringKey, price: '€225', featured: true },
+    { keyL: 'svc1.clean-row-1' as StringKey, price: onRequest, featured: false },
+    { keyL: 'svc1.clean-row-2' as StringKey, price: onRequest, featured: false },
+    { keyL: 'svc1.clean-row-3' as StringKey, price: onRequest, featured: false },
+    { keyL: 'svc1.clean-row-4' as StringKey, price: onRequest, featured: false },
+    { keyL: 'svc1.clean-row-5' as StringKey, price: onRequest, featured: true },
   ];
   const maint = [
-    { keyL: 'svc1.maint-row-1' as StringKey, price: '€65', featured: false },
-    { keyL: 'svc1.maint-row-2' as StringKey, price: '€55', featured: false },
-    { keyL: 'svc1.maint-row-3' as StringKey, price: '€85', featured: false },
-    { keyL: 'svc1.maint-row-4' as StringKey, price: '€95', featured: true },
-    { keyL: 'svc1.maint-row-5' as StringKey, price: '€75', featured: false },
+    { keyL: 'svc1.maint-row-1' as StringKey, price: onRequest, featured: false },
+    { keyL: 'svc1.maint-row-2' as StringKey, price: onRequest, featured: false },
+    { keyL: 'svc1.maint-row-3' as StringKey, price: onRequest, featured: false },
+    { keyL: 'svc1.maint-row-4' as StringKey, price: onRequest, featured: true },
+    { keyL: 'svc1.maint-row-5' as StringKey, price: onRequest, featured: false },
   ];
 
   return (
@@ -290,16 +293,31 @@ function Combos({ t }: { t: T }) {
                   </li>
                 ))}
               </ul>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, margin: '0 0 18px' }}>
-                <span className="display-num" style={{ fontSize: 36, lineHeight: 1, color: 'var(--navy)' }}>
-                  {t(c.priceKey)}
-                </span>
-                {c.oldKey && (
-                  <span style={{ color: 'var(--muted)', fontSize: 14, textDecoration: 'line-through' }}>
-                    {t('svc1.combo-was')} {t(c.oldKey)}
-                  </span>
-                )}
-              </div>
+              {(() => {
+                const priceText = t(c.priceKey);
+                const oldText = c.oldKey ? t(c.oldKey) : '';
+                const isOnRequest = !/^[€$\d]/.test(priceText);
+                return (
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, margin: '0 0 18px', flexWrap: 'wrap' }}>
+                    <span
+                      className="display-num"
+                      style={{
+                        fontSize: isOnRequest ? 22 : 36,
+                        lineHeight: 1.1,
+                        color: 'var(--navy)',
+                        fontWeight: 700,
+                      }}
+                    >
+                      {priceText}
+                    </span>
+                    {oldText && (
+                      <span style={{ color: 'var(--muted)', fontSize: 14, textDecoration: 'line-through' }}>
+                        {t('svc1.combo-was')} {oldText}
+                      </span>
+                    )}
+                  </div>
+                );
+              })()}
               <Link href={c.ctaHref} className={c.featured ? 'btn btn-primary btn-block' : 'btn btn-ghost btn-block'}>
                 {t(c.ctaKey)} <ArrowRight size={14} aria-hidden />
               </Link>

@@ -144,7 +144,7 @@ function ReportMock({ t }: { t: T }) {
       <ScoreRow label="Elektra & gas" status="amber" />
       <ScoreRow label="Interieur & afwerking" status="green" />
       <div style={{ marginTop: 18, padding: 14, background: 'var(--bg)', borderRadius: 10, fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.55 }}>
-        <strong style={{ color: 'var(--navy)' }}>Advies:</strong> Vervang accu binnen 6 maanden; leverbaar via onze werkplaats voor €145 incl. plaatsing.
+        <strong style={{ color: 'var(--navy)' }}>Advies:</strong> Vervang accu binnen 6 maanden; leverbaar via onze werkplaats — vraag een offerte voor onderdeel + plaatsing.
       </div>
     </div>
   );

@@ -106,7 +106,7 @@ function Tiers({ t }: { t: T }) {
               <p style={{ color: 'var(--ink-2)', fontSize: 14.5, lineHeight: 1.6, margin: '0 0 18px' }}>
                 {t(tr.descKey)}
               </p>
-              <div className="display-num" style={{ fontSize: 30, lineHeight: 1, color: 'var(--navy)', marginBottom: 22 }}>
+              <div className="display-num" style={{ fontSize: 22, lineHeight: 1.1, color: 'var(--navy)', marginBottom: 22, fontWeight: 700 }}>
                 {t(tr.fromKey)}
               </div>
               <Link href="/reserveren/configurator" className={tr.featured ? 'btn btn-primary btn-block' : 'btn btn-ghost btn-block'}>
