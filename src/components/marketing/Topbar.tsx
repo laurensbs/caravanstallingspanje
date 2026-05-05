@@ -1,38 +1,41 @@
 'use client';
 
-import { MapPin, Phone, Mail } from 'lucide-react';
+import Link from 'next/link';
+import { Phone, Mail, MapPin } from 'lucide-react';
+import LocaleSwitch from '../LocaleSwitch';
+import { useLocale } from '../LocaleProvider';
 
-// Smalle informatie-strip boven de hoofd-nav. Adres + tel + mail.
-// Donkere navy. Mobiel: alleen tel + mail (adres weg om
-// horizontale ruimte te besparen). Taal-switcher staat in PublicHeader.
+// Smalle navy-deep info-strip boven de hoofd-nav (mockup p01-21).
+// Links: live-status pulse + adres. Rechts: tel, mail, taalswitch, login.
+// Op mobiel klappen e-mail + adres weg (.hide-mobile uit globals.css).
 
 export default function Topbar() {
+  const { t } = useLocale();
   return (
-    <div
-      className="hidden sm:block text-[12px]"
-      style={{
-        background: 'var(--color-navy-deep)',
-        color: 'rgba(255,255,255,0.85)',
-      }}
-    >
-      <div className="max-w-[1180px] mx-auto px-5 sm:px-8 py-2 flex items-center gap-5 flex-wrap">
-        <span className="hidden md:inline-flex items-center gap-1.5">
-          <MapPin size={12} aria-hidden /> Ctra. de Palamós 9, Sant Climent de Peralta
+    <div className="brand-topbar">
+      <div className="tb-left">
+        <span className="live">
+          <span className="pulse" aria-hidden />
+          {t('topbar.live')}
         </span>
-        <a
-          href="tel:+34633778699"
-          className="inline-flex items-center gap-1.5 hover:underline underline-offset-4"
-          style={{ color: 'rgba(255,255,255,0.85)' }}
-        >
+        <span className="pipe hide-mobile" aria-hidden />
+        <span className="hide-mobile" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <MapPin size={12} aria-hidden /> {t('topbar.address')}
+        </span>
+      </div>
+      <div className="tb-right">
+        <a href="tel:+34633778699">
           <Phone size={12} aria-hidden /> +34 633 77 86 99
         </a>
-        <a
-          href="mailto:info@caravanstalling-spanje.com"
-          className="inline-flex items-center gap-1.5 hover:underline underline-offset-4"
-          style={{ color: 'rgba(255,255,255,0.85)' }}
-        >
+        <a href="mailto:info@caravanstalling-spanje.com" className="hide-mobile">
           <Mail size={12} aria-hidden /> info@caravanstalling-spanje.com
         </a>
+        <span className="lang hide-mobile">
+          <LocaleSwitch variant="dark" />
+        </span>
+        <Link href="/account/login" className="tb-login">
+          {t('nav.login')}
+        </Link>
       </div>
     </div>
   );

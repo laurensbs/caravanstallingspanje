@@ -54,11 +54,10 @@ export default function MarketingPage({
   children,
   hideFooter = false,
 }: MarketingPageProps) {
-  const bg = (() => {
-    if (variant === 'sand') return 'var(--color-sand)';
-    if (variant === 'white') return '#FFFFFF';
-    return 'var(--color-marketing-cream)';
-  })();
+  // Mockup-look: alle content-pages staan op een wit/grey canvas. De legacy
+  // 'sand'/'cream' varianten worden voorlopig genegeerd zodat we niet per
+  // page een tussenstijl krijgen — slice 1+ rebuilden de pages alsnog.
+  const bg = variant === 'sand' ? 'var(--bg-2)' : '#FFFFFF';
 
   return (
     <div className="mk-page min-h-screen flex flex-col" style={{ background: bg }}>

@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import CookieBanner from './CookieBanner';
+import WhatsAppBubble from './marketing/WhatsAppBubble';
 
 // Dunne client-wrapper die in de root layout draait en op basis van het
 // pathname bepaalt of publieke chrome (skip-link + cookiebanner) gerenderd
@@ -20,6 +21,7 @@ export default function PublicChrome() {
   return (
     <>
       <SkipLink />
+      <WhatsAppBubble />
       <CookieBanner />
     </>
   );

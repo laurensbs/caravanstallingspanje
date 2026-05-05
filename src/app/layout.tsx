@@ -1,15 +1,23 @@
 import type { Metadata, Viewport } from 'next';
-import { GeistSans } from 'geist/font/sans';
-import { GeistMono } from 'geist/font/mono';
-import { Playfair_Display } from 'next/font/google';
+import { Sora, Inter } from 'next/font/google';
 
-// Premium serif voor headings — Playfair Display met 600/700 weights.
-// Body blijft Geist Sans. Variable wordt op <html> gezet zodat we 'm via
-// font-family: var(--font-display) kunnen gebruiken in CSS.
-const playfair = Playfair_Display({
+// Brand-fonts uit het mockup-design:
+// - Sora voor headings, eyebrows, navigatie en knoppen (display).
+// - Inter voor body-tekst, alinea's en formulieren.
+// Beide via next/font/google met subsets en variabele weights zodat de
+// browser alleen de gebruikte gewichten ophaalt. CSS gebruikt de variabelen
+// via var(--font-sora) en var(--font-inter) onder de aliassen --font-display
+// en --font-body in globals.css.
+const sora = Sora({
   subsets: ['latin'],
-  weight: ['600', '700'],
-  variable: '--font-display',
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-sora',
+  display: 'swap',
+});
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-inter',
   display: 'swap',
 });
 import { Toaster } from 'sonner';
@@ -58,7 +66,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="nl" className={`${GeistSans.variable} ${GeistMono.variable} ${playfair.variable}`}>
+    <html lang="nl" className={`${sora.variable} ${inter.variable}`}>
       <body>
         <JsonLd id="org" payload={organizationLd()} />
         <JsonLd id="local" payload={localBusinessLd()} />
