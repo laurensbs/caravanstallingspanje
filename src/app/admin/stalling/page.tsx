@@ -401,7 +401,7 @@ function SalesInvoiceStripStalling({
   // direct in Holded waar admin het kan converteren naar sales invoice.
   const linkUrl = holdedUrl
     ? holdedUrl
-    : holdedId ? `https://app.holded.com/invoicing/proforms/${holdedId}` : null;
+    : holdedId ? `https://app.holded.com/sales/proforms#open:proform-${holdedId}` : null;
   const isConverted = !!convertedAt;
   const canToggle = holdedPaid || isConverted;
   const fmt = (s: string | null) =>

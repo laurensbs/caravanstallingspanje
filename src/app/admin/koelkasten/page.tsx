@@ -95,11 +95,17 @@ function resolveDeviceType(raw: string | null | undefined): DeviceType {
 // Holded pro forma deep-link. publicUrl is voor klanten, app-URL is voor
 // ons (admin) — opent direct het document in Holded waar we 'm kunnen
 // bewerken / converteren naar sales invoice.
+//
+// LET OP: Holded gebruikt twee verschillende URL-shapes:
+//   - publicUrl: https://invoice.holded.com/...  (klant-facing, share-link)
+//   - app-deeplink: https://app.holded.com/sales/proforms#open:proform-{id}
+// Het oude /invoicing/proforms/{id}-pad redirect niet meer; daarom
+// genereren we expliciet het sales/proforms#open:proform-{id} formaat.
 function holdedProformaUrl(idOrUrl: string | null | undefined, fallbackId?: string | null): string | null {
   if (idOrUrl && idOrUrl.startsWith('http')) return idOrUrl;
   const id = fallbackId || idOrUrl;
   if (!id) return null;
-  return `https://app.holded.com/invoicing/proforms/${id}`;
+  return `https://app.holded.com/sales/proforms#open:proform-${id}`;
 }
 
 function bookingDescription(b: Booking, fridgeName: string, deviceTypeOverride?: string): string {
