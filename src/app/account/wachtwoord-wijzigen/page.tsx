@@ -4,7 +4,8 @@ import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { KeyRound, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
-import MarketingPage from '@/components/marketing/MarketingPage';
+import AccountLayout from '@/components/account/AccountLayout';
+import { useLocale } from '@/components/LocaleProvider';
 
 function ChangeForm() {
   const router = useRouter();
@@ -41,8 +42,6 @@ function ChangeForm() {
         return;
       }
       setDone(true);
-      // Korte vertraging zodat klant de bevestiging ziet, dan door naar
-      // dashboard. Bij eerste login is dat de eerste keer dat ze 'm zien.
       setTimeout(() => router.push('/account'), 900);
     } catch {
       setError('Verbindingsfout. Probeer het zo opnieuw.');
@@ -53,121 +52,136 @@ function ChangeForm() {
 
   if (done) {
     return (
-      <section className="max-w-md mx-auto px-5 sm:px-6 py-8 sm:py-12">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="mk-card p-6 sm:p-8 text-center space-y-3"
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="card-mk text-center"
+        style={{ padding: 32, maxWidth: 480 }}
+      >
+        <div
+          aria-hidden
+          style={{
+            width: 56, height: 56,
+            margin: '0 auto 14px',
+            borderRadius: 999,
+            background: 'var(--green-soft)',
+            color: 'var(--green)',
+            display: 'grid', placeItems: 'center',
+            border: '2px solid var(--green)',
+          }}
         >
-          <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center" style={{ background: 'var(--color-terracotta-soft)', color: 'var(--color-terracotta-deep)' }}>
-            <CheckCircle2 size={22} />
-          </div>
-          <h2 className="font-display" style={{ color: 'var(--color-navy)', fontSize: '1.3rem', fontWeight: 700 }}>
-            Wachtwoord gewijzigd
-          </h2>
-          <p className="text-[14px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>
-            Je gaat zo door naar je portaal…
-          </p>
-        </motion.div>
-      </section>
+          <CheckCircle2 size={28} />
+        </div>
+        <h2 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 20, color: 'var(--navy)', margin: '0 0 8px' }}>
+          Wachtwoord gewijzigd
+        </h2>
+        <p style={{ fontSize: 14, color: 'var(--ink-2)', margin: 0 }}>
+          Je gaat zo door naar je portaal…
+        </p>
+      </motion.div>
     );
   }
 
   return (
-    <section className="max-w-md mx-auto px-5 sm:px-6 py-8 sm:py-12">
-      <motion.form
-        onSubmit={submit}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        className="mk-card p-6 sm:p-8 space-y-5"
-      >
-        <div>
-          <h2 className="font-display" style={{ color: 'var(--color-navy)', fontSize: '1.4rem', fontWeight: 700, letterSpacing: '-0.012em', margin: '0 0 0.4rem' }}>
-            {isFirstLogin ? 'Kies je eigen wachtwoord' : 'Wachtwoord wijzigen'}
-          </h2>
-          <p className="text-[14px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>
-            {isFirstLogin
-              ? 'Voor toegang tot je portaal kies je nu een eigen wachtwoord. Het eenmalige wachtwoord uit de mail mag je daarna vergeten.'
-              : 'Voer je huidige wachtwoord in en kies een nieuw wachtwoord van minimaal 8 tekens.'}
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          <div className="space-y-1.5">
-            <label className="block text-[13px] font-medium" style={{ color: 'var(--color-marketing-ink)' }}>
-              {isFirstLogin ? 'Wachtwoord uit welkomst-mail' : 'Huidig wachtwoord'}
-            </label>
-            <input
-              type="password"
-              required
-              autoComplete="current-password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              className="w-full h-12 px-3.5 text-[15px] bg-white text-[var(--color-marketing-ink)] border border-[var(--color-marketing-line)] rounded-[var(--radius-md)] transition-colors focus:outline-none focus:ring-2 focus:border-[color:var(--color-terracotta)] focus:ring-[color:var(--color-terracotta-soft)]"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <label className="block text-[13px] font-medium" style={{ color: 'var(--color-marketing-ink)' }}>
-              Nieuw wachtwoord <span className="text-[12px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>(min. 8 tekens)</span>
-            </label>
-            <input
-              type="password"
-              required
-              minLength={8}
-              autoComplete="new-password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full h-12 px-3.5 text-[15px] bg-white text-[var(--color-marketing-ink)] border border-[var(--color-marketing-line)] rounded-[var(--radius-md)] transition-colors focus:outline-none focus:ring-2 focus:border-[color:var(--color-terracotta)] focus:ring-[color:var(--color-terracotta-soft)]"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <label className="block text-[13px] font-medium" style={{ color: 'var(--color-marketing-ink)' }}>
-              Bevestig nieuw wachtwoord
-            </label>
-            <input
-              type="password"
-              required
-              autoComplete="new-password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full h-12 px-3.5 text-[15px] bg-white text-[var(--color-marketing-ink)] border border-[var(--color-marketing-line)] rounded-[var(--radius-md)] transition-colors focus:outline-none focus:ring-2 focus:border-[color:var(--color-terracotta)] focus:ring-[color:var(--color-terracotta-soft)]"
-            />
-          </div>
-        </div>
-
-        {error && (
-          <div role="alert" className="flex items-start gap-2 rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-[13px]">
-            <AlertCircle size={14} className="mt-0.5 shrink-0" />
-            <span>{error}</span>
-          </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={submitting}
-          className="mk-btn-primary w-full justify-center disabled:opacity-50"
+    <motion.form
+      onSubmit={submit}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      className="card-mk"
+      style={{ padding: 32, maxWidth: 480 }}
+    >
+      {isFirstLogin && (
+        <div
+          role="status"
+          style={{
+            background: 'var(--sky-soft)',
+            border: '1px solid rgba(47,66,84,0.10)',
+            color: 'var(--navy)',
+            padding: 14,
+            borderRadius: 10,
+            fontSize: 13.5,
+            marginBottom: 18,
+            lineHeight: 1.55,
+          }}
         >
-          {submitting ? <Loader2 size={16} className="animate-spin" /> : <KeyRound size={16} />}
-          {submitting ? 'Bezig…' : 'Wachtwoord opslaan'}
-        </button>
-      </motion.form>
-    </section>
+          Welkom! Voor je verder kunt: kies een eigen wachtwoord ter vervanging van het tijdelijke uit de welkomstmail.
+        </div>
+      )}
+
+      <h2 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 20, color: 'var(--navy)', margin: '0 0 18px' }}>
+        Wachtwoord wijzigen
+      </h2>
+
+      <div className="field-mk">
+        <label htmlFor="pw-current">Huidig wachtwoord</label>
+        <input
+          id="pw-current"
+          type="password"
+          autoComplete="current-password"
+          value={currentPassword}
+          onChange={(e) => setCurrentPassword(e.target.value)}
+          required
+        />
+      </div>
+      <div className="field-mk">
+        <label htmlFor="pw-new">Nieuw wachtwoord</label>
+        <input
+          id="pw-new"
+          type="password"
+          autoComplete="new-password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          minLength={8}
+          required
+        />
+        <div className="hint">Minimaal 8 tekens.</div>
+      </div>
+      <div className="field-mk">
+        <label htmlFor="pw-confirm">Bevestig nieuw wachtwoord</label>
+        <input
+          id="pw-confirm"
+          type="password"
+          autoComplete="new-password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+        />
+      </div>
+
+      {error && (
+        <div role="alert" style={{ display: 'flex', alignItems: 'flex-start', gap: 10, background: '#FEF2F2', border: '1px solid #FECACA', color: '#991B1B', padding: 12, borderRadius: 10, fontSize: 13, margin: '14px 0' }}>
+          <AlertCircle size={14} style={{ marginTop: 2, flexShrink: 0 }} />
+          <span>{error}</span>
+        </div>
+      )}
+
+      <button type="submit" disabled={submitting} className="btn btn-primary btn-block disabled:opacity-50" style={{ marginTop: 6 }}>
+        {submitting ? <Loader2 size={16} className="animate-spin" aria-hidden /> : <KeyRound size={15} aria-hidden />}
+        {submitting ? 'Wijzigen…' : 'Wijzig wachtwoord'}
+      </button>
+    </motion.form>
   );
 }
 
-export default function ChangePasswordPage() {
+export default function WachtwoordWijzigenPage() {
+  const { t } = useLocale();
   return (
-    <MarketingPage
-      hero={{
-        title: 'Wachtwoord instellen',
-        back: { href: '/account/login', label: 'Inloggen' },
-        variant: 'compact',
-      }}
-    >
-      <Suspense fallback={null}>
+    <AccountLayout>
+      <motion.header
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-6"
+      >
+        <span className="eyebrow-mk">{t('pt1.brand')}</span>
+        <h1 className="h2-mk" style={{ marginTop: 4, fontSize: 'clamp(1.6rem, 3.2vw, 2.2rem)' }}>
+          Wachtwoord wijzigen
+        </h1>
+      </motion.header>
+      <Suspense fallback={<div className="card-mk" style={{ padding: 32, maxWidth: 480, height: 320 }} />}>
         <ChangeForm />
       </Suspense>
-    </MarketingPage>
+    </AccountLayout>
   );
 }

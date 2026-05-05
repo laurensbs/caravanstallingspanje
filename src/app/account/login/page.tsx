@@ -1,12 +1,23 @@
 'use client';
 
 import { useState, Suspense } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { LogIn, Loader2, AlertCircle } from 'lucide-react';
-import MarketingPage from '@/components/marketing/MarketingPage';
+import {
+  LogIn, Loader2, AlertCircle, Receipt, Camera, Calendar, ArrowLeft,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import Topbar from '@/components/marketing/Topbar';
+import PublicHeader from '@/components/PublicHeader';
+import PublicFooter from '@/components/PublicFooter';
+import { useLocale } from '@/components/LocaleProvider';
+import type { StringKey } from '@/lib/i18n';
 
-function LoginForm() {
+const EASE = [0.16, 1, 0.3, 1] as const;
+type T = (k: StringKey, ...a: (string | number)[]) => string;
+
+function LoginForm({ t }: { t: T }) {
   const router = useRouter();
   const params = useSearchParams();
   const [email, setEmail] = useState(params.get('email') || '');
@@ -29,8 +40,6 @@ function LoginForm() {
         setError(data.error || 'Inloggen mislukt.');
         return;
       }
-      // Eerste login op een eenmalig wachtwoord → dwingend naar
-      // wachtwoord-wijzigen scherm. Daarna pas toegang tot dashboard.
       if (data.mustChangePassword) {
         router.push('/account/wachtwoord-wijzigen?first=1');
       } else {
@@ -44,91 +53,141 @@ function LoginForm() {
   };
 
   return (
-    <section className="max-w-md mx-auto px-5 sm:px-6 py-8 sm:py-12">
-      <motion.form
-        onSubmit={submit}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        className="mk-card p-6 sm:p-8 space-y-5"
-      >
-        <div>
-          <h2 className="font-display" style={{
-            color: 'var(--color-navy)',
-            fontSize: '1.4rem',
-            fontWeight: 700,
-            letterSpacing: '-0.012em',
-            margin: '0 0 0.4rem',
-          }}>
-            Inloggen
-          </h2>
-          <p className="text-[14px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>
-            Gebruik het wachtwoord uit je welkomst-mail. De eerste keer vragen we je een eigen wachtwoord te kiezen.
-          </p>
-        </div>
+    <motion.form
+      onSubmit={submit}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: EASE }}
+      className="card-mk card-lift"
+      style={{ padding: 32 }}
+    >
+      <h2 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 22, color: 'var(--navy)', margin: '0 0 20px' }}>
+        {t('pt1.login-form-title')}
+      </h2>
 
-        <div className="space-y-4">
-          <div className="space-y-1.5">
-            <label className="block text-[13px] font-medium" style={{ color: 'var(--color-marketing-ink)' }}>
-              E-mail
-            </label>
-            <input
-              type="email"
-              required
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-12 px-3.5 text-[15px] bg-white text-[var(--color-marketing-ink)] border border-[var(--color-marketing-line)] rounded-[var(--radius-md)] transition-colors placeholder:opacity-60 focus:outline-none focus:ring-2 focus:border-[color:var(--color-terracotta)] focus:ring-[color:var(--color-terracotta-soft)]"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <label className="block text-[13px] font-medium" style={{ color: 'var(--color-marketing-ink)' }}>
-              Wachtwoord
-            </label>
-            <input
-              type="password"
-              required
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-12 px-3.5 text-[15px] bg-white text-[var(--color-marketing-ink)] border border-[var(--color-marketing-line)] rounded-[var(--radius-md)] transition-colors placeholder:opacity-60 focus:outline-none focus:ring-2 focus:border-[color:var(--color-terracotta)] focus:ring-[color:var(--color-terracotta-soft)]"
-            />
-          </div>
-        </div>
+      <div className="field-mk">
+        <label htmlFor="login-email">{t('pt1.login-email')}</label>
+        <input
+          id="login-email"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+      </div>
 
-        {error && (
-          <div role="alert" className="flex items-start gap-2 rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-[13px]">
-            <AlertCircle size={14} className="mt-0.5 shrink-0" />
-            <span>{error}</span>
-          </div>
-        )}
+      <div className="field-mk">
+        <label htmlFor="login-password">{t('pt1.login-password')}</label>
+        <input
+          id="login-password"
+          type="password"
+          autoComplete="current-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+      </div>
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="mk-btn-primary w-full justify-center disabled:opacity-50"
+      {error && (
+        <div
+          role="alert"
+          style={{
+            display: 'flex', alignItems: 'flex-start', gap: 10,
+            background: '#FEF2F2', border: '1px solid #FECACA',
+            color: '#991B1B', padding: 12, borderRadius: 10,
+            fontSize: 13, marginBottom: 14,
+          }}
         >
-          {submitting ? <Loader2 size={16} className="animate-spin" /> : <LogIn size={16} />}
-          {submitting ? 'Bezig…' : 'Inloggen'}
-        </button>
-      </motion.form>
-    </section>
+          <AlertCircle size={14} style={{ marginTop: 2, flexShrink: 0 }} />
+          <span>{error}</span>
+        </div>
+      )}
+
+      <button
+        type="submit"
+        disabled={submitting}
+        className="btn btn-primary btn-block disabled:opacity-50"
+        style={{ marginTop: 6 }}
+      >
+        {submitting ? <Loader2 size={16} className="animate-spin" aria-hidden /> : <LogIn size={16} aria-hidden />}
+        {submitting ? '...' : t('pt1.login-submit')}
+      </button>
+
+      <p style={{ fontSize: 12, color: 'var(--muted)', textAlign: 'center', marginTop: 14, lineHeight: 1.5 }}>
+        {t('pt1.login-help')}
+      </p>
+    </motion.form>
+  );
+}
+
+function Benefits({ t }: { t: T }) {
+  const items: Array<{ icon: LucideIcon; tKey: StringKey; dKey: StringKey }> = [
+    { icon: Receipt, tKey: 'pt1.login-benefit-1-t', dKey: 'pt1.login-benefit-1-d' },
+    { icon: Camera, tKey: 'pt1.login-benefit-2-t', dKey: 'pt1.login-benefit-2-d' },
+    { icon: Calendar, tKey: 'pt1.login-benefit-3-t', dKey: 'pt1.login-benefit-3-d' },
+  ];
+  return (
+    <div>
+      <Link href="/" className="inline-flex items-center gap-1.5" style={{ color: 'var(--muted)', fontSize: 13, textDecoration: 'none', marginBottom: 22, fontFamily: 'var(--inter)' }}>
+        <ArrowLeft size={14} aria-hidden /> {t('pt1.back-to-site')}
+      </Link>
+      <span className="eyebrow-mk">{t('pt1.login-eyebrow')}</span>
+      <h1 className="h1-mk" style={{ marginTop: 4, fontSize: 'clamp(2rem, 4vw, 2.6rem)' }}>
+        {t('pt1.login-h1')}
+      </h1>
+      <p className="lead-mk" style={{ marginTop: 14, maxWidth: 480 }}>
+        {t('pt1.login-lead')}
+      </p>
+
+      <ul style={{ marginTop: 30, display: 'flex', flexDirection: 'column', gap: 18, listStyle: 'none', padding: 0 }}>
+        {items.map(({ icon: Icon, tKey, dKey }) => (
+          <li key={tKey} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+            <span
+              aria-hidden
+              style={{
+                width: 40, height: 40, borderRadius: 10,
+                background: 'var(--sky-soft)', color: 'var(--navy)',
+                display: 'grid', placeItems: 'center', flexShrink: 0,
+                marginTop: 2,
+              }}
+            >
+              <Icon size={18} />
+            </span>
+            <div>
+              <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 15, color: 'var(--navy)', margin: '0 0 3px' }}>
+                {t(tKey)}
+              </h3>
+              <p style={{ fontSize: 13.5, color: 'var(--ink-2)', margin: 0, lineHeight: 1.55, maxWidth: 460 }}>
+                {t(dKey)}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
 export default function AccountLoginPage() {
+  const { t } = useLocale();
   return (
-    <MarketingPage
-      hero={{
-        title: 'Klantportaal',
-        intro: 'Log in om je facturen en gegevens te bekijken.',
-        back: { href: '/', label: 'Caravanstalling Spanje' },
-        variant: 'compact',
-      }}
-    >
-      <Suspense fallback={null}>
-        <LoginForm />
-      </Suspense>
-    </MarketingPage>
+    <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
+      <Topbar />
+      <PublicHeader />
+      <main id="main" className="flex-1">
+        <section className="section-bg-sky-soft">
+          <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-14 sm:py-20">
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-10 lg:gap-16 items-center">
+              <Benefits t={t} />
+              <Suspense fallback={<div className="card-mk" style={{ padding: 32, height: 360 }} />}>
+                <LoginForm t={t} />
+              </Suspense>
+            </div>
+          </div>
+        </section>
+      </main>
+      <PublicFooter />
+    </div>
   );
 }

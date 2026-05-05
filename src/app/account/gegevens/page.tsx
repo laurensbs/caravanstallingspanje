@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Save, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
-import MarketingPage from '@/components/marketing/MarketingPage';
+import AccountLayout from '@/components/account/AccountLayout';
+import { useLocale } from '@/components/LocaleProvider';
 
 type CustomerForm = {
   name: string;
@@ -24,6 +25,7 @@ const empty: CustomerForm = {
 
 export default function GegevensPage() {
   const router = useRouter();
+  const { t } = useLocale();
   const [form, setForm] = useState<CustomerForm>(empty);
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(true);
@@ -88,170 +90,104 @@ export default function GegevensPage() {
 
   if (loading) {
     return (
-      <MarketingPage
-        hero={{ title: 'Mijn gegevens', back: { href: '/account', label: 'Terug naar portaal' }, variant: 'compact' }}
-      >
-        <section className="max-w-2xl mx-auto px-5 sm:px-6 py-8 sm:py-12 flex justify-center">
-          <Loader2 className="animate-spin" style={{ color: 'var(--color-terracotta)' }} />
-        </section>
-      </MarketingPage>
+      <AccountLayout>
+        <div className="flex justify-center py-20">
+          <Loader2 className="animate-spin" style={{ color: 'var(--muted)' }} />
+        </div>
+      </AccountLayout>
     );
   }
 
-  const inputCls = "w-full h-12 px-3.5 text-[15px] bg-white text-[var(--color-marketing-ink)] border border-[var(--color-marketing-line)] rounded-[var(--radius-md)] transition-colors focus:outline-none focus:ring-2 focus:border-[color:var(--color-terracotta)] focus:ring-[color:var(--color-terracotta-soft)]";
-  const labelCls = "block text-[13px] font-medium";
-  const labelStyle = { color: 'var(--color-marketing-ink)' };
   const set = <K extends keyof CustomerForm>(k: K, v: CustomerForm[K]) => setForm((f) => ({ ...f, [k]: v }));
 
   return (
-    <MarketingPage
-      hero={{
-        title: 'Mijn gegevens',
-        intro: 'Wijzigingen worden meteen ook in onze boekhouding bijgewerkt.',
-        back: { href: '/account', label: 'Terug naar portaal' },
-        variant: 'compact',
-      }}
-    >
-      <section className="max-w-2xl mx-auto px-5 sm:px-6 py-8 sm:py-12">
-        <motion.form
-          onSubmit={submit}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="mk-card p-6 sm:p-8 space-y-6"
-        >
-          <div className="space-y-1.5">
-            <label className={labelCls} style={labelStyle}>E-mail</label>
-            <input
-              type="email"
-              value={email}
-              disabled
-              className={`${inputCls} opacity-60 cursor-not-allowed`}
-            />
-            <p className="text-[12px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>
-              E-mail wijzigen? Stuur een bericht via <a href="/contact" className="underline">contact</a>.
-            </p>
+    <AccountLayout customerName={form.name} customerEmail={email}>
+      <motion.header
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-6"
+      >
+        <span className="eyebrow-mk">{t('pt1.brand')}</span>
+        <h1 className="h2-mk" style={{ marginTop: 4, fontSize: 'clamp(1.6rem, 3.2vw, 2.2rem)' }}>
+          Mijn gegevens
+        </h1>
+        <p className="lead-mk" style={{ marginTop: 8, fontSize: 14 }}>
+          Wijzigingen worden meteen ook in onze boekhouding bijgewerkt.
+        </p>
+      </motion.header>
+
+      <form onSubmit={submit} className="card-mk" style={{ padding: 28, maxWidth: 720 }}>
+        <div className="field-mk">
+          <label htmlFor="acc-name">Naam</label>
+          <input id="acc-name" type="text" value={form.name} onChange={(e) => set('name', e.target.value)} required />
+        </div>
+
+        <div className="field-mk">
+          <label htmlFor="acc-email">E-mail</label>
+          <input id="acc-email" type="email" value={email} disabled style={{ background: 'var(--bg)', color: 'var(--muted)' }} />
+          <div className="hint">E-mailadres wijzigen? Stuur ons een bericht.</div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+          <div className="field-mk">
+            <label htmlFor="acc-phone">Telefoon</label>
+            <input id="acc-phone" type="tel" value={form.phone} onChange={(e) => set('phone', e.target.value)} />
           </div>
-
-          <div className="space-y-1.5">
-            <label className={labelCls} style={labelStyle}>Naam</label>
-            <input
-              type="text"
-              required
-              autoComplete="name"
-              value={form.name}
-              onChange={(e) => set('name', e.target.value)}
-              className={inputCls}
-            />
+          <div className="field-mk">
+            <label htmlFor="acc-mobile">Mobiel</label>
+            <input id="acc-mobile" type="tel" value={form.mobile} onChange={(e) => set('mobile', e.target.value)} />
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <label className={labelCls} style={labelStyle}>Telefoon</label>
-              <input
-                type="tel"
-                autoComplete="tel"
-                value={form.phone}
-                onChange={(e) => set('phone', e.target.value)}
-                className={inputCls}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className={labelCls} style={labelStyle}>Mobiel</label>
-              <input
-                type="tel"
-                value={form.mobile}
-                onChange={(e) => set('mobile', e.target.value)}
-                className={inputCls}
-              />
-            </div>
+        <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 11, letterSpacing: 2.4, textTransform: 'uppercase', color: 'var(--muted)', margin: '20px 0 12px' }}>
+          Factuuradres
+        </h3>
+
+        <div className="field-mk">
+          <label htmlFor="acc-address">Adres</label>
+          <input id="acc-address" type="text" value={form.address} onChange={(e) => set('address', e.target.value)} />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-4">
+          <div className="field-mk">
+            <label htmlFor="acc-postal">Postcode</label>
+            <input id="acc-postal" type="text" value={form.postal_code} onChange={(e) => set('postal_code', e.target.value)} />
           </div>
-
-          <div className="space-y-1.5">
-            <label className={labelCls} style={labelStyle}>Adres</label>
-            <input
-              type="text"
-              autoComplete="street-address"
-              value={form.address}
-              onChange={(e) => set('address', e.target.value)}
-              className={inputCls}
-            />
+          <div className="field-mk">
+            <label htmlFor="acc-city">Plaats</label>
+            <input id="acc-city" type="text" value={form.city} onChange={(e) => set('city', e.target.value)} />
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-[1fr_2fr_1fr] gap-3">
-            <div className="space-y-1.5">
-              <label className={labelCls} style={labelStyle}>Postcode</label>
-              <input
-                type="text"
-                autoComplete="postal-code"
-                value={form.postal_code}
-                onChange={(e) => set('postal_code', e.target.value)}
-                className={inputCls}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className={labelCls} style={labelStyle}>Stad</label>
-              <input
-                type="text"
-                autoComplete="address-level2"
-                value={form.city}
-                onChange={(e) => set('city', e.target.value)}
-                className={inputCls}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className={labelCls} style={labelStyle}>Land</label>
-              <input
-                type="text"
-                autoComplete="country-name"
-                value={form.country}
-                onChange={(e) => set('country', e.target.value)}
-                className={inputCls}
-              />
-            </div>
+          <div className="field-mk">
+            <label htmlFor="acc-country">Land</label>
+            <input id="acc-country" type="text" value={form.country} onChange={(e) => set('country', e.target.value)} />
           </div>
+        </div>
+        <div className="field-mk">
+          <label htmlFor="acc-vat">BTW-nummer (optioneel)</label>
+          <input id="acc-vat" type="text" value={form.vat_number} onChange={(e) => set('vat_number', e.target.value)} placeholder="NL123456789B01" />
+        </div>
 
-          <div className="space-y-1.5">
-            <label className={labelCls} style={labelStyle}>BTW-nummer <span className="text-[12px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>(optioneel)</span></label>
-            <input
-              type="text"
-              value={form.vat_number}
-              onChange={(e) => set('vat_number', e.target.value)}
-              className={inputCls}
-            />
+        {error && (
+          <div role="alert" style={{ display: 'flex', alignItems: 'flex-start', gap: 10, background: '#FEF2F2', border: '1px solid #FECACA', color: '#991B1B', padding: 12, borderRadius: 10, fontSize: 13, margin: '14px 0' }}>
+            <AlertCircle size={14} style={{ marginTop: 2, flexShrink: 0 }} />
+            <span>{error}</span>
           </div>
+        )}
 
-          {error && (
-            <div role="alert" className="flex items-start gap-2 rounded-[var(--radius-md)] bg-danger-soft text-danger px-4 py-3 text-[13px]">
-              <AlertCircle size={14} className="mt-0.5 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          {savedAt && Date.now() - savedAt < 4000 && (
-            <motion.div
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex items-start gap-2 rounded-[var(--radius-md)] px-4 py-3 text-[13px]"
-              style={{ background: 'var(--color-terracotta-soft)', color: 'var(--color-terracotta-deep)' }}
-            >
-              <CheckCircle2 size={14} className="mt-0.5 shrink-0" />
-              <span>Gegevens opgeslagen.</span>
-            </motion.div>
-          )}
-
-          <div className="pt-4 border-t" style={{ borderColor: 'var(--color-marketing-line)' }}>
-            <button
-              type="submit"
-              disabled={submitting}
-              className="mk-btn-primary w-full justify-center disabled:opacity-50"
-            >
-              {submitting ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-              {submitting ? 'Opslaan…' : 'Wijzigingen opslaan'}
-            </button>
+        {savedAt && !error && (
+          <div role="status" style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--green-soft)', border: '1px solid var(--green)', color: 'var(--green)', padding: 12, borderRadius: 10, fontSize: 13, margin: '14px 0' }}>
+            <CheckCircle2 size={15} aria-hidden />
+            <span>Opgeslagen.</span>
           </div>
-        </motion.form>
-      </section>
-    </MarketingPage>
+        )}
+
+        <div style={{ paddingTop: 20, borderTop: '1px solid var(--line)', marginTop: 14 }}>
+          <button type="submit" disabled={submitting} className="btn btn-primary disabled:opacity-50">
+            {submitting ? <Loader2 size={16} className="animate-spin" aria-hidden /> : <Save size={15} aria-hidden />}
+            {submitting ? 'Opslaan…' : 'Opslaan'}
+          </button>
+        </div>
+      </form>
+    </AccountLayout>
   );
 }

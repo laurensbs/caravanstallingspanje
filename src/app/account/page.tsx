@@ -5,10 +5,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
-  Receipt, FileText, ExternalLink, Download, ChevronRight, LogOut, Loader2,
-  User, Plus, KeyRound, AlertCircle,
+  Receipt, ChevronRight, Loader2, Caravan, Calendar, Camera, AlertCircle,
+  Wrench, Sparkles, ClipboardCheck, ArrowRight, Activity,
 } from 'lucide-react';
-import MarketingPage from '@/components/marketing/MarketingPage';
+import type { LucideIcon } from 'lucide-react';
+import AccountLayout from '@/components/account/AccountLayout';
+import { useLocale } from '@/components/LocaleProvider';
+import type { StringKey } from '@/lib/i18n';
 
 type Customer = {
   id: number;
@@ -35,15 +38,9 @@ type Invoice = {
   created: number;
 };
 
-function fmtEur(cents: number, currency: string): string {
-  return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: currency.toUpperCase() }).format(cents / 100);
-}
-function fmtDate(unix: number): string {
-  return new Date(unix * 1000).toLocaleDateString('nl-NL', { day: '2-digit', month: 'short', year: 'numeric' });
-}
-
 export default function AccountDashboard() {
   const router = useRouter();
+  const { t } = useLocale();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [invoices, setInvoices] = useState<Invoice[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -57,8 +54,6 @@ export default function AccountDashboard() {
         const me = await meRes.json();
         if (!alive) return;
         setCustomer(me.customer);
-        // Eerste login? Forceer wachtwoord-wijziging — dashboard is dan
-        // visueel kort zichtbaar maar functioneel disabled tot wijziging.
         if (me.customer.mustChangePassword) {
           router.push('/account/wachtwoord-wijzigen?first=1');
           return;
@@ -76,180 +71,275 @@ export default function AccountDashboard() {
     return () => { alive = false; };
   }, [router]);
 
-  const logout = async () => {
-    await fetch('/api/account/logout', { method: 'POST', credentials: 'include' });
-    router.push('/account/login');
-  };
-
   if (loading || !customer) {
     return (
-      <MarketingPage
-        hero={{
-          title: 'Mijn portaal',
-          back: { href: '/', label: 'Caravanstalling Spanje' },
-          variant: 'compact',
-        }}
-      >
-        <section className="max-w-3xl mx-auto px-5 sm:px-6 py-8 sm:py-12 flex justify-center">
-          <Loader2 className="animate-spin" style={{ color: 'var(--color-terracotta)' }} />
-        </section>
-      </MarketingPage>
+      <AccountLayout>
+        <div className="flex justify-center py-20">
+          <Loader2 className="animate-spin" style={{ color: 'var(--muted)' }} />
+        </div>
+      </AccountLayout>
     );
   }
 
-  return (
-    <MarketingPage
-      hero={{
-        title: `Welkom terug, ${customer.name.split(' ')[0]}`,
-        intro: 'Bekijk je facturen, update je gegevens of start een nieuwe boeking.',
-        eyebrow: 'Klantportaal',
-        back: { href: '/', label: 'Caravanstalling Spanje' },
-        variant: 'compact',
-      }}
-    >
-      <section className="max-w-3xl mx-auto px-5 sm:px-6 py-8 sm:py-12 space-y-6">
-        {/* Quick-actions tegels */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-3"
-        >
-          <Link href="/koelkast" className="mk-card mk-card-hover group p-5 block">
-            <div className="mk-icon-disc mb-3"><Plus size={20} /></div>
-            <h3 className="font-display" style={{ color: 'var(--color-navy)', fontSize: '1rem', fontWeight: 700, margin: '0 0 0.2rem' }}>Nieuwe boeking</h3>
-            <p className="text-[13px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>Koelkast of airco huren</p>
-          </Link>
-          <Link href="/account/gegevens" className="mk-card mk-card-hover group p-5 block">
-            <div className="mk-icon-disc mb-3"><User size={20} /></div>
-            <h3 className="font-display" style={{ color: 'var(--color-navy)', fontSize: '1rem', fontWeight: 700, margin: '0 0 0.2rem' }}>Mijn gegevens</h3>
-            <p className="text-[13px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>Adres, telefoon, BTW</p>
-          </Link>
-          <Link href="/account/wachtwoord-wijzigen" className="mk-card mk-card-hover group p-5 block">
-            <div className="mk-icon-disc mb-3"><KeyRound size={20} /></div>
-            <h3 className="font-display" style={{ color: 'var(--color-navy)', fontSize: '1rem', fontWeight: 700, margin: '0 0 0.2rem' }}>Wachtwoord</h3>
-            <p className="text-[13px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>Wijzig wachtwoord</p>
-          </Link>
-        </motion.div>
+  const firstName = customer.name.split(' ')[0];
+  const openInvoices = (invoices || []).filter((i) => i.status === 'open');
+  const paidCount = (invoices || []).filter((i) => i.status === 'paid').length;
 
-        {/* Facturen-lijst */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
-          className="mk-card p-5 sm:p-7"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Receipt size={16} style={{ color: 'var(--color-terracotta-deep)' }} />
-              <h2 className="font-display" style={{ color: 'var(--color-navy)', fontSize: '1.15rem', fontWeight: 700, margin: 0 }}>
-                Facturen & betalingen
-              </h2>
-            </div>
-            <span className="text-[12px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>
-              {invoices?.length ?? 0} {invoices?.length === 1 ? 'factuur' : 'facturen'}
-            </span>
+  return (
+    <AccountLayout customerName={customer.name} customerEmail={customer.email}>
+      {/* Welkom-header */}
+      <motion.header
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-8"
+      >
+        <span className="eyebrow-mk">{t('pt1.brand')}</span>
+        <h1 className="h2-mk" style={{ marginTop: 4, fontSize: 'clamp(1.6rem, 3.2vw, 2.2rem)' }}>
+          {t('pt1.db-welcome', firstName)}
+        </h1>
+        <p className="lead-mk" style={{ marginTop: 8, fontSize: 15 }}>
+          {t('pt1.db-sub')}
+        </p>
+      </motion.header>
+
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+        <div className="space-y-6">
+          {/* Caravan card */}
+          <CaravanCard t={t} />
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <StatTile labelKey="pt1.db-stat-1-l" value={t('pt1.db-stat-1-v')} accent="green" />
+            <StatTile labelKey="pt1.db-stat-2-l" value="—" accent="muted" />
+            <StatTile labelKey="pt1.db-stat-3-l" value={String(openInvoices.length)} accent={openInvoices.length > 0 ? 'orange' : 'muted'} />
+            <StatTile labelKey="pt1.db-stat-4-l" value={String(paidCount)} accent="muted" />
           </div>
 
-          {invoices === null ? (
-            <div className="flex justify-center py-6">
-              <Loader2 className="animate-spin" style={{ color: 'var(--color-marketing-ink-soft)' }} />
-            </div>
-          ) : invoices.length === 0 ? (
-            <div className="text-center py-8">
-              <FileText size={32} className="mx-auto mb-2" style={{ color: 'var(--color-marketing-ink-soft)', opacity: 0.5 }} />
-              <p className="text-[14px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>
-                Nog geen facturen.
-              </p>
-              <p className="text-[12px] mt-1" style={{ color: 'var(--color-marketing-ink-soft)' }}>
-                Zodra je een betaling doet verschijnen ze hier automatisch.
-              </p>
-            </div>
-          ) : (
-            <ul className="divide-y" style={{ borderColor: 'var(--color-marketing-line)' }}>
-              {invoices.map((inv) => (
-                <li key={inv.id} className="py-3.5 flex items-center justify-between gap-3 first:pt-0 last:pb-0">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium tabular-nums" style={{ color: 'var(--color-marketing-ink)' }}>
-                        {inv.number || inv.id.slice(0, 12)}
-                      </span>
-                      <StatusBadge status={inv.status} />
-                    </div>
-                    <p className="text-[12px] mt-0.5" style={{ color: 'var(--color-marketing-ink-soft)' }}>
-                      {fmtDate(inv.created)}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className="font-medium tabular-nums" style={{ color: 'var(--color-marketing-ink)' }}>
-                      {fmtEur(inv.amount_paid, inv.currency)}
-                    </span>
-                    {/* PDF-download is de primaire actie — klant download
-                        de factuur direct als bestand. Hosted-link is een
-                        secundaire optie voor in-browser bekijken. */}
-                    {inv.invoice_pdf && (
-                      <a
-                        href={inv.invoice_pdf}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[13px] font-medium hover:underline"
-                        style={{ color: 'var(--color-terracotta-deep)' }}
-                        title="Factuur downloaden (PDF)"
-                      >
-                        <Download size={13} /> PDF
-                      </a>
-                    )}
-                    {inv.hosted_invoice_url && (
-                      <a
-                        href={inv.hosted_invoice_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[13px] hover:underline"
-                        style={{ color: 'var(--color-marketing-ink-soft)' }}
-                        title="Factuur in browser bekijken"
-                      >
-                        <ExternalLink size={12} />
-                      </a>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </motion.div>
+          {/* Geplande afspraken */}
+          <Appointments t={t} />
 
-        {/* Logout-knop onder */}
-        <div className="flex justify-center pt-2">
-          <button
-            type="button"
-            onClick={logout}
-            className="inline-flex items-center gap-1.5 text-[13px] font-medium hover:opacity-70 transition-opacity"
-            style={{ color: 'var(--color-marketing-ink-soft)' }}
-          >
-            <LogOut size={14} /> Uitloggen
-          </button>
+          {/* Recente activiteit */}
+          <Activity_Section t={t} invoices={invoices || []} />
         </div>
-      </section>
-    </MarketingPage>
+
+        <aside className="space-y-6">
+          <QuickActions t={t} />
+          <RecentInvoices t={t} invoices={invoices || []} />
+        </aside>
+      </div>
+    </AccountLayout>
   );
 }
 
-function StatusBadge({ status }: { status: string | null }) {
-  if (!status) return null;
-  const map: Record<string, { label: string; bg: string; color: string; icon?: typeof ChevronRight }> = {
-    paid: { label: 'Betaald', bg: 'var(--color-terracotta-soft)', color: 'var(--color-terracotta-deep)' },
-    open: { label: 'Open', bg: 'rgba(255,180,80,0.18)', color: '#9a6a08', icon: AlertCircle },
-    void: { label: 'Vervallen', bg: 'rgba(0,0,0,0.06)', color: 'rgba(0,0,0,0.5)' },
-    draft: { label: 'Concept', bg: 'rgba(0,0,0,0.04)', color: 'rgba(0,0,0,0.5)' },
-    uncollectible: { label: 'Niet inbaar', bg: 'rgba(220,38,38,0.10)', color: '#dc2626' },
-  };
-  const m = map[status] || { label: status, bg: 'rgba(0,0,0,0.04)', color: 'rgba(0,0,0,0.55)' };
+type T = (k: StringKey, ...a: (string | number)[]) => string;
+
+function StatTile({
+  labelKey, value, accent,
+}: {
+  labelKey: StringKey;
+  value: string;
+  accent: 'green' | 'orange' | 'muted';
+}) {
+  const { t } = useLocale();
+  const accentColor = accent === 'green' ? 'var(--green)' : accent === 'orange' ? 'var(--orange-d)' : 'var(--muted)';
   return (
-    <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-[0.05em]"
-      style={{ background: m.bg, color: m.color }}
-    >
-      {m.label}
-    </span>
+    <div className="card-mk" style={{ padding: 18 }}>
+      <div style={{ fontSize: 11.5, fontFamily: 'var(--sora)', fontWeight: 600, color: 'var(--muted)', letterSpacing: 0.4, textTransform: 'uppercase', marginBottom: 6 }}>
+        {t(labelKey)}
+      </div>
+      <div style={{ fontFamily: 'var(--sora)', fontWeight: 700, fontSize: 22, color: accentColor }}>{value}</div>
+    </div>
   );
+}
+
+function CaravanCard({ t }: { t: T }) {
+  return (
+    <Link
+      href="/account/caravan"
+      className="card-mk card-lift block"
+      style={{ padding: 24, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 18 }}
+    >
+      <span
+        aria-hidden
+        style={{
+          width: 76, height: 76, borderRadius: 14,
+          background: 'linear-gradient(135deg, var(--sky) 0%, #BFE7FD 100%)',
+          color: 'var(--navy)',
+          display: 'grid', placeItems: 'center', flexShrink: 0,
+        }}
+      >
+        <Caravan size={38} aria-hidden />
+      </span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 11, fontFamily: 'var(--sora)', fontWeight: 600, color: 'var(--muted)', letterSpacing: 1.4, textTransform: 'uppercase', marginBottom: 4 }}>
+          {t('pt1.db-caravan-h3')}
+        </div>
+        <div style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 17, color: 'var(--navy)' }}>
+          Hobby De Luxe 460 LU
+        </div>
+        <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 2 }}>
+          Plek B-12 · Buitenstalling · Sinds 2021
+        </div>
+      </div>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--orange-d)', fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 13, flexShrink: 0 }}>
+        {t('pt1.db-caravan-cta')} <ChevronRight size={14} aria-hidden />
+      </span>
+    </Link>
+  );
+}
+
+function Appointments({ t }: { t: T }) {
+  return (
+    <div className="card-mk" style={{ padding: 24 }}>
+      <div className="flex items-center gap-2" style={{ marginBottom: 16 }}>
+        <Calendar size={16} style={{ color: 'var(--orange)' }} aria-hidden />
+        <h2 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 16, color: 'var(--navy)', margin: 0 }}>
+          {t('pt1.db-appoint-h3')}
+        </h2>
+      </div>
+      <div style={{ padding: '20px 0', textAlign: 'center', fontSize: 13.5, color: 'var(--muted)' }}>
+        {t('pt1.db-appoint-empty')}
+      </div>
+    </div>
+  );
+}
+
+function QuickActions({ t }: { t: T }) {
+  const items: Array<{ icon: LucideIcon; labelKey: StringKey; href: string }> = [
+    { icon: Wrench, labelKey: 'pt1.db-quick-1', href: '/diensten/reparatie' },
+    { icon: Sparkles, labelKey: 'pt1.db-quick-2', href: '/diensten/service' },
+    { icon: ClipboardCheck, labelKey: 'pt1.db-quick-3', href: '/diensten/inspectie' },
+    { icon: Calendar, labelKey: 'pt1.db-quick-4', href: '/reserveren/configurator' },
+  ];
+  return (
+    <div className="card-mk" style={{ padding: 24 }}>
+      <h2 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 11, letterSpacing: 2.4, textTransform: 'uppercase', color: 'var(--muted)', margin: '0 0 14px' }}>
+        {t('pt1.db-quick-h3')}
+      </h2>
+      <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 4 }}>
+        {items.map(({ icon: Icon, labelKey, href }) => (
+          <li key={href}>
+            <Link
+              href={href}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '10px 12px', borderRadius: 8,
+                fontSize: 13.5, color: 'var(--ink-2)',
+                textDecoration: 'none', fontFamily: 'var(--inter)',
+                transition: 'background 0.15s',
+              }}
+              className="hover:bg-[color:var(--bg)]"
+            >
+              <Icon size={15} aria-hidden style={{ color: 'var(--orange)', flexShrink: 0 }} />
+              <span style={{ flex: 1 }}>{t(labelKey)}</span>
+              <ArrowRight size={13} aria-hidden style={{ color: 'var(--muted)' }} />
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function RecentInvoices({ t, invoices }: { t: T; invoices: Invoice[] }) {
+  const recent = invoices.slice(0, 3);
+  return (
+    <div className="card-mk" style={{ padding: 24 }}>
+      <div className="flex items-center gap-2" style={{ marginBottom: 14 }}>
+        <Receipt size={15} style={{ color: 'var(--orange)' }} aria-hidden />
+        <h2 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 11, letterSpacing: 2.4, textTransform: 'uppercase', color: 'var(--muted)', margin: 0 }}>
+          {t('pt1.nav-invoices')}
+        </h2>
+      </div>
+      {recent.length === 0 ? (
+        <p style={{ fontSize: 13, color: 'var(--muted)', margin: 0, lineHeight: 1.55 }}>{t('pt1.inv-empty')}</p>
+      ) : (
+        <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {recent.map((inv) => (
+            <li key={inv.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--line)', fontSize: 13 }}>
+              <span style={{ color: 'var(--ink)', fontFamily: 'var(--sora)', fontWeight: 600 }}>
+                {inv.number || inv.id.slice(0, 8)}
+              </span>
+              <span style={{ color: 'var(--ink-2)', fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 12.5 }}>
+                {fmtEur(inv.amount_paid, inv.currency)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <Link
+        href="/account/facturen"
+        style={{
+          display: 'inline-flex', alignItems: 'center', gap: 4,
+          marginTop: 12, color: 'var(--orange-d)',
+          fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 13, textDecoration: 'none',
+        }}
+      >
+        Alle facturen <ArrowRight size={13} aria-hidden />
+      </Link>
+    </div>
+  );
+}
+
+function Activity_Section({ t, invoices }: { t: T; invoices: Invoice[] }) {
+  // Use invoices as proxy for activity-feed
+  const activity = invoices.slice(0, 5);
+  return (
+    <div className="card-mk" style={{ padding: 24 }}>
+      <div className="flex items-center gap-2" style={{ marginBottom: 16 }}>
+        <Activity size={16} style={{ color: 'var(--orange)' }} aria-hidden />
+        <h2 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 16, color: 'var(--navy)', margin: 0 }}>
+          {t('pt1.db-activity-h3')}
+        </h2>
+      </div>
+      {activity.length === 0 ? (
+        <div style={{ padding: '20px 0', textAlign: 'center', fontSize: 13.5, color: 'var(--muted)' }}>
+          {t('pt1.db-activity-empty')}
+        </div>
+      ) : (
+        <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column' }}>
+          {activity.map((inv) => (
+            <li
+              key={inv.id}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '12px 0', borderBottom: '1px solid var(--line)',
+              }}
+            >
+              <span
+                aria-hidden
+                style={{
+                  width: 32, height: 32, borderRadius: 999,
+                  background: inv.status === 'paid' ? 'var(--green-soft)' : 'var(--bg)',
+                  color: inv.status === 'paid' ? 'var(--green)' : 'var(--muted)',
+                  display: 'grid', placeItems: 'center', flexShrink: 0,
+                  border: inv.status === 'paid' ? 'none' : '1px solid var(--line)',
+                }}
+              >
+                <Receipt size={14} />
+              </span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13.5, color: 'var(--ink)' }}>
+                  Factuur {inv.number || inv.id.slice(0, 8)} {inv.status === 'paid' ? 'betaald' : 'aangemaakt'}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--muted)' }}>{fmtDate(inv.created)}</div>
+              </div>
+              <span style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 13, color: 'var(--ink)', flexShrink: 0 }}>
+                {fmtEur(inv.amount_paid, inv.currency)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function fmtEur(cents: number, currency: string): string {
+  return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: currency.toUpperCase() }).format(cents / 100);
+}
+
+function fmtDate(unix: number): string {
+  return new Date(unix * 1000).toLocaleDateString('nl-NL', { day: '2-digit', month: 'short', year: 'numeric' });
 }
