@@ -146,47 +146,59 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
     // ── Stripe Checkout sessie (30 dagen geldig) ──
     const origin = req.nextUrl.origin;
     const ref = formatRef(refKindForFridge(fridge.device_type), id);
+    const successUrl = `${origin}/koelkast/bedankt?ref=${ref}&session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${origin}/koelkast?cancelled=1`;
+    const sessionMetadata = {
+      kind: 'fridge_booking_manual',
+      refId: String(id),
+      ref,
+      originalAmountCents: String(Math.round(amountEurIncVat * 100)),
+      description,
+      // Adresvelden → webhook kan ze gebruiken voor de bevestigings-mail /
+      // ensureLocalCustomer als de klant nog niet centraal staat.
+      billing_name: contactInput.name,
+      billing_phone: contactInput.phone || '',
+      billing_address: contactInput.address || '',
+      billing_postal_code: contactInput.postal_code || '',
+      billing_city: contactInput.city || '',
+      billing_country: contactInput.country || '',
+      billing_vat: contactInput.vat_number || '',
+    };
+
     const session = await createCheckoutSession({
       description,
       // Stripe int wat de klant betaalt → inclusief BTW.
       amountEur: amountEurIncVat,
-      successUrl: `${origin}/koelkast/bedankt?ref=${ref}&session_id={CHECKOUT_SESSION_ID}`,
-      cancelUrl: `${origin}/koelkast?cancelled=1`,
+      successUrl,
+      cancelUrl,
       customerEmail,
       // Stripe Checkout Sessions zijn max 24u geldig. Klant betaalt
       // doorgaans dezelfde dag; admin kan altijd opnieuw versturen.
       expiresInHours: 23,
-      // Idempotency: combinatie van booking + bedrag + dag + hash van
-      // overige parameters (description, email, tax). Stripe weigert
-      // dezelfde key te hergebruiken met andere body-params, dus we
-      // includen alle params die de session beïnvloeden in de key.
-      // Zelfde input → zelfde key (true idempotent retry).
-      // Andere input → andere key (= nieuwe session).
+      // Idempotency: hash van ALLE session-parameters die naar Stripe
+      // gaan. Stripe weigert dezelfde key te hergebruiken met andere
+      // body-params, dus elke wijziging (bedrag, beschrijving, mail,
+      // adres, BTW, urls, metadata) krijgt automatisch een nieuwe key
+      // → nieuwe sessie. Zelfde input → zelfde key (true idempotent
+      // retry, bv. bij netwerk-fail die de browser opnieuw probeert).
       idempotencyKey: (() => {
         const cents = Math.round(amountEurIncVat * 100);
         const day = new Date().toISOString().slice(0, 10);
         const fingerprint = createHash('sha1')
-          .update(`${description}|${customerEmail}|${taxPercent}`)
+          .update(JSON.stringify({
+            cents,
+            description,
+            customerEmail,
+            taxPercent,
+            successUrl,
+            cancelUrl,
+            metadata: sessionMetadata,
+          }))
           .digest('hex')
-          .slice(0, 10);
+          .slice(0, 12);
         return `paylink_${id}_${cents}_${day}_${fingerprint}`;
       })(),
-      metadata: {
-        kind: 'fridge_booking_manual',
-        refId: String(id),
-        ref,
-        originalAmountCents: String(Math.round(amountEurIncVat * 100)),
-        description,
-        // Adresvelden → webhook kan ze gebruiken voor de bevestigings-mail /
-        // ensureLocalCustomer als de klant nog niet centraal staat.
-        billing_name: contactInput.name,
-        billing_phone: contactInput.phone || '',
-        billing_address: contactInput.address || '',
-        billing_postal_code: contactInput.postal_code || '',
-        billing_city: contactInput.city || '',
-        billing_country: contactInput.country || '',
-        billing_vat: contactInput.vat_number || '',
-      },
+      metadata: sessionMetadata,
     });
 
     if (!session.url) {
