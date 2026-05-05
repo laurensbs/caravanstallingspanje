@@ -104,11 +104,31 @@ export async function POST(req: NextRequest) {
 
 // ─── Handlers ────────────────────────────────────────────
 
+// Stripe-account wordt door meerdere sites gebruikt. We herkennen alleen
+// onze eigen sessions aan metadata.kind — andere apps (bv. caravanverhuur-
+// spanje.com) sturen hun eigen metadata-shape (bookingRef / holdedInvoiceId).
+// We negeren die met 200 OK zodat Stripe 'm niet gaat retryen.
+const OUR_KINDS = new Set([
+  'fridge_booking',
+  'fridge_booking_manual',
+  'stalling_request',
+  'transport_request',
+  'service_intake',
+]);
+
 async function handleCheckoutCompleted(event: Stripe.Event) {
   const session = event.data.object as Stripe.Checkout.Session;
   const md = session.metadata || {};
   const kind = md.kind || 'unknown';
   const refId = md.refId || null;
+
+  // Niet onze sessie? Niets doen, geen 500. Webhook-endpoint krijgt events
+  // van het hele Stripe-account; events zonder onze metadata.kind komen
+  // van een andere app.
+  if (!OUR_KINDS.has(kind)) {
+    log.info('stripe_webhook_event_ignored_foreign', { kind, session_id: session.id });
+    return;
+  }
   const metaRef = typeof md.ref === 'string' ? md.ref : null;
   const originalAmountCents = md.originalAmountCents ? Number(md.originalAmountCents) : null;
   const originalAmountEur = originalAmountCents !== null && Number.isFinite(originalAmountCents)
