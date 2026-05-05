@@ -20,7 +20,6 @@ import {
 import { sendMail, paymentLinkHtml } from '@/lib/email';
 import { createCheckoutSession } from '@/lib/stripe';
 import { formatRef, refKindForFridge } from '@/lib/refs';
-import { createHash } from 'crypto';
 
 // Admin verstuurt een betaallink naar een klant die handmatig in het systeem
 // is gezet (bv. een bestaande huurder waar we offline met afgesproken hebben).
@@ -175,29 +174,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ boo
       // Stripe Checkout Sessions zijn max 24u geldig. Klant betaalt
       // doorgaans dezelfde dag; admin kan altijd opnieuw versturen.
       expiresInHours: 23,
-      // Idempotency: hash van ALLE session-parameters die naar Stripe
-      // gaan. Stripe weigert dezelfde key te hergebruiken met andere
-      // body-params, dus elke wijziging (bedrag, beschrijving, mail,
-      // adres, BTW, urls, metadata) krijgt automatisch een nieuwe key
-      // → nieuwe sessie. Zelfde input → zelfde key (true idempotent
-      // retry, bv. bij netwerk-fail die de browser opnieuw probeert).
-      idempotencyKey: (() => {
-        const cents = Math.round(amountEurIncVat * 100);
-        const day = new Date().toISOString().slice(0, 10);
-        const fingerprint = createHash('sha1')
-          .update(JSON.stringify({
-            cents,
-            description,
-            customerEmail,
-            taxPercent,
-            successUrl,
-            cancelUrl,
-            metadata: sessionMetadata,
-          }))
-          .digest('hex')
-          .slice(0, 12);
-        return `paylink_${id}_${cents}_${day}_${fingerprint}`;
-      })(),
+      // GEEN idempotency-key voor admin-paylinks. Reden: admin klikt
+      // bewust opnieuw "Send link" als de eerste sessie niet werkte
+      // (bv. expired voor klant kon betalen). Idempotency met een
+      // body-fingerprint laat dat falen zodra ook maar één parameter
+      // afwijkt; idempotency zonder fingerprint blokkeert juist legitieme
+      // re-sends. Voor de publieke fridge_booking flow blijft het wél
+      // staan (zie /api/order/fridge) waar dubbele form-submit een
+      // dubbele booking zou maken.
       metadata: sessionMetadata,
     });
 
