@@ -65,7 +65,16 @@ function Hero({ t }: { t: T }) {
             </motion.span>
             <motion.h1 {...fade(0.08)} className="h1-mk" style={{ marginTop: 4 }}>
               {t('home1.hero-h1-prefix')}{' '}
-              <em style={{ fontStyle: 'italic', color: 'var(--orange-d)' }}>
+              <em
+                style={{
+                  fontStyle: 'italic',
+                  background: 'linear-gradient(120deg, var(--orange-d) 0%, #FBB851 50%, var(--orange-d) 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  color: 'var(--orange-d)',
+                }}
+              >
                 {t('home1.hero-h1-accent')}
               </em>{' '}
               {t('home1.hero-h1-suffix')}
@@ -101,13 +110,18 @@ function Hero({ t }: { t: T }) {
             </motion.div>
           </div>
 
-          {/* Caravan-SVG illustratie. Rustige stijl, palm als anker rechts. */}
+          {/* Caravan-SVG illustratie. Subtiele float-animatie voor "leven". */}
           <motion.div
             {...fade(0.18)}
             className="hidden lg:block"
             aria-hidden
           >
-            <HeroIllustration />
+            <motion.div
+              animate={reduce ? undefined : { y: [0, -8, 0] }}
+              transition={reduce ? undefined : { duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <HeroIllustration />
+            </motion.div>
           </motion.div>
         </div>
       </div>
@@ -176,6 +190,7 @@ function HeroIllustration() {
 // STATS — 4-cell stat-row-mk
 // ───────────────────────────────────────────────────
 function Stats({ t }: { t: T }) {
+  const reduce = useReducedMotion();
   const stats: Array<{ vKey: StringKey; lKey: StringKey }> = [
     { vKey: 'home1.stat-1-v', lKey: 'home1.stat-1-l' },
     { vKey: 'home1.stat-2-v', lKey: 'home1.stat-2-l' },
@@ -185,14 +200,27 @@ function Stats({ t }: { t: T }) {
   return (
     <section className="py-12 sm:py-16">
       <div className="max-w-[1200px] mx-auto px-5 sm:px-10">
-        <div className="stat-row-mk">
-          {stats.map((s) => (
-            <div className="stat-mk" key={s.vKey}>
+        <motion.div
+          className="stat-row-mk"
+          initial={reduce ? false : { opacity: 0, y: 16 }}
+          whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.5, ease: EASE }}
+        >
+          {stats.map((s, i) => (
+            <motion.div
+              className="stat-mk"
+              key={s.vKey}
+              initial={reduce ? false : { opacity: 0, y: 10 }}
+              whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, ease: EASE, delay: 0.05 + i * 0.06 }}
+            >
               <div className="v">{t(s.vKey)}</div>
               <div className="l">{t(s.lKey)}</div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -222,13 +250,21 @@ function Services({ t }: { t: T }) {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {items.map(({ icon: Icon, titleKey, descKey, href }) => (
-            <Link key={href} href={href} className="service-card-mk block" style={{ textDecoration: 'none' }}>
-              <div className="ic"><Icon size={20} aria-hidden /></div>
-              <h3>{t(titleKey)}</h3>
-              <p>{t(descKey)}</p>
-              <span className="more">{t('home1.svc-more')}</span>
-            </Link>
+          {items.map(({ icon: Icon, titleKey, descKey, href }, i) => (
+            <motion.div
+              key={href}
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.4, ease: EASE, delay: i * 0.05 }}
+            >
+              <Link href={href} className="service-card-mk block" style={{ textDecoration: 'none' }}>
+                <div className="ic"><Icon size={20} aria-hidden /></div>
+                <h3>{t(titleKey)}</h3>
+                <p>{t(descKey)}</p>
+                <span className="more">{t('home1.svc-more')}</span>
+              </Link>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -254,8 +290,15 @@ function Certainties({ t }: { t: T }) {
           <h2 className="h2-mk">{t('home1.cert-h2')}</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {items.map(({ icon: Icon, titleKey, descKey }) => (
-            <div key={titleKey} className="card-mk card-tight">
+          {items.map(({ icon: Icon, titleKey, descKey }, i) => (
+            <motion.div
+              key={titleKey}
+              className="card-mk card-tight"
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.4, ease: EASE, delay: i * 0.05 }}
+            >
               <div
                 aria-hidden
                 style={{
@@ -272,7 +315,7 @@ function Certainties({ t }: { t: T }) {
               <p style={{ fontSize: 13.5, color: 'var(--ink-2)', margin: 0, lineHeight: 1.55 }}>
                 {t(descKey)}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -483,8 +526,15 @@ function Quotes({ t }: { t: T }) {
           <h2 className="h2-mk">{t('home1.q-h2')}</h2>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {quotes.map((q) => (
-            <div key={q.textKey} className="quote-card-mk">
+          {quotes.map((q, i) => (
+            <motion.div
+              key={q.textKey}
+              className="quote-card-mk"
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.45, ease: EASE, delay: i * 0.08 }}
+            >
               <p>{t(q.textKey)}</p>
               <div className="who">
                 <span className="av">{q.av}</span>
@@ -493,7 +543,7 @@ function Quotes({ t }: { t: T }) {
                   <div className="mt">{t(q.metaKey)}</div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

@@ -7,6 +7,8 @@ const KEYS = [
   'fridge_price_grote', 'fridge_price_tafel', 'fridge_price_airco',
   'fridge_stock_grote', 'fridge_stock_tafel', 'fridge_stock_airco',
   'transport_price_wij_rijden', 'transport_price_zelf',
+  'service_price_cleaning_full', 'service_price_maintenance_full',
+  'service_price_inspection', 'service_price_repair_hourly',
   'stalling_address',
 ] as const;
 
@@ -24,6 +26,10 @@ export async function GET() {
       fridge_stock_airco: Number(map.fridge_stock_airco ?? 10),
       transport_price_wij_rijden: Number(map.transport_price_wij_rijden ?? 100),
       transport_price_zelf: Number(map.transport_price_zelf ?? 50),
+      service_price_cleaning_full: Number(map.service_price_cleaning_full ?? 0),
+      service_price_maintenance_full: Number(map.service_price_maintenance_full ?? 0),
+      service_price_inspection: Number(map.service_price_inspection ?? 0),
+      service_price_repair_hourly: Number(map.service_price_repair_hourly ?? 0),
       stalling_address: typeof map.stalling_address === 'string'
         ? map.stalling_address
         : 'Stalling Cruïlles, Cruïlles (Girona), Spanje',

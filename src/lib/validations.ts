@@ -170,6 +170,10 @@ export const settingsUpdateSchema = z.object({
   fridge_stock_airco: z.number().int().nonnegative().max(10000).optional(),
   transport_price_wij_rijden: z.number().nonnegative().max(10000).optional(),
   transport_price_zelf: z.number().nonnegative().max(10000).optional(),
+  service_price_cleaning_full: z.number().nonnegative().max(10000).optional(),
+  service_price_maintenance_full: z.number().nonnegative().max(10000).optional(),
+  service_price_inspection: z.number().nonnegative().max(10000).optional(),
+  service_price_repair_hourly: z.number().nonnegative().max(1000).optional(),
   stalling_address: z.string().max(500).optional(),
 });
 

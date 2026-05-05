@@ -5,26 +5,51 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import {
+  Menu, X, ShieldCheck, Wrench, Sparkles, ClipboardCheck, Truck,
+  Snowflake, Tag, Recycle, ArrowRight,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import LocaleSwitch from './LocaleSwitch';
 import { useLocale } from './LocaleProvider';
 import { useFocusTrap } from '@/lib/focusTrap';
 import type { StringKey } from '@/lib/i18n';
 
-// Hoofd-nav uit mockup (p01-21): wit, logo links, links midden, orange CTA
-// rechts. De variant-prop blijft accepted voor backwards-compat met oude
-// callers, maar wordt nu visueel genegeerd — er is één unified mockup-look.
+// Hoofd-nav uit mockup (p01-21): navy-deep canvas, logo links, links midden,
+// orange CTA rechts, mobiele burger. Versmelt visueel met de Topbar erboven.
+// Diensten heeft een desktop megamenu (3 koloms + featured-card).
 
 type NavLink = { href: string; labelKey: StringKey };
 
-const NAV_LINKS: NavLink[] = [
+const NAV_LEFT: NavLink[] = [
   { href: '/diensten/stalling', labelKey: 'nav.storage' },
-  { href: '/diensten',          labelKey: 'nav.services' },
-  { href: '/verkoop',           labelKey: 'nav.sales' },
-  { href: '/tarieven',          labelKey: 'nav.pricing' },
-  { href: '/over-ons',          labelKey: 'nav.about' },
-  { href: '/faq',               labelKey: 'nav.faq' },
-  { href: '/contact',           labelKey: 'nav.contact' },
+];
+
+const NAV_RIGHT: NavLink[] = [
+  { href: '/verkoop',  labelKey: 'nav.sales' },
+  { href: '/tarieven', labelKey: 'nav.pricing' },
+  { href: '/over-ons', labelKey: 'nav.about' },
+  { href: '/faq',      labelKey: 'nav.faq' },
+  { href: '/contact',  labelKey: 'nav.contact' },
+];
+
+type MegaItem = { href: string; icon: LucideIcon; titleKey: StringKey; subKey: StringKey };
+
+const MEGA_STORAGE: MegaItem[] = [
+  { href: '/diensten/stalling', icon: ShieldCheck, titleKey: 'home1.svc-1-title', subKey: 'home1.svc-1-desc' },
+  { href: '/diensten/transport', icon: Truck, titleKey: 'home1.svc-5-title', subKey: 'home1.svc-5-desc' },
+];
+
+const MEGA_WORKSHOP: MegaItem[] = [
+  { href: '/diensten/reparatie', icon: Wrench, titleKey: 'home1.svc-2-title', subKey: 'home1.svc-2-desc' },
+  { href: '/diensten/service', icon: Sparkles, titleKey: 'home1.svc-3-title', subKey: 'home1.svc-3-desc' },
+  { href: '/diensten/inspectie', icon: ClipboardCheck, titleKey: 'home1.svc-4-title', subKey: 'home1.svc-4-desc' },
+];
+
+const MEGA_RENTAL: MegaItem[] = [
+  { href: '/koelkast', icon: Snowflake, titleKey: 'home1.svc-6-title', subKey: 'home1.svc-6-desc' },
+  { href: '/verkoop', icon: Tag, titleKey: 'home1.svc-7-title', subKey: 'home1.svc-7-desc' },
+  { href: '/verkoop#inkoop', icon: Recycle, titleKey: 'home1.svc-8-title', subKey: 'home1.svc-8-desc' },
 ];
 
 interface PublicHeaderProps {
@@ -35,9 +60,11 @@ export default function PublicHeader({}: PublicHeaderProps = {}) {
   const { t } = useLocale();
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [megaOpen, setMegaOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const megaRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { setMenuOpen(false); }, [pathname]);
+  useEffect(() => { setMenuOpen(false); setMegaOpen(false); }, [pathname]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -50,10 +77,27 @@ export default function PublicHeader({}: PublicHeaderProps = {}) {
     };
   }, [menuOpen]);
 
+  useEffect(() => {
+    if (!megaOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMegaOpen(false); };
+    const onClick = (e: MouseEvent) => {
+      if (megaRef.current && !megaRef.current.contains(e.target as Node)) setMegaOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('mousedown', onClick);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('mousedown', onClick);
+    };
+  }, [megaOpen]);
+
   useFocusTrap(menuRef, { active: menuOpen });
 
+  const isActive = (href: string) => pathname === href || (href !== '/' && !!pathname?.startsWith(href));
+  const dienstenActive = !!pathname?.startsWith('/diensten') || pathname === '/koelkast';
+
   return (
-    <>
+    <div className="brand-nav-wrap" ref={megaRef}>
       <div className="brand-nav">
         <Link href="/" aria-label={t('common.brand')} className="nav-brand">
           <Image
@@ -62,24 +106,42 @@ export default function PublicHeader({}: PublicHeaderProps = {}) {
             width={420}
             height={95}
             priority
-            style={{ height: 40, width: 'auto' }}
+            style={{ height: 36, width: 'auto', filter: 'drop-shadow(0 0 14px rgba(255,255,255,0.10))' }}
           />
         </Link>
 
         <nav aria-label="Hoofd-navigatie" className="nav-links">
-          {NAV_LINKS.map((link) => {
-            const active = pathname === link.href || (link.href !== '/' && !!pathname?.startsWith(link.href));
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                aria-current={active ? 'page' : undefined}
-                className={active ? 'active' : undefined}
-              >
-                {t(link.labelKey)}
-              </Link>
-            );
-          })}
+          {NAV_LEFT.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              aria-current={isActive(link.href) ? 'page' : undefined}
+              className={isActive(link.href) ? 'active' : undefined}
+            >
+              {t(link.labelKey)}
+            </Link>
+          ))}
+
+          <button
+            type="button"
+            className={`has-sub ${megaOpen ? 'open' : ''} ${dienstenActive ? 'active' : ''}`}
+            onClick={() => setMegaOpen((v) => !v)}
+            aria-expanded={megaOpen}
+            aria-haspopup="true"
+          >
+            {t('nav.services')}
+          </button>
+
+          {NAV_RIGHT.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              aria-current={isActive(link.href) ? 'page' : undefined}
+              className={isActive(link.href) ? 'active' : undefined}
+            >
+              {t(link.labelKey)}
+            </Link>
+          ))}
         </nav>
 
         <Link href="/reserveren/configurator" className="nav-cta">
@@ -96,6 +158,24 @@ export default function PublicHeader({}: PublicHeaderProps = {}) {
         >
           {menuOpen ? <X size={20} aria-hidden /> : <Menu size={20} aria-hidden />}
         </button>
+      </div>
+
+      {/* Desktop megamenu */}
+      <div className={`megamenu-wrap ${megaOpen ? 'open' : ''}`} aria-hidden={!megaOpen}>
+        <div className="megamenu-inner">
+          <MegaCol title="Stalling & transport" items={MEGA_STORAGE} t={t} />
+          <MegaCol title="Werkplaats" items={MEGA_WORKSHOP} t={t} />
+          <MegaCol title="Verhuur & verkoop" items={MEGA_RENTAL} t={t} />
+
+          <Link href="/diensten" className="megamenu-feature" style={{ textDecoration: 'none' }}>
+            <span className="eb">Bekijk alles</span>
+            <h3>Alle diensten op één pagina</h3>
+            <p>Schoonmaak, onderhoud, transport, reparatie, inspectie, verhuur en meer — onder één dak.</p>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--navy)', fontFamily: 'var(--sora)', fontWeight: 700, fontSize: 13 }}>
+              Naar diensten <ArrowRight size={14} aria-hidden />
+            </span>
+          </Link>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -119,8 +199,8 @@ export default function PublicHeader({}: PublicHeaderProps = {}) {
           >
             <nav aria-label="Mobiel navigatie-menu">
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {NAV_LINKS.map((link) => {
-                  const active = pathname === link.href || (link.href !== '/' && !!pathname?.startsWith(link.href));
+                {[...NAV_LEFT, { href: '/diensten', labelKey: 'nav.services' as StringKey }, ...NAV_RIGHT].map((link) => {
+                  const active = isActive(link.href);
                   return (
                     <li key={link.href}>
                       <Link
@@ -170,6 +250,27 @@ export default function PublicHeader({}: PublicHeaderProps = {}) {
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </div>
+  );
+}
+
+function MegaCol({ title, items, t }: { title: string; items: MegaItem[]; t: (k: StringKey) => string }) {
+  return (
+    <div className="megamenu-col">
+      <h4>{title}</h4>
+      <ul>
+        {items.map(({ icon: Icon, href, titleKey, subKey }) => (
+          <li key={href}>
+            <Link href={href}>
+              <span className="ic"><Icon size={15} aria-hidden /></span>
+              <span className="info">
+                <span className="ttl">{t(titleKey)}</span>
+                <span className="sub">{t(subKey)}</span>
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
