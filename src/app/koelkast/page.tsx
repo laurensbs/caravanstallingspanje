@@ -283,7 +283,7 @@ export default function KoelkastBestelPagina() {
         }}
       >
         <section className="max-w-md mx-auto px-5 sm:px-6 py-8 sm:py-12">
-          <div className="mk-card p-6 sm:p-8 space-y-5">
+          <div className="card-mk space-y-5" style={{ padding: 28 }}>
             <div
               className="w-12 h-12 rounded-full flex items-center justify-center"
               style={{
@@ -309,7 +309,7 @@ export default function KoelkastBestelPagina() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="mk-btn-primary w-full justify-center disabled:opacity-50"
+                className="btn btn-primary btn-block disabled:opacity-50"
               >
                 {submitting ? <Loader2 size={16} className="animate-spin" aria-hidden /> : null}
                 {submitting ? t('common.busy') : t('fridge.add-to-waitlist')}
@@ -317,7 +317,7 @@ export default function KoelkastBestelPagina() {
               <button
                 type="button"
                 onClick={() => { setSoldOut(false); setError(''); }}
-                className="mk-btn-secondary w-full justify-center"
+                className="btn btn-ghost btn-block"
               >
                 {t('fridge.adjust-period')}
               </button>
@@ -347,17 +347,24 @@ export default function KoelkastBestelPagina() {
                 onClick={() => setForm({ ...form, device_type: type })}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: 'spring', stiffness: 380, damping: 26 }}
-                className="mk-card mk-card-hover text-left p-5"
+                className="card-mk text-left"
                 style={{
-                  borderColor: selected ? 'var(--color-terracotta)' : undefined,
+                  padding: 20,
+                  borderColor: selected ? 'var(--navy)' : undefined,
                   boxShadow: selected
-                    ? '0 0 0 4px rgba(217,110,60,0.10), 0 1px 2px rgba(20,14,5,0.05), 0 16px 40px -16px rgba(217,110,60,0.18)'
+                    ? '0 0 0 3px rgba(47,66,84,0.10), var(--shadow-card-mk)'
                     : undefined,
                 }}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="mk-icon-disc">
+                    <div
+                      style={{
+                        width: 44, height: 44, borderRadius: 10,
+                        background: 'var(--sky-soft)', color: 'var(--navy)',
+                        display: 'grid', placeItems: 'center',
+                      }}
+                    >
                       <AnimatedServiceIcon kind="fridge" size={20} loop />
                     </div>
                     <span className="text-[15px] font-semibold" style={{ color: 'var(--color-marketing-ink)' }}>

@@ -85,7 +85,8 @@ function ContactPageInner() {
               focusFirstError(form);
             })}
             noValidate
-            className="mk-card p-6 sm:p-8 space-y-7"
+            className="card-mk space-y-7"
+            style={{ padding: 28 }}
           >
             <Section title={t('contact.section-details')}>
               <Field label={t('common.name')} required>

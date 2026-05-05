@@ -411,7 +411,7 @@ function IdeasHero() {
           className="relative grid grid-cols-1 lg:grid-cols-12 gap-6 items-end"
         >
           <div className="lg:col-span-8">
-            <span className="mk-eyebrow mb-3 inline-flex items-center gap-1.5">
+            <span className="eyebrow-mk mb-3 inline-flex items-center gap-1.5">
               <Lightbulb size={12} aria-hidden /> {t('ideas.eyebrow')}
             </span>
 

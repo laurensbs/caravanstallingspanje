@@ -25,7 +25,7 @@ export default function LegalShell({
       }}
     >
       <article className="max-w-3xl mx-auto px-5 sm:px-8 py-10 sm:py-14">
-        <div className="mk-prose-legal">{children}</div>
+        <div className="prose-mk">{children}</div>
       </article>
     </MarketingPage>
   );
