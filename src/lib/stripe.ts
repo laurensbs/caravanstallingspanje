@@ -69,17 +69,28 @@ export async function listInvoicesForEmail(email: string, limit = 25): Promise<{
   const customers = await s.customers.list({ email, limit: 10 });
   const seen = new Set<string>();
   const out: Awaited<ReturnType<typeof listInvoicesForEmail>> = [];
+  // Toon alleen invoices die voor klant relevant zijn — paid (afgerond),
+  // open (nog te betalen) of uncollectible (probleem). Draft/void verbergen
+  // we; die zijn intern of weggegooid en horen niet in een klant-overzicht.
+  const visibleStatuses = new Set(['paid', 'open', 'uncollectible']);
   for (const c of customers.data) {
     const inv = await s.invoices.list({ customer: c.id, limit }).catch(() => null);
     if (!inv?.data) continue;
     for (const i of inv.data) {
       if (seen.has(i.id ?? '')) continue;
       if (!i.id) continue;
+      if (i.status && !visibleStatuses.has(i.status)) continue;
       seen.add(i.id);
+      // Voor paid invoices tonen we amount_paid; voor open invoices de
+      // amount_due (nog te betalen). Voor uncollectible vallen we terug
+      // op amount_due of total.
+      const displayAmount = i.status === 'paid'
+        ? (i.amount_paid ?? i.amount_due ?? i.total ?? 0)
+        : (i.amount_due ?? i.total ?? 0);
       out.push({
         id: i.id,
         number: i.number || null,
-        amount_paid: i.amount_paid ?? 0,
+        amount_paid: displayAmount,
         currency: i.currency ?? 'eur',
         status: i.status ?? null,
         hosted_invoice_url: i.hosted_invoice_url ?? null,

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
-  Receipt, FileText, ExternalLink, ChevronRight, LogOut, Loader2,
+  Receipt, FileText, ExternalLink, Download, ChevronRight, LogOut, Loader2,
   User, Plus, KeyRound, AlertCircle,
 } from 'lucide-react';
 import MarketingPage from '@/components/marketing/MarketingPage';
@@ -184,15 +184,31 @@ export default function AccountDashboard() {
                     <span className="font-medium tabular-nums" style={{ color: 'var(--color-marketing-ink)' }}>
                       {fmtEur(inv.amount_paid, inv.currency)}
                     </span>
+                    {/* PDF-download is de primaire actie — klant download
+                        de factuur direct als bestand. Hosted-link is een
+                        secundaire optie voor in-browser bekijken. */}
+                    {inv.invoice_pdf && (
+                      <a
+                        href={inv.invoice_pdf}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[13px] font-medium hover:underline"
+                        style={{ color: 'var(--color-terracotta-deep)' }}
+                        title="Factuur downloaden (PDF)"
+                      >
+                        <Download size={13} /> PDF
+                      </a>
+                    )}
                     {inv.hosted_invoice_url && (
                       <a
                         href={inv.hosted_invoice_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[13px] font-medium hover:underline"
-                        style={{ color: 'var(--color-terracotta-deep)' }}
+                        className="inline-flex items-center gap-1 text-[13px] hover:underline"
+                        style={{ color: 'var(--color-marketing-ink-soft)' }}
+                        title="Factuur in browser bekijken"
                       >
-                        Bekijk <ExternalLink size={12} />
+                        <ExternalLink size={12} />
                       </a>
                     )}
                   </div>
