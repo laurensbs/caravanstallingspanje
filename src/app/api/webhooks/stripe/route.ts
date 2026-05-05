@@ -26,10 +26,14 @@ import {
   linkFridgeToCustomer,
   linkStallingToCustomer,
   linkTransportToCustomer,
+  setCustomerPassword,
+  setCustomerStripeId,
 } from '@/lib/db';
 import { sendIntake, type IntakePayload } from '@/lib/work-order-hub';
 import { invoiceForCustomer, findContactByEmail } from '@/lib/holded';
-import { sendMail, paymentReceivedHtml } from '@/lib/email';
+import { sendMail, paymentReceivedHtml, welcomePortalHtml } from '@/lib/email';
+import { generateTempPassword } from '@/lib/auth';
+import { hashPassword } from '@/lib/passwords';
 import { formatRef, refKindForFridge } from '@/lib/refs';
 import { log } from '@/lib/log';
 
@@ -522,6 +526,15 @@ async function ensureLocalCustomer(
       if (!existing.holded_contact_id && holdedContactId) {
         await updateCustomerHoldedId(existing.id, holdedContactId);
       }
+      // Klant bestond al maar heeft nog geen portal-toegang? Stuur 'm
+      // alsnog een welkomst-mail met temp-password — bv. nuttig bij een
+      // tweede betaling als de eerste mail per ongeluk in spam belandde.
+      const hasPassword = !!(existing as { password_hash?: string | null }).password_hash;
+      if (!hasPassword) {
+        await sendPortalWelcome(existing.id, name || existing.name, email).catch((err) => {
+          log.error('stripe_webhook_portal_welcome_existing_failed', err, { customer_id: existing.id });
+        });
+      }
       return existing;
     }
     // Geen lokale klant — haal volledig contact uit Holded op zodat we
@@ -529,7 +542,7 @@ async function ensureLocalCustomer(
     const holdedHit = await findContactByEmail(email).catch(() => null);
     const finalHoldedId = holdedContactId || holdedHit?.id || null;
     const addr = holdedHit?.address;
-    return await createCustomer({
+    const created = await createCustomer({
       name: name || holdedHit?.name || email,
       email,
       phone: phone || holdedHit?.phone || null,
@@ -542,10 +555,30 @@ async function ensureLocalCustomer(
       holded_contact_id: finalHoldedId,
       source: holdedHit ? 'holded_import' : 'stripe',
     });
+    // Verse customer → meteen portal-onboarding starten.
+    await sendPortalWelcome(created.id, created.name, email).catch((err) => {
+      log.error('stripe_webhook_portal_welcome_new_failed', err, { customer_id: created.id });
+    });
+    return created;
   } catch (err) {
     log.error('stripe_webhook_ensure_customer_failed', err);
     return null;
   }
+}
+
+// Genereer een eenmalig wachtwoord, sla 'm gehasht op met
+// must_change_password=true, en mail 'm naar de klant. Best-effort: een
+// mail-faal zet de hele webhook niet stuk. Caller wraps in .catch.
+async function sendPortalWelcome(customerId: number, name: string, email: string) {
+  const tempPassword = generateTempPassword();
+  const hash = await hashPassword(tempPassword);
+  await setCustomerPassword(customerId, hash, true);
+  // Origin uit env zodat de link altijd absoluut is in de mail. Fallback
+  // naar de gehoste vercel-URL.
+  const base = process.env.PUBLIC_BASE_URL || 'https://caravanstallingspanje.vercel.app';
+  const loginUrl = `${base}/account/login`;
+  const mail = welcomePortalHtml({ name, email, tempPassword, loginUrl });
+  await sendMail({ to: email, subject: mail.subject, html: mail.html, text: mail.text });
 }
 
 // Inline zodat de helper hierboven hem kan gebruiken zonder DB-helper toe

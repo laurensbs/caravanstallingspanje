@@ -164,6 +164,37 @@ export function paymentReceivedHtml(input: {
   return { subject, html, text };
 }
 
+// Welkomst-mail met eenmalig wachtwoord — verstuurd na de eerste
+// succesvolle Stripe-betaling. Klant logt in op /account, wordt direct
+// gedwongen het wachtwoord te wijzigen, en kan daarna z'n facturen
+// bekijken en gegevens beheren.
+export function welcomePortalHtml(input: {
+  name: string;
+  email: string;
+  tempPassword: string;
+  loginUrl: string;
+}): { subject: string; html: string; text: string } {
+  const subject = 'Je klantportaal staat voor je klaar';
+  const card = `
+    <p>Hi ${escapeHtml(input.name)},</p>
+    <p>Je hebt nu een persoonlijk klantportaal bij Caravanstalling Spanje. Daar zie je al je facturen en kun je je gegevens bijwerken of een nieuwe boeking starten zonder opnieuw alles in te vullen.</p>
+    <div class="summary">
+      <div class="row"><span class="muted">E-mail</span><strong>${escapeHtml(input.email)}</strong></div>
+      <div class="row"><span class="muted">Eenmalig wachtwoord</span><strong style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.04em">${escapeHtml(input.tempPassword)}</strong></div>
+    </div>
+    <p style="text-align:center;margin:18px 0 8px"><a class="btn" href="${input.loginUrl}">Inloggen op je portaal</a></p>
+    <div class="next"><strong>Wat moet je doen?</strong><br/>Je wordt bij eerste login direct gevraagd om een eigen wachtwoord te kiezen. Bewaar dit eenmalige wachtwoord daarna niet meer.</div>
+    <p class="muted" style="font-size:12px">Geen toegang nodig? Dan kun je deze mail negeren — je bestelling is gewoon ontvangen en wordt verwerkt.</p>
+  `;
+  const html = shell(card, {
+    eyebrow: 'Caravanstalling Spanje',
+    heading: 'Welkom in je klantportaal',
+    subline: 'Eenmalig wachtwoord — wijzig die bij eerste login.',
+  });
+  const text = `Hi ${input.name},\n\nJe klantportaal staat voor je klaar. Inloggen:\n${input.loginUrl}\n\nE-mail: ${input.email}\nEenmalig wachtwoord: ${input.tempPassword}\n\nJe wordt bij eerste login gevraagd een eigen wachtwoord te kiezen.`;
+  return { subject, html, text };
+}
+
 // Mail die admin handmatig verstuurt vanuit /admin/koelkasten naar klanten
 // die we eerder zelf in het systeem zetten — voorheen kregen die nooit
 // een betaal-uitnodiging. Bevat een grote "Nu betalen" knop met de

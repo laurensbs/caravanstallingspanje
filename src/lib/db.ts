@@ -1253,6 +1253,20 @@ export async function ensureMiscSchema(): Promise<void> {
       sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_billing_address JSONB`);
     await tryMigrate('customers.holded_shipping_address', () =>
       sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS holded_shipping_address JSONB`);
+    // Customer-portal auth — bcrypt password-hash + flag dat klant 'm na
+    // eerste login verplicht moet wijzigen + Stripe customer-id voor de
+    // facturen-lookup. password_set_at = wanneer een echt zelf-gekozen
+    // wachtwoord is gezet (NULL = nog op temp uit welkomst-mail).
+    await tryMigrate('customers.password_hash', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS password_hash TEXT`);
+    await tryMigrate('customers.must_change_password', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN DEFAULT false`);
+    await tryMigrate('customers.password_set_at', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS password_set_at TIMESTAMP`);
+    await tryMigrate('customers.last_login_at', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMP`);
+    await tryMigrate('customers.stripe_customer_id', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT`);
     // Handmatige betaallink-flow.
     await tryMigrate('fridge_bookings.payment_link_url', () =>
       sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_url TEXT`);
@@ -1514,6 +1528,30 @@ export async function getCustomerByEmail(email: string): Promise<CustomerRow | n
   await ensureCustomerSchema();
   const rows = await sql`SELECT * FROM customers WHERE LOWER(email) = LOWER(${email}) AND deleted_at IS NULL LIMIT 1`;
   return (rows[0] as CustomerRow) || null;
+}
+
+// ─── Customer-portal auth helpers ──
+export async function setCustomerPassword(
+  id: number,
+  passwordHash: string,
+  mustChange: boolean,
+) {
+  await ensureMiscSchema();
+  await sql`UPDATE customers
+    SET password_hash = ${passwordHash},
+        must_change_password = ${mustChange},
+        password_set_at = ${mustChange ? null : new Date().toISOString()}::timestamp,
+        updated_at = NOW()
+    WHERE id = ${id}`;
+}
+
+export async function recordCustomerLogin(id: number) {
+  await sql`UPDATE customers SET last_login_at = NOW() WHERE id = ${id}`;
+}
+
+export async function setCustomerStripeId(id: number, stripeCustomerId: string) {
+  await ensureMiscSchema();
+  await sql`UPDATE customers SET stripe_customer_id = ${stripeCustomerId}, updated_at = NOW() WHERE id = ${id}`;
 }
 
 export async function getCustomerByHoldedId(holdedId: string): Promise<CustomerRow | null> {
