@@ -1,39 +1,42 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
-  Phone, ArrowRight,
-  Shield, Lock, FileCheck2, Search,
-  Wrench, Truck, Sparkles, Wind, Refrigerator, ClipboardCheck,
+  Phone, ArrowRight, ShieldCheck, Wrench as WrenchIcon, Truck, Sparkles,
+  Snowflake, ClipboardCheck, Tag, Recycle, Users, Lock, MapPin, MessageSquare,
 } from 'lucide-react';
 import { useLocale } from '@/components/LocaleProvider';
 import Topbar from '@/components/marketing/Topbar';
 import PublicHeader from '@/components/PublicHeader';
 import PublicFooter from '@/components/PublicFooter';
-import PhotoSlot from '@/components/PhotoSlot';
+import ScarcityBar from '@/components/marketing/ScarcityBar';
 import type { StringKey } from '@/lib/i18n';
+import type { LucideIcon } from 'lucide-react';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-export default function MarketingHomepage() {
+type T = (k: StringKey, ...a: (string | number)[]) => string;
+
+export default function HomePage() {
   const { t } = useLocale();
   return (
-    <div className="mk-page min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
       <Topbar />
-      <PublicHeader variant="marketing-cream" />
+      <PublicHeader />
+      <ScarcityBar />
 
       <main id="main" className="flex-1">
         <Hero t={t} />
-        <StatsStrip t={t} />
-        <VacationTagline t={t} />
-        <StorageOverview t={t} />
-        <ServicesGrid t={t} />
+        <Stats t={t} />
+        <Services t={t} />
+        <Certainties t={t} />
+        <Steps t={t} />
         <Security t={t} />
-        <Reviews t={t} />
-        <About t={t} />
-        <FaqSection t={t} />
-        <CtaStrip t={t} />
+        <Workshop t={t} />
+        <Quotes t={t} />
+        <Location t={t} />
+        <CtaBand t={t} />
       </main>
 
       <PublicFooter />
@@ -41,577 +44,384 @@ export default function MarketingHomepage() {
   );
 }
 
-// ──────────────────────────────────────────────────────────────
-// HERO
-// ──────────────────────────────────────────────────────────────
-function Hero({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
+// ───────────────────────────────────────────────────
+// HERO — sky gradient, links tekst + dubbele CTA, rechts SVG-illustratie
+// (caravan onder palm) zoals mockup p01.
+// ───────────────────────────────────────────────────
+function Hero({ t }: { t: T }) {
+  const reduce = useReducedMotion();
+  const fade = (delay = 0) =>
+    reduce
+      ? { initial: false, animate: { opacity: 1, y: 0 }, transition: { duration: 0 } }
+      : { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.55, ease: EASE, delay } };
+
   return (
-    <section className="mk-hero-bg relative overflow-hidden" style={{ paddingTop: '4rem', paddingBottom: '3.5rem' }}>
-      <div className="relative max-w-[1180px] mx-auto px-5 sm:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, ease: EASE }}
-          className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.9fr] gap-10 lg:gap-16 items-center"
-        >
-          {/* Tekst-kolom */}
+    <section className="section-bg-sky relative overflow-hidden">
+      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-10 py-14 sm:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-10 lg:gap-14 items-center">
           <div>
-            <span
-              className="mk-eyebrow inline-block mb-4"
-              style={{ color: '#ffd29b' }}
-            >
-              {t('mk.hero-eyebrow')}
-            </span>
-            <h1
-              className="font-display"
+            <motion.span {...fade(0)} className="eyebrow-mk on-sky">
+              {t('home1.hero-eyebrow')}
+            </motion.span>
+            <motion.h1 {...fade(0.08)} className="h1-mk" style={{ marginTop: 4 }}>
+              {t('home1.hero-h1-prefix')}{' '}
+              <em style={{ fontStyle: 'italic', color: 'var(--orange-d)' }}>
+                {t('home1.hero-h1-accent')}
+              </em>{' '}
+              {t('home1.hero-h1-suffix')}
+            </motion.h1>
+            <motion.p {...fade(0.16)} className="lead-mk" style={{ marginTop: 14 }}>
+              {t('home1.hero-lead')}
+            </motion.p>
+
+            <motion.div {...fade(0.24)} className="mt-7 flex flex-wrap gap-3">
+              <Link href="/reserveren/configurator" className="btn btn-primary">
+                {t('home1.hero-cta-primary')} <ArrowRight size={16} aria-hidden />
+              </Link>
+              <Link href="/diensten" className="btn btn-ghost">
+                {t('home1.hero-cta-secondary')}
+              </Link>
+            </motion.div>
+
+            <motion.div
+              {...fade(0.32)}
+              className="mt-8 inline-flex items-center gap-3 px-4 py-2 rounded-full"
               style={{
-                color: '#FFFFFF',
-                fontSize: 'clamp(2.1rem, 4.6vw, 3.6rem)',
-                fontWeight: 700,
-                lineHeight: 1.12,
-                letterSpacing: '-0.012em',
-                margin: '0 0 0.4em',
+                background: 'rgba(255,255,255,0.65)',
+                border: '1px solid rgba(31,42,54,0.10)',
+                backdropFilter: 'blur(4px)',
+                fontFamily: 'var(--sora)',
+                fontSize: 13,
+                color: 'var(--navy)',
+                fontWeight: 600,
               }}
             >
-              {t('mk.hero-h1-prefix')}{' '}
-              <span style={{ color: '#ffd29b', fontStyle: 'italic' }}>
-                {t('mk.hero-h1-accent')}
-              </span>{' '}
-              {t('mk.hero-h1-suffix')}
-            </h1>
-            <p
-              className="text-[1.05rem] sm:text-[1.15rem] leading-relaxed max-w-xl mb-7"
-              style={{ color: 'rgba(255,255,255,0.85)' }}
-            >
-              {t('mk.hero-lead')}
-            </p>
-
-            <div className="flex gap-3 flex-wrap">
-              <Link href="/diensten" className="mk-btn-primary">
-                {t('mk.hero-cta-primary')}
-                <ArrowRight size={16} aria-hidden />
-              </Link>
-              <Link href="/contact" className="mk-btn-ghost">
-                {t('mk.hero-cta-secondary')}
-              </Link>
-            </div>
-
-            {/* Trust-row */}
-            <div className="mt-9 flex flex-wrap gap-7 items-start">
-              <div>
-                <div style={{ color: '#ffc04d', letterSpacing: '2px', fontSize: '1.05rem' }}>★★★★★</div>
-                <small className="block text-[0.82rem]" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                  <strong style={{ color: '#fff' }}>{t('mk.hero-trust-rating')}</strong> · {t('mk.hero-trust-rating-sub')}
-                </small>
-              </div>
-              <div>
-                <strong className="block text-[0.95rem]" style={{ color: '#fff' }}>{t('mk.hero-trust-securitas')}</strong>
-                <small className="block text-[0.82rem]" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                  {t('mk.hero-trust-securitas-sub')}
-                </small>
-              </div>
-              <div>
-                <strong className="block text-[0.95rem]" style={{ color: '#fff' }}>{t('mk.hero-trust-team')}</strong>
-                <small className="block text-[0.82rem]" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                  {t('mk.hero-trust-team-sub')}
-                </small>
-              </div>
-            </div>
+              <span aria-hidden style={{ color: '#F1B53A', letterSpacing: 1 }}>★★★★★</span>
+              {t('home1.hero-trust')}
+            </motion.div>
           </div>
 
-          {/* Foto-slot rechts (lg+). Tot URL geleverd: aspect-ratio bewaard. */}
-          <div className="hidden lg:block">
-            <PhotoSlot
-              ratio="hero"
-              ariaLabel="Caravanstalling Spanje terrein"
-              className="rounded-[22px]"
-              style={{
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.18)',
-                boxShadow: '0 20px 60px rgba(8, 38, 56, 0.30)',
-              }}
-            />
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────
-// STATS-STRIP
-// ──────────────────────────────────────────────────────────────
-function StatsStrip({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
-  const stats = [
-    { num: '650+',  labelKey: 'mk.stat-customers' as StringKey },
-    { num: '15+',   labelKey: 'mk.stat-years'     as StringKey },
-    { num: '100%',  labelKey: 'mk.stat-insured'   as StringKey },
-    { num: '24/7',  labelKey: 'mk.stat-guarded'   as StringKey },
-  ];
-  return (
-    <section
-      className="border-t border-b"
-      style={{ background: 'var(--color-sand)', borderColor: 'var(--color-marketing-line)' }}
-    >
-      <div className="max-w-[1180px] mx-auto px-5 sm:px-8 py-9 grid grid-cols-2 md:grid-cols-4 gap-6">
-        {stats.map((s) => (
-          <div key={s.num} className="text-center">
-            <div className="mk-stat-num">{s.num}</div>
-            <div
-              className="mt-1 text-[0.82rem] font-semibold uppercase"
-              style={{ color: 'var(--color-marketing-ink-soft)', letterSpacing: '0.04em' }}
-            >
-              {t(s.labelKey)}
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────
-// STORAGE OVERVIEW (zonder prijzen — gebruiker geeft die niet publiek)
-// ──────────────────────────────────────────────────────────────
-function StorageOverview({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
-  const tiers = [
-    {
-      titleKey: 'mk.storage-outdoor-title' as StringKey,
-      descKey: 'mk.storage-outdoor-desc' as StringKey,
-      featured: false,
-      featureKeys: ['mk.storage-feat-securitas', 'mk.storage-feat-insurance', 'mk.storage-feat-check'] as StringKey[],
-    },
-    {
-      titleKey: 'mk.storage-indoor-title' as StringKey,
-      descKey: 'mk.storage-indoor-desc' as StringKey,
-      featured: true,
-      featureKeys: ['mk.storage-feat-securitas', 'mk.storage-feat-insurance', 'mk.storage-feat-climate', 'mk.storage-feat-staff', 'mk.storage-feat-priority'] as StringKey[],
-    },
-  ];
-
-  return (
-    <section id="stalling" className="py-16 sm:py-20">
-      <div className="max-w-[1180px] mx-auto px-5 sm:px-8">
-        <div className="text-center max-w-[720px] mx-auto mb-12">
-          <span className="mk-eyebrow mb-3 block">{t('mk.storage-eyebrow')}</span>
-          <h2>{t('mk.storage-h2')}</h2>
-          <p className="mt-3">{t('mk.storage-intro')}</p>
+          {/* Caravan-SVG illustratie. Rustige stijl, palm als anker rechts. */}
+          <motion.div
+            {...fade(0.18)}
+            className="hidden lg:block"
+            aria-hidden
+          >
+            <HeroIllustration />
+          </motion.div>
         </div>
+      </div>
+    </section>
+  );
+}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-[820px] mx-auto">
-          {tiers.map((tier) => (
-            <div
-              key={tier.titleKey}
-              className="relative rounded-[22px] p-7 transition-all hover:-translate-y-1"
-              style={{
-                background: '#fff',
-                border: tier.featured ? '2px solid var(--color-terracotta)' : '1px solid var(--color-marketing-line)',
-                boxShadow: tier.featured ? 'var(--shadow-md)' : 'var(--shadow-sm)',
-              }}
-            >
-              {tier.featured && (
-                <span
-                  aria-hidden
-                  className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[0.72rem] font-bold uppercase tracking-[0.05em]"
-                  style={{ background: 'var(--color-terracotta)', color: '#fff' }}
-                >
-                  {t('mk.storage-badge')}
-                </span>
-              )}
-              <h3
-                className="font-sans"
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '1.05rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                  color: 'var(--color-terracotta-deep)',
-                  fontWeight: 700,
-                  margin: '0 0 0.4rem',
-                }}
-              >
-                {t(tier.titleKey)}
-              </h3>
-              <p className="text-[0.92rem]" style={{ color: 'var(--color-marketing-ink-soft)' }}>
-                {t(tier.descKey)}
-              </p>
-              <ul className="list-none p-0 mt-4 mb-6 space-y-2">
-                {tier.featureKeys.map((fk) => (
-                  <li
-                    key={fk}
-                    className="relative pl-7 text-[0.9rem]"
-                    style={{ color: 'var(--color-marketing-ink)' }}
-                  >
-                    <span
-                      aria-hidden
-                      className="absolute left-0 top-[0.55rem] block"
-                      style={{
-                        width: 14, height: 8,
-                        borderLeft: '2px solid #3d6e4c',
-                        borderBottom: '2px solid #3d6e4c',
-                        transform: 'rotate(-45deg)',
-                      }}
-                    />
-                    {t(fk)}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/contact?subject=Stalling-aanvraag"
-                className={tier.featured ? 'mk-btn-primary w-full justify-center' : 'mk-btn-secondary w-full justify-center'}
-                style={{ display: 'inline-flex', width: '100%' }}
-              >
-                {t('mk.storage-cta')}
-              </Link>
+function HeroIllustration() {
+  return (
+    <svg viewBox="0 0 480 360" width="100%" height="auto" role="img" aria-label="Caravan onder palm">
+      <defs>
+        <linearGradient id="vanBody" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stopColor="#FFFFFF" />
+          <stop offset="1" stopColor="#E8F2F9" />
+        </linearGradient>
+        <linearGradient id="ground" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stopColor="#F2DDB6" />
+          <stop offset="1" stopColor="#E5C98A" />
+        </linearGradient>
+      </defs>
+      {/* Ground */}
+      <ellipse cx="240" cy="310" rx="220" ry="22" fill="url(#ground)" opacity="0.55" />
+
+      {/* Palm */}
+      <g transform="translate(385,80)">
+        <path d="M0 230 Q-4 150 6 80" stroke="#5C4422" strokeWidth="7" fill="none" strokeLinecap="round" />
+        <g fill="#418A46">
+          <path d="M6 80 Q-30 50 -60 60 Q-32 68 -10 78 Z" />
+          <path d="M6 80 Q40 50 70 60 Q42 68 18 78 Z" />
+          <path d="M6 80 Q-15 30 -40 18 Q-10 38 0 70 Z" />
+          <path d="M6 80 Q22 30 50 20 Q22 38 12 70 Z" />
+          <path d="M6 80 Q4 35 -8 8 Q10 32 14 72 Z" />
+        </g>
+      </g>
+
+      {/* Caravan body */}
+      <g transform="translate(70,150)">
+        <rect x="0" y="0" width="240" height="110" rx="14" fill="url(#vanBody)" stroke="#2F4254" strokeWidth="2" />
+        {/* Roof line */}
+        <path d="M0 22 H240" stroke="#95D8FD" strokeWidth="3" />
+        {/* Window */}
+        <rect x="20" y="34" width="80" height="48" rx="6" fill="#95D8FD" stroke="#2F4254" strokeWidth="2" />
+        <path d="M60 34 V82" stroke="#FFFFFF" strokeWidth="2" />
+        {/* Door */}
+        <rect x="120" y="34" width="48" height="68" rx="4" fill="#F9AD36" stroke="#2F4254" strokeWidth="2" />
+        <circle cx="160" cy="68" r="2.5" fill="#2F4254" />
+        {/* Side window 2 */}
+        <rect x="184" y="34" width="40" height="34" rx="4" fill="#95D8FD" stroke="#2F4254" strokeWidth="2" />
+        {/* Hitch */}
+        <path d="M0 60 L-30 78 L-44 78" stroke="#2F4254" strokeWidth="3" fill="none" strokeLinecap="round" />
+        {/* Wheels */}
+        <circle cx="50" cy="116" r="16" fill="#2F4254" />
+        <circle cx="50" cy="116" r="6" fill="#95D8FD" />
+        <circle cx="200" cy="116" r="16" fill="#2F4254" />
+        <circle cx="200" cy="116" r="6" fill="#95D8FD" />
+      </g>
+
+      {/* Sun */}
+      <circle cx="120" cy="80" r="22" fill="#F9AD36" opacity="0.9" />
+      <circle cx="120" cy="80" r="34" fill="#F9AD36" opacity="0.18" />
+    </svg>
+  );
+}
+
+// ───────────────────────────────────────────────────
+// STATS — 4-cell stat-row-mk
+// ───────────────────────────────────────────────────
+function Stats({ t }: { t: T }) {
+  const stats: Array<{ vKey: StringKey; lKey: StringKey }> = [
+    { vKey: 'home1.stat-1-v', lKey: 'home1.stat-1-l' },
+    { vKey: 'home1.stat-2-v', lKey: 'home1.stat-2-l' },
+    { vKey: 'home1.stat-3-v', lKey: 'home1.stat-3-l' },
+    { vKey: 'home1.stat-4-v', lKey: 'home1.stat-4-l' },
+  ];
+  return (
+    <section className="py-12 sm:py-16">
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-10">
+        <div className="stat-row-mk">
+          {stats.map((s) => (
+            <div className="stat-mk" key={s.vKey}>
+              <div className="v">{t(s.vKey)}</div>
+              <div className="l">{t(s.lKey)}</div>
             </div>
           ))}
         </div>
-
-        <p className="text-center mt-6 text-[0.85rem]" style={{ color: 'var(--color-marketing-ink-soft)' }}>
-          {t('mk.storage-note')}
-        </p>
       </div>
     </section>
   );
 }
 
-// ──────────────────────────────────────────────────────────────
-// SERVICES GRID
-// ──────────────────────────────────────────────────────────────
-function ServicesGrid({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
-  const services: Array<{ icon: typeof Wrench; titleKey: StringKey; descKey: StringKey; href: string }> = [
-    { icon: Wrench, titleKey: 'mk.svc-repair-title', descKey: 'mk.svc-repair-desc', href: '/diensten/reparatie' },
-    { icon: Truck,  titleKey: 'mk.svc-transport-title', descKey: 'mk.svc-transport-desc', href: '/diensten/transport' },
-    { icon: Sparkles, titleKey: 'mk.svc-cleaning-title', descKey: 'mk.svc-cleaning-desc', href: '/diensten/service' },
-    { icon: Wind, titleKey: 'mk.svc-airco-title', descKey: 'mk.svc-airco-desc', href: '/diensten/airco' },
-    { icon: Refrigerator, titleKey: 'mk.svc-fridge-title', descKey: 'mk.svc-fridge-desc', href: '/koelkast' },
-    { icon: ClipboardCheck, titleKey: 'mk.svc-inspection-title', descKey: 'mk.svc-inspection-desc', href: '/diensten/inspectie' },
+// ───────────────────────────────────────────────────
+// SERVICES — 4x2 grid van .service-card-mk
+// ───────────────────────────────────────────────────
+function Services({ t }: { t: T }) {
+  const items: Array<{ icon: LucideIcon; titleKey: StringKey; descKey: StringKey; href: string }> = [
+    { icon: ShieldCheck, titleKey: 'home1.svc-1-title', descKey: 'home1.svc-1-desc', href: '/diensten/stalling' },
+    { icon: WrenchIcon, titleKey: 'home1.svc-2-title', descKey: 'home1.svc-2-desc', href: '/diensten/reparatie' },
+    { icon: Sparkles, titleKey: 'home1.svc-3-title', descKey: 'home1.svc-3-desc', href: '/diensten/service' },
+    { icon: ClipboardCheck, titleKey: 'home1.svc-4-title', descKey: 'home1.svc-4-desc', href: '/diensten/inspectie' },
+    { icon: Truck, titleKey: 'home1.svc-5-title', descKey: 'home1.svc-5-desc', href: '/diensten/transport' },
+    { icon: Snowflake, titleKey: 'home1.svc-6-title', descKey: 'home1.svc-6-desc', href: '/koelkast' },
+    { icon: Tag, titleKey: 'home1.svc-7-title', descKey: 'home1.svc-7-desc', href: '/verkoop' },
+    { icon: Recycle, titleKey: 'home1.svc-8-title', descKey: 'home1.svc-8-desc', href: '/verkoop#inkoop' },
   ];
-
   return (
-    <section id="diensten" className="py-16 sm:py-20" style={{ background: 'var(--color-sand)' }}>
-      <div className="max-w-[1180px] mx-auto px-5 sm:px-8">
-        <div className="text-center max-w-[720px] mx-auto mb-12">
-          <span className="mk-eyebrow mb-3 block">{t('mk.svc-eyebrow')}</span>
-          <h2>{t('mk.svc-h2')}</h2>
-          <p className="mt-3">{t('mk.svc-intro')}</p>
+    <section className="py-16 sm:py-20 section-bg-grey">
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-10">
+        <div className="text-center max-w-[720px] mx-auto mb-10 sm:mb-12">
+          <span className="eyebrow-mk">{t('home1.svc-eyebrow')}</span>
+          <h2 className="h2-mk">{t('home1.svc-h2')}</h2>
+          <p className="lead-mk" style={{ marginTop: 10 }}>{t('home1.svc-intro')}</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {services.map((s) => {
-            const Icon = s.icon;
-            return (
-              <Link
-                key={s.href}
-                href={s.href}
-                className="group block p-6 rounded-[14px] transition-transform hover:-translate-y-0.5"
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {items.map(({ icon: Icon, titleKey, descKey, href }) => (
+            <Link key={href} href={href} className="service-card-mk block" style={{ textDecoration: 'none' }}>
+              <div className="ic"><Icon size={20} aria-hidden /></div>
+              <h3>{t(titleKey)}</h3>
+              <p>{t(descKey)}</p>
+              <span className="more">{t('home1.svc-more')}</span>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ───────────────────────────────────────────────────
+// CERTAINTIES — 4-koloms checklist op wit
+// ───────────────────────────────────────────────────
+function Certainties({ t }: { t: T }) {
+  const items: Array<{ icon: LucideIcon; titleKey: StringKey; descKey: StringKey }> = [
+    { icon: Users, titleKey: 'home1.cert-1-title', descKey: 'home1.cert-1-desc' },
+    { icon: ShieldCheck, titleKey: 'home1.cert-2-title', descKey: 'home1.cert-2-desc' },
+    { icon: WrenchIcon, titleKey: 'home1.cert-3-title', descKey: 'home1.cert-3-desc' },
+    { icon: MessageSquare, titleKey: 'home1.cert-4-title', descKey: 'home1.cert-4-desc' },
+  ];
+  return (
+    <section className="py-16 sm:py-20">
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-10">
+        <div className="text-center max-w-[720px] mx-auto mb-10 sm:mb-12">
+          <span className="eyebrow-mk">{t('home1.cert-eyebrow')}</span>
+          <h2 className="h2-mk">{t('home1.cert-h2')}</h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {items.map(({ icon: Icon, titleKey, descKey }) => (
+            <div key={titleKey} className="card-mk card-tight">
+              <div
+                aria-hidden
                 style={{
-                  background: '#fff',
-                  border: '1px solid var(--color-marketing-line)',
+                  width: 44, height: 44, borderRadius: 10,
+                  background: 'var(--sky-soft)', color: 'var(--navy)',
+                  display: 'grid', placeItems: 'center', marginBottom: 14,
                 }}
               >
-                <div
-                  className="w-13 h-13 rounded-xl flex items-center justify-center mb-4"
-                  style={{ background: 'var(--color-sand-2)', width: 52, height: 52 }}
-                >
-                  <Icon size={22} style={{ color: 'var(--color-navy)' }} aria-hidden />
-                </div>
-                <h3
-                  className="font-sans text-[1.1rem] mb-1"
-                  style={{ fontFamily: 'var(--font-sans)', color: 'var(--color-navy)', margin: '0 0 0.3rem' }}
-                >
-                  {t(s.titleKey)}
-                </h3>
-                <p className="text-[0.92rem]" style={{ color: 'var(--color-marketing-ink-soft)', margin: 0 }}>
-                  {t(s.descKey)}
-                </p>
-                <span
-                  className="inline-flex items-center gap-1 mt-3 text-[0.9rem] font-semibold transition-transform group-hover:translate-x-0.5"
-                  style={{ color: 'var(--color-terracotta-deep)' }}
-                >
-                  {t('mk.svc-link-more')} <ArrowRight size={14} aria-hidden />
-                </span>
-              </Link>
-            );
-          })}
+                <Icon size={20} />
+              </div>
+              <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 16, color: 'var(--navy)', margin: '0 0 6px' }}>
+                {t(titleKey)}
+              </h3>
+              <p style={{ fontSize: 13.5, color: 'var(--ink-2)', margin: 0, lineHeight: 1.55 }}>
+                {t(descKey)}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-// ──────────────────────────────────────────────────────────────
-// VACATION TAGLINE — sfeer-strip, geen aparte dienst meer.
-// "Stap uit het vliegtuig — stap je vakantie in" als emotioneel anker
-// over wat onze stalling + service samen mogelijk maakt.
-// ──────────────────────────────────────────────────────────────
-function VacationTagline({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
+// ───────────────────────────────────────────────────
+// STEPS — timeline-mk 3 stappen
+// ───────────────────────────────────────────────────
+function Steps({ t }: { t: T }) {
+  const steps: Array<{ titleKey: StringKey; descKey: StringKey }> = [
+    { titleKey: 'home1.steps-1-title', descKey: 'home1.steps-1-desc' },
+    { titleKey: 'home1.steps-2-title', descKey: 'home1.steps-2-desc' },
+    { titleKey: 'home1.steps-3-title', descKey: 'home1.steps-3-desc' },
+  ];
   return (
-    <section
-      id="vakantie"
-      className="relative overflow-hidden py-14 sm:py-20"
+    <section className="py-16 sm:py-20 section-bg-grey">
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-10">
+        <div className="text-center max-w-[720px] mx-auto mb-10 sm:mb-12">
+          <span className="eyebrow-mk">{t('home1.steps-eyebrow')}</span>
+          <h2 className="h2-mk">{t('home1.steps-h2')}</h2>
+        </div>
+        <div className="timeline-mk" style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 14 }}>
+          {steps.map((s, i) => (
+            <div className="timeline-step" key={s.titleKey} style={{ borderLeft: i === 0 ? 'none' : '1px solid var(--line)' }}>
+              <span className="n">{String(i + 1).padStart(2, '0')}</span>
+              <h4>{t(s.titleKey)}</h4>
+              <p>{t(s.descKey)}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ───────────────────────────────────────────────────
+// SECURITY — navy section, checklist + foto-slot
+// ───────────────────────────────────────────────────
+function Security({ t }: { t: T }) {
+  const bullets: StringKey[] = [
+    'home1.sec-bullet-1',
+    'home1.sec-bullet-2',
+    'home1.sec-bullet-3',
+    'home1.sec-bullet-4',
+  ];
+  return (
+    <section className="py-16 sm:py-20 section-bg-navy">
+      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-10 lg:gap-14 items-center">
+          <div>
+            <span className="eyebrow-mk on-navy">{t('home1.sec-eyebrow')}</span>
+            <h2 className="h2-mk on-navy">{t('home1.sec-h2')}</h2>
+            <ul className="checklist-mk" style={{ marginTop: 24 }}>
+              {bullets.map((k) => (
+                <li key={k} style={{ color: '#E5EFF7' }}>
+                  <span className="v" />
+                  {t(k)}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div
+            className="relative rounded-[18px] overflow-hidden"
+            style={{
+              aspectRatio: '4 / 3',
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))',
+              border: '1px solid rgba(255,255,255,0.18)',
+              padding: 24,
+              display: 'grid',
+              placeItems: 'center',
+            }}
+            aria-hidden
+          >
+            <div style={{ display: 'grid', gap: 14, width: '100%', maxWidth: 320 }}>
+              <SecurityBadge label="SECURITAS DIRECT" sub="24/7 alarm-monitoring" icon={Lock} />
+              <SecurityBadge label="VERZEKERD" sub="Brand · diefstal · storm" icon={ShieldCheck} />
+              <SecurityBadge label="PERIMETER" sub="Hek + camera's + patrouilles" icon={ClipboardCheck} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SecurityBadge({ label, sub, icon: Icon }: { label: string; sub: string; icon: LucideIcon }) {
+  return (
+    <div
       style={{
-        background: 'linear-gradient(135deg, var(--color-navy) 0%, var(--color-navy-deep) 100%)',
-        color: '#fff',
+        background: 'rgba(255,255,255,0.06)',
+        border: '1px solid rgba(255,255,255,0.16)',
+        borderRadius: 12,
+        padding: '14px 16px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 14,
       }}
     >
-      {/* Zachte terracotta orb-glow rechtsboven voor warmte op de navy */}
-      <div
-        aria-hidden
-        className="absolute -top-32 -right-24 w-[420px] h-[420px] rounded-full pointer-events-none"
+      <span
         style={{
-          background: 'radial-gradient(circle, rgba(217,110,60,0.22) 0%, transparent 65%)',
-          filter: 'blur(8px)',
+          width: 40, height: 40, borderRadius: 10,
+          background: 'var(--sky)', color: 'var(--navy)',
+          display: 'grid', placeItems: 'center', flexShrink: 0,
         }}
-      />
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-80px' }}
-        transition={{ duration: 0.7, ease: EASE }}
-        className="relative max-w-[1180px] mx-auto px-5 sm:px-8 text-center"
       >
-        <span
-          className="mk-eyebrow inline-block mb-5"
-          style={{ color: '#ffd29b' }}
-        >
-          {t('mk.vac-eyebrow')}
-        </span>
-        <h2
-          className="font-display"
-          style={{
-            color: '#fff',
-            fontSize: 'clamp(2rem, 4vw + 0.5rem, 3.4rem)',
-            lineHeight: 1.08,
-            letterSpacing: '-0.012em',
-            fontWeight: 700,
-            margin: '0 auto 0.5em',
-            maxWidth: '20ch',
-          }}
-        >
-          {t('mk.vac-h2')}
-        </h2>
-        <p
-          className="mx-auto leading-relaxed text-[1.05rem] sm:text-[1.15rem]"
-          style={{ color: 'rgba(255,255,255,0.82)', maxWidth: '60ch' }}
-        >
-          {t('mk.vac-intro')}
-        </p>
-      </motion.div>
-    </section>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────
-// SECURITY
-// ──────────────────────────────────────────────────────────────
-function Security({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
-  const items: Array<{ icon: typeof Shield; titleKey: StringKey; descKey: StringKey }> = [
-    { icon: Shield, titleKey: 'mk.sec-cam-title', descKey: 'mk.sec-cam-desc' },
-    { icon: Lock, titleKey: 'mk.sec-fence-title', descKey: 'mk.sec-fence-desc' },
-    { icon: FileCheck2, titleKey: 'mk.sec-insurance-title', descKey: 'mk.sec-insurance-desc' },
-    { icon: Search, titleKey: 'mk.sec-check-title', descKey: 'mk.sec-check-desc' },
-  ];
-
-  return (
-    <section
-      className="relative overflow-hidden py-16 sm:py-20"
-      style={{ background: 'var(--color-navy)', color: '#fff' }}
-    >
-      <div
-        aria-hidden
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: 'radial-gradient(circle at 80% 20%, rgba(217,110,60,0.15), transparent 50%)',
-        }}
-      />
-      <div className="relative max-w-[1180px] mx-auto px-5 sm:px-8">
-        <div className="text-center max-w-[720px] mx-auto mb-12">
-          <span className="mk-eyebrow mb-3 block" style={{ color: '#ffd29b' }}>
-            {t('mk.sec-eyebrow')}
-          </span>
-          <h2 style={{ color: '#fff' }}>{t('mk.sec-h2')}</h2>
-          <p className="mt-3" style={{ color: 'rgba(255,255,255,0.82)' }}>
-            {t('mk.sec-intro')}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {items.map((it) => {
-            const Icon = it.icon;
-            return (
-              <div key={it.titleKey} className="text-center px-4 py-6">
-                <div
-                  className="mx-auto mb-4 grid place-items-center"
-                  style={{
-                    width: 64, height: 64, borderRadius: '50%',
-                    background: 'rgba(255,255,255,0.08)',
-                    border: '1.5px solid rgba(255,255,255,0.18)',
-                  }}
-                >
-                  <Icon size={26} aria-hidden style={{ color: '#ffd29b' }} />
-                </div>
-                <h4
-                  className="font-sans text-[1rem] mb-1"
-                  style={{ fontFamily: 'var(--font-sans)', color: '#fff', margin: '0 0 0.3rem' }}
-                >
-                  {t(it.titleKey)}
-                </h4>
-                <p className="text-[0.88rem]" style={{ color: 'rgba(255,255,255,0.82)', margin: 0 }}>
-                  {t(it.descKey)}
-                </p>
-              </div>
-            );
-          })}
-        </div>
+        <Icon size={20} aria-hidden />
+      </span>
+      <div>
+        <div style={{ fontFamily: 'var(--sora)', fontWeight: 700, fontSize: 12.5, letterSpacing: 1, color: '#fff' }}>{label}</div>
+        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>{sub}</div>
       </div>
-    </section>
+    </div>
   );
 }
 
-// ──────────────────────────────────────────────────────────────
-// REVIEWS — placeholder met 3 quotes; later vervangen door echte
-// Google review snippets als die er komen.
-// ──────────────────────────────────────────────────────────────
-function Reviews({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
-  // Placeholder testimonials — later vervangen door echte Google reviews.
-  const reviews = [
-    {
-      stars: 5,
-      text: '"Onze caravan stond perfect schoon en gerepareerd voor onze aankomst. Wat een service en wat fijne mensen. Bij aankomst zelfs een welkomstpakket. Echt top."',
-      author: 'Martine V.',
-      sub: 'Vaste klant sinds 2018',
-      avatar: 'MV',
-    },
-    {
-      stars: 5,
-      text: '"Hagelschade aan ons dak in twee dagen onzichtbaar gerepareerd terwijl wij in Nederland waren. Alles in foto\'s gedocumenteerd. Dit is hoe je een bedrijf runt."',
-      author: 'Jan D.',
-      sub: 'Reparatie-klant',
-      avatar: 'JD',
-    },
-    {
-      stars: 5,
-      text: '"Persoonlijk, betrouwbaar en altijd bereikbaar in het Nederlands. We laten onze camper hier al vier jaar staan en het voelt elke keer als thuiskomen."',
-      author: 'Peter & Brigitte',
-      sub: 'Camper-klant uit Hilversum',
-      avatar: 'PB',
-    },
-  ];
-
+// ───────────────────────────────────────────────────
+// WORKSHOP — peek met SVG mock + 3 spec-chips
+// ───────────────────────────────────────────────────
+function Workshop({ t }: { t: T }) {
   return (
-    <section className="py-16 sm:py-20" style={{ background: 'var(--color-sand)' }}>
-      <div className="max-w-[1180px] mx-auto px-5 sm:px-8">
-        <div className="flex justify-between items-end flex-wrap gap-6 mb-10">
+    <section className="py-16 sm:py-20">
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[0.95fr_1fr] gap-10 lg:gap-14 items-center">
+          <div className="card-mk card-lift" aria-hidden style={{ padding: 18, background: 'linear-gradient(180deg, #F8FBFD 0%, #FFFFFF 100%)' }}>
+            <WorkshopSvg />
+          </div>
           <div>
-            <span className="mk-eyebrow mb-3 block">{t('mk.rev-eyebrow')}</span>
-            <h2>{t('mk.rev-h2')}</h2>
-          </div>
-          <div
-            className="flex items-center gap-4 px-5 py-4 rounded-[14px]"
-            style={{
-              background: '#fff',
-              border: '1px solid var(--color-marketing-line)',
-              boxShadow: 'var(--shadow-sm)',
-            }}
-          >
-            <div>
-              <div className="mk-stat-num" style={{ fontSize: '2.4rem' }}>{t('mk.rev-score-num')}</div>
-              <div style={{ color: '#f5b94a', fontSize: '0.9rem', letterSpacing: '1px' }}>★★★★★</div>
+            <span className="eyebrow-mk">{t('home1.shop-eyebrow')}</span>
+            <h2 className="h2-mk">{t('home1.shop-h2')}</h2>
+            <p className="lead-mk" style={{ marginTop: 10 }}>{t('home1.shop-intro')}</p>
+            <div className="flex flex-wrap gap-3 mt-6">
+              <span className="spec-chip">
+                <span className="v">{t('home1.shop-spec-1-v')}</span>
+                <span className="l">{t('home1.shop-spec-1-l')}</span>
+              </span>
+              <span className="spec-chip">
+                <span className="v">{t('home1.shop-spec-2-v')}</span>
+                <span className="l">{t('home1.shop-spec-2-l')}</span>
+              </span>
+              <span className="spec-chip">
+                <span className="v">{t('home1.shop-spec-3-v')}</span>
+                <span className="l">{t('home1.shop-spec-3-l')}</span>
+              </span>
             </div>
-            <div>
-              <small className="block text-[0.8rem]" style={{ color: 'var(--color-marketing-ink-soft)' }}>
-                {t('mk.rev-score-base')}
-              </small>
-              <strong className="block text-[1rem]" style={{ color: 'var(--color-navy)' }}>
-                {t('mk.rev-score-count')}
-              </strong>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {reviews.map((r, i) => (
-            <div
-              key={i}
-              className="p-6 rounded-[14px]"
-              style={{ background: '#fff', border: '1px solid var(--color-marketing-line)' }}
-            >
-              <div style={{ color: '#f5b94a', fontSize: '1rem', letterSpacing: '1px', marginBottom: '0.8rem' }}>
-                {'★'.repeat(r.stars)}
-              </div>
-              <p className="italic text-[0.95rem] mb-4" style={{ color: 'var(--color-marketing-ink)' }}>
-                {r.text}
-              </p>
-              <div className="flex items-center gap-3">
-                <div
-                  className="grid place-items-center font-bold text-[0.9rem]"
-                  style={{
-                    width: 38, height: 38, borderRadius: '50%',
-                    background: 'var(--color-terracotta)', color: '#fff',
-                  }}
-                >
-                  {r.avatar}
-                </div>
-                <div>
-                  <strong className="block text-[0.9rem]" style={{ color: 'var(--color-navy)' }}>{r.author}</strong>
-                  <small className="text-[0.8rem]" style={{ color: 'var(--color-marketing-ink-soft)' }}>{r.sub}</small>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────
-// ABOUT
-// ──────────────────────────────────────────────────────────────
-function About({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
-  return (
-    <section id="about" className="py-16 sm:py-20">
-      <div className="max-w-[1180px] mx-auto px-5 sm:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
-          {/* Visual met overlay-quote */}
-          <div
-            className="relative rounded-[22px] overflow-hidden"
-            style={{
-              aspectRatio: '4 / 5',
-              background:
-                'linear-gradient(135deg, rgba(14,58,85,0.5), rgba(217,110,60,0.4)), linear-gradient(180deg, #4d8fb3 0%, #f0c89a 60%, #d96e3c 100%)',
-              boxShadow: 'var(--shadow-md)',
-            }}
-          >
-            <PhotoSlot
-              ratio="4/3"
-              ariaLabel="Onze locatie"
-              className="absolute inset-0"
-              style={{ background: 'transparent' }}
-            />
-            <div
-              className="absolute bottom-6 left-6 right-6 italic text-[1.05rem]"
-              style={{
-                color: '#fff',
-                fontFamily: 'var(--font-display)',
-                lineHeight: 1.4,
-                textShadow: '0 2px 12px rgba(0,0,0,0.3)',
-              }}
-            >
-              {t('mk.about-quote')}
-            </div>
-          </div>
-
-          {/* Tekst */}
-          <div>
-            <span className="mk-eyebrow mb-3 block">{t('mk.about-eyebrow')}</span>
-            <h2>{t('mk.about-h2')}</h2>
-            <p className="mt-3">{t('mk.about-p1')}</p>
-            <p>{t('mk.about-p2')}</p>
-            <div className="flex gap-3 flex-wrap mt-6">
-              <Link href="/contact" className="mk-btn-primary">
-                {t('mk.about-cta-tour')}
+            <div className="mt-7">
+              <Link href="/diensten/reparatie" className="btn btn-ghost">
+                {t('home1.svc-more')} <ArrowRight size={14} aria-hidden />
               </Link>
             </div>
           </div>
@@ -621,30 +431,69 @@ function About({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }
   );
 }
 
-// ──────────────────────────────────────────────────────────────
-// FAQ
-// ──────────────────────────────────────────────────────────────
-function FaqSection({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
-  const items: Array<{ qKey: StringKey; aKey: StringKey }> = [
-    { qKey: 'mk.faq-q1', aKey: 'mk.faq-a1' },
-    { qKey: 'mk.faq-q2', aKey: 'mk.faq-a2' },
-    { qKey: 'mk.faq-q3', aKey: 'mk.faq-a3' },
-    { qKey: 'mk.faq-q4', aKey: 'mk.faq-a4' },
-    { qKey: 'mk.faq-q5', aKey: 'mk.faq-a5' },
+function WorkshopSvg() {
+  return (
+    <svg viewBox="0 0 480 280" width="100%" height="auto" role="img" aria-label="Werkplaats">
+      <defs>
+        <linearGradient id="floor" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stopColor="#E5F3FB" />
+          <stop offset="1" stopColor="#CDE7F6" />
+        </linearGradient>
+      </defs>
+      <rect x="0" y="200" width="480" height="80" fill="url(#floor)" />
+      {/* hall outline */}
+      <path d="M30 60 L240 24 L450 60 L450 220 L30 220 Z" fill="#F8FBFD" stroke="#2F4254" strokeWidth="2.5" />
+      {/* roof beams */}
+      <path d="M30 60 L240 24 L450 60" stroke="#2F4254" strokeWidth="2.5" fill="none" />
+      <path d="M240 24 V220" stroke="#95D8FD" strokeWidth="1.5" strokeDasharray="4 4" />
+      {/* hangar door */}
+      <rect x="180" y="120" width="120" height="100" fill="#FFFFFF" stroke="#2F4254" strokeWidth="2" />
+      <path d="M180 140 H300 M180 160 H300 M180 180 H300 M180 200 H300" stroke="#2F4254" strokeWidth="1" />
+      {/* caravan inside on left */}
+      <g transform="translate(56,150)">
+        <rect width="100" height="46" rx="6" fill="#FFFFFF" stroke="#2F4254" strokeWidth="2" />
+        <rect x="10" y="8" width="34" height="20" rx="3" fill="#95D8FD" stroke="#2F4254" strokeWidth="1.5" />
+        <rect x="56" y="8" width="20" height="28" rx="2" fill="#F9AD36" stroke="#2F4254" strokeWidth="1.5" />
+        <circle cx="22" cy="50" r="7" fill="#2F4254" />
+        <circle cx="78" cy="50" r="7" fill="#2F4254" />
+      </g>
+      {/* ladder */}
+      <path d="M340 80 V210 M360 80 V210 M340 100 H360 M340 130 H360 M340 160 H360 M340 190 H360" stroke="#2F4254" strokeWidth="2" fill="none" />
+      {/* light */}
+      <circle cx="240" cy="40" r="4" fill="#F9AD36" />
+      <path d="M240 44 V60" stroke="#F9AD36" strokeWidth="1" strokeDasharray="2 3" />
+    </svg>
+  );
+}
+
+// ───────────────────────────────────────────────────
+// QUOTES — 3 quote-cards
+// ───────────────────────────────────────────────────
+function Quotes({ t }: { t: T }) {
+  const quotes: Array<{ textKey: StringKey; nameKey: StringKey; metaKey: StringKey; av: string }> = [
+    { textKey: 'home1.q-1-text', nameKey: 'home1.q-1-name', metaKey: 'home1.q-1-meta', av: 'MV' },
+    { textKey: 'home1.q-2-text', nameKey: 'home1.q-2-name', metaKey: 'home1.q-2-meta', av: 'JD' },
+    { textKey: 'home1.q-3-text', nameKey: 'home1.q-3-name', metaKey: 'home1.q-3-meta', av: 'PB' },
   ];
   return (
-    <section className="py-16 sm:py-20" style={{ background: 'var(--color-sand)' }}>
-      <div className="max-w-[1180px] mx-auto px-5 sm:px-8">
-        <div className="text-center max-w-[720px] mx-auto mb-12">
-          <span className="mk-eyebrow mb-3 block">{t('mk.faq-eyebrow')}</span>
-          <h2>{t('mk.faq-h2')}</h2>
+    <section className="py-16 sm:py-20 section-bg-grey">
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-10">
+        <div className="text-center max-w-[720px] mx-auto mb-10 sm:mb-12">
+          <span className="eyebrow-mk">{t('home1.q-eyebrow')}</span>
+          <h2 className="h2-mk">{t('home1.q-h2')}</h2>
         </div>
-        <div className="max-w-[820px] mx-auto">
-          {items.map((it) => (
-            <details key={it.qKey} className="mk-faq-item">
-              <summary>{t(it.qKey)}</summary>
-              <div className="mk-faq-answer">{t(it.aKey)}</div>
-            </details>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          {quotes.map((q) => (
+            <div key={q.textKey} className="quote-card-mk">
+              <p>{t(q.textKey)}</p>
+              <div className="who">
+                <span className="av">{q.av}</span>
+                <div>
+                  <div className="nm">{t(q.nameKey)}</div>
+                  <div className="mt">{t(q.metaKey)}</div>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -652,43 +501,98 @@ function FaqSection({ t }: { t: (k: StringKey, ...a: (string | number)[]) => str
   );
 }
 
-// ──────────────────────────────────────────────────────────────
-// CTA-STRIP (terracotta)
-// ──────────────────────────────────────────────────────────────
-function CtaStrip({ t }: { t: (k: StringKey, ...a: (string | number)[]) => string }) {
+// ───────────────────────────────────────────────────
+// LOCATION — kaart-strip met dot-pattern
+// ───────────────────────────────────────────────────
+function Location({ t }: { t: T }) {
   return (
-    <section
-      id="contact"
-      className="py-12 sm:py-14"
-      style={{ background: 'var(--color-terracotta)', color: '#fff' }}
-    >
-      <div className="max-w-[1180px] mx-auto px-5 sm:px-8 flex justify-between items-center gap-6 flex-wrap">
-        <div>
-          <h2 className="font-display" style={{ color: '#fff', margin: 0, fontSize: 'clamp(1.4rem, 2.4vw, 2rem)' }}>
-            {t('mk.cta-h2')}
-          </h2>
-          <p className="mt-1" style={{ color: 'rgba(255,255,255,0.92)', margin: 0 }}>
-            {t('mk.cta-sub')}
-          </p>
-        </div>
-        <div className="flex gap-3 flex-wrap">
-          <a
-            href="tel:+34633778699"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-[0.95rem] font-semibold"
-            style={{ background: '#fff', color: 'var(--color-terracotta-deep)' }}
+    <section className="py-16 sm:py-20">
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-10 lg:gap-14 items-center">
+          <div>
+            <span className="eyebrow-mk">{t('home1.loc-eyebrow')}</span>
+            <h2 className="h2-mk">{t('home1.loc-h2')}</h2>
+            <p className="lead-mk" style={{ marginTop: 10 }}>{t('home1.loc-intro')}</p>
+            <p style={{ fontFamily: 'var(--sora)', fontWeight: 600, color: 'var(--navy)', marginTop: 18, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              <MapPin size={16} aria-hidden /> {t('home1.loc-address')}
+            </p>
+            <div className="mt-5">
+              <a
+                href="https://maps.google.com/?q=Ctra+de+Palamos+9,+17110+Sant+Climent+de+Peralta,+Girona,+Spain"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-ghost"
+              >
+                {t('home1.loc-cta')}
+              </a>
+            </div>
+          </div>
+          <div
+            className="dot-pattern relative rounded-[18px] overflow-hidden"
+            style={{
+              aspectRatio: '5 / 4',
+              background: 'linear-gradient(160deg, #E5F3FB 0%, #F2DDB6 100%)',
+              border: '1px solid var(--line)',
+            }}
+            aria-hidden
           >
-            <Phone size={16} aria-hidden /> {t('mk.cta-call')}
-          </a>
-          <Link
-            href="/contact"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-[0.95rem] font-semibold"
-            style={{ background: 'var(--color-marketing-cream)', color: 'var(--color-terracotta-deep)' }}
-          >
-            {t('mk.cta-quote')}
-          </Link>
+            <LocationMapSvg />
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
+function LocationMapSvg() {
+  return (
+    <svg viewBox="0 0 480 380" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" role="presentation">
+      {/* coastline curve */}
+      <path d="M0 240 Q120 180 220 220 T480 200" stroke="#2F4254" strokeWidth="1.5" fill="none" opacity="0.5" />
+      <path d="M0 250 Q120 195 220 230 T480 215 L480 380 L0 380 Z" fill="#95D8FD" opacity="0.5" />
+      {/* roads */}
+      <path d="M50 80 Q180 120 220 200 T410 320" stroke="#FFFFFF" strokeWidth="3" fill="none" />
+      <path d="M50 80 Q180 120 220 200 T410 320" stroke="#2F4254" strokeWidth="1" fill="none" strokeDasharray="6 6" />
+      {/* pin at our location */}
+      <g transform="translate(220,200)">
+        <circle r="22" fill="#F9AD36" opacity="0.25" />
+        <circle r="12" fill="#F9AD36" stroke="#2F4254" strokeWidth="2" />
+        <circle r="4" fill="#2F4254" />
+      </g>
+      {/* labels */}
+      <text x="120" y="80" fontFamily="var(--sora)" fontSize="12" fontWeight="600" fill="#2F4254" opacity="0.7">Girona</text>
+      <text x="370" y="335" fontFamily="var(--sora)" fontSize="12" fontWeight="600" fill="#2F4254" opacity="0.7">Palamós</text>
+      <text x="240" y="194" fontFamily="var(--sora)" fontSize="12" fontWeight="700" fill="#2F4254">Wij</text>
+    </svg>
+  );
+}
+
+// ───────────────────────────────────────────────────
+// CTA-BAND — navy met grain
+// ───────────────────────────────────────────────────
+function CtaBand({ t }: { t: T }) {
+  return (
+    <section className="py-12 sm:py-16">
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-10">
+        <div className="cta-band-mk">
+          <div>
+            <h2 className="h2-mk on-navy" style={{ margin: 0 }}>
+              {t('home1.cta-h2')}
+            </h2>
+            <p style={{ marginTop: 8, color: 'rgba(255,255,255,0.78)', fontSize: 15, lineHeight: 1.55 }}>
+              {t('home1.cta-sub')}
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <Link href="/reserveren/configurator" className="btn btn-primary">
+              {t('home1.cta-primary')} <ArrowRight size={16} aria-hidden />
+            </Link>
+            <a href="tel:+34633778699" className="btn btn-ghost-light">
+              <Phone size={15} aria-hidden /> {t('home1.cta-secondary')}
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
