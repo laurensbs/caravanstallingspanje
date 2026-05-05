@@ -95,6 +95,14 @@ export async function createCheckoutSession(input: {
         },
       ],
       customer_email: input.customerEmail,
+      // Altijd een Stripe Customer-record aanmaken zodat klant via de
+      // Customer Portal al z'n betalingen + facturen kan terugzien.
+      customer_creation: 'always',
+      // Stripe genereert per Checkout-betaling een echte factuur (PDF +
+      // factuur-nummer) die automatisch naar de klant wordt gemaild en in
+      // de Customer Portal verschijnt. Holded blijft voor onze eigen
+      // boekhouding — Stripe is alleen klant-facing.
+      invoice_creation: { enabled: true },
       metadata: input.metadata,
       success_url: input.successUrl,
       cancel_url: input.cancelUrl,
