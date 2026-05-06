@@ -195,6 +195,34 @@ export function welcomePortalHtml(input: {
   return { subject, html, text };
 }
 
+// Welkomstmail met set-password-link (geen temp-password). Klant volgt de
+// link, kiest zelf een wachtwoord — token verloopt na 14 dagen.
+export function welcomeSetupHtml(input: {
+  name: string;
+  email: string;
+  setupUrl: string;
+  expiresInDays: number;
+}): { subject: string; html: string; text: string } {
+  const subject = 'Stel je klantportaal-wachtwoord in';
+  const card = `
+    <p>Hi ${escapeHtml(input.name)},</p>
+    <p>We hebben een persoonlijk klantportaal voor je klaargezet bij Caravanstalling Spanje. Daar zie je je caravan, plek, foto's van onze monteurs, service-historie en facturen — en kun je makkelijk een aanvraag indienen.</p>
+    <div class="summary">
+      <div class="row"><span class="muted">Inloggen met</span><strong>${escapeHtml(input.email)}</strong></div>
+    </div>
+    <p style="text-align:center;margin:18px 0 8px"><a class="btn" href="${input.setupUrl}">Kies je wachtwoord</a></p>
+    <div class="next"><strong>Wat doe je nu?</strong><br/>Klik op de knop om zelf een wachtwoord te kiezen. De link werkt ${input.expiresInDays} dagen — daarna stuur je ons een berichtje en sturen we 'm opnieuw.</div>
+    <p class="muted" style="font-size:12px">Geen interesse? Dan kun je deze mail negeren — je gegevens blijven gewoon bij ons.</p>
+  `;
+  const html = shell(card, {
+    eyebrow: 'Caravanstalling Spanje',
+    heading: 'Welkom — kies je wachtwoord',
+    subline: 'Eenmalige link, persoonlijk voor jou.',
+  });
+  const text = `Hi ${input.name},\n\nWe hebben een klantportaal voor je klaargezet. Volg deze link om zelf je wachtwoord in te stellen (geldig ${input.expiresInDays} dagen):\n${input.setupUrl}\n\nInloggen doe je daarna met: ${input.email}`;
+  return { subject, html, text };
+}
+
 // Mail die admin handmatig verstuurt vanuit /admin/koelkasten naar klanten
 // die we eerder zelf in het systeem zetten — voorheen kregen die nooit
 // een betaal-uitnodiging. Bevat een grote "Nu betalen" knop met de

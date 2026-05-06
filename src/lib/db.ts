@@ -1267,6 +1267,16 @@ export async function ensureMiscSchema(): Promise<void> {
       sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMP`);
     await tryMigrate('customers.stripe_customer_id', () =>
       sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT`);
+    // Welkomstmail-flow: token waarmee klant zelf zijn eerste wachtwoord zet.
+    // 14 dagen geldig; één keer bruikbaar (we wissen 'm na set).
+    await tryMigrate('customers.password_setup_token', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS password_setup_token TEXT`);
+    await tryMigrate('customers.password_setup_token_expires', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS password_setup_token_expires TIMESTAMP`);
+    await tryMigrate('customers.welcome_email_sent_at', () =>
+      sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS welcome_email_sent_at TIMESTAMP`);
+    await tryMigrate('customers.password_setup_token_idx', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_customers_password_setup_token ON customers(password_setup_token) WHERE password_setup_token IS NOT NULL`);
     // Handmatige betaallink-flow.
     await tryMigrate('fridge_bookings.payment_link_url', () =>
       sql`ALTER TABLE fridge_bookings ADD COLUMN IF NOT EXISTS payment_link_url TEXT`);
@@ -1541,6 +1551,45 @@ export async function setCustomerPassword(
     SET password_hash = ${passwordHash},
         must_change_password = ${mustChange},
         password_set_at = ${mustChange ? null : new Date().toISOString()}::timestamp,
+        updated_at = NOW()
+    WHERE id = ${id}`;
+}
+
+// Welkomstmail-flow: admin genereert token, klant zet zelf wachtwoord.
+export async function setCustomerPasswordSetupToken(
+  id: number,
+  token: string,
+  expiresAt: Date,
+) {
+  await ensureMiscSchema();
+  await sql`UPDATE customers
+    SET password_setup_token = ${token},
+        password_setup_token_expires = ${expiresAt.toISOString()}::timestamp,
+        welcome_email_sent_at = NOW(),
+        updated_at = NOW()
+    WHERE id = ${id}`;
+}
+
+export async function getCustomerByPasswordSetupToken(token: string): Promise<CustomerRow | null> {
+  if (!token) return null;
+  await ensureMiscSchema();
+  const rows = await sql`
+    SELECT * FROM customers
+    WHERE password_setup_token = ${token}
+      AND password_setup_token_expires > NOW()
+      AND deleted_at IS NULL
+    LIMIT 1`;
+  return (rows[0] as CustomerRow) || null;
+}
+
+export async function consumePasswordSetupToken(id: number, passwordHash: string) {
+  await ensureMiscSchema();
+  await sql`UPDATE customers
+    SET password_hash = ${passwordHash},
+        must_change_password = false,
+        password_set_at = NOW(),
+        password_setup_token = NULL,
+        password_setup_token_expires = NULL,
         updated_at = NOW()
     WHERE id = ${id}`;
 }
@@ -2209,8 +2258,87 @@ export async function ensureCaravansSchema(): Promise<void> {
     `);
     await tryMigrate('caravan_photos.idx_caravan', () =>
       sql`CREATE INDEX IF NOT EXISTS idx_caravan_photos_caravan ON caravan_photos(caravan_id)`);
+
+    // Service-aanvragen: klanten dienen een verzoek in vanuit /account/caravan,
+    // admin pakt het op. Status loopt: new → in_progress → done | cancelled.
+    await tryMigrate('customer_service_requests.create', () => sql`
+      CREATE TABLE IF NOT EXISTS customer_service_requests (
+        id SERIAL PRIMARY KEY,
+        customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+        caravan_id INTEGER REFERENCES customer_caravans(id) ON DELETE SET NULL,
+        kind TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT,
+        preferred_date DATE,
+        status TEXT NOT NULL DEFAULT 'new',
+        admin_note TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    await tryMigrate('customer_service_requests.idx_customer', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_csr_customer ON customer_service_requests(customer_id)`);
+    await tryMigrate('customer_service_requests.idx_status', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_csr_status ON customer_service_requests(status)`);
   })();
   return _caravansMigrationsApplied;
+}
+
+export type CustomerServiceRequestRow = {
+  id: number;
+  customer_id: number;
+  caravan_id: number | null;
+  kind: string;
+  title: string;
+  description: string | null;
+  preferred_date: string | null;
+  status: 'new' | 'in_progress' | 'done' | 'cancelled';
+  admin_note: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export async function listServiceRequestsByCustomer(customerId: number): Promise<CustomerServiceRequestRow[]> {
+  await ensureCaravansSchema();
+  return sql`SELECT * FROM customer_service_requests WHERE customer_id = ${customerId} ORDER BY created_at DESC` as unknown as Promise<CustomerServiceRequestRow[]>;
+}
+
+export async function listOpenServiceRequests(): Promise<CustomerServiceRequestRow[]> {
+  await ensureCaravansSchema();
+  return sql`SELECT * FROM customer_service_requests WHERE status IN ('new', 'in_progress') ORDER BY created_at DESC` as unknown as Promise<CustomerServiceRequestRow[]>;
+}
+
+export async function createServiceRequest(data: {
+  customer_id: number;
+  caravan_id?: number | null;
+  kind: string;
+  title: string;
+  description?: string | null;
+  preferred_date?: string | null;
+}): Promise<CustomerServiceRequestRow> {
+  await ensureCaravansSchema();
+  const rows = await sql`
+    INSERT INTO customer_service_requests (customer_id, caravan_id, kind, title, description, preferred_date)
+    VALUES (${data.customer_id}, ${data.caravan_id ?? null}, ${data.kind}, ${data.title},
+            ${data.description ?? null}, ${data.preferred_date ?? null})
+    RETURNING *` as unknown as CustomerServiceRequestRow[];
+  return rows[0];
+}
+
+export async function updateServiceRequestStatus(id: number, status: CustomerServiceRequestRow['status'], adminNote?: string | null): Promise<CustomerServiceRequestRow | null> {
+  await ensureCaravansSchema();
+  const rows = await sql`
+    UPDATE customer_service_requests
+    SET status = ${status}, admin_note = ${adminNote ?? null}, updated_at = NOW()
+    WHERE id = ${id}
+    RETURNING *` as unknown as CustomerServiceRequestRow[];
+  return rows[0] || null;
+}
+
+export async function getServiceRequestById(id: number): Promise<CustomerServiceRequestRow | null> {
+  await ensureCaravansSchema();
+  const rows = await sql`SELECT * FROM customer_service_requests WHERE id = ${id}` as unknown as CustomerServiceRequestRow[];
+  return rows[0] || null;
 }
 
 export type CaravanPhotoRow = {

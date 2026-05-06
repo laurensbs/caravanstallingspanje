@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Loader2, Caravan as CaravanIcon, ShieldCheck, Calendar, FileText, Camera,
-  Wrench, ClipboardCheck, Sparkles, X,
+  Wrench, ClipboardCheck, Sparkles, X, MessageSquare, Plus, CheckCircle2, Clock, AlertCircle,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import AccountLayout from '@/components/account/AccountLayout';
@@ -55,7 +55,19 @@ type ServiceHistoryItem = {
   createdAt: string;
 };
 
-type Tab = 'overview' | 'history' | 'docs' | 'photos';
+type Tab = 'overview' | 'history' | 'docs' | 'photos' | 'requests';
+
+type ServiceRequest = {
+  id: number;
+  kind: string;
+  title: string;
+  description: string | null;
+  preferredDate: string | null;
+  status: 'new' | 'in_progress' | 'done' | 'cancelled';
+  adminNote: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
 type T = (k: StringKey, ...a: (string | number)[]) => string;
 
 export default function MijnCaravanPage() {
@@ -108,11 +120,12 @@ export default function MijnCaravanPage() {
     );
   }
 
-  const tabs: Array<{ id: Tab; labelKey: StringKey }> = [
-    { id: 'overview', labelKey: 'pt1.cv-tab-overview' },
-    { id: 'history', labelKey: 'pt1.cv-tab-history' },
-    { id: 'docs', labelKey: 'pt1.cv-tab-docs' },
-    { id: 'photos', labelKey: 'pt1.cv-tab-photos' },
+  const tabs: Array<{ id: Tab; label: string }> = [
+    { id: 'overview', label: t('pt1.cv-tab-overview') },
+    { id: 'history', label: t('pt1.cv-tab-history') },
+    { id: 'requests', label: 'Aanvragen' },
+    { id: 'docs', label: t('pt1.cv-tab-docs') },
+    { id: 'photos', label: t('pt1.cv-tab-photos') },
   ];
 
   return (
@@ -185,7 +198,7 @@ export default function MijnCaravanPage() {
                       }}
                       aria-pressed={active}
                     >
-                      {t(tb.labelKey)}
+                      {tb.label}
                     </button>
                   </li>
                 );
@@ -195,6 +208,7 @@ export default function MijnCaravanPage() {
 
           {tab === 'overview' && <OverviewTab t={t} caravan={caravan} />}
           {tab === 'history' && <HistoryTab t={t} history={history} />}
+          {tab === 'requests' && <RequestsTab />}
           {tab === 'docs' && <DocsTab t={t} />}
           {tab === 'photos' && <PhotosTab t={t} caravanId={caravan.id} initialPhotos={photos} />}
         </>
@@ -625,6 +639,215 @@ function SpecRow({ k, v }: { k: string; v: string }) {
     <div>
       <dt style={{ color: 'var(--muted)', textTransform: 'uppercase', fontSize: 11, letterSpacing: 1.2, fontFamily: 'var(--sora)', fontWeight: 600, marginBottom: 4 }}>{k}</dt>
       <dd style={{ color: 'var(--ink)', margin: 0, fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 14 }}>{v}</dd>
+    </div>
+  );
+}
+
+// ─── Klant-aanvragen ─────────────────────────────────
+const REQUEST_KINDS: Array<{ value: string; label: string }> = [
+  { value: 'cleaning', label: 'Schoonmaak' },
+  { value: 'service', label: 'Onderhoud / service' },
+  { value: 'inspection', label: 'Inspectie' },
+  { value: 'repair', label: 'Reparatie' },
+  { value: 'transport', label: 'Transport' },
+  { value: 'other', label: 'Anders' },
+];
+
+function statusMeta(s: ServiceRequest['status']): { label: string; color: string; Icon: LucideIcon } {
+  switch (s) {
+    case 'new': return { label: 'Ontvangen', color: 'var(--orange)', Icon: Clock };
+    case 'in_progress': return { label: 'In behandeling', color: '#3B82F6', Icon: AlertCircle };
+    case 'done': return { label: 'Afgerond', color: 'var(--green)', Icon: CheckCircle2 };
+    case 'cancelled': return { label: 'Geannuleerd', color: 'var(--muted)', Icon: X };
+  }
+}
+
+function RequestsTab() {
+  const [items, setItems] = useState<ServiceRequest[] | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [draft, setDraft] = useState({ kind: 'service', title: '', description: '', preferredDate: '' });
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/account/service-requests', { credentials: 'include' })
+      .then((r) => r.json())
+      .then((d) => { if (!cancelled) setItems(d.items || []); })
+      .catch(() => { if (!cancelled) setItems([]); });
+    return () => { cancelled = true; };
+  }, []);
+
+  async function submit() {
+    if (!draft.title.trim()) { setErr('Vul een korte omschrijving in.'); return; }
+    setSaving(true);
+    setErr(null);
+    try {
+      const res = await fetch('/api/account/service-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          kind: draft.kind,
+          title: draft.title.trim(),
+          description: draft.description.trim() || undefined,
+          preferredDate: draft.preferredDate || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setErr(data?.error || 'Versturen mislukt.'); return; }
+      setItems((prev) => [data.item, ...(prev || [])]);
+      setCreating(false);
+      setDraft({ kind: 'service', title: '', description: '', preferredDate: '' });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div>
+      <div className="card-mk" style={{ padding: 24, marginBottom: 18 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+          <span aria-hidden style={{ width: 38, height: 38, borderRadius: 10, background: 'var(--sky-soft)', color: 'var(--navy)', display: 'grid', placeItems: 'center' }}>
+            <MessageSquare size={18} />
+          </span>
+          <div style={{ flex: 1 }}>
+            <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 17, color: 'var(--navy)', margin: 0 }}>
+              Service aanvragen
+            </h3>
+            <p style={{ fontSize: 13, color: 'var(--muted)', margin: '2px 0 0' }}>
+              Schoonmaak, onderhoud, transport of een reparatie nodig? Stuur een bericht — wij plannen het in.
+            </p>
+          </div>
+          {!creating && (
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => setCreating(true)}
+              style={{ flexShrink: 0 }}
+            >
+              <Plus size={14} aria-hidden /> Nieuwe aanvraag
+            </button>
+          )}
+        </div>
+
+        {creating && (
+          <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--line)', display: 'grid', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10 }}>
+              <label>
+                <span style={{ display: 'block', fontSize: 11, fontFamily: 'var(--sora)', textTransform: 'uppercase', letterSpacing: 1.2, color: 'var(--muted)', marginBottom: 4 }}>
+                  Type
+                </span>
+                <select
+                  value={draft.kind}
+                  onChange={(e) => setDraft({ ...draft, kind: e.target.value })}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: '1px solid var(--line)', fontSize: 14, background: '#fff' }}
+                >
+                  {REQUEST_KINDS.map((k) => (<option key={k.value} value={k.value}>{k.label}</option>))}
+                </select>
+              </label>
+              <label>
+                <span style={{ display: 'block', fontSize: 11, fontFamily: 'var(--sora)', textTransform: 'uppercase', letterSpacing: 1.2, color: 'var(--muted)', marginBottom: 4 }}>
+                  Voorkeur datum
+                </span>
+                <input
+                  type="date"
+                  value={draft.preferredDate}
+                  onChange={(e) => setDraft({ ...draft, preferredDate: e.target.value })}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: '1px solid var(--line)', fontSize: 14, background: '#fff' }}
+                />
+              </label>
+            </div>
+            <label>
+              <span style={{ display: 'block', fontSize: 11, fontFamily: 'var(--sora)', textTransform: 'uppercase', letterSpacing: 1.2, color: 'var(--muted)', marginBottom: 4 }}>
+                Korte titel
+              </span>
+              <input
+                value={draft.title}
+                onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                placeholder="Bv: jaarlijkse onderhoudsbeurt"
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: '1px solid var(--line)', fontSize: 14, background: '#fff' }}
+              />
+            </label>
+            <label>
+              <span style={{ display: 'block', fontSize: 11, fontFamily: 'var(--sora)', textTransform: 'uppercase', letterSpacing: 1.2, color: 'var(--muted)', marginBottom: 4 }}>
+                Toelichting
+              </span>
+              <textarea
+                rows={3}
+                value={draft.description}
+                onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+                placeholder="Wat moet er gebeuren? Eventueel aanvullende info."
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: '1px solid var(--line)', fontSize: 14, background: '#fff', resize: 'vertical' }}
+              />
+            </label>
+            {err && <p style={{ fontSize: 13, color: 'var(--red)', margin: 0 }}>{err}</p>}
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              <button type="button" className="btn btn-ghost" onClick={() => { setCreating(false); setErr(null); }}>
+                Annuleer
+              </button>
+              <button type="button" className="btn btn-primary" onClick={submit} disabled={saving}>
+                {saving ? <Loader2 size={14} className="animate-spin" aria-hidden /> : <Plus size={14} aria-hidden />} Versturen
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {items === null ? (
+        <div className="card-mk text-center" style={{ padding: 32 }}>
+          <Loader2 className="animate-spin" style={{ color: 'var(--muted)' }} />
+        </div>
+      ) : items.length === 0 ? (
+        <div className="card-mk text-center" style={{ padding: 32 }}>
+          <p style={{ fontSize: 14, color: 'var(--muted)', margin: 0 }}>
+            Nog geen aanvragen. Klik op &quot;Nieuwe aanvraag&quot; om er een te starten.
+          </p>
+        </div>
+      ) : (
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 10 }}>
+          {items.map((r) => {
+            const meta = statusMeta(r.status);
+            const kindLabel = REQUEST_KINDS.find((k) => k.value === r.kind)?.label || r.kind;
+            return (
+              <li key={r.id} className="card-mk" style={{ padding: 18 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                  <div style={{ flex: 1, minWidth: 200 }}>
+                    <div style={{ fontFamily: 'var(--sora)', fontWeight: 600, color: 'var(--navy)', fontSize: 15 }}>
+                      {r.title}
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>
+                      {kindLabel}
+                      {r.preferredDate ? ` · gewenst: ${new Date(r.preferredDate).toLocaleDateString('nl-NL')}` : ''}
+                      {' · '}ingediend {new Date(r.createdAt).toLocaleDateString('nl-NL')}
+                    </div>
+                  </div>
+                  <span
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 6,
+                      padding: '4px 10px', borderRadius: 999, fontSize: 12,
+                      fontFamily: 'var(--sora)', fontWeight: 600,
+                      background: 'rgba(0,0,0,0.04)', color: meta.color,
+                    }}
+                  >
+                    <meta.Icon size={12} aria-hidden /> {meta.label}
+                  </span>
+                </div>
+                {r.description && (
+                  <p style={{ fontSize: 13, color: 'var(--ink-2)', margin: '10px 0 0', lineHeight: 1.55 }}>
+                    {r.description}
+                  </p>
+                )}
+                {r.adminNote && (
+                  <div style={{ marginTop: 10, padding: 10, borderRadius: 8, background: 'var(--sky-soft)', fontSize: 13, color: 'var(--navy)' }}>
+                    <strong style={{ fontFamily: 'var(--sora)', fontWeight: 600 }}>Reactie van team:</strong> {r.adminNote}
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }

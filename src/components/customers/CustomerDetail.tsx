@@ -139,9 +139,11 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
   const [syncing, setSyncing] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [resettingPassword, setResettingPassword] = useState(false);
+  const [sendingWelcome, setSendingWelcome] = useState(false);
   // Resultaat van een wachtwoord-reset — toont een modal met het temp-
   // password zodat admin het kan kopiëren als de mail niet aankomt.
   const [resetResult, setResetResult] = useState<null | { tempPassword: string; mailSent: boolean; mailError: string | null; email: string }>(null);
+  const [welcomeResult, setWelcomeResult] = useState<null | { mailSent: boolean; mailError: string | null; email: string; setupUrl: string; expiresAt: string }>(null);
   const [copied, setCopied] = useState(false);
 
   // setFridges/setStalling/setTransports zijn intentioneel niet hot-reloading;
@@ -246,6 +248,39 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
     }
   };
 
+  const sendWelcomeMail = async () => {
+    if (!customer.email) {
+      toast.error('Klant heeft geen e-mailadres.');
+      return;
+    }
+    if (!confirm(`Welkomstmail versturen naar ${customer.email}? Klant kiest zelf zijn wachtwoord via een eenmalige link (14 dagen geldig).`)) {
+      return;
+    }
+    setSendingWelcome(true);
+    try {
+      const res = await fetch(`/api/admin/customers/${customer.id}/send-welcome`, {
+        method: 'POST', credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || 'Versturen mislukt');
+        return;
+      }
+      setWelcomeResult({
+        mailSent: data.mailSent,
+        mailError: data.mailError,
+        email: data.email,
+        setupUrl: data.setupUrl,
+        expiresAt: data.expiresAt,
+      });
+      setCopied(false);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Versturen mislukt');
+    } finally {
+      setSendingWelcome(false);
+    }
+  };
+
   const deleteCustomer = async () => {
     const res = await fetch(`/api/admin/customers/${customer.id}`, {
       method: 'DELETE', credentials: 'include',
@@ -297,6 +332,10 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
           </Button>
           <Button variant="secondary" onClick={syncToHolded} disabled={syncing}>
             <RefreshCw size={14} /> Push to Holded
+          </Button>
+          <Button variant="secondary" onClick={sendWelcomeMail} disabled={sendingWelcome || !customer.email}>
+            {sendingWelcome ? <Loader2 size={14} className="animate-spin" /> : <Mail size={14} />}
+            Stuur welkomstmail
           </Button>
           <Button variant="secondary" onClick={resetPortalPassword} disabled={resettingPassword || !customer.email}>
             {resettingPassword ? <Loader2 size={14} className="animate-spin" /> : <KeyRound size={14} />}
@@ -539,6 +578,77 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
 
             <div className="flex justify-end pt-2">
               <Button onClick={() => setResetResult(null)}>Klaar</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Welkomstmail-resultaat modal — toont de set-password-link zodat
+          admin 'm via een ander kanaal kan delen als de mail niet aankomt. */}
+      {welcomeResult && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.5)' }}
+          onClick={() => setWelcomeResult(null)}
+        >
+          <div
+            className="bg-bg border border-border rounded-[var(--radius-xl)] shadow-lg max-w-lg w-full p-6 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <h2 className="text-base font-medium text-text inline-flex items-center gap-2">
+                <Mail size={18} /> Welkomstmail klaar
+              </h2>
+              <button
+                type="button"
+                onClick={() => setWelcomeResult(null)}
+                className="text-text-muted hover:text-text"
+                aria-label="Sluiten"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <p className="text-[13px] text-text-muted">
+              Set-password-link voor <strong>{welcomeResult.email}</strong>. Geldig tot{' '}
+              <strong>{new Date(welcomeResult.expiresAt).toLocaleString('nl-NL')}</strong>.
+            </p>
+
+            <div className="rounded-[var(--radius-md)] bg-surface-2 border border-border p-3 flex items-center justify-between gap-3">
+              <code className="text-[12px] font-mono text-text break-all">
+                {welcomeResult.setupUrl}
+              </code>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  navigator.clipboard.writeText(welcomeResult.setupUrl);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+              >
+                {copied ? <Check size={13} /> : <Copy size={13} />}
+                {copied ? 'Gekopieerd' : 'Kopiëren'}
+              </Button>
+            </div>
+
+            {welcomeResult.mailSent ? (
+              <div className="flex items-start gap-2 rounded-[var(--radius-md)] px-3 py-2.5 text-[12px] bg-success-soft text-success">
+                <Mail size={13} className="mt-0.5 shrink-0" />
+                <span>Welkomstmail verstuurd naar {welcomeResult.email}.</span>
+              </div>
+            ) : (
+              <div className="flex items-start gap-2 rounded-[var(--radius-md)] px-3 py-2.5 text-[12px] bg-warning-soft text-warning">
+                <AlertTriangle size={13} className="mt-0.5 shrink-0" />
+                <span>
+                  Mail niet verstuurd{welcomeResult.mailError ? ` (${welcomeResult.mailError})` : ''}.
+                  Deel de link via WhatsApp of bel de klant.
+                </span>
+              </div>
+            )}
+
+            <div className="flex justify-end pt-2">
+              <Button onClick={() => setWelcomeResult(null)}>Klaar</Button>
             </div>
           </div>
         </div>

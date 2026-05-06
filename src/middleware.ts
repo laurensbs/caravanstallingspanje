@@ -69,6 +69,7 @@ export async function middleware(request: NextRequest) {
   if (
     pathname.startsWith('/account')
     && !pathname.startsWith('/account/login')
+    && !pathname.startsWith('/account/welkom')
     && !pathname.startsWith('/account/wachtwoord-wijzigen')
   ) {
     const token = request.cookies.get('customer_token')?.value;
@@ -88,6 +89,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/api/account')
     && !pathname.startsWith('/api/account/login')
     && !pathname.startsWith('/api/account/logout')
+    && !pathname.startsWith('/api/account/welcome-password')
   ) {
     const token = request.cookies.get('customer_token')?.value;
     const session = token ? await verifyCustomerToken(token) : null;
