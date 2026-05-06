@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Menu, X, ShieldCheck, Wrench, Sparkles, ClipboardCheck, Truck,
-  Snowflake, Tag, Recycle, ArrowRight, Phone, Mail, MapPin,
+  Snowflake, Tag, Recycle, ArrowRight, Phone, Mail, MapPin, Heart,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import LocaleSwitch from './LocaleSwitch';
@@ -47,6 +47,7 @@ const MEGA_WORKSHOP: MegaItem[] = [
 ];
 
 const MEGA_RENTAL: MegaItem[] = [
+  { href: '/caravan-huren', icon: Heart, titleKey: 'nav.rent', subKey: 'nav.rent-sub' },
   { href: '/koelkast', icon: Snowflake, titleKey: 'home1.svc-6-title', subKey: 'home1.svc-6-desc' },
   { href: '/aangesloten-campings', icon: MapPin, titleKey: 'nav.campings', subKey: 'nav.campings-sub' },
   { href: '/verkoop', icon: Tag, titleKey: 'home1.svc-7-title', subKey: 'home1.svc-7-desc' },

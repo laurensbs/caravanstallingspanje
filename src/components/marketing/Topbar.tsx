@@ -1,13 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { Phone, Mail, MessageCircle } from 'lucide-react';
+import { Phone, Mail, MessageCircle, MapPin } from 'lucide-react';
 import LocaleSwitch from '../LocaleSwitch';
 import { useLocale } from '../LocaleProvider';
 
 // Smalle navy-deep info-strip boven de hoofd-nav (mockup p01-21).
-// Mobiel-eerst: alleen live-pulse + WhatsApp + telefoon. Op desktop ook
-// e-mail + taalswitch + login.
+// Links: locatie. Rechts: WhatsApp + telefoon (icons-only op mobiel),
+// e-mail + taalswitch + login op desktop.
 
 const WHATSAPP_HREF =
   'https://wa.me/34633778699?text=' +
@@ -18,10 +18,8 @@ export default function Topbar() {
   return (
     <div className="brand-topbar">
       <div className="tb-left">
-        <span className="live">
-          <span className="pulse" aria-hidden />
-          <span className="live-full">{t('topbar.live')}</span>
-          <span className="live-short" aria-hidden>4 plekken vrij</span>
+        <span className="tb-location" aria-hidden>
+          <MapPin size={12} /> Costa Brava · Sant Climent de Peralta
         </span>
       </div>
       <div className="tb-right">

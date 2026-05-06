@@ -12,6 +12,7 @@ type FooterLink = { href: string; label: StringKey; external?: boolean };
 
 const SERVICES: FooterLink[] = [
   { href: '/diensten/stalling', label: 'footer.svc-storage' },
+  { href: '/caravan-huren', label: 'footer.svc-rent' },
   { href: '/koelkast', label: 'footer.svc-fridge' },
   { href: '/diensten/airco', label: 'footer.svc-airco' },
   { href: '/diensten/transport', label: 'footer.svc-transport' },

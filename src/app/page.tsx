@@ -5,13 +5,12 @@ import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   Phone, ArrowRight, ShieldCheck, Wrench as WrenchIcon, Truck, Sparkles,
-  Snowflake, ClipboardCheck, Tag, Recycle, Users, Lock, MapPin, MessageSquare,
+  Snowflake, ClipboardCheck, Tag, Heart, Users, Lock, MapPin, MessageSquare,
 } from 'lucide-react';
 import { useLocale } from '@/components/LocaleProvider';
 import Topbar from '@/components/marketing/Topbar';
 import PublicHeader from '@/components/PublicHeader';
 import PublicFooter from '@/components/PublicFooter';
-import ScarcityBar from '@/components/marketing/ScarcityBar';
 import type { StringKey } from '@/lib/i18n';
 import type { LucideIcon } from 'lucide-react';
 
@@ -25,7 +24,6 @@ export default function HomePage() {
     <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
       <Topbar />
       <PublicHeader />
-      <ScarcityBar />
 
       <main id="main" className="flex-1">
         <Hero t={t} />
@@ -195,7 +193,7 @@ function Services({ t }: { t: T }) {
     { icon: Truck, titleKey: 'home1.svc-5-title', descKey: 'home1.svc-5-desc', href: '/diensten/transport' },
     { icon: Snowflake, titleKey: 'home1.svc-6-title', descKey: 'home1.svc-6-desc', href: '/koelkast' },
     { icon: Tag, titleKey: 'home1.svc-7-title', descKey: 'home1.svc-7-desc', href: '/verkoop' },
-    { icon: Recycle, titleKey: 'home1.svc-8-title', descKey: 'home1.svc-8-desc', href: '/verkoop#inkoop' },
+    { icon: Heart, titleKey: 'home1.svc-9-title', descKey: 'home1.svc-9-desc', href: '/caravan-huren' },
   ];
   return (
     <section className="py-16 sm:py-20 section-bg-grey">

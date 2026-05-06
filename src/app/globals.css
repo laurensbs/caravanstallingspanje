@@ -1889,6 +1889,14 @@ a.card-mk:hover, button.card-mk:hover, .card-mk.is-clickable:hover {
 }
 .brand-topbar a:hover { color: #fff; }
 .brand-topbar a.tb-login { color: #fff; }
+.brand-topbar .tb-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--inter);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+}
 .brand-topbar a.tb-whatsapp {
   background: rgba(37, 211, 102, 0.14);
   color: #6EE7A8;
@@ -2505,13 +2513,8 @@ a.card-mk:hover, button.card-mk:hover, .card-mk.is-clickable:hover {
   .brand-topbar a.tb-whatsapp {
     padding: 5px 7px;
   }
-  /* live-pulse compacter — alleen "4 plekken vrij" ipv full */
-  .brand-topbar .live {
-    font-size: 11px;
-    gap: 6px;
-  }
-  .brand-topbar .live .live-full { display: none; }
-  .brand-topbar .live .live-short { display: inline; }
+  /* Locatie hide op mobiel — telefoon/whatsapp belangrijker */
+  .brand-topbar .tb-location { display: none; }
 
   /* Megamenu uit op mobiel — daarvoor is de slide-in drawer */
   .megamenu-wrap { display: none !important; }
