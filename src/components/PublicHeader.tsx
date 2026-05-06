@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Menu, X, ShieldCheck, Wrench, Sparkles, ClipboardCheck, Truck,
-  Snowflake, Tag, Recycle, ArrowRight,
+  Snowflake, Tag, Recycle, ArrowRight, Phone, Mail,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import LocaleSwitch from './LocaleSwitch';
@@ -180,74 +180,123 @@ export default function PublicHeader({}: PublicHeaderProps = {}) {
 
       <AnimatePresence>
         {menuOpen && (
-          <motion.div
-            id="mobile-menu"
-            ref={menuRef}
-            role="dialog"
-            aria-modal="true"
-            aria-label={t('nav.menu-open')}
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="brand-mobile-panel"
-            style={{
-              background: '#fff',
-              borderBottom: '1px solid var(--line)',
-              padding: '14px 18px',
-            }}
-          >
-            <nav aria-label="Mobiel navigatie-menu">
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {[...NAV_LEFT, { href: '/diensten', labelKey: 'nav.services' as StringKey }, ...NAV_RIGHT].map((link) => {
-                  const active = isActive(link.href);
-                  return (
-                    <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        style={{
-                          display: 'block',
-                          padding: '12px 10px',
-                          borderRadius: 8,
-                          fontFamily: 'var(--inter)',
-                          fontWeight: active ? 600 : 500,
-                          color: active ? 'var(--navy)' : 'var(--ink-2)',
-                          background: active ? 'rgba(149,216,253,0.18)' : 'transparent',
-                          textDecoration: 'none',
-                          fontSize: 15,
-                        }}
-                      >
-                        {t(link.labelKey)}
-                      </Link>
-                    </li>
-                  );
-                })}
-                <li>
-                  <Link
-                    href="/account/login"
-                    style={{
-                      display: 'block',
-                      padding: '12px 10px',
-                      borderRadius: 8,
-                      fontFamily: 'var(--inter)',
-                      fontWeight: 500,
-                      color: 'var(--ink-2)',
-                      textDecoration: 'none',
-                      fontSize: 15,
-                    }}
-                  >
-                    {t('nav.login')}
-                  </Link>
-                </li>
-              </ul>
-              <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid var(--line)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-                <LocaleSwitch />
-                <Link href="/reserveren/configurator" className="btn btn-primary">
-                  {t('nav.cta-pickup')}
+          <>
+            {/* Backdrop */}
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setMenuOpen(false)}
+              aria-hidden
+              className="mobile-menu-backdrop"
+            />
+            {/* Drawer */}
+            <motion.div
+              key="drawer"
+              id="mobile-menu"
+              ref={menuRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label={t('nav.menu-open')}
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              className="mobile-menu-drawer"
+            >
+              {/* Drawer header */}
+              <div className="mobile-menu-head">
+                <Image
+                  src="/images/logo.png"
+                  alt="Caravanstalling Spanje"
+                  width={420}
+                  height={95}
+                  style={{ height: 28, width: 'auto', filter: 'drop-shadow(0 0 14px rgba(255,255,255,0.10))' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setMenuOpen(false)}
+                  aria-label={t('nav.menu-close')}
+                  className="mobile-menu-close"
+                >
+                  <X size={20} aria-hidden />
+                </button>
+              </div>
+
+              {/* CTA boven — primair */}
+              <div className="mobile-menu-cta">
+                <Link href="/reserveren/configurator" className="btn btn-primary btn-block">
+                  {t('nav.cta-pickup')} <ArrowRight size={15} aria-hidden />
                 </Link>
               </div>
-            </nav>
-          </motion.div>
+
+              <nav aria-label="Mobiel navigatie-menu" className="mobile-menu-nav">
+                {/* Hoofdnavigatie */}
+                <div className="mobile-menu-section">
+                  <span className="mobile-menu-eyebrow">Pagina&apos;s</span>
+                  <ul>
+                    {[...NAV_LEFT, { href: '/diensten', labelKey: 'nav.services' as StringKey }, ...NAV_RIGHT].map((link) => {
+                      const active = isActive(link.href);
+                      return (
+                        <li key={link.href}>
+                          <Link
+                            href={link.href}
+                            className={active ? 'mobile-menu-link active' : 'mobile-menu-link'}
+                          >
+                            {t(link.labelKey)}
+                            <ArrowRight size={14} aria-hidden className="arrow" />
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+
+                {/* Diensten quick-grid */}
+                <div className="mobile-menu-section">
+                  <span className="mobile-menu-eyebrow">Snel naar</span>
+                  <div className="mobile-menu-grid">
+                    {[...MEGA_STORAGE, ...MEGA_WORKSHOP, ...MEGA_RENTAL].slice(0, 6).map(({ icon: Icon, href, titleKey }) => (
+                      <Link key={href} href={href} className="mobile-menu-tile">
+                        <span className="ic"><Icon size={16} aria-hidden /></span>
+                        <span className="ttl">{t(titleKey)}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Account + locale */}
+                <div className="mobile-menu-section">
+                  <span className="mobile-menu-eyebrow">Account</span>
+                  <ul>
+                    <li>
+                      <Link href="/account/login" className="mobile-menu-link">
+                        {t('nav.login')}
+                        <ArrowRight size={14} aria-hidden className="arrow" />
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
+              </nav>
+
+              {/* Footer-strook met contact + taal */}
+              <div className="mobile-menu-foot">
+                <div className="mobile-menu-contact">
+                  <a href="tel:+34633778699" className="mobile-menu-contact-item">
+                    <Phone size={14} aria-hidden /> +34 633 77 86 99
+                  </a>
+                  <a href="mailto:info@caravanstalling-spanje.com" className="mobile-menu-contact-item">
+                    <Mail size={14} aria-hidden /> info@caravanstalling-spanje.com
+                  </a>
+                </div>
+                <div className="mobile-menu-locale">
+                  <LocaleSwitch variant="dark" />
+                </div>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>
