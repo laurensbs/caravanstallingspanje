@@ -13,9 +13,12 @@ const nextConfig: NextConfig = {
 
   images: {
     remotePatterns: [
-      // Tijdelijke foto-host voor brand-fotografie van de stalling.
-      // Vervangen wanneer we eigen CDN/Vercel-blob gebruiken.
+      // Brand-fotografie + camping-foto's geüpload door admin
       { protocol: 'https', hostname: 'u.cubeupload.com' },
+      // Caravanverhuur sister-site host (eigen camping-foto's)
+      { protocol: 'https', hostname: 'caravanverhuurspanje.com' },
+      // Wikimedia Commons (locatie-foto's voor bestemmingen)
+      { protocol: 'https', hostname: 'upload.wikimedia.org' },
     ],
     // AVIF + WebP waar mogelijk; ~30% kleiner dan PNG/JPG.
     formats: ['image/avif', 'image/webp'],
