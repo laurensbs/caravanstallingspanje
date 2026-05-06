@@ -47,7 +47,7 @@ export default function PublicFooter() {
               alt="Caravanstalling Spanje"
               width={420}
               height={95}
-              style={{ height: 36, width: 'auto', filter: 'drop-shadow(0 0 14px rgba(255,255,255,0.10))' }}
+              style={{ height: 52, width: 'auto', filter: 'drop-shadow(0 0 14px rgba(255,255,255,0.10))' }}
             />
           </Link>
           <p>{t('footer.tagline')}</p>

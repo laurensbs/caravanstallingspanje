@@ -171,6 +171,12 @@ export default function PlanningPage() {
             >
               <ChevronRight size={15} />
             </button>
+            <a
+              href="/admin/planning/agenda"
+              className="px-3 h-9 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-[var(--radius-md)] border border-border bg-surface hover:border-border-strong transition-colors"
+            >
+              <Calendar size={13} /> Google-agenda
+            </a>
           </div>
         }
       />

@@ -111,7 +111,7 @@ export default function PublicHeader({}: PublicHeaderProps = {}) {
             width={420}
             height={95}
             priority
-            style={{ height: 36, width: 'auto', filter: 'drop-shadow(0 0 14px rgba(255,255,255,0.10))' }}
+            style={{ height: 56, width: 'auto', filter: 'drop-shadow(0 0 14px rgba(255,255,255,0.10))' }}
           />
         </Link>
 
@@ -236,7 +236,7 @@ export default function PublicHeader({}: PublicHeaderProps = {}) {
                   alt="Caravanstalling Spanje"
                   width={420}
                   height={95}
-                  style={{ height: 28, width: 'auto', filter: 'drop-shadow(0 0 14px rgba(255,255,255,0.10))' }}
+                  style={{ height: 40, width: 'auto', filter: 'drop-shadow(0 0 14px rgba(255,255,255,0.10))' }}
                 />
                 <button
                   type="button"

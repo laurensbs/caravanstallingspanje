@@ -156,6 +156,32 @@ export async function initDatabase() {
   await sql`CREATE INDEX IF NOT EXISTS idx_transport_requests_created ON transport_requests(created_at DESC)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_transport_requests_date ON transport_requests(preferred_date)`;
 
+  // Google Calendar cache. Cron pulled de Google-agenda elk uur en
+  // upserted de events hier. Admin kan vervolgens een event aan een
+  // transport-aanvraag koppelen (transport_request_id) zodat de planning
+  // overzicht uit ons systeem gaat — niet meer uit een externe agenda.
+  await sql`CREATE TABLE IF NOT EXISTS calendar_events (
+    id SERIAL PRIMARY KEY,
+    google_event_id TEXT NOT NULL UNIQUE,
+    calendar_id TEXT NOT NULL,
+    summary TEXT,
+    description TEXT,
+    location TEXT,
+    start_time TIMESTAMPTZ,
+    end_time TIMESTAMPTZ,
+    all_day BOOLEAN DEFAULT FALSE,
+    status TEXT,
+    html_link TEXT,
+    creator_email TEXT,
+    transport_request_id INTEGER REFERENCES transport_requests(id) ON DELETE SET NULL,
+    raw JSONB,
+    last_synced_at TIMESTAMPTZ DEFAULT NOW(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+  )`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_calendar_events_start ON calendar_events(start_time)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_calendar_events_transport ON calendar_events(transport_request_id) WHERE transport_request_id IS NOT NULL`;
+
   await sql`CREATE TABLE IF NOT EXISTS stalling_requests (
     id SERIAL PRIMARY KEY,
     type TEXT NOT NULL,
@@ -1106,6 +1132,88 @@ export async function updateTransportRequestStatus(id: number, status: string) {
 
 export async function deleteTransportRequest(id: number) {
   await sql`DELETE FROM transport_requests WHERE id = ${id}`;
+}
+
+// ─── Google Calendar events (gecached uit Google) ───
+export type CalendarEventRow = {
+  id: number;
+  google_event_id: string;
+  calendar_id: string;
+  summary: string | null;
+  description: string | null;
+  location: string | null;
+  start_time: string | null;
+  end_time: string | null;
+  all_day: boolean;
+  status: string | null;
+  html_link: string | null;
+  creator_email: string | null;
+  transport_request_id: number | null;
+  raw: Record<string, unknown> | null;
+  last_synced_at: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export async function upsertCalendarEvent(data: {
+  google_event_id: string;
+  calendar_id: string;
+  summary: string | null;
+  description: string | null;
+  location: string | null;
+  start_time: string | null;
+  end_time: string | null;
+  all_day: boolean;
+  status: string | null;
+  html_link: string | null;
+  creator_email: string | null;
+  raw: Record<string, unknown>;
+}): Promise<CalendarEventRow> {
+  const rows = await sql`
+    INSERT INTO calendar_events (
+      google_event_id, calendar_id, summary, description, location,
+      start_time, end_time, all_day, status, html_link, creator_email, raw
+    ) VALUES (
+      ${data.google_event_id}, ${data.calendar_id}, ${data.summary}, ${data.description},
+      ${data.location}, ${data.start_time}, ${data.end_time}, ${data.all_day},
+      ${data.status}, ${data.html_link}, ${data.creator_email}, ${JSON.stringify(data.raw)}::jsonb
+    )
+    ON CONFLICT (google_event_id) DO UPDATE SET
+      calendar_id = EXCLUDED.calendar_id,
+      summary = EXCLUDED.summary,
+      description = EXCLUDED.description,
+      location = EXCLUDED.location,
+      start_time = EXCLUDED.start_time,
+      end_time = EXCLUDED.end_time,
+      all_day = EXCLUDED.all_day,
+      status = EXCLUDED.status,
+      html_link = EXCLUDED.html_link,
+      creator_email = EXCLUDED.creator_email,
+      raw = EXCLUDED.raw,
+      last_synced_at = NOW(),
+      updated_at = NOW()
+    RETURNING *` as unknown as CalendarEventRow[];
+  return rows[0];
+}
+
+export async function deleteCalendarEvent(googleEventId: string) {
+  await sql`DELETE FROM calendar_events WHERE google_event_id = ${googleEventId}`;
+}
+
+export async function listCalendarEvents(opts: { from?: string; to?: string; limit?: number } = {}): Promise<CalendarEventRow[]> {
+  const limit = opts.limit ?? 200;
+  if (opts.from && opts.to) {
+    return sql`SELECT * FROM calendar_events
+      WHERE start_time >= ${opts.from}::timestamptz AND start_time < ${opts.to}::timestamptz
+      ORDER BY start_time ASC LIMIT ${limit}` as unknown as Promise<CalendarEventRow[]>;
+  }
+  return sql`SELECT * FROM calendar_events ORDER BY start_time DESC LIMIT ${limit}` as unknown as Promise<CalendarEventRow[]>;
+}
+
+export async function linkCalendarEventToTransport(eventId: number, transportRequestId: number | null) {
+  await sql`UPDATE calendar_events
+    SET transport_request_id = ${transportRequestId}, updated_at = NOW()
+    WHERE id = ${eventId}`;
 }
 
 // ─── Stalling requests (lokaal, niet doorgestuurd) ───
