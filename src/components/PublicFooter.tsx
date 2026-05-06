@@ -56,6 +56,21 @@ export default function PublicFooter() {
             17110 Sant Climent de Peralta<br />
             Girona, Spain
           </p>
+          <div style={{ marginTop: 18, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.10)' }}>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', margin: '0 0 8px', letterSpacing: 0.4, textTransform: 'uppercase', fontFamily: 'var(--sora)', fontWeight: 600 }}>
+              Zustersite
+            </p>
+            <a href="https://caravanverhuurspanje.com" target="_blank" rel="noopener noreferrer" className="inline-block">
+              <Image
+                src="https://u.cubeupload.com/laurensbos/12aCaravanverhuur2.png"
+                alt="Caravanverhuur Costa Brava"
+                width={400}
+                height={160}
+                style={{ height: 32, width: 'auto', filter: 'brightness(0) invert(1) opacity(0.8)' }}
+                unoptimized
+              />
+            </a>
+          </div>
         </div>
 
         <div>

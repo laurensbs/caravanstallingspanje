@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight, Phone, ShieldCheck, Wrench, Truck, Sparkles, ClipboardCheck,
@@ -41,6 +42,7 @@ export default function DienstenClient(props: DienstenClientProps) {
         <Hero t={t} />
         <Specialties t={t} services={props} />
         <MoreServices t={t} />
+        <SisterSite t={t} />
         <Combos t={t} />
         <CtaBand t={t} />
       </main>
@@ -231,6 +233,65 @@ function MoreServices({ t }: { t: T }) {
               <span className="more">{t('svc1.combo-cta')}</span>
             </Link>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── SISTER SITE — caravanverhuurspanje.com ─────────
+function SisterSite({ t }: { t: T }) {
+  void t;
+  return (
+    <section className="py-16 sm:py-20">
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-10">
+        <div
+          className="card-mk"
+          style={{
+            padding: 0,
+            overflow: 'hidden',
+            background: 'linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%)',
+            border: '1px solid rgba(255,255,255,0.10)',
+          }}
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-0 items-stretch">
+            <div style={{ padding: '40px 36px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <span className="eyebrow-mk on-navy">Zustersite</span>
+              <Image
+                src="https://u.cubeupload.com/laurensbos/12aCaravanverhuur2.png"
+                alt="Caravanverhuur Costa Brava"
+                width={400}
+                height={160}
+                style={{ height: 48, width: 'auto', marginTop: 10, filter: 'brightness(0) invert(1)' }}
+                unoptimized
+              />
+              <p style={{ marginTop: 18, color: 'rgba(255,255,255,0.82)', fontSize: 15, lineHeight: 1.6 }}>
+                Geen eigen caravan? Huur er één bij onze zustersite. Volledig uitgeruste caravans op vaste plekken, met onze service en transport inbegrepen.
+              </p>
+              <div style={{ marginTop: 22, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                <Link href="/caravan-huren" className="btn btn-primary">
+                  Bekijk verhuur <ArrowRight size={15} aria-hidden />
+                </Link>
+                <a
+                  href="https://caravanverhuurspanje.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-ghost-light"
+                >
+                  caravanverhuurspanje.com
+                </a>
+              </div>
+            </div>
+            <div style={{ position: 'relative', minHeight: 280 }}>
+              <Image
+                src="/images/caravanverhuur/hero.jpg"
+                alt="Caravan-verhuur op de Costa Brava"
+                fill
+                sizes="(max-width: 1024px) 100vw, 600px"
+                style={{ objectFit: 'cover' }}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </section>
