@@ -100,28 +100,18 @@ function Hero() {
       {/* Hero-content */}
       <div className="relative max-w-[1200px] mx-auto px-5 sm:px-10 py-12 sm:py-20 w-full" style={{ zIndex: 1 }}>
         <div className="max-w-[720px]">
-          <motion.div
-            {...fade(0)}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 10,
-              padding: '8px 14px',
-              background: 'rgba(255, 255, 255, 0.92)',
-              borderRadius: 999,
-              marginBottom: 18,
-              boxShadow: '0 8px 24px -10px rgba(0, 0, 0, 0.4)',
-            }}
-          >
+          <motion.div {...fade(0)} style={{ marginBottom: 22 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={VERHUUR_LOGO}
-              alt="Caravanverhuur Spanje logo"
-              style={{ height: 22, width: 'auto', objectFit: 'contain' }}
+              alt="Caravanverhuur Spanje"
+              style={{
+                height: 'clamp(64px, 9vw, 100px)',
+                width: 'auto',
+                objectFit: 'contain',
+                filter: 'brightness(0) invert(1) drop-shadow(0 4px 16px rgba(0, 0, 0, 0.4))',
+              }}
             />
-            <span style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 11, color: 'var(--muted)', letterSpacing: 0.6 }}>
-              ZUSTERSITE
-            </span>
           </motion.div>
 
           <motion.span {...fade(0.06)} className="eyebrow-mk on-navy">
