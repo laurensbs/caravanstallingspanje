@@ -286,6 +286,74 @@ export default function AircoPage() {
     </>
   );
 
+  const preForm = (
+    <div className="flex flex-wrap gap-3">
+      <span className="spec-chip">
+        <span className="v">{formatEur(aircoWeekPrice)}</span>
+        <span className="l">Per week</span>
+      </span>
+      <span className="spec-chip">
+        <span className="v">≥ 7</span>
+        <span className="l">Dagen min.</span>
+      </span>
+      <span className="spec-chip">
+        <span className="v">230V</span>
+        <span className="l">Standaard stekker</span>
+      </span>
+      <span className="spec-chip">
+        <span className="v">Stil</span>
+        <span className="l">Slaapkamer-modus</span>
+      </span>
+    </div>
+  );
+
+  const aside = (
+    <div className="space-y-4">
+      <div className="card-mk" style={{ padding: 22 }}>
+        <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 11, letterSpacing: 2.4, textTransform: 'uppercase', color: 'var(--muted)', margin: '0 0 12px' }}>
+          Wat krijg je?
+        </h3>
+        <ul className="checklist-mk">
+          <li><span className="v" aria-hidden /><span>Mobiele airco-unit, bezorgd op je staanplaats</span></li>
+          <li><span className="v" aria-hidden /><span>Compleet met afvoerslang en raamkit</span></li>
+          <li><span className="v" aria-hidden /><span>230V — direct aansluiten</span></li>
+          <li><span className="v" aria-hidden /><span>Ophalen aan einde verhuur</span></li>
+        </ul>
+      </div>
+
+      <div className="card-mk" style={{ padding: 22 }}>
+        <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 11, letterSpacing: 2.4, textTransform: 'uppercase', color: 'var(--muted)', margin: '0 0 14px' }}>
+          Zo werkt het
+        </h3>
+        <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {[
+            { n: 1, t: 'Kies periode + camping' },
+            { n: 2, t: 'Vul je gegevens in' },
+            { n: 3, t: 'Betaal veilig via Stripe' },
+            { n: 4, t: 'Wij bezorgen op je staanplaats' },
+          ].map((s) => (
+            <li key={s.n} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+              <span
+                aria-hidden
+                style={{
+                  width: 26, height: 26, borderRadius: 999,
+                  background: 'var(--sky-soft)', color: 'var(--navy)',
+                  display: 'grid', placeItems: 'center', flexShrink: 0,
+                  fontFamily: 'var(--sora)', fontWeight: 700, fontSize: 12,
+                }}
+              >
+                {s.n}
+              </span>
+              <span style={{ fontSize: 13.5, color: 'var(--ink-2)', lineHeight: 1.5, paddingTop: 4 }}>
+                {s.t}
+              </span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  );
+
   return (
     <MultiStepShell
       title={t('airco.heading')}
@@ -307,6 +375,8 @@ export default function AircoPage() {
       errorTrigger={shakeTick}
       done={false}
       paid
+      preForm={preForm}
+      aside={aside}
     />
   );
 }

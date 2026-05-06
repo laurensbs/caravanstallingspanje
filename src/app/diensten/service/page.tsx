@@ -143,6 +143,70 @@ export default function ServicePage() {
     </>
   );
 
+  const preForm = (
+    <div className="flex flex-wrap gap-3">
+      <span className="spec-chip">
+        <span className="v">{catalog?.length || '—'}</span>
+        <span className="l">Beschikbare diensten</span>
+      </span>
+      <span className="spec-chip">
+        <span className="v">Eigen werkplaats</span>
+        <span className="l">Geen externe partijen</span>
+      </span>
+      <span className="spec-chip">
+        <span className="v">PDF-rapport</span>
+        <span className="l">Foto&apos;s vóór + na</span>
+      </span>
+    </div>
+  );
+
+  const aside = (
+    <div className="space-y-4">
+      <div className="card-mk" style={{ padding: 22 }}>
+        <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 11, letterSpacing: 2.4, textTransform: 'uppercase', color: 'var(--muted)', margin: '0 0 12px' }}>
+          Wat krijg je?
+        </h3>
+        <ul className="checklist-mk">
+          <li><span className="v" aria-hidden /><span>Eigen monteurs in onze 850 m² werkplaats</span></li>
+          <li><span className="v" aria-hidden /><span>Foto-rapport vóór en na</span></li>
+          <li><span className="v" aria-hidden /><span>Vaste prijs per dienst — geen verrassingen</span></li>
+          <li><span className="v" aria-hidden /><span>Klaar tussen 1–5 werkdagen</span></li>
+        </ul>
+      </div>
+
+      <div className="card-mk" style={{ padding: 22 }}>
+        <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 11, letterSpacing: 2.4, textTransform: 'uppercase', color: 'var(--muted)', margin: '0 0 14px' }}>
+          Zo werkt het
+        </h3>
+        <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {[
+            { n: 1, t: 'Kies de dienst die je wil' },
+            { n: 2, t: 'Vul je gegevens in' },
+            { n: 3, t: 'Betaal veilig via Stripe' },
+            { n: 4, t: 'Wij plannen + leveren rapport' },
+          ].map((s) => (
+            <li key={s.n} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+              <span
+                aria-hidden
+                style={{
+                  width: 26, height: 26, borderRadius: 999,
+                  background: 'var(--sky-soft)', color: 'var(--navy)',
+                  display: 'grid', placeItems: 'center', flexShrink: 0,
+                  fontFamily: 'var(--sora)', fontWeight: 700, fontSize: 12,
+                }}
+              >
+                {s.n}
+              </span>
+              <span style={{ fontSize: 13.5, color: 'var(--ink-2)', lineHeight: 1.5, paddingTop: 4 }}>
+                {s.t}
+              </span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  );
+
   return (
     <MultiStepShell
       paid
@@ -165,6 +229,8 @@ export default function ServicePage() {
       errorTrigger={shakeTick}
       done={done}
       doneTitle={t('service.done-title')}
+      preForm={preForm}
+      aside={aside}
     />
   );
 }

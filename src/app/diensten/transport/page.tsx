@@ -250,6 +250,70 @@ export default function TransportPage() {
     </>
   );
 
+  const preForm = (
+    <div className="flex flex-wrap gap-3">
+      <span className="spec-chip">
+        <span className="v">{formatEur(prices.wij_rijden)}</span>
+        <span className="l">Wij halen op</span>
+      </span>
+      <span className="spec-chip">
+        <span className="v">{formatEur(prices.zelf)}</span>
+        <span className="l">Zelf ophalen</span>
+      </span>
+      <span className="spec-chip">
+        <span className="v">Heen + terug</span>
+        <span className="l">In één boeking</span>
+      </span>
+    </div>
+  );
+
+  const aside = (
+    <div className="space-y-4">
+      <div className="card-mk" style={{ padding: 22 }}>
+        <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 11, letterSpacing: 2.4, textTransform: 'uppercase', color: 'var(--muted)', margin: '0 0 12px' }}>
+          Wat we regelen
+        </h3>
+        <ul className="checklist-mk">
+          <li><span className="v" aria-hidden /><span>Eigen vrachtwagens en vaste chauffeurs</span></li>
+          <li><span className="v" aria-hidden /><span>Sleuteloverdracht — geen gedoe op de camping</span></li>
+          <li><span className="v" aria-hidden /><span>Verzekerd transport (alle merken)</span></li>
+          <li><span className="v" aria-hidden /><span>Heen en terug binnen één afspraak</span></li>
+        </ul>
+      </div>
+
+      <div className="card-mk" style={{ padding: 22 }}>
+        <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 11, letterSpacing: 2.4, textTransform: 'uppercase', color: 'var(--muted)', margin: '0 0 14px' }}>
+          Hoe het werkt
+        </h3>
+        <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {[
+            { n: 1, t: 'Kies optie + camping + datums' },
+            { n: 2, t: 'Vul je gegevens in' },
+            { n: 3, t: 'Betaal via Stripe' },
+            { n: 4, t: 'Wij bevestigen tijdslot' },
+          ].map((s) => (
+            <li key={s.n} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+              <span
+                aria-hidden
+                style={{
+                  width: 26, height: 26, borderRadius: 999,
+                  background: 'var(--sky-soft)', color: 'var(--navy)',
+                  display: 'grid', placeItems: 'center', flexShrink: 0,
+                  fontFamily: 'var(--sora)', fontWeight: 700, fontSize: 12,
+                }}
+              >
+                {s.n}
+              </span>
+              <span style={{ fontSize: 13.5, color: 'var(--ink-2)', lineHeight: 1.5, paddingTop: 4 }}>
+                {s.t}
+              </span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  );
+
   return (
     <MultiStepShell
       paid
@@ -272,6 +336,8 @@ export default function TransportPage() {
       errorTrigger={shakeTick}
       done={done}
       publicCode={publicCode}
+      preForm={preForm}
+      aside={aside}
     />
   );
 }

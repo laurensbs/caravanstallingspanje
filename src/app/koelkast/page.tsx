@@ -501,6 +501,98 @@ export default function KoelkastBestelPagina() {
     </>
   );
 
+  // Sky-soft features-strook met spec-chips boven de form
+  const preForm = (
+    <div className="flex flex-wrap gap-3">
+      <span className="spec-chip">
+        <span className="v">{formatEur(livePrices['Grote koelkast'])}</span>
+        <span className="l">Grote koelkast / wk</span>
+      </span>
+      <span className="spec-chip">
+        <span className="v">{formatEur(livePrices['Tafelmodel koelkast'])}</span>
+        <span className="l">Tafelmodel / wk</span>
+      </span>
+      <span className="spec-chip">
+        <span className="v">≥ 7</span>
+        <span className="l">Dagen min.</span>
+      </span>
+      <span className="spec-chip">
+        <span className="v">Bezorgd</span>
+        <span className="l">Op je staanplaats</span>
+      </span>
+    </div>
+  );
+
+  // Sticky aside: wat krijg je + zo werkt het
+  const aside = (
+    <div className="space-y-4">
+      <div className="card-mk" style={{ padding: 22 }}>
+        <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 11, letterSpacing: 2.4, textTransform: 'uppercase', color: 'var(--muted)', margin: '0 0 12px' }}>
+          Wat krijg je?
+        </h3>
+        <ul className="checklist-mk">
+          <li><span className="v" aria-hidden /><span>Bezorgd én geïnstalleerd op je staanplaats</span></li>
+          <li><span className="v" aria-hidden /><span>Compleet werkend, getest vóór levering</span></li>
+          <li><span className="v" aria-hidden /><span>Eenvoudige kabelsetup — direct aansluiten</span></li>
+          <li><span className="v" aria-hidden /><span>Ophalen aan einde verhuur</span></li>
+        </ul>
+      </div>
+
+      <div className="card-mk" style={{ padding: 22 }}>
+        <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 11, letterSpacing: 2.4, textTransform: 'uppercase', color: 'var(--muted)', margin: '0 0 14px' }}>
+          Zo werkt het
+        </h3>
+        <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {[
+            { n: 1, t: 'Kies model + periode + camping' },
+            { n: 2, t: 'Vul je gegevens in' },
+            { n: 3, t: 'Betaal veilig via Stripe' },
+            { n: 4, t: 'Wij bezorgen op je staanplaats' },
+          ].map((s) => (
+            <li key={s.n} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+              <span
+                aria-hidden
+                style={{
+                  width: 26, height: 26, borderRadius: 999,
+                  background: 'var(--sky-soft)', color: 'var(--navy)',
+                  display: 'grid', placeItems: 'center', flexShrink: 0,
+                  fontFamily: 'var(--sora)', fontWeight: 700, fontSize: 12,
+                }}
+              >
+                {s.n}
+              </span>
+              <span style={{ fontSize: 13.5, color: 'var(--ink-2)', lineHeight: 1.5, paddingTop: 4 }}>
+                {s.t}
+              </span>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <div
+        className="card-mk"
+        style={{
+          padding: 22,
+          background: 'linear-gradient(160deg, var(--sky-soft) 0%, var(--bg) 100%)',
+        }}
+      >
+        <div style={{ fontFamily: 'var(--sora)', fontWeight: 700, fontSize: 13, color: 'var(--navy)', marginBottom: 6 }}>
+          Vragen vooraf?
+        </div>
+        <p style={{ fontSize: 13, color: 'var(--ink-2)', margin: '0 0 12px', lineHeight: 1.55 }}>
+          Bel of stuur een bericht — we helpen je snel.
+        </p>
+        <a
+          href="tel:+34633778699"
+          className="btn btn-ghost btn-block"
+          style={{ fontSize: 13, padding: '10px 14px' }}
+        >
+          +34 633 77 86 99
+        </a>
+      </div>
+    </div>
+  );
+
   return (
     <MultiStepShell
       title={t('fridge.heading')}
@@ -516,6 +608,8 @@ export default function KoelkastBestelPagina() {
       error={error}
       done={false}
       paid
+      preForm={preForm}
+      aside={aside}
     />
   );
 }

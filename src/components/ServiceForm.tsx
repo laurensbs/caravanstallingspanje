@@ -351,13 +351,21 @@ interface MultiStepProps {
   inlineError?: string | null;
   /** Increment-trigger om MotionShake opnieuw te firen op de error-banner. */
   errorTrigger?: number;
+  /** Optionele rechter-aside met content (product-card, features, FAQ etc.).
+   *  Verschijnt naast de form op desktop, onder de form op mobiel. */
+  aside?: ReactNode;
+  /** Optionele content boven de form (binnen dezelfde page-container).
+   *  Bv. "wat krijg je"-strook, mini-features-grid. */
+  preForm?: ReactNode;
+  /** Optionele content onder de form. Bv. FAQ-sectie. */
+  postForm?: ReactNode;
 }
 
 export function MultiStepShell({
   title, intro, step1, step2, step1Valid,
   onSubmit, submitting, error, done, doneTitle, doneBody, publicCode,
   paid = false, summary, eyebrow, eyebrowIcon, icon, accent = 'default',
-  inlineError, errorTrigger = 0,
+  inlineError, errorTrigger = 0, aside, preForm, postForm,
 }: MultiStepProps) {
   const { t } = useLocale();
   const [step, setStep] = useState(0);
@@ -395,7 +403,14 @@ export function MultiStepShell({
         variant: 'compact',
       }}
     >
-      <section className="max-w-[820px] w-full mx-auto px-5 sm:px-10 py-12 sm:py-16">
+      {preForm && (
+        <section className="max-w-[1200px] w-full mx-auto px-5 sm:px-10 py-10 sm:py-14">
+          {preForm}
+        </section>
+      )}
+
+      <section className="max-w-[1200px] w-full mx-auto px-5 sm:px-10 py-8 sm:py-12">
+        <div className={aside ? 'grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 lg:gap-10 items-start' : ''}>
         <form
           onSubmit={(e) => {
             // Voorkom dat een per ongeluk-submit (bv. enter in date-input)
@@ -505,7 +520,20 @@ export function MultiStepShell({
             {step === 1 ? (paid ? t('common.stripe-footer-paid') : t('common.email-confirmation-footer')) : ' '}
           </p>
         </form>
+
+        {aside && (
+          <aside className="lg:sticky lg:top-6 self-start">
+            {aside}
+          </aside>
+        )}
+        </div>
       </section>
+
+      {postForm && (
+        <section className="max-w-[1200px] w-full mx-auto px-5 sm:px-10 py-12 sm:py-16">
+          {postForm}
+        </section>
+      )}
 
       <AnimatePresence>
         {paid && submitting && <RedirectOverlay />}
