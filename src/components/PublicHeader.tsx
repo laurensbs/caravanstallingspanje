@@ -49,7 +49,6 @@ const MEGA_WORKSHOP: MegaItem[] = [
 const MEGA_RENTAL: MegaItem[] = [
   { href: '/caravan-huren', icon: Heart, titleKey: 'nav.rent', subKey: 'nav.rent-sub' },
   { href: '/koelkast', icon: Snowflake, titleKey: 'home1.svc-6-title', subKey: 'home1.svc-6-desc' },
-  { href: '/aangesloten-campings', icon: MapPin, titleKey: 'nav.campings', subKey: 'nav.campings-sub' },
   { href: '/verkoop', icon: Tag, titleKey: 'home1.svc-7-title', subKey: 'home1.svc-7-desc' },
   { href: '/verkoop#inkoop', icon: Recycle, titleKey: 'home1.svc-8-title', subKey: 'home1.svc-8-desc' },
 ];
@@ -96,7 +95,11 @@ export default function PublicHeader({}: PublicHeaderProps = {}) {
   useFocusTrap(menuRef, { active: menuOpen });
 
   const isActive = (href: string) => pathname === href || (href !== '/' && !!pathname?.startsWith(href));
-  const dienstenActive = !!pathname?.startsWith('/diensten') || pathname === '/koelkast';
+  // "Diensten"-button is actief op /diensten/* en /koelkast — maar NIET op
+  // /diensten/stalling want dat is een eigen top-level nav-link.
+  const dienstenActive =
+    (!!pathname?.startsWith('/diensten') && !pathname?.startsWith('/diensten/stalling')) ||
+    pathname === '/koelkast';
 
   return (
     <div className="brand-nav-wrap" ref={megaRef}>
