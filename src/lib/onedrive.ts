@@ -87,9 +87,9 @@ export interface OneDriveUploadResult {
  *
  *   {root}/website-uploads/{kind}/{ref}/
  *
- * Bv. `Reparaties/website-uploads/repair-intake/2026-05-12-A1B2C3/` */
+ * Bv. `Stalling/website-uploads/repair-intake/2026-05-12-A1B2C3/` */
 export function buildPublicUploadFolderPath(kind: string, ref: string): string {
-  const root = process.env.ONEDRIVE_ROOT_FOLDER || 'Reparaties';
+  const root = process.env.ONEDRIVE_ROOT_FOLDER || 'Stalling';
   return `${root}/website-uploads/${sanitizeName(kind)}/${sanitizeName(ref)}`;
 }
 
