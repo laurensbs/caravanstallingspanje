@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Menu, X, ShieldCheck, Wrench, Sparkles, ClipboardCheck, Truck,
-  Snowflake, Tag, Recycle, ArrowRight, Phone, Mail, MapPin, Heart,
+  Snowflake, Tag, Recycle, ArrowRight, Phone, Mail, Heart, User,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import LocaleSwitch from './LocaleSwitch';
@@ -149,9 +149,27 @@ export default function PublicHeader({}: PublicHeaderProps = {}) {
           ))}
         </nav>
 
-        <Link href="/reserveren/configurator" className="nav-cta">
-          {t('nav.cta-pickup')}
-        </Link>
+        <div className="nav-cta-group">
+          <Link
+            href="/account/login"
+            aria-label={t('nav.login')}
+            title={t('nav.login')}
+            className="nav-icon-btn"
+          >
+            <User size={16} aria-hidden />
+          </Link>
+          <a
+            href="tel:+34633778699"
+            aria-label="Bel ons"
+            className="nav-icon-btn"
+            title="+34 633 77 86 99"
+          >
+            <Phone size={16} aria-hidden />
+          </a>
+          <Link href="/reserveren/configurator" className="nav-cta">
+            {t('nav.cta-pickup')}
+          </Link>
+        </div>
 
         <button
           type="button"

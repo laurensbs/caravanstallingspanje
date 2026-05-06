@@ -2066,6 +2066,42 @@ a.card-mk:hover, button.card-mk:hover, .card-mk.is-clickable:hover {
 }
 .brand-nav .nav-cta:active { transform: translateY(0); }
 
+/* Header rechts: groep met icon-buttons + primary CTA */
+.brand-nav .nav-cta-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.brand-nav .nav-icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.78);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+}
+.brand-nav .nav-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.10);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
+}
+@media (max-width: 980px) {
+  .brand-nav .nav-cta-group { display: none; }
+}
+
+/* Topbar Instagram-icoon */
+.brand-topbar a.tb-social {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.brand-topbar a.tb-social:hover { color: #fff; }
+
 /* Burger op donker */
 .m-burger { color: #fff; }
 
@@ -2202,7 +2238,8 @@ a.card-mk:hover, button.card-mk:hover, .card-mk.is-clickable:hover {
 }
 @media (max-width: 900px) {
   .brand-nav .nav-links,
-  .brand-nav .nav-cta { display: none; }
+  .brand-nav .nav-cta,
+  .brand-nav .nav-cta-group { display: none; }
   .brand-nav-mobile { display: inline-flex !important; }
   .brand-nav { padding: 14px 18px; }
 }
