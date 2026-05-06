@@ -19,6 +19,31 @@ type Customer = {
   mustChangePassword: boolean;
 };
 
+type Caravan = {
+  id: number;
+  kind: string;
+  brand: string | null;
+  model: string | null;
+  year: number | null;
+  registration: string | null;
+  lengthM: number | null;
+  spotCode: string | null;
+  storageType: string | null;
+  contractStart: string | null;
+  contractRenew: string | null;
+  insuranceProvider: string | null;
+  notes: string | null;
+};
+
+type ServiceHistoryItem = {
+  id: number;
+  kind: string;
+  title: string;
+  description: string | null;
+  happenedOn: string | null;
+  createdAt: string;
+};
+
 type Tab = 'overview' | 'history' | 'docs' | 'photos';
 type T = (k: StringKey, ...a: (string | number)[]) => string;
 
@@ -26,6 +51,8 @@ export default function MijnCaravanPage() {
   const router = useRouter();
   const { t } = useLocale();
   const [customer, setCustomer] = useState<Customer | null>(null);
+  const [caravan, setCaravan] = useState<Caravan | null>(null);
+  const [history, setHistory] = useState<ServiceHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>('overview');
 
@@ -41,6 +68,13 @@ export default function MijnCaravanPage() {
         if (data.customer.mustChangePassword) {
           router.push('/account/wachtwoord-wijzigen?first=1');
           return;
+        }
+        const cvRes = await fetch('/api/account/caravan', { credentials: 'include' });
+        if (cvRes.ok) {
+          const cv = await cvRes.json();
+          if (!alive) return;
+          setCaravan(cv.caravan);
+          setHistory(cv.history || []);
         }
       } catch {
         if (alive) router.push('/account/login');
@@ -82,69 +116,111 @@ export default function MijnCaravanPage() {
         </h1>
       </motion.header>
 
-      {/* Header-card */}
-      <div className="card-mk card-lift" style={{ padding: 24, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
-        <span
-          aria-hidden
-          style={{
-            width: 76, height: 76, borderRadius: 14,
-            background: 'linear-gradient(135deg, var(--sky) 0%, #BFE7FD 100%)',
-            color: 'var(--navy)',
-            display: 'grid', placeItems: 'center', flexShrink: 0,
-          }}
-        >
-          <CaravanIcon size={38} aria-hidden />
-        </span>
-        <div style={{ flex: 1, minWidth: 200 }}>
-          <div style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 19, color: 'var(--navy)' }}>
-            Hobby De Luxe 460 LU
+      {!caravan ? (
+        <NoCaravanState t={t} />
+      ) : (
+        <>
+          {/* Header-card */}
+          <div className="card-mk card-lift" style={{ padding: 24, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
+            <span
+              aria-hidden
+              style={{
+                width: 76, height: 76, borderRadius: 14,
+                background: 'linear-gradient(135deg, var(--sky) 0%, #BFE7FD 100%)',
+                color: 'var(--navy)',
+                display: 'grid', placeItems: 'center', flexShrink: 0,
+              }}
+            >
+              <CaravanIcon size={38} aria-hidden />
+            </span>
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <div style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 19, color: 'var(--navy)' }}>
+                {[caravan.brand, caravan.model].filter(Boolean).join(' ') || 'Caravan'}
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
+                {[
+                  caravan.year ? `Bouwjaar ${caravan.year}` : null,
+                  caravan.lengthM !== null ? `Lengte ${caravan.lengthM.toString().replace('.', ',')} m` : null,
+                  caravan.registration ? `Kenteken ${caravan.registration}` : null,
+                ].filter(Boolean).join(' · ') || 'Geen specs ingesteld'}
+              </div>
+            </div>
+            {caravan.insuranceProvider && (
+              <span className="tag-mk green">
+                <ShieldCheck size={11} /> Verzekerd
+              </span>
+            )}
           </div>
-          <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
-            Bouwjaar 2019 · Lengte 6,5 m · Kenteken WL-AB-12
+
+          {/* Tabs */}
+          <div style={{ borderBottom: '1px solid var(--line)', marginBottom: 22, overflowX: 'auto' }}>
+            <ul style={{ display: 'flex', gap: 4, listStyle: 'none', margin: 0, padding: 0 }}>
+              {tabs.map((tb) => {
+                const active = tab === tb.id;
+                return (
+                  <li key={tb.id} style={{ flex: '0 0 auto' }}>
+                    <button
+                      type="button"
+                      onClick={() => setTab(tb.id)}
+                      style={{
+                        fontFamily: 'var(--sora)', fontWeight: active ? 600 : 500, fontSize: 13.5,
+                        color: active ? 'var(--navy)' : 'var(--muted)',
+                        padding: '12px 18px', background: 'none', border: 'none', cursor: 'pointer',
+                        borderBottom: active ? '2px solid var(--orange)' : '2px solid transparent',
+                        marginBottom: -1,
+                        whiteSpace: 'nowrap',
+                      }}
+                      aria-pressed={active}
+                    >
+                      {t(tb.labelKey)}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
-        </div>
-        <span className="tag-mk green">
-          <ShieldCheck size={11} /> Verzekerd
-        </span>
-      </div>
 
-      {/* Tabs */}
-      <div style={{ borderBottom: '1px solid var(--line)', marginBottom: 22, overflowX: 'auto' }}>
-        <ul style={{ display: 'flex', gap: 4, listStyle: 'none', margin: 0, padding: 0 }}>
-          {tabs.map((tb) => {
-            const active = tab === tb.id;
-            return (
-              <li key={tb.id} style={{ flex: '0 0 auto' }}>
-                <button
-                  type="button"
-                  onClick={() => setTab(tb.id)}
-                  style={{
-                    fontFamily: 'var(--sora)', fontWeight: active ? 600 : 500, fontSize: 13.5,
-                    color: active ? 'var(--navy)' : 'var(--muted)',
-                    padding: '12px 18px', background: 'none', border: 'none', cursor: 'pointer',
-                    borderBottom: active ? '2px solid var(--orange)' : '2px solid transparent',
-                    marginBottom: -1,
-                    whiteSpace: 'nowrap',
-                  }}
-                  aria-pressed={active}
-                >
-                  {t(tb.labelKey)}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-
-      {tab === 'overview' && <OverviewTab t={t} />}
-      {tab === 'history' && <HistoryTab t={t} />}
-      {tab === 'docs' && <DocsTab t={t} />}
-      {tab === 'photos' && <PhotosTab t={t} />}
+          {tab === 'overview' && <OverviewTab t={t} caravan={caravan} />}
+          {tab === 'history' && <HistoryTab t={t} history={history} />}
+          {tab === 'docs' && <DocsTab t={t} />}
+          {tab === 'photos' && <PhotosTab t={t} />}
+        </>
+      )}
     </AccountLayout>
   );
 }
 
-function OverviewTab({ t }: { t: T }) {
+function NoCaravanState({ t }: { t: T }) {
+  void t;
+  return (
+    <div className="card-mk text-center" style={{ padding: 48 }}>
+      <CaravanIcon size={40} aria-hidden style={{ margin: '0 auto 14px', color: 'var(--muted)', opacity: 0.5 }} />
+      <h2 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 18, color: 'var(--navy)', margin: '0 0 8px' }}>
+        Nog geen caravan gekoppeld
+      </h2>
+      <p style={{ fontSize: 14, color: 'var(--ink-2)', margin: '0 0 18px', lineHeight: 1.6, maxWidth: 460, marginLeft: 'auto', marginRight: 'auto' }}>
+        We koppelen je caravan zodra je eerste betaling binnen is. Mocht hij ontbreken — stuur ons een bericht met je gegevens, dan regelen we het.
+      </p>
+      <a href="/contact?topic=storage" className="btn btn-primary">
+        Stuur een bericht
+      </a>
+    </div>
+  );
+}
+
+function OverviewTab({ t, caravan }: { t: T; caravan: Caravan }) {
+  const storageLabel = caravan.storageType === 'binnen' ? 'Binnenstalling'
+    : caravan.storageType === 'overdekt' ? 'Overdekt'
+    : caravan.storageType === 'buiten' ? 'Buitenstalling' : '—';
+  const sectionLetter = caravan.spotCode?.match(/^([A-Z]+)/)?.[1] || '';
+  const fmtDate = (iso: string | null) => {
+    if (!iso) return '—';
+    try {
+      return new Date(iso).toLocaleDateString('nl-NL', { day: '2-digit', month: 'short', year: 'numeric' });
+    } catch { return iso; }
+  };
+  const sinceYear = caravan.contractStart ? new Date(caravan.contractStart).getFullYear() : null;
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
       <div className="space-y-6">
@@ -154,44 +230,48 @@ function OverviewTab({ t }: { t: T }) {
             Specificaties
           </h2>
           <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '14px 24px', fontSize: 13.5 }}>
-            <SpecRow k={t('pt1.cv-spec-brand')} v="Hobby" />
-            <SpecRow k={t('pt1.cv-spec-model')} v="De Luxe 460 LU" />
-            <SpecRow k={t('pt1.cv-spec-year')} v="2019" />
-            <SpecRow k={t('pt1.cv-spec-length')} v="6,5 m" />
-            <SpecRow k={t('pt1.cv-spec-reg')} v="WL-AB-12" />
+            <SpecRow k={t('pt1.cv-spec-brand')} v={caravan.brand || '—'} />
+            <SpecRow k={t('pt1.cv-spec-model')} v={caravan.model || '—'} />
+            <SpecRow k={t('pt1.cv-spec-year')} v={caravan.year ? String(caravan.year) : '—'} />
+            <SpecRow k={t('pt1.cv-spec-length')} v={caravan.lengthM !== null ? `${caravan.lengthM.toString().replace('.', ',')} m` : '—'} />
+            <SpecRow k={t('pt1.cv-spec-reg')} v={caravan.registration || '—'} />
           </dl>
         </div>
 
-        {/* Stallingplek met SVG-plattegrond */}
-        <div className="card-mk" style={{ padding: 24 }}>
-          <h2 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 16, color: 'var(--navy)', margin: '0 0 16px' }}>
-            {t('pt1.cv-spot-h3')}
-          </h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
-            <span
-              aria-hidden
-              style={{
-                width: 86, height: 86, borderRadius: 12,
-                background: 'var(--sky-soft)',
-                display: 'grid', placeItems: 'center',
-                fontFamily: 'var(--sora)', fontWeight: 800, fontSize: 28,
-                color: 'var(--navy)',
-                border: '2px solid var(--sky)',
-              }}
-            >
-              B-12
-            </span>
-            <div style={{ flex: 1, minWidth: 200 }}>
-              <div style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 15, color: 'var(--navy)', marginBottom: 4 }}>
-                Buitenstalling — Sectie B
+        {/* Stallingplek */}
+        {caravan.spotCode && (
+          <div className="card-mk" style={{ padding: 24 }}>
+            <h2 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 16, color: 'var(--navy)', margin: '0 0 16px' }}>
+              {t('pt1.cv-spot-h3')}
+            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
+              <span
+                aria-hidden
+                style={{
+                  width: 86, height: 86, borderRadius: 12,
+                  background: 'var(--sky-soft)',
+                  display: 'grid', placeItems: 'center',
+                  fontFamily: 'var(--sora)', fontWeight: 800, fontSize: 28,
+                  color: 'var(--navy)',
+                  border: '2px solid var(--sky)',
+                }}
+              >
+                {caravan.spotCode}
+              </span>
+              <div style={{ flex: 1, minWidth: 200 }}>
+                <div style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 15, color: 'var(--navy)', marginBottom: 4 }}>
+                  {storageLabel}{sectionLetter ? ` — Sectie ${sectionLetter}` : ''}
+                </div>
+                {caravan.notes && (
+                  <div style={{ fontSize: 13, color: 'var(--muted)' }}>
+                    {caravan.notes}
+                  </div>
+                )}
               </div>
-              <div style={{ fontSize: 13, color: 'var(--muted)' }}>
-                Toegankelijk via hoofdpoort, links na de werkplaats
-              </div>
+              <SpotMapSvg />
             </div>
-            <SpotMapSvg />
           </div>
-        </div>
+        )}
       </div>
 
       <aside className="space-y-6">
@@ -202,80 +282,87 @@ function OverviewTab({ t }: { t: T }) {
           </h3>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, padding: '6px 0' }}>
             <span style={{ color: 'var(--muted)' }}>{t('pt1.cv-contract-since')}</span>
-            <span style={{ color: 'var(--ink)', fontFamily: 'var(--sora)', fontWeight: 600 }}>2021</span>
+            <span style={{ color: 'var(--ink)', fontFamily: 'var(--sora)', fontWeight: 600 }}>{sinceYear || '—'}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, padding: '6px 0' }}>
             <span style={{ color: 'var(--muted)' }}>{t('pt1.cv-contract-renew')}</span>
-            <span style={{ color: 'var(--ink)', fontFamily: 'var(--sora)', fontWeight: 600 }}>1 jan 2027</span>
+            <span style={{ color: 'var(--ink)', fontFamily: 'var(--sora)', fontWeight: 600 }}>{fmtDate(caravan.contractRenew)}</span>
           </div>
         </div>
 
         {/* Insurance */}
-        <div className="card-mk" style={{ padding: 22 }}>
-          <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 11, letterSpacing: 2.4, textTransform: 'uppercase', color: 'var(--muted)', margin: '0 0 12px' }}>
-            {t('pt1.cv-insurance-h3')}
-          </h3>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 0' }}>
-            <ShieldCheck size={18} style={{ color: 'var(--green)' }} aria-hidden />
-            <div>
-              <div style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 13.5, color: 'var(--navy)' }}>Securitas Direct</div>
-              <div style={{ fontSize: 12, color: 'var(--muted)' }}>{t('pt1.cv-insurance-cover')}</div>
+        {caravan.insuranceProvider && (
+          <div className="card-mk" style={{ padding: 22 }}>
+            <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 11, letterSpacing: 2.4, textTransform: 'uppercase', color: 'var(--muted)', margin: '0 0 12px' }}>
+              {t('pt1.cv-insurance-h3')}
+            </h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 0' }}>
+              <ShieldCheck size={18} style={{ color: 'var(--green)' }} aria-hidden />
+              <div>
+                <div style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 13.5, color: 'var(--navy)' }}>{caravan.insuranceProvider}</div>
+                <div style={{ fontSize: 12, color: 'var(--muted)' }}>{t('pt1.cv-insurance-cover')}</div>
+              </div>
             </div>
           </div>
-        </div>
-
-        {/* Documenten */}
-        <div className="card-mk" style={{ padding: 22 }}>
-          <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 11, letterSpacing: 2.4, textTransform: 'uppercase', color: 'var(--muted)', margin: '0 0 12px' }}>
-            {t('pt1.cv-doc-h3')}
-          </h3>
-          <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <DocLink label="Stalling-contract 2026" />
-            <DocLink label="Verzekerings-polis" />
-          </ul>
-        </div>
+        )}
       </aside>
     </div>
   );
 }
 
-function HistoryTab({ t }: { t: T }) {
-  // Mock-historie tot DB-koppeling
-  const history: Array<{ icon: LucideIcon; date: string; title: string; desc: string; status: 'done' | 'planned' }> = [
-    { icon: Sparkles, date: '12 mrt 2026', title: 'Volledige schoonmaak', desc: 'Buiten + interieur + ramen', status: 'done' },
-    { icon: ClipboardCheck, date: '01 mrt 2026', title: 'Voorseizoen-inspectie', desc: '25-punts check uitgevoerd', status: 'done' },
-    { icon: Wrench, date: '14 nov 2025', title: 'Dakreparatie', desc: 'Kleine lekkage rechts achter, opnieuw gekit', status: 'done' },
-  ];
+function HistoryTab({ t, history }: { t: T; history: ServiceHistoryItem[] }) {
   if (history.length === 0) {
     return <div className="card-mk text-center" style={{ padding: 40, color: 'var(--muted)', fontSize: 14 }}>{t('pt1.cv-history-empty')}</div>;
   }
+  const iconForKind = (kind: string): LucideIcon => {
+    switch (kind) {
+      case 'cleaning':
+      case 'service':
+        return Sparkles;
+      case 'inspection':
+        return ClipboardCheck;
+      case 'repair':
+        return Wrench;
+      default:
+        return Calendar;
+    }
+  };
+  const fmtDate = (h: ServiceHistoryItem) => {
+    const d = h.happenedOn || h.createdAt;
+    try {
+      return new Date(d).toLocaleDateString('nl-NL', { day: '2-digit', month: 'short', year: 'numeric' });
+    } catch { return d; }
+  };
   return (
     <div className="card-mk" style={{ padding: 24 }}>
       <ul style={{ margin: 0, padding: 0, listStyle: 'none', position: 'relative' }}>
-        {history.map((h, i) => (
-          <li key={i} style={{ display: 'flex', gap: 14, paddingBottom: 22, position: 'relative' }}>
-            <div style={{ position: 'relative', flexShrink: 0 }}>
-              <span
-                aria-hidden
-                style={{
-                  width: 36, height: 36, borderRadius: 999,
-                  background: 'var(--green-soft)', color: 'var(--green)',
-                  display: 'grid', placeItems: 'center',
-                }}
-              >
-                <h.icon size={16} />
-              </span>
-              {i < history.length - 1 && (
-                <span aria-hidden style={{ position: 'absolute', top: 38, bottom: -22, left: '50%', width: 2, background: 'var(--line)' }} />
-              )}
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 12, color: 'var(--muted)', fontFamily: 'var(--sora)', fontWeight: 600, letterSpacing: 0.4 }}>{h.date}</div>
-              <div style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 15, color: 'var(--navy)', margin: '2px 0 4px' }}>{h.title}</div>
-              <div style={{ fontSize: 13, color: 'var(--ink-2)', lineHeight: 1.55 }}>{h.desc}</div>
-            </div>
-          </li>
-        ))}
+        {history.map((h, i) => {
+          const Icon = iconForKind(h.kind);
+          return (
+            <li key={h.id} style={{ display: 'flex', gap: 14, paddingBottom: 22, position: 'relative' }}>
+              <div style={{ position: 'relative', flexShrink: 0 }}>
+                <span
+                  aria-hidden
+                  style={{
+                    width: 36, height: 36, borderRadius: 999,
+                    background: 'var(--green-soft)', color: 'var(--green)',
+                    display: 'grid', placeItems: 'center',
+                  }}
+                >
+                  <Icon size={16} />
+                </span>
+                {i < history.length - 1 && (
+                  <span aria-hidden style={{ position: 'absolute', top: 38, bottom: -22, left: '50%', width: 2, background: 'var(--line)' }} />
+                )}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 12, color: 'var(--muted)', fontFamily: 'var(--sora)', fontWeight: 600, letterSpacing: 0.4 }}>{fmtDate(h)}</div>
+                <div style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 15, color: 'var(--navy)', margin: '2px 0 4px' }}>{h.title}</div>
+                {h.description && <div style={{ fontSize: 13, color: 'var(--ink-2)', lineHeight: 1.55 }}>{h.description}</div>}
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
@@ -283,13 +370,9 @@ function HistoryTab({ t }: { t: T }) {
 
 function DocsTab({ t }: { t: T }) {
   return (
-    <div className="card-mk" style={{ padding: 24 }}>
-      <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <DocLink label="Stalling-contract 2026" detail="PDF · 240 KB" />
-        <DocLink label="Verzekerings-polis" detail="PDF · 1.1 MB" />
-        <DocLink label="Inspectierapport · 01 mrt 2026" detail="PDF · 3.4 MB" />
-      </ul>
-      <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 16 }}>{t('pt1.cv-docs-empty').includes('Nog') ? '' : ''}</p>
+    <div className="card-mk text-center" style={{ padding: 40 }}>
+      <FileText size={32} style={{ margin: '0 auto 10px', color: 'var(--muted)', opacity: 0.5 }} aria-hidden />
+      <p style={{ color: 'var(--muted)', fontSize: 14, margin: 0 }}>{t('pt1.cv-docs-empty')}</p>
     </div>
   );
 }

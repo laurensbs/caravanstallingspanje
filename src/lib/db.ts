@@ -1763,11 +1763,20 @@ export async function getCustomerWithRelated(id: number) {
     WHERE customer_id = ${id}
        OR (customer_id IS NULL AND ${email}::text IS NOT NULL AND LOWER(email) = LOWER(${email}))
     ORDER BY preferred_date DESC NULLS LAST`;
+  // Caravan-koppeling — leeft in een aparte tabel; pull lazy zodat oude
+  // installaties zonder ensureCaravansSchema niet falen.
+  let caravans: CustomerCaravanRow[] = [];
+  try {
+    caravans = await getCaravansByCustomer(id);
+  } catch (err) {
+    console.warn('[getCustomerWithRelated] caravans fetch failed:', err);
+  }
   return {
     customer,
     fridges: fridges as never,
     stalling: stalling as never,
     transports: transports as never,
+    caravans,
   };
 }
 
@@ -2132,6 +2141,203 @@ export async function markStallingCustomerNotified(id: number, statusNotified: s
   await sql`UPDATE stalling_requests
     SET customer_notified_at = NOW(), notified_status = ${statusNotified}, updated_at = NOW()
     WHERE id = ${id}`;
+}
+
+// ─── Klant-caravans ──────────────────────────────────────
+// customer_caravans: een klant heeft één (soms meerdere) caravan/camper
+// die bij ons gestald staat. Wordt zichtbaar in /account/caravan en op
+// het dashboard. service_history is een lichte log van wat we eraan
+// gedaan hebben (schoonmaak/onderhoud/inspectie/reparatie).
+
+let _caravansMigrationsApplied: Promise<void> | null = null;
+
+export async function ensureCaravansSchema(): Promise<void> {
+  if (_caravansMigrationsApplied) return _caravansMigrationsApplied;
+  _caravansMigrationsApplied = (async () => {
+    await tryMigrate('customer_caravans.create', () => sql`
+      CREATE TABLE IF NOT EXISTS customer_caravans (
+        id SERIAL PRIMARY KEY,
+        customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+        kind TEXT NOT NULL DEFAULT 'caravan',
+        brand TEXT,
+        model TEXT,
+        year INTEGER,
+        registration TEXT,
+        length_m NUMERIC(4,2),
+        spot_code TEXT,
+        storage_type TEXT,
+        contract_start DATE,
+        contract_renew DATE,
+        insurance_provider TEXT,
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    await tryMigrate('customer_caravans.idx_customer', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_customer_caravans_customer ON customer_caravans(customer_id)`);
+
+    await tryMigrate('caravan_service_history.create', () => sql`
+      CREATE TABLE IF NOT EXISTS caravan_service_history (
+        id SERIAL PRIMARY KEY,
+        caravan_id INTEGER NOT NULL REFERENCES customer_caravans(id) ON DELETE CASCADE,
+        kind TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT,
+        happened_on DATE,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    await tryMigrate('caravan_service_history.idx_caravan', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_caravan_service_history_caravan ON caravan_service_history(caravan_id)`);
+    await tryMigrate('caravan_service_history.idx_happened', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_caravan_service_history_happened ON caravan_service_history(happened_on DESC)`);
+  })();
+  return _caravansMigrationsApplied;
+}
+
+export type CustomerCaravanRow = {
+  id: number;
+  customer_id: number;
+  kind: string;
+  brand: string | null;
+  model: string | null;
+  year: number | null;
+  registration: string | null;
+  length_m: string | null;
+  spot_code: string | null;
+  storage_type: string | null;
+  contract_start: string | null;
+  contract_renew: string | null;
+  insurance_provider: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export async function getCaravansByCustomer(customerId: number): Promise<CustomerCaravanRow[]> {
+  await ensureCaravansSchema();
+  return sql`SELECT * FROM customer_caravans WHERE customer_id = ${customerId} ORDER BY created_at DESC` as unknown as Promise<CustomerCaravanRow[]>;
+}
+
+export async function getCaravanById(id: number): Promise<CustomerCaravanRow | null> {
+  await ensureCaravansSchema();
+  const rows = await sql`SELECT * FROM customer_caravans WHERE id = ${id}` as unknown as CustomerCaravanRow[];
+  return rows[0] || null;
+}
+
+export async function createCustomerCaravan(data: {
+  customer_id: number;
+  kind?: string;
+  brand?: string | null;
+  model?: string | null;
+  year?: number | null;
+  registration?: string | null;
+  length_m?: number | null;
+  spot_code?: string | null;
+  storage_type?: string | null;
+  contract_start?: string | null;
+  contract_renew?: string | null;
+  insurance_provider?: string | null;
+  notes?: string | null;
+}): Promise<CustomerCaravanRow> {
+  await ensureCaravansSchema();
+  const rows = await sql`
+    INSERT INTO customer_caravans
+      (customer_id, kind, brand, model, year, registration, length_m, spot_code,
+       storage_type, contract_start, contract_renew, insurance_provider, notes)
+    VALUES
+      (${data.customer_id}, ${data.kind || 'caravan'},
+       ${data.brand || null}, ${data.model || null}, ${data.year ?? null},
+       ${data.registration || null}, ${data.length_m ?? null},
+       ${data.spot_code || null}, ${data.storage_type || null},
+       ${data.contract_start || null}::date, ${data.contract_renew || null}::date,
+       ${data.insurance_provider || null}, ${data.notes || null})
+    RETURNING *` as unknown as CustomerCaravanRow[];
+  return rows[0];
+}
+
+export async function updateCustomerCaravan(id: number, data: Partial<{
+  kind: string;
+  brand: string | null;
+  model: string | null;
+  year: number | null;
+  registration: string | null;
+  length_m: number | null;
+  spot_code: string | null;
+  storage_type: string | null;
+  contract_start: string | null;
+  contract_renew: string | null;
+  insurance_provider: string | null;
+  notes: string | null;
+}>): Promise<CustomerCaravanRow | null> {
+  await ensureCaravansSchema();
+  const cur = await getCaravanById(id);
+  if (!cur) return null;
+  const rows = await sql`
+    UPDATE customer_caravans SET
+      kind = ${data.kind ?? cur.kind},
+      brand = ${data.brand !== undefined ? data.brand : cur.brand},
+      model = ${data.model !== undefined ? data.model : cur.model},
+      year = ${data.year !== undefined ? data.year : cur.year},
+      registration = ${data.registration !== undefined ? data.registration : cur.registration},
+      length_m = ${data.length_m !== undefined ? data.length_m : cur.length_m},
+      spot_code = ${data.spot_code !== undefined ? data.spot_code : cur.spot_code},
+      storage_type = ${data.storage_type !== undefined ? data.storage_type : cur.storage_type},
+      contract_start = ${data.contract_start !== undefined ? data.contract_start : cur.contract_start}::date,
+      contract_renew = ${data.contract_renew !== undefined ? data.contract_renew : cur.contract_renew}::date,
+      insurance_provider = ${data.insurance_provider !== undefined ? data.insurance_provider : cur.insurance_provider},
+      notes = ${data.notes !== undefined ? data.notes : cur.notes},
+      updated_at = NOW()
+    WHERE id = ${id}
+    RETURNING *` as unknown as CustomerCaravanRow[];
+  return rows[0] || null;
+}
+
+export async function deleteCustomerCaravan(id: number): Promise<boolean> {
+  await ensureCaravansSchema();
+  const rows = await sql`DELETE FROM customer_caravans WHERE id = ${id} RETURNING id` as unknown as { id: number }[];
+  return rows.length > 0;
+}
+
+export type ServiceHistoryRow = {
+  id: number;
+  caravan_id: number;
+  kind: string;
+  title: string;
+  description: string | null;
+  happened_on: string | null;
+  created_at: string;
+};
+
+export async function getServiceHistory(caravanId: number): Promise<ServiceHistoryRow[]> {
+  await ensureCaravansSchema();
+  return sql`
+    SELECT * FROM caravan_service_history
+    WHERE caravan_id = ${caravanId}
+    ORDER BY COALESCE(happened_on, created_at::date) DESC, created_at DESC
+  ` as unknown as Promise<ServiceHistoryRow[]>;
+}
+
+export async function createServiceHistoryEntry(data: {
+  caravan_id: number;
+  kind: string;
+  title: string;
+  description?: string | null;
+  happened_on?: string | null;
+}): Promise<ServiceHistoryRow> {
+  await ensureCaravansSchema();
+  const rows = await sql`
+    INSERT INTO caravan_service_history (caravan_id, kind, title, description, happened_on)
+    VALUES (${data.caravan_id}, ${data.kind}, ${data.title}, ${data.description || null}, ${data.happened_on || null}::date)
+    RETURNING *` as unknown as ServiceHistoryRow[];
+  return rows[0];
+}
+
+export async function deleteServiceHistoryEntry(id: number): Promise<boolean> {
+  await ensureCaravansSchema();
+  const rows = await sql`DELETE FROM caravan_service_history WHERE id = ${id} RETURNING id` as unknown as { id: number }[];
+  return rows.length > 0;
 }
 
 // ─── Voorraad / verkoop ──────────────────────────────────

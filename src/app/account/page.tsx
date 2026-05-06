@@ -38,11 +38,24 @@ type Invoice = {
   created: number;
 };
 
+type Caravan = {
+  id: number;
+  kind: string;
+  brand: string | null;
+  model: string | null;
+  year: number | null;
+  registration: string | null;
+  spotCode: string | null;
+  storageType: string | null;
+  contractStart: string | null;
+};
+
 export default function AccountDashboard() {
   const router = useRouter();
   const { t } = useLocale();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [invoices, setInvoices] = useState<Invoice[] | null>(null);
+  const [caravan, setCaravan] = useState<Caravan | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -58,10 +71,17 @@ export default function AccountDashboard() {
           router.push('/account/wachtwoord-wijzigen?first=1');
           return;
         }
-        const invRes = await fetch('/api/account/invoices', { credentials: 'include' });
-        const inv = await invRes.json();
+        const [invRes, cvRes] = await Promise.all([
+          fetch('/api/account/invoices', { credentials: 'include' }),
+          fetch('/api/account/caravan', { credentials: 'include' }),
+        ]);
         if (!alive) return;
+        const inv = await invRes.json();
         setInvoices(inv.invoices || []);
+        if (cvRes.ok) {
+          const cv = await cvRes.json();
+          setCaravan(cv.caravan);
+        }
       } catch {
         if (alive) router.push('/account/login');
       } finally {
@@ -106,7 +126,7 @@ export default function AccountDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
         <div className="space-y-6">
           {/* Caravan card */}
-          <CaravanCard t={t} />
+          <CaravanCard t={t} caravan={caravan} />
 
           {/* Stats */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -153,7 +173,57 @@ function StatTile({
   );
 }
 
-function CaravanCard({ t }: { t: T }) {
+function CaravanCard({ t, caravan }: { t: T; caravan: Caravan | null }) {
+  // Geen caravan-koppeling? Toon een vriendelijke placeholder met "Stuur
+  // bericht" CTA zodat de klant kan vragen om koppeling.
+  if (!caravan) {
+    return (
+      <div
+        className="card-mk"
+        style={{ padding: 24, display: 'flex', alignItems: 'center', gap: 18 }}
+      >
+        <span
+          aria-hidden
+          style={{
+            width: 76, height: 76, borderRadius: 14,
+            background: 'var(--sky-soft)', color: 'var(--muted)',
+            display: 'grid', placeItems: 'center', flexShrink: 0,
+          }}
+        >
+          <Caravan size={38} aria-hidden />
+        </span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 11, fontFamily: 'var(--sora)', fontWeight: 600, color: 'var(--muted)', letterSpacing: 1.4, textTransform: 'uppercase', marginBottom: 4 }}>
+            {t('pt1.db-caravan-h3')}
+          </div>
+          <div style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 15, color: 'var(--navy)' }}>
+            Nog niet gekoppeld
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 2, lineHeight: 1.5 }}>
+            We koppelen je caravan zodra je eerste betaling binnen is — neem contact op als hij ontbreekt.
+          </div>
+        </div>
+        <Link
+          href="/contact?topic=storage"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--orange-d)', fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 13, flexShrink: 0, textDecoration: 'none' }}
+        >
+          Vraag koppeling <ChevronRight size={14} aria-hidden />
+        </Link>
+      </div>
+    );
+  }
+
+  const title = [caravan.brand, caravan.model].filter(Boolean).join(' ') || 'Caravan';
+  const storageLabel = caravan.storageType === 'binnen' ? 'Binnenstalling'
+    : caravan.storageType === 'overdekt' ? 'Overdekt'
+    : caravan.storageType === 'buiten' ? 'Buitenstalling' : null;
+  const sinceYear = caravan.contractStart ? new Date(caravan.contractStart).getFullYear() : null;
+  const subParts = [
+    caravan.spotCode ? `Plek ${caravan.spotCode}` : null,
+    storageLabel,
+    sinceYear ? `Sinds ${sinceYear}` : null,
+  ].filter(Boolean);
+
   return (
     <Link
       href="/account/caravan"
@@ -176,11 +246,13 @@ function CaravanCard({ t }: { t: T }) {
           {t('pt1.db-caravan-h3')}
         </div>
         <div style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 17, color: 'var(--navy)' }}>
-          Hobby De Luxe 460 LU
+          {title}
         </div>
-        <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 2 }}>
-          Plek B-12 · Buitenstalling · Sinds 2021
-        </div>
+        {subParts.length > 0 && (
+          <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 2 }}>
+            {subParts.join(' · ')}
+          </div>
+        )}
       </div>
       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--orange-d)', fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 13, flexShrink: 0 }}>
         {t('pt1.db-caravan-cta')} <ChevronRight size={14} aria-hidden />

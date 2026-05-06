@@ -18,6 +18,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
       initialFridges={data.fridges}
       initialStalling={data.stalling}
       initialTransports={data.transports}
+      initialCaravans={data.caravans}
     />
   );
 }

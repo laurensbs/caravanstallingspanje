@@ -11,6 +11,7 @@ import {
 import { Button, Badge } from '@/components/ui';
 import InlineField from '@/components/InlineField';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import CustomerCaravanSection from './CustomerCaravanSection';
 
 type Booking = {
   id: number;
@@ -125,9 +126,10 @@ interface Props {
   initialFridges: FridgeWithBookings[];
   initialStalling: Stalling[];
   initialTransports: Transport[];
+  initialCaravans?: import('./CustomerCaravanSection').AdminCaravan[];
 }
 
-export default function CustomerDetail({ initialCustomer, initialFridges, initialStalling, initialTransports }: Props) {
+export default function CustomerDetail({ initialCustomer, initialFridges, initialStalling, initialTransports, initialCaravans = [] }: Props) {
   const router = useRouter();
   const [customer, setCustomer] = useState(initialCustomer);
   const [fridges, setFridges] = useState(initialFridges);
@@ -327,6 +329,8 @@ export default function CustomerDetail({ initialCustomer, initialFridges, initia
           </div>
 
           <HoldedDataSection customer={customer} />
+
+          <CustomerCaravanSection customerId={customer.id} initialCaravans={initialCaravans} />
         </section>
 
         <div className="space-y-6">
