@@ -410,6 +410,82 @@ export function contactNotifyHtml(input: {
   return { subject, html: shell(card), text };
 }
 
+// Wachtwoord-vergeten mail. Hergebruikt dezelfde token-flow als welkomst:
+// klant landt op /account/welkom?token=… en kiest een nieuw wachtwoord.
+export function passwordResetHtml(input: {
+  name: string;
+  email: string;
+  setupUrl: string;
+  expiresInDays: number;
+}): { subject: string; html: string; text: string } {
+  const subject = 'Stel een nieuw wachtwoord in voor je portaal';
+  const card = `
+    <p>Hi ${escapeHtml(input.name)},</p>
+    <p>Je hebt een nieuw wachtwoord aangevraagd voor je klantportaal bij Caravanstalling Spanje. Klik op de knop hieronder om er een te kiezen.</p>
+    <div class="summary">
+      <div class="row"><span class="muted">Voor account</span><strong>${escapeHtml(input.email)}</strong></div>
+    </div>
+    <p style="text-align:center;margin:18px 0 8px"><a class="btn" href="${input.setupUrl}">Kies een nieuw wachtwoord</a></p>
+    <div class="next"><strong>Niet aangevraagd?</strong><br/>Negeer deze mail dan — je huidige wachtwoord blijft werken. De link werkt ${input.expiresInDays} dagen.</div>
+  `;
+  const html = shell(card, {
+    eyebrow: 'Caravanstalling Spanje',
+    heading: 'Wachtwoord opnieuw instellen',
+    subline: 'Eenmalige link, persoonlijk voor jou.',
+  });
+  const text = `Hi ${input.name},\n\nJe hebt een nieuw wachtwoord aangevraagd. Volg deze link (geldig ${input.expiresInDays} dagen):\n${input.setupUrl}\n\nNiet aangevraagd? Negeer deze mail.`;
+  return { subject, html, text };
+}
+
+// Admin-notify mail bij nieuwe klant-service-aanvraag uit het portaal.
+// Klant heeft al een referentie + status, dit is voor jou (Laurens) zodat
+// je de aanvraag direct in het admin-paneel kunt oppakken.
+export function serviceRequestNotifyHtml(input: {
+  customerName: string;
+  customerEmail: string | null;
+  customerPhone: string | null;
+  kind: string;
+  title: string;
+  description: string | null;
+  preferredDate: string | null;
+  adminUrl: string;
+}): { subject: string; html: string; text: string } {
+  const kindLabels: Record<string, string> = {
+    cleaning: 'Schoonmaak',
+    service: 'Onderhoud',
+    inspection: 'Inspectie',
+    repair: 'Reparatie',
+    transport: 'Transport',
+    other: 'Overig',
+  };
+  const kindLabel = kindLabels[input.kind] || input.kind;
+  const subject = `🔧 Service-aanvraag van ${input.customerName}: ${input.title}`;
+  const phoneRow = input.customerPhone
+    ? `<div class="row"><span class="muted">Telefoon</span><strong>${escapeHtml(input.customerPhone)}</strong></div>` : '';
+  const emailRow = input.customerEmail
+    ? `<div class="row"><span class="muted">E-mail</span><strong>${escapeHtml(input.customerEmail)}</strong></div>` : '';
+  const dateRow = input.preferredDate
+    ? `<div class="row"><span class="muted">Voorkeursdatum</span><strong>${escapeHtml(input.preferredDate)}</strong></div>` : '';
+  const descBlock = input.description
+    ? `<div class="row" style="display:block"><span class="muted" style="display:block;margin-bottom:6px">Toelichting</span><span style="white-space:pre-wrap">${escapeHtml(input.description)}</span></div>` : '';
+  const card = `
+    <p>Een klant heeft via het portaal een service-aanvraag ingediend.</p>
+    <div class="summary">
+      <div class="row"><span class="muted">Klant</span><strong>${escapeHtml(input.customerName)}</strong></div>
+      ${emailRow}
+      ${phoneRow}
+      <div class="row"><span class="muted">Type</span><strong>${escapeHtml(kindLabel)}</strong></div>
+      <div class="row"><span class="muted">Titel</span><strong>${escapeHtml(input.title)}</strong></div>
+      ${dateRow}
+      ${descBlock}
+    </div>
+    <p style="text-align:center;margin:18px 0 8px"><a class="btn" href="${input.adminUrl}">Open in admin</a></p>
+  `;
+  const html = shell(card, { eyebrow: 'Caravanstalling Spanje', heading: 'Nieuwe service-aanvraag', subline: 'Vanuit het klantportaal.' });
+  const text = `Nieuwe service-aanvraag\n\nKlant: ${input.customerName}${input.customerEmail ? ` (${input.customerEmail})` : ''}${input.customerPhone ? `\nTelefoon: ${input.customerPhone}` : ''}\nType: ${kindLabel}\nTitel: ${input.title}${input.preferredDate ? `\nVoorkeursdatum: ${input.preferredDate}` : ''}${input.description ? `\n\n${input.description}` : ''}\n\nOpen: ${input.adminUrl}`;
+  return { subject, html, text };
+}
+
 function escapeHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }

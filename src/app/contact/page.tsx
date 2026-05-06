@@ -12,6 +12,7 @@ import type { LucideIcon } from 'lucide-react';
 import Topbar from '@/components/marketing/Topbar';
 import PublicHeader from '@/components/PublicHeader';
 import PublicFooter from '@/components/PublicFooter';
+import MotionPageTransition from '@/components/motion/MotionPageTransition';
 import PhotoDropzone, { type UploadedFile } from '@/components/PhotoDropzone';
 import { useLocale } from '@/components/LocaleProvider';
 import type { StringKey } from '@/lib/i18n';
@@ -140,6 +141,7 @@ function ContactInner() {
   return (
     <PageShell>
       <main id="main" className="flex-1">
+        <MotionPageTransition>
         <Hero t={t} />
 
         <section className="py-12 sm:py-16">
@@ -263,6 +265,7 @@ function ContactInner() {
             )}
           </div>
         </section>
+        </MotionPageTransition>
       </main>
     </PageShell>
   );

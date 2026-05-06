@@ -6,6 +6,7 @@ import { useMemo, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, MapPin, Search, Snowflake, Wind, Truck } from 'lucide-react';
 import Topbar from '@/components/marketing/Topbar';
+import MotionPageTransition from '@/components/motion/MotionPageTransition';
 import PublicHeader from '@/components/PublicHeader';
 import PublicFooter from '@/components/PublicFooter';
 import type { Camping } from '@/lib/campings-data';
@@ -37,6 +38,7 @@ export default function CampingsClient({ campings }: { campings: Camping[] }) {
       <Topbar />
       <PublicHeader />
       <main id="main" className="flex-1">
+        <MotionPageTransition>
         <Hero campingCount={campings.length} />
 
         <section className="py-12 sm:py-16">
@@ -124,6 +126,7 @@ export default function CampingsClient({ campings }: { campings: Camping[] }) {
         </section>
 
         <ServicesBand />
+        </MotionPageTransition>
       </main>
       <PublicFooter />
     </div>

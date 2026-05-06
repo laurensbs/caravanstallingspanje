@@ -7,6 +7,7 @@ import { ArrowRight, Tag } from 'lucide-react';
 import Topbar from '@/components/marketing/Topbar';
 import PublicHeader from '@/components/PublicHeader';
 import PublicFooter from '@/components/PublicFooter';
+import MotionPageTransition from '@/components/motion/MotionPageTransition';
 import { useLocale } from '@/components/LocaleProvider';
 import type { StringKey } from '@/lib/i18n';
 
@@ -33,9 +34,11 @@ export default function VerkoopClient({ items }: { items: PublicStockItem[] }) {
       <Topbar />
       <PublicHeader />
       <main id="main" className="flex-1">
-        <Hero t={t} />
-        <Stock t={t} items={items} />
-        <Intake t={t} />
+        <MotionPageTransition>
+          <Hero t={t} />
+          <Stock t={t} items={items} />
+          <Intake t={t} />
+        </MotionPageTransition>
       </main>
       <PublicFooter />
     </div>

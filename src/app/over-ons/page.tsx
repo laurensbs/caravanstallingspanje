@@ -8,6 +8,7 @@ import type { LucideIcon } from 'lucide-react';
 import Topbar from '@/components/marketing/Topbar';
 import PublicHeader from '@/components/PublicHeader';
 import PublicFooter from '@/components/PublicFooter';
+import MotionPageTransition from '@/components/motion/MotionPageTransition';
 import { useLocale } from '@/components/LocaleProvider';
 import type { StringKey } from '@/lib/i18n';
 
@@ -21,10 +22,12 @@ export default function OverOnsPage() {
       <Topbar />
       <PublicHeader />
       <main id="main" className="flex-1">
-        <Hero t={t} />
-        <Approach t={t} />
-        <Values t={t} />
-        <CtaBand />
+        <MotionPageTransition>
+          <Hero t={t} />
+          <Approach t={t} />
+          <Values t={t} />
+          <CtaBand />
+        </MotionPageTransition>
       </main>
       <PublicFooter />
     </div>

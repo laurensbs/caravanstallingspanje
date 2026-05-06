@@ -2450,6 +2450,44 @@ export async function listOpenServiceRequests(): Promise<CustomerServiceRequestR
   return sql`SELECT * FROM customer_service_requests WHERE status IN ('new', 'in_progress') ORDER BY created_at DESC` as unknown as Promise<CustomerServiceRequestRow[]>;
 }
 
+export type ServiceRequestWithCustomer = CustomerServiceRequestRow & {
+  customer_name: string | null;
+  customer_email: string | null;
+  customer_phone: string | null;
+};
+
+// Voor admin-UI: lijst service-requests joined met customer-info zodat we
+// niet voor elke rij apart de klant hoeven op te halen. Optioneel filter op
+// status; default toont alles met openstaande eerst.
+export async function listServiceRequestsForAdmin(opts: {
+  status?: CustomerServiceRequestRow['status'] | 'all';
+} = {}): Promise<ServiceRequestWithCustomer[]> {
+  await ensureCaravansSchema();
+  const status = opts.status || 'all';
+  if (status === 'all') {
+    return sql`
+      SELECT r.*, c.name AS customer_name, c.email AS customer_email, c.phone AS customer_phone
+      FROM customer_service_requests r
+      LEFT JOIN customers c ON c.id = r.customer_id
+      ORDER BY
+        CASE r.status
+          WHEN 'new' THEN 0
+          WHEN 'in_progress' THEN 1
+          WHEN 'done' THEN 2
+          WHEN 'cancelled' THEN 3
+        END,
+        r.created_at DESC
+    ` as unknown as Promise<ServiceRequestWithCustomer[]>;
+  }
+  return sql`
+    SELECT r.*, c.name AS customer_name, c.email AS customer_email, c.phone AS customer_phone
+    FROM customer_service_requests r
+    LEFT JOIN customers c ON c.id = r.customer_id
+    WHERE r.status = ${status}
+    ORDER BY r.created_at DESC
+  ` as unknown as Promise<ServiceRequestWithCustomer[]>;
+}
+
 export async function createServiceRequest(data: {
   customer_id: number;
   caravan_id?: number | null;

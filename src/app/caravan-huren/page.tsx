@@ -7,6 +7,7 @@ import { ArrowRight, ExternalLink, ShieldCheck, Calendar, Truck, Heart, MapPin }
 import Topbar from '@/components/marketing/Topbar';
 import PublicHeader from '@/components/PublicHeader';
 import PublicFooter from '@/components/PublicFooter';
+import MotionPageTransition from '@/components/motion/MotionPageTransition';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -19,9 +20,11 @@ export default function CaravanHurenPage() {
       <Topbar />
       <PublicHeader />
       <main id="main" className="flex-1">
-        <Hero />
-        <Features />
-        <CtaBand />
+        <MotionPageTransition>
+          <Hero />
+          <Features />
+          <CtaBand />
+        </MotionPageTransition>
       </main>
       <PublicFooter />
     </div>

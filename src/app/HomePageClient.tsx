@@ -11,6 +11,7 @@ import { useLocale } from '@/components/LocaleProvider';
 import Topbar from '@/components/marketing/Topbar';
 import PublicHeader from '@/components/PublicHeader';
 import PublicFooter from '@/components/PublicFooter';
+import MotionPageTransition from '@/components/motion/MotionPageTransition';
 import type { StringKey } from '@/lib/i18n';
 import type { LucideIcon } from 'lucide-react';
 import type { Camping } from '@/lib/campings-data';
@@ -27,16 +28,18 @@ export default function HomePageClient({ campings }: { campings: Camping[] }) {
       <PublicHeader />
 
       <main id="main" className="flex-1">
-        <Hero t={t} />
-        <Stats t={t} />
-        <Services t={t} />
-        <Certainties t={t} />
-        <Steps t={t} />
-        <Security t={t} />
-        <Workshop t={t} />
-        <Campings campings={campings} />
-        <Location t={t} />
-        <CtaBand t={t} />
+        <MotionPageTransition>
+          <Hero t={t} />
+          <Stats t={t} />
+          <Services t={t} />
+          <Certainties t={t} />
+          <Steps t={t} />
+          <Security t={t} />
+          <Workshop t={t} />
+          <Campings campings={campings} />
+          <Location t={t} />
+          <CtaBand t={t} />
+        </MotionPageTransition>
       </main>
 
       <PublicFooter />

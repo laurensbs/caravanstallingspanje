@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { listOpenServiceRequests } from '@/lib/db';
+import { listServiceRequestsForAdmin } from '@/lib/db';
 
-// Lijst alle openstaande klant-service-aanvragen voor admin-dashboard.
-export async function GET(_req: NextRequest) {
-  const items = await listOpenServiceRequests();
+const VALID_STATUS = new Set(['new', 'in_progress', 'done', 'cancelled', 'all']);
+
+export async function GET(req: NextRequest) {
+  const url = new URL(req.url);
+  const statusParam = url.searchParams.get('status') || 'all';
+  const status = VALID_STATUS.has(statusParam) ? statusParam as 'new' | 'in_progress' | 'done' | 'cancelled' | 'all' : 'all';
+  const items = await listServiceRequestsForAdmin({ status });
   return NextResponse.json({ items });
 }

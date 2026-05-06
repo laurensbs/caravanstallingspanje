@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Search, Plus, ArrowRight, Phone } from 'lucide-react';
 import Topbar from '@/components/marketing/Topbar';
+import MotionPageTransition from '@/components/motion/MotionPageTransition';
 import PublicHeader from '@/components/PublicHeader';
 import PublicFooter from '@/components/PublicFooter';
 import { useLocale } from '@/components/LocaleProvider';
@@ -63,6 +64,7 @@ export default function FaqPage() {
       <Topbar />
       <PublicHeader />
       <main id="main" className="flex-1">
+        <MotionPageTransition>
         <Hero t={t} q={q} setQ={setQ} />
         <section className="py-12 sm:py-16">
           <div className="max-w-[820px] mx-auto px-5 sm:px-10">
@@ -124,6 +126,7 @@ export default function FaqPage() {
           </div>
         </section>
         <CtaBand t={t} />
+        </MotionPageTransition>
       </main>
       <PublicFooter />
     </div>

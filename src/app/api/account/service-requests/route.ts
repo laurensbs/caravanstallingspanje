@@ -5,6 +5,9 @@ import {
   getCustomerByEmail, getCaravansByCustomer,
   listServiceRequestsByCustomer, createServiceRequest, logActivity,
 } from '@/lib/db';
+import { sendMail, serviceRequestNotifyHtml } from '@/lib/email';
+
+const ADMIN_NOTIFY_TO = process.env.ADMIN_NOTIFY_EMAIL || 'laurens@caravanstalling-spanje.com';
 
 const KINDS = ['cleaning', 'service', 'inspection', 'repair', 'transport', 'other'] as const;
 
@@ -71,6 +74,26 @@ export async function POST(req: NextRequest) {
       entityId: String(entry.id),
       entityLabel: customer.name || customer.email || `customer-${customer.id}`,
     });
+
+    // Admin-notify mail: best-effort, fail-soft. Klant ziet z'n aanvraag al
+    // in z'n portaal staan, dus mail is alleen voor jou (Laurens).
+    try {
+      const base = process.env.PUBLIC_BASE_URL || new URL(req.url).origin;
+      const mail = serviceRequestNotifyHtml({
+        customerName: customer.name || 'klant',
+        customerEmail: customer.email,
+        customerPhone: customer.phone,
+        kind: parsed.data.kind,
+        title: parsed.data.title,
+        description: parsed.data.description ?? null,
+        preferredDate: parsed.data.preferredDate ?? null,
+        adminUrl: `${base}/admin/service-requests`,
+      });
+      await sendMail({ to: ADMIN_NOTIFY_TO, subject: mail.subject, html: mail.html, text: mail.text });
+    } catch (err) {
+      console.warn('[service-request] admin notify mail failed:', err);
+    }
+
     return NextResponse.json({
       item: {
         id: entry.id,

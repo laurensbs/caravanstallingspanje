@@ -19,6 +19,7 @@ type CountMap = {
   contact: number;
   ideas: number;
   waitlist: number;
+  service_requests: number;
 };
 
 async function safeCount(promise: Promise<{ count: number | string }[]>): Promise<number> {
@@ -33,16 +34,17 @@ async function safeCount(promise: Promise<{ count: number | string }[]>): Promis
 
 export async function GET() {
   try {
-    const [stalling, transport, fridge, contact, ideas, waitlist] = await Promise.all([
+    const [stalling, transport, fridge, contact, ideas, waitlist, service_requests] = await Promise.all([
       safeCount(sql`SELECT COUNT(*)::int AS count FROM stalling_requests WHERE status = 'controleren'` as unknown as Promise<{ count: number }[]>),
       safeCount(sql`SELECT COUNT(*)::int AS count FROM transport_requests WHERE status = 'controleren'` as unknown as Promise<{ count: number }[]>),
       safeCount(sql`SELECT COUNT(*)::int AS count FROM fridge_bookings WHERE status = 'controleren'` as unknown as Promise<{ count: number }[]>),
       safeCount(sql`SELECT COUNT(*)::int AS count FROM contact_messages WHERE status = 'open'` as unknown as Promise<{ count: number }[]>),
       safeCount(sql`SELECT COUNT(*)::int AS count FROM ideas WHERE status = 'new'` as unknown as Promise<{ count: number }[]>),
       safeCount(sql`SELECT COUNT(*)::int AS count FROM fridge_waitlist WHERE status = 'wachtend'` as unknown as Promise<{ count: number }[]>),
+      safeCount(sql`SELECT COUNT(*)::int AS count FROM customer_service_requests WHERE status IN ('new', 'in_progress')` as unknown as Promise<{ count: number }[]>),
     ]);
 
-    const counts: CountMap = { stalling, transport, fridge, contact, ideas, waitlist };
+    const counts: CountMap = { stalling, transport, fridge, contact, ideas, waitlist, service_requests };
     return NextResponse.json(counts, {
       headers: { 'Cache-Control': 'no-store' },
     });

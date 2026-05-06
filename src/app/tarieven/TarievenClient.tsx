@@ -6,6 +6,7 @@ import { ArrowRight, Phone, Info } from 'lucide-react';
 import Topbar from '@/components/marketing/Topbar';
 import PublicHeader from '@/components/PublicHeader';
 import PublicFooter from '@/components/PublicFooter';
+import MotionPageTransition from '@/components/motion/MotionPageTransition';
 import { useLocale } from '@/components/LocaleProvider';
 import type { StringKey } from '@/lib/i18n';
 import type { PublicService } from '@/lib/services-catalog';
@@ -46,6 +47,7 @@ export default function TarievenClient(props: Props) {
       <Topbar />
       <PublicHeader />
       <main id="main" className="flex-1">
+        <MotionPageTransition>
         <Hero t={t} />
 
         <section className="py-16 sm:py-20">
@@ -132,6 +134,7 @@ export default function TarievenClient(props: Props) {
         </section>
 
         <Notes t={t} repairHourly={props.repairHourly} />
+        </MotionPageTransition>
       </main>
       <PublicFooter />
     </div>

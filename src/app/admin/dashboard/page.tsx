@@ -6,7 +6,9 @@ import { motion } from 'framer-motion';
 import {
   Refrigerator, ArrowUpRight, AlertCircle, CheckCircle2, Truck, Package,
   Activity, Receipt, RefreshCw, Loader2, Sparkles, FileCheck2,
+  Warehouse, MessageSquare, Wrench,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import PageHeader from '@/components/admin/PageHeader';
 import { Skeleton, Button } from '@/components/ui';
@@ -65,6 +67,7 @@ export default function DashboardPage() {
   const [holded, setHolded] = useState<HoldedRow[] | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [recent, setRecent] = useState<RecentOrders | null>(null);
+  const [pending, setPending] = useState<Record<string, number> | null>(null);
 
   const loadHolded = () => {
     fetch('/api/admin/holded-status', { credentials: 'include' })
@@ -101,7 +104,23 @@ export default function DashboardPage() {
     };
     loadRecent();
     const pollId = setInterval(loadRecent, 30_000);
-    return () => clearInterval(pollId);
+
+    // Pending-counts uit /api/admin/badge-counts. Dashboard toont 'm in een
+    // eigen "Action queue"-rij zodat ik in 1 oogopslag zie waar ik moet
+    // kijken zonder door de sidebar te scrollen.
+    const loadPending = () => {
+      fetch('/api/admin/badge-counts', { credentials: 'include' })
+        .then((r) => r.ok ? r.json() : null)
+        .then((d) => setPending(d || {}))
+        .catch(() => setPending({}));
+    };
+    loadPending();
+    const pendingPoll = setInterval(loadPending, 30_000);
+
+    return () => {
+      clearInterval(pollId);
+      clearInterval(pendingPoll);
+    };
   }, []);
 
   const triggerSync = async () => {
@@ -203,6 +222,8 @@ export default function DashboardPage() {
           </Link>
         </motion.div>
       )}
+
+      <PendingQueue counts={pending} />
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {tiles.map((t, i) => {
@@ -385,5 +406,57 @@ function StockBar({ label, current, capacity, loading, href }: {
         </p>
       )}
     </Wrapper>
+  );
+}
+
+// Action queue: in 1 oogopslag waar ik (Laurens) actie moet ondernemen.
+// Toont alleen kanalen met >0 pending — geen 0-tegels die ruis maken.
+const PENDING_DEFS: Array<{ key: string; label: string; href: string; Icon: LucideIcon }> = [
+  { key: 'service_requests', label: 'Service-aanvragen', href: '/admin/service-requests', Icon: Wrench },
+  { key: 'transport', label: 'Transport', href: '/admin/transport', Icon: Truck },
+  { key: 'stalling', label: 'Stalling', href: '/admin/stalling', Icon: Warehouse },
+  { key: 'fridge', label: 'Koelkast/airco', href: '/admin/koelkasten?status=controleren', Icon: Refrigerator },
+  { key: 'contact', label: 'Contact-berichten', href: '/admin/contact', Icon: MessageSquare },
+];
+
+function PendingQueue({ counts }: { counts: Record<string, number> | null }) {
+  if (!counts) return null;
+  const items = PENDING_DEFS
+    .map((d) => ({ ...d, n: counts[d.key] || 0 }))
+    .filter((d) => d.n > 0);
+  if (items.length === 0) {
+    return (
+      <div className="mb-6 rounded-[var(--radius-lg)] border border-border p-4 flex items-center gap-3" style={{ background: 'var(--color-success-soft)' }}>
+        <CheckCircle2 size={16} className="text-success" />
+        <span className="text-[13px] text-text">Niets in de wachtrij — alles is afgehandeld.</span>
+      </div>
+    );
+  }
+  return (
+    <div className="mb-6">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-text-muted mb-2 flex items-center gap-2">
+        <AlertCircle size={12} /> Action queue
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        {items.map((it) => {
+          const Icon = it.Icon;
+          return (
+            <Link
+              key={it.key}
+              href={it.href}
+              className="card-surface hover-lift p-3 flex items-center gap-3"
+            >
+              <span className="w-9 h-9 rounded-md grid place-items-center flex-shrink-0" style={{ background: 'var(--color-warning-soft)', color: 'var(--color-warning)' }}>
+                <Icon size={16} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="text-2xl font-semibold tabular-nums leading-none">{it.n}</div>
+                <div className="text-[11px] uppercase tracking-[0.14em] text-text-muted mt-1 truncate">{it.label}</div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
   );
 }

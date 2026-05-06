@@ -78,7 +78,18 @@ function LoginForm({ t }: { t: T }) {
       </div>
 
       <div className="field-mk">
-        <label htmlFor="login-password">{t('pt1.login-password')}</label>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 4 }}>
+          <label htmlFor="login-password" style={{ margin: 0 }}>{t('pt1.login-password')}</label>
+          <Link
+            href="/account/wachtwoord-vergeten"
+            style={{
+              fontSize: 12, color: 'var(--muted)', textDecoration: 'none',
+              fontFamily: 'var(--sora)', fontWeight: 500,
+            }}
+          >
+            Wachtwoord vergeten?
+          </Link>
+        </div>
         <input
           id="login-password"
           type="password"
