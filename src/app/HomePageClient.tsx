@@ -498,13 +498,13 @@ function Campings({ campings }: { campings: Camping[] }) {
               className="card-mk card-lift block"
               style={{ padding: 0, overflow: 'hidden', textDecoration: 'none' }}
             >
-              <div style={{ position: 'relative', aspectRatio: '4 / 3', background: 'var(--surface-2)' }}>
-                <Image
+              <div style={{ position: 'relative', aspectRatio: '4 / 3', background: 'var(--surface-2)', overflow: 'hidden' }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={c.photos[0]}
                   alt={c.name}
-                  fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  style={{ objectFit: 'cover' }}
+                  loading="lazy"
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               </div>
               <div style={{ padding: '12px 14px 14px' }}>

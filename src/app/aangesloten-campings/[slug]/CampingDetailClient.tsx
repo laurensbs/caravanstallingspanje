@@ -64,13 +64,11 @@ export default function CampingDetailClient({ camping }: { camping: Camping }) {
                   }}
                 >
                   {activePhoto && (
-                    <Image
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
                       src={activePhoto}
                       alt={camping.name}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 60vw"
-                      style={{ objectFit: 'cover' }}
-                      priority
+                      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                   )}
                 </motion.div>
@@ -96,7 +94,8 @@ export default function CampingDetailClient({ camping }: { camping: Camping }) {
                           position: 'relative',
                         }}
                       >
-                        <Image src={url} alt="" fill sizes="96px" style={{ objectFit: 'cover' }} />
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={url} alt="" loading="lazy" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                       </button>
                     ))}
                   </div>

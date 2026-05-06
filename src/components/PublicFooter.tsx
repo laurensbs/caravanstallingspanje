@@ -61,13 +61,11 @@ export default function PublicFooter() {
               Zustersite
             </p>
             <a href="https://caravanverhuurspanje.com" target="_blank" rel="noopener noreferrer" className="inline-block">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src="https://u.cubeupload.com/laurensbos/12aCaravanverhuur2.png"
                 alt="Caravanverhuur Costa Brava"
-                width={400}
-                height={160}
                 style={{ height: 32, width: 'auto', filter: 'brightness(0) invert(1) opacity(0.8)' }}
-                unoptimized
               />
             </a>
           </div>

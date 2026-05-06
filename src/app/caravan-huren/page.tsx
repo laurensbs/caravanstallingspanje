@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight, ExternalLink, Tent, Package, Camera, Wallet, Shield, Truck,
@@ -61,14 +60,12 @@ function Hero() {
       {/* Video achtergrond */}
       <div className="absolute inset-0" style={{ zIndex: 0 }}>
         {/* Poster fallback (instant paint) */}
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={VIDEO_POSTER}
           alt=""
-          fill
-          priority
-          sizes="100vw"
+          className="absolute inset-0 w-full h-full"
           style={{ objectFit: 'cover' }}
-          unoptimized
         />
         {/* Mobile native video — autoplays met poster, HLS bron */}
         <video
@@ -116,13 +113,11 @@ function Hero() {
               boxShadow: '0 8px 24px -10px rgba(0, 0, 0, 0.4)',
             }}
           >
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={VERHUUR_LOGO}
               alt="Caravanverhuur Spanje logo"
-              width={180}
-              height={40}
               style={{ height: 22, width: 'auto', objectFit: 'contain' }}
-              unoptimized
             />
             <span style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 11, color: 'var(--muted)', letterSpacing: 0.6 }}>
               ZUSTERSITE

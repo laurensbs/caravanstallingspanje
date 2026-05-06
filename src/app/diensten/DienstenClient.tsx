@@ -260,13 +260,11 @@ function SisterSite({ t }: { t: T }) {
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-0 items-stretch">
             <div style={{ padding: '40px 36px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <span className="eyebrow-mk on-navy">Zustersite</span>
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src="https://u.cubeupload.com/laurensbos/12aCaravanverhuur2.png"
                 alt="Caravanverhuur Costa Brava"
-                width={400}
-                height={160}
                 style={{ height: 48, width: 'auto', marginTop: 10, filter: 'brightness(0) invert(1)' }}
-                unoptimized
               />
               <p style={{ marginTop: 18, color: 'rgba(255,255,255,0.82)', fontSize: 15, lineHeight: 1.6 }}>
                 Geen eigen caravan? Huur er één bij onze zustersite. Volledig uitgeruste caravans op vaste plekken, met onze service en transport inbegrepen.

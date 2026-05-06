@@ -196,12 +196,12 @@ function CampingCard({ camping }: { camping: Camping }) {
         }}
       >
         {heroPhoto && (
-          <Image
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
             src={heroPhoto}
             alt={camping.name}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            style={{ objectFit: 'cover' }}
+            loading="lazy"
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
           />
         )}
         <span
