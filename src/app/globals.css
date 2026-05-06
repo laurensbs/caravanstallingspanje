@@ -1694,8 +1694,11 @@ a.card-mk:hover, button.card-mk:hover, .card-mk.is-clickable:hover {
   flex-shrink: 0;
 }
 
-/* ───── Display numerals (decoratief, oversized achter content) ───── */
-.display-num {
+/* ───── Display numerals (decoratief, oversized achter content) ─────
+   Vereist explicit .display-num-bg modifier-class om de absolute-positioning
+   en transparent-stroke styling te triggeren — anders is het gewoon een
+   normaal element waar inline styles vrij overrulen. */
+.display-num.display-num-bg {
   font-family: var(--sora);
   font-weight: 800;
   font-size: 280px;
@@ -1706,6 +1709,14 @@ a.card-mk:hover, button.card-mk:hover, .card-mk.is-clickable:hover {
   position: absolute;
   pointer-events: none;
   user-select: none;
+}
+/* Voor "normaal" gebruik als prijs-display: gewoon sora bold met netjes
+   formaat. Inline styles bepalen exacte waardes (size/color/margin). */
+.display-num {
+  font-family: var(--sora);
+  font-weight: 700;
+  letter-spacing: -0.012em;
+  line-height: 1.1;
 }
 
 /* ───── Scarcity bar ───── */
