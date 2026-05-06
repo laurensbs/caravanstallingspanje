@@ -53,123 +53,84 @@ function Hero() {
       : { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6, ease: EASE, delay } };
 
   return (
-    <section
-      className="relative overflow-hidden"
-      style={{ minHeight: 'min(640px, 80vh)', display: 'flex', alignItems: 'flex-end' }}
-    >
-      {/* Video achtergrond */}
-      <div className="absolute inset-0" style={{ zIndex: 0 }}>
-        {/* Poster fallback (instant paint) */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={VIDEO_POSTER}
-          alt=""
-          className="absolute inset-0 w-full h-full"
-          style={{ objectFit: 'cover' }}
-        />
-        {/* Mobile native video — autoplays met poster, HLS bron */}
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full sm:hidden"
-          style={{ objectFit: 'cover' }}
-          poster={VIDEO_POSTER}
-        >
-          <source src={VIDEO_HLS} type="application/x-mpegURL" />
-        </video>
-        {/* Desktop iframe — zelfde stream, betere quality */}
-        <iframe
-          src={VIDEO_IFRAME}
-          title="Costa Brava video"
-          allow="autoplay; fullscreen"
-          loading="eager"
-          className="absolute inset-0 w-full h-full hidden sm:block"
-          style={{ border: 0, transform: 'scale(1.4)', pointerEvents: 'none' }}
-        />
-        {/* Donkere gradient voor leesbaarheid */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(to top, rgba(15,23,32,0.85) 0%, rgba(15,23,32,0.50) 50%, rgba(15,23,32,0.20) 100%)',
-          }}
-        />
-      </div>
+    <section className="section-bg-sky-soft">
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-14 sm:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-14 items-center">
+          <div>
+            <motion.div {...fade(0)} style={{ marginBottom: 18 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={VERHUUR_LOGO}
+                alt="Caravanverhuur Spanje"
+                style={{
+                  height: 'clamp(56px, 7.5vw, 84px)',
+                  width: 'auto',
+                  objectFit: 'contain',
+                }}
+              />
+            </motion.div>
 
-      {/* Hero-content */}
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-10 py-12 sm:py-20 w-full" style={{ zIndex: 1 }}>
-        <div className="max-w-[720px]">
-          <motion.div {...fade(0)} style={{ marginBottom: 22 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={VERHUUR_LOGO}
-              alt="Caravanverhuur Spanje"
+            <motion.span {...fade(0.06)} className="eyebrow-mk">
+              <Sun size={12} aria-hidden style={{ display: 'inline', marginRight: 6 }} /> Vakantie zonder gedoe
+            </motion.span>
+            <motion.h1 {...fade(0.12)} className="h1-mk" style={{ marginTop: 6 }}>
+              Geen eigen caravan? Huur er een.
+            </motion.h1>
+            <motion.p {...fade(0.18)} className="lead-mk" style={{ marginTop: 14, maxWidth: 580 }}>
+              Onze zustersite <strong>Caravanverhuur Spanje</strong> levert volledig
+              uitgeruste caravans op partner-campings aan de Costa Brava — bezorgd,
+              opgesteld en klaar voor jouw vakantie.
+            </motion.p>
+
+            <motion.div {...fade(0.24)} className="mt-7 flex flex-wrap gap-3">
+              <a
+                href={VERHUUR_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+              >
+                Bekijk aanbod <ExternalLink size={15} aria-hidden />
+              </a>
+              <Link href="/aangesloten-campings" className="btn btn-ghost">
+                <MapPin size={14} aria-hidden /> Bekijk campings
+              </Link>
+            </motion.div>
+
+            <motion.div {...fade(0.32)} style={{ marginTop: 28, display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+              <span className="spec-chip">
+                <span className="v">50+</span>
+                <span className="l">Campings</span>
+              </span>
+              <span className="spec-chip">
+                <span className="v">All-in</span>
+                <span className="l">Bezorgd + opgesteld</span>
+              </span>
+              <span className="spec-chip">
+                <span className="v">25%</span>
+                <span className="l">Aanbetaling</span>
+              </span>
+            </motion.div>
+          </div>
+
+          {/* Hero foto rechts */}
+          <motion.div {...fade(0.18)} className="hidden lg:block">
+            <div
               style={{
-                height: 'clamp(64px, 9vw, 100px)',
-                width: 'auto',
-                objectFit: 'contain',
-                filter: 'brightness(0) invert(1) drop-shadow(0 4px 16px rgba(0, 0, 0, 0.4))',
+                position: 'relative',
+                aspectRatio: '5 / 4',
+                borderRadius: 22,
+                overflow: 'hidden',
+                boxShadow: 'var(--shadow-card-mk), 0 32px 64px -24px rgba(31, 42, 54, 0.30)',
+                border: '1px solid rgba(255, 255, 255, 0.40)',
               }}
-            />
-          </motion.div>
-
-          <motion.span {...fade(0.06)} className="eyebrow-mk on-navy">
-            <Sun size={12} aria-hidden style={{ display: 'inline', marginRight: 6 }} /> Vakantie zonder gedoe
-          </motion.span>
-          <motion.h1
-            {...fade(0.12)}
-            style={{
-              fontFamily: 'var(--sora)', fontWeight: 800, color: '#fff',
-              fontSize: 'clamp(2.2rem, 5vw, 3.6rem)', lineHeight: 1.05, marginTop: 6,
-              textShadow: '0 2px 24px rgba(0,0,0,0.4)', letterSpacing: '-0.02em',
-            }}
-          >
-            Geen eigen caravan? Huur er een.
-          </motion.h1>
-          <motion.p
-            {...fade(0.18)}
-            style={{
-              color: 'rgba(255,255,255,0.92)', fontSize: 'clamp(15px, 2.2vw, 18px)',
-              lineHeight: 1.55, maxWidth: 580, marginTop: 16,
-              textShadow: '0 1px 16px rgba(0,0,0,0.4)',
-            }}
-          >
-            Onze zustersite <strong>Caravanverhuur Spanje</strong> levert volledig
-            uitgeruste caravans op partner-campings aan de Costa Brava — bezorgd,
-            opgesteld en klaar voor jouw vakantie.
-          </motion.p>
-
-          <motion.div {...fade(0.24)} className="mt-7 flex flex-wrap gap-3">
-            <a
-              href={VERHUUR_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-primary"
             >
-              Bekijk aanbod <ExternalLink size={15} aria-hidden />
-            </a>
-            <Link
-              href="/aangesloten-campings"
-              className="btn btn-ghost-light"
-            >
-              <MapPin size={14} aria-hidden /> Bekijk campings
-            </Link>
-          </motion.div>
-
-          <motion.div {...fade(0.32)} style={{ marginTop: 28, display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-            <span className="spec-chip" style={{ background: 'rgba(255,255,255,0.92)' }}>
-              <span className="v">50+</span>
-              <span className="l">Campings</span>
-            </span>
-            <span className="spec-chip" style={{ background: 'rgba(255,255,255,0.92)' }}>
-              <span className="v">All-in</span>
-              <span className="l">Bezorgd + opgesteld</span>
-            </span>
-            <span className="spec-chip" style={{ background: 'rgba(255,255,255,0.92)' }}>
-              <span className="v">25%</span>
-              <span className="l">Aanbetaling</span>
-            </span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/caravanverhuur/hero.jpg"
+                alt="Caravan-verhuur op de Costa Brava"
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            </div>
           </motion.div>
         </div>
       </div>
@@ -333,68 +294,114 @@ function InventoryBlock() {
   const totalItems = INVENTORY.reduce((sum, c) => sum + c.items.length, 0);
   return (
     <section className="py-16 sm:py-20 section-bg-grey">
-      <div className="max-w-[820px] mx-auto px-5 sm:px-10">
-        <div className="text-center max-w-[720px] mx-auto mb-10">
-          <span className="eyebrow-mk">Wat zit erbij</span>
-          <h2 className="h2-mk">Volledige inventaris inbegrepen</h2>
-          <p className="lead-mk" style={{ marginTop: 10 }}>
-            {totalItems}+ items, klaar om te gebruiken. Alleen beddengoed neem je zelf mee — of huur het bij ons.
-          </p>
-        </div>
-        <div className="card-mk" style={{ padding: 0, overflow: 'hidden' }}>
-          {INVENTORY.map((cat, i) => {
-            const isOpen = openCat === i;
-            const Icon = cat.Icon;
-            return (
-              <div key={cat.label} style={{ borderBottom: i < INVENTORY.length - 1 ? '1px solid var(--line)' : 'none' }}>
-                <button
-                  type="button"
-                  onClick={() => setOpenCat(isOpen ? null : i)}
-                  style={{
-                    width: '100%', display: 'flex', alignItems: 'center', gap: 14,
-                    padding: '16px 22px', background: 'none', border: 'none', cursor: 'pointer',
-                    textAlign: 'left',
-                  }}
-                  aria-expanded={isOpen}
-                >
-                  <span style={{ color: 'var(--orange-d)', display: 'inline-flex' }}>
-                    <Icon size={18} />
-                  </span>
-                  <span style={{ flex: 1, fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 15, color: 'var(--navy)' }}>
-                    {cat.label}
-                  </span>
-                  <span style={{ fontSize: 12, color: 'var(--muted)', marginRight: 4 }}>
-                    {cat.items.length}
-                  </span>
-                  <ChevronDown
-                    size={16}
-                    style={{
-                      color: 'var(--muted)',
-                      transition: 'transform 0.18s',
-                      transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                    }}
-                  />
-                </button>
-                {isOpen && (
-                  <div style={{ padding: '4px 22px 18px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 6 }}>
-                    {cat.items.map((it) => (
-                      <span
-                        key={it}
-                        style={{
-                          fontSize: 12.5, color: 'var(--ink-2)',
-                          display: 'inline-flex', alignItems: 'center', gap: 6,
-                          padding: '6px 10px', background: 'var(--bg)', borderRadius: 8,
-                        }}
-                      >
-                        <CheckCircle size={11} aria-hidden style={{ color: 'var(--orange-d)', flexShrink: 0 }} />
-                        {it}
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[0.95fr_1fr] gap-10 lg:gap-14 items-start">
+          {/* Video links (sticky op desktop zodat hij meelift met de scroll) */}
+          <div className="lg:sticky" style={{ top: 24 }}>
+            <div
+              style={{
+                position: 'relative',
+                aspectRatio: '16 / 10',
+                borderRadius: 18,
+                overflow: 'hidden',
+                boxShadow: 'var(--shadow-card-mk), 0 24px 48px -20px rgba(31, 42, 54, 0.30)',
+                background: '#0F1720',
+              }}
+            >
+              {/* Poster image (instant paint) */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={VIDEO_POSTER}
+                alt="Caravanverhuur Costa Brava"
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+              {/* Mobile: native video met HLS-bron */}
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="sm:hidden"
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                poster={VIDEO_POSTER}
+              >
+                <source src={VIDEO_HLS} type="application/x-mpegURL" />
+              </video>
+              {/* Desktop: iframe met betere quality */}
+              <iframe
+                src={VIDEO_IFRAME}
+                title="Caravanverhuur Costa Brava video"
+                allow="autoplay; fullscreen"
+                loading="lazy"
+                className="hidden sm:block"
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0, pointerEvents: 'none' }}
+              />
+            </div>
+          </div>
+
+          {/* Inventaris-content rechts */}
+          <div>
+            <span className="eyebrow-mk">Wat zit erbij</span>
+            <h2 className="h2-mk">Alles inbegrepen in elke caravan</h2>
+            <p className="lead-mk" style={{ marginTop: 10 }}>
+              {totalItems}+ items, klaar om te gebruiken. Alleen beddengoed neem je zelf mee — of huur het bij ons.
+            </p>
+            <div className="card-mk" style={{ padding: 0, overflow: 'hidden', marginTop: 22 }}>
+              {INVENTORY.map((cat, i) => {
+                const isOpen = openCat === i;
+                const Icon = cat.Icon;
+                return (
+                  <div key={cat.label} style={{ borderBottom: i < INVENTORY.length - 1 ? '1px solid var(--line)' : 'none' }}>
+                    <button
+                      type="button"
+                      onClick={() => setOpenCat(isOpen ? null : i)}
+                      style={{
+                        width: '100%', display: 'flex', alignItems: 'center', gap: 14,
+                        padding: '16px 22px', background: 'none', border: 'none', cursor: 'pointer',
+                        textAlign: 'left',
+                      }}
+                      aria-expanded={isOpen}
+                    >
+                      <span style={{ color: 'var(--orange-d)', display: 'inline-flex' }}>
+                        <Icon size={18} />
                       </span>
-                    ))}
+                      <span style={{ flex: 1, fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 15, color: 'var(--navy)' }}>
+                        {cat.label}
+                      </span>
+                      <span style={{ fontSize: 12, color: 'var(--muted)', marginRight: 4 }}>
+                        {cat.items.length}
+                      </span>
+                      <ChevronDown
+                        size={16}
+                        style={{
+                          color: 'var(--muted)',
+                          transition: 'transform 0.18s',
+                          transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                        }}
+                      />
+                    </button>
+                    {isOpen && (
+                      <div style={{ padding: '4px 22px 18px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 6 }}>
+                        {cat.items.map((it) => (
+                          <span
+                            key={it}
+                            style={{
+                              fontSize: 12.5, color: 'var(--ink-2)',
+                              display: 'inline-flex', alignItems: 'center', gap: 6,
+                              padding: '6px 10px', background: 'var(--bg)', borderRadius: 8,
+                            }}
+                          >
+                            <CheckCircle size={11} aria-hidden style={{ color: 'var(--orange-d)', flexShrink: 0 }} />
+                            {it}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
     </section>
