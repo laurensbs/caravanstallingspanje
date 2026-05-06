@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Check, Sparkles } from 'lucide-react';
 import {
@@ -26,9 +27,19 @@ type CatalogService = {
 type ServiceForm = z.input<typeof serviceOrderSchema>;
 
 export default function ServicePage() {
+  return (
+    <Suspense fallback={null}>
+      <ServiceContent />
+    </Suspense>
+  );
+}
+
+function ServiceContent() {
   const { t, locale } = useLocale();
   const formatEur = (eur: number) => fmtEur(eur, locale, 2);
   const [catalog, setCatalog] = useState<CatalogService[] | null>(null);
+  const params = useSearchParams();
+  const presetType = params.get('type') || '';
 
   const form = useZodForm<ServiceForm>(serviceOrderSchema, {
     defaultValues: {
@@ -49,9 +60,19 @@ export default function ServicePage() {
   useEffect(() => {
     fetch('/api/order/services-catalog')
       .then((r) => r.json())
-      .then((d) => setCatalog(d.services || []))
+      .then((d) => {
+        const list = d.services || [];
+        setCatalog(list);
+        // Pre-select via ?type=<slug> uit /tarieven-link. Pas pre-selecten
+        // als de slug ook bestaat in de gefetchte catalog — anders blijft 't
+        // veld leeg en kiest klant zelf.
+        if (presetType && list.some((s: CatalogService) => s.slug === presetType)) {
+          setValue('serviceCategory', presetType, { shouldValidate: false, shouldDirty: false });
+        }
+      })
       .catch(() => setCatalog([]));
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [presetType]);
 
   const selected = catalog?.find((s) => s.slug === serviceSlug);
   const step1Valid = !!selected;
