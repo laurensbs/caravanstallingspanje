@@ -533,6 +533,8 @@ export const STRINGS = {
   'nav.login': { nl: 'Inloggen', en: 'Log in' },
   'nav.cta-pickup': { nl: 'Plan ophaaldatum', en: 'Schedule pickup' },
   'topbar.live': { nl: 'Live: 4 plekken vrij', en: 'Live: 4 spots free' },
+  'nav.campings': { nl: 'Campings', en: 'Campsites' },
+  'nav.campings-sub': { nl: 'Aangesloten campings waar wij leveren', en: 'Affiliated campsites we deliver to' },
   'topbar.address': { nl: 'Ctra. de Palamós 9, Sant Climent de Peralta', en: 'Ctra. de Palamós 9, Sant Climent de Peralta' },
   'wa.help': { nl: 'Kunnen wij helpen?', en: 'Can we help?' },
   'scarcity.text': { nl: 'Nog 4 plekken vrij voor het hoogseizoen', en: 'Only 4 spots left for high season' },
