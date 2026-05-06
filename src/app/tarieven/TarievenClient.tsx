@@ -21,6 +21,10 @@ interface Props {
   airco: number;
   transportWij: number;
   transportZelf: number;
+  cleaningFull: number;
+  maintenanceFull: number;
+  inspection: number;
+  repairHourly: number;
 }
 
 function fmtEur(n: number, suffix?: string) {
@@ -37,6 +41,10 @@ export default function TarievenClient(props: Props) {
   const { t } = useLocale();
   const onRequest = t('pri1.on-request');
 
+  // Helper: toont vast bedrag als > 0, anders "Op aanvraag".
+  const priced = (n: number, suffix?: string) =>
+    n > 0 ? fmtEur(n, suffix) : onRequest;
+
   const cats: Cat[] = [
     {
       titleKey: 'pri1.cat-storage',
@@ -52,7 +60,7 @@ export default function TarievenClient(props: Props) {
         { keyL: 'pri1.cat-clean-row-1', price: onRequest },
         { keyL: 'pri1.cat-clean-row-2', price: onRequest },
         { keyL: 'pri1.cat-clean-row-3', price: onRequest },
-        { keyL: 'pri1.cat-clean-row-4', price: onRequest, featured: true },
+        { keyL: 'pri1.cat-clean-row-4', price: priced(props.cleaningFull), featured: true },
       ],
     },
     {
@@ -61,7 +69,7 @@ export default function TarievenClient(props: Props) {
         { keyL: 'pri1.cat-maint-row-1', price: onRequest },
         { keyL: 'pri1.cat-maint-row-2', price: onRequest },
         { keyL: 'pri1.cat-maint-row-3', price: onRequest },
-        { keyL: 'pri1.cat-maint-row-4', price: onRequest, featured: true },
+        { keyL: 'pri1.cat-maint-row-4', price: priced(props.maintenanceFull), featured: true },
       ],
     },
     {
@@ -75,7 +83,7 @@ export default function TarievenClient(props: Props) {
     {
       titleKey: 'pri1.cat-inspection',
       rows: [
-        { keyL: 'pri1.cat-inspection-row-1', price: onRequest },
+        { keyL: 'pri1.cat-inspection-row-1', price: priced(props.inspection) },
         { keyL: 'pri1.cat-inspection-row-2', price: onRequest },
       ],
     },
@@ -96,7 +104,7 @@ export default function TarievenClient(props: Props) {
       <main id="main" className="flex-1">
         <Hero t={t} />
         <Tables t={t} cats={cats} />
-        <Notes t={t} />
+        <Notes t={t} repairHourly={props.repairHourly} />
       </main>
       <PublicFooter />
     </div>
@@ -153,8 +161,11 @@ function Tables({ t, cats }: { t: T; cats: Cat[] }) {
   );
 }
 
-function Notes({ t }: { t: T }) {
+function Notes({ t, repairHourly }: { t: T; repairHourly: number }) {
   const notes: StringKey[] = ['pri1.note-1', 'pri1.note-2', 'pri1.note-3', 'pri1.note-4'];
+  const hourlyText = repairHourly > 0
+    ? `Reparatie wordt op uurbasis afgerekend (${fmtEur(repairHourly, '/u')}) of via een vaste prijs in offerte.`
+    : null;
   return (
     <section className="py-12 sm:py-16 section-bg-grey">
       <div className="max-w-[1080px] mx-auto px-5 sm:px-10">
@@ -169,6 +180,12 @@ function Notes({ t }: { t: T }) {
                 {t(k)}
               </li>
             ))}
+            {hourlyText && (
+              <li style={{ paddingLeft: 18, position: 'relative' }}>
+                <span aria-hidden style={{ position: 'absolute', left: 0, top: '0.55em', width: 6, height: 6, borderRadius: 999, background: 'var(--orange)' }} />
+                {hourlyText}
+              </li>
+            )}
           </ul>
           <div style={{ marginTop: 22, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <Link href="/contact?subject=Offerte-aanvraag" className="btn btn-primary">
