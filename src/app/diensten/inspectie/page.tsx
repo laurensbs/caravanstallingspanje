@@ -6,6 +6,7 @@ import { Phone, FileText, Check } from 'lucide-react';
 import Topbar from '@/components/marketing/Topbar';
 import PublicHeader from '@/components/PublicHeader';
 import PublicFooter from '@/components/PublicFooter';
+import IntakeForm from '@/components/IntakeForm';
 import { useLocale } from '@/components/LocaleProvider';
 import type { StringKey } from '@/lib/i18n';
 
@@ -22,6 +23,7 @@ export default function InspectiePage() {
         <Hero t={t} />
         <Checklist t={t} />
         <Report t={t} />
+        <FormSection />
         <CtaBand t={t} />
       </main>
       <PublicFooter />
@@ -160,6 +162,31 @@ function ScoreRow({ label, status }: { label: string; status: 'green' | 'amber' 
         {status === 'green' ? 'OK' : status === 'amber' ? 'Let op' : 'Vervangen'}
       </span>
     </div>
+  );
+}
+
+function FormSection() {
+  return (
+    <section className="py-16 sm:py-20 section-bg-grey">
+      <div className="max-w-[820px] mx-auto px-5 sm:px-10">
+        <div className="text-center max-w-[640px] mx-auto mb-10">
+          <span className="eyebrow-mk">Aanvragen</span>
+          <h2 className="h2-mk">Plan je inspectie</h2>
+          <p className="lead-mk" style={{ marginTop: 10 }}>
+            Vul je voorkeursdatum en eventuele aandachtspunten in — wij sturen binnen 48u een datum-voorstel.
+          </p>
+        </div>
+        <IntakeForm
+          endpoint="/api/order/inspection"
+          uploadKind="inspection-intake"
+          title="Inspectie-aanvraag"
+          intro="25-punts technische check, PDF-rapport. Je kunt foto's meesturen van eventuele bestaande zorgen."
+          descriptionPlaceholder="Bv: Pre-seizoens-check; aandachtspunten zijn lekkage rechts achter en remmen die weleens piepen. Voor de verzekering of voor verkoop?"
+          withPreferredDate
+          submitLabel="Plan inspectie"
+        />
+      </div>
+    </section>
   );
 }
 

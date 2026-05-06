@@ -14,10 +14,17 @@ export async function POST(req: NextRequest) {
     }
     const d = validated.data;
 
+    const attachments = d.attachments || [];
+    const metadata: Record<string, string> = { source: 'website-inspection-form' };
+    attachments.forEach((a, i) => { metadata[`photo_${i + 1}`] = a.url; });
+    const attachmentLines = attachments.length
+      ? '\n\nBijlagen:\n' + attachments.map((a, i) => `  ${i + 1}. ${a.fileName} — ${a.url}`).join('\n')
+      : '';
+
     const description = [
       d.description || 'Inspectie-aanvraag',
       d.preferredDate ? `Voorkeursdatum: ${d.preferredDate}` : null,
-    ].filter(Boolean).join('\n');
+    ].filter(Boolean).join('\n') + attachmentLines;
 
     const result = await sendIntake({
       type: 'inspection',
@@ -29,6 +36,7 @@ export async function POST(req: NextRequest) {
       title: 'Inspectie-aanvraag',
       description,
       locationHint: d.locationHint || undefined,
+      metadata,
     });
 
     await logActivity({

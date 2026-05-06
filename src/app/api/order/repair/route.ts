@@ -14,6 +14,13 @@ export async function POST(req: NextRequest) {
     }
     const d = validated.data;
 
+    const attachments = d.attachments || [];
+    const metadata: Record<string, string> = { source: 'website-repair-form' };
+    attachments.forEach((a, i) => { metadata[`photo_${i + 1}`] = a.url; });
+    const attachmentLines = attachments.length
+      ? '\n\nBijlagen:\n' + attachments.map((a, i) => `  ${i + 1}. ${a.fileName} — ${a.url}`).join('\n')
+      : '';
+
     const result = await sendIntake({
       type: 'repair',
       customer: {
@@ -22,8 +29,9 @@ export async function POST(req: NextRequest) {
       },
       unit: d.registration ? { registration: d.registration, brand: d.brand || undefined, model: d.model || undefined } : undefined,
       title: 'Reparatie-aanvraag',
-      description: d.description,
+      description: d.description + attachmentLines,
       locationHint: d.locationHint || undefined,
+      metadata,
     });
 
     await logActivity({

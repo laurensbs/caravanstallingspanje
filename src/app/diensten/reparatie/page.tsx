@@ -9,6 +9,7 @@ import type { LucideIcon } from 'lucide-react';
 import Topbar from '@/components/marketing/Topbar';
 import PublicHeader from '@/components/PublicHeader';
 import PublicFooter from '@/components/PublicFooter';
+import IntakeForm from '@/components/IntakeForm';
 import { useLocale } from '@/components/LocaleProvider';
 import type { StringKey } from '@/lib/i18n';
 
@@ -25,6 +26,7 @@ export default function ReparatiePage() {
         <Hero t={t} />
         <Specialties t={t} />
         <Process t={t} />
+        <FormSection />
         <UrgentBand t={t} />
       </main>
       <PublicFooter />
@@ -155,6 +157,29 @@ function Process({ t }: { t: T }) {
             </div>
           ))}
         </div>
+      </div>
+    </section>
+  );
+}
+
+function FormSection() {
+  return (
+    <section className="py-16 sm:py-20 section-bg-grey">
+      <div className="max-w-[820px] mx-auto px-5 sm:px-10">
+        <div className="text-center max-w-[640px] mx-auto mb-10">
+          <span className="eyebrow-mk">Aanvragen</span>
+          <h2 className="h2-mk">Stuur ons je reparatie-aanvraag</h2>
+          <p className="lead-mk" style={{ marginTop: 10 }}>
+            Voeg foto&apos;s toe — dat scheelt heen-en-weer mailen en we kunnen direct een offerte maken.
+          </p>
+        </div>
+        <IntakeForm
+          endpoint="/api/order/repair"
+          uploadKind="repair-intake"
+          title="Reparatie-aanvraag"
+          intro="Beschrijf zo concreet mogelijk wat er aan de hand is. Foto's vóór de schade én van het gebied helpen ons enorm."
+          descriptionPlaceholder="Bv: Klein lek bij raamhoek rechts achter, zichtbaar na regen. Caravan stond 3 maanden buiten."
+        />
       </div>
     </section>
   );

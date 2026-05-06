@@ -100,9 +100,17 @@ const contactBase = {
   locationHint: z.string().max(300).optional().or(z.literal('')),
 };
 
+const attachmentsField = z.array(z.object({
+  url: z.string().url(),
+  webUrl: z.string().url().optional(),
+  fileName: z.string().max(200),
+  sizeKb: z.number().int().nonnegative().optional(),
+})).max(8).optional();
+
 export const repairOrderSchema = z.object({
   ...contactBase,
   description: z.string().min(5).max(3000),
+  attachments: attachmentsField,
 });
 
 export const serviceOrderSchema = z.object({
@@ -115,6 +123,7 @@ export const inspectionOrderSchema = z.object({
   ...contactBase,
   preferredDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().or(z.literal('')),
   description: z.string().max(2000).optional().or(z.literal('')),
+  attachments: attachmentsField,
 });
 
 // Transport = betaalde dienst met twee modes:
@@ -156,6 +165,16 @@ export const contactMessageSchema = z.object({
   phone: z.string().max(40).optional().or(z.literal('')),
   subject: z.string().max(200).optional().or(z.literal('')),
   message: z.string().min(5, 'Schrijf een bericht').max(5000),
+  topic: z.enum(['storage', 'repair', 'inspection', 'sales', 'general']).optional(),
+  registration: z.string().max(40).optional().or(z.literal('')),
+  brand: z.string().max(80).optional().or(z.literal('')),
+  model: z.string().max(80).optional().or(z.literal('')),
+  attachments: z.array(z.object({
+    url: z.string().url(),
+    webUrl: z.string().url().optional(),
+    fileName: z.string().max(200),
+    sizeKb: z.number().int().nonnegative().optional(),
+  })).max(8).optional(),
 });
 
 // Stalling stays local; not forwarded to reparatiepanel.
