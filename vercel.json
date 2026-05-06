@@ -4,6 +4,10 @@
     {
       "path": "/api/cron/holded-sync",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/holded-customers-sync",
+      "schedule": "0 */6 * * *"
     }
   ]
 }

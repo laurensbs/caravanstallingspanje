@@ -1610,6 +1610,40 @@ export async function getCustomerByHoldedId(holdedId: string): Promise<CustomerR
   return (rows[0] as CustomerRow) || null;
 }
 
+// Periodieke Holded-sync: pak klanten die aandacht nodig hebben.
+//   - holded_sync_failed = true → vorige push faalde, retry
+//   - holded_contact_id IS NULL en email IS NOT NULL → nog niet gekoppeld
+//   - laatst gesynced > 7d geleden → snapshot vernieuwen
+// Limit beperkt batch — anders kan een cron-call timeout-en op grote
+// klanten-lijst.
+export async function getCustomersNeedingHoldedSync(limit = 50): Promise<CustomerRow[]> {
+  await ensureCustomerSchema();
+  const rows = await sql`
+    SELECT * FROM customers
+    WHERE deleted_at IS NULL
+      AND email IS NOT NULL
+      AND (
+        holded_sync_failed = true
+        OR holded_contact_id IS NULL
+        OR holded_synced_at IS NULL
+        OR holded_synced_at < NOW() - INTERVAL '7 days'
+      )
+    ORDER BY
+      CASE WHEN holded_sync_failed THEN 0 ELSE 1 END,
+      holded_synced_at NULLS FIRST
+    LIMIT ${limit}`;
+  return rows as CustomerRow[];
+}
+
+export async function setCustomerHoldedLink(id: number, holdedContactId: string, syncOk: boolean) {
+  await sql`UPDATE customers
+    SET holded_contact_id = ${holdedContactId},
+        holded_sync_failed = ${!syncOk},
+        holded_synced_at = NOW(),
+        updated_at = NOW()
+    WHERE id = ${id}`;
+}
+
 export async function createCustomer(data: {
   name: string;
   email?: string | null;

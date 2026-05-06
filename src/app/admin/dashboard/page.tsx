@@ -119,6 +119,21 @@ export default function DashboardPage() {
     }
   };
 
+  const [syncingCustomers, setSyncingCustomers] = useState(false);
+  const triggerCustomerSync = async () => {
+    setSyncingCustomers(true);
+    try {
+      const res = await fetch('/api/cron/holded-customers-sync', { method: 'POST', credentials: 'include' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'sync failed');
+      toast.success(`Klanten gesynced — verwerkt ${data.processed}: gekoppeld ${data.linked}, aangemaakt ${data.created}, gepusht ${data.pushed}, snapshot ${data.pulled}${data.errors ? `, errors ${data.errors}` : ''}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Klant-sync mislukt');
+    } finally {
+      setSyncingCustomers(false);
+    }
+  };
+
   const byStatus = stats?.byStatus ?? [];
   const compleet = parseInt(byStatus.find((s) => s.status === 'compleet')?.count || '0');
   const controleren = parseInt(byStatus.find((s) => s.status === 'controleren')?.count || '0');
@@ -243,10 +258,16 @@ export default function DashboardPage() {
           <h2 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-text-muted flex items-center gap-2">
             <Receipt size={13} /> Pro formas in Holded
           </h2>
-          <Button size="sm" variant="secondary" onClick={triggerSync} disabled={syncing}>
-            {syncing ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
-            Sync now
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="secondary" onClick={triggerCustomerSync} disabled={syncingCustomers}>
+              {syncingCustomers ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
+              Sync klanten
+            </Button>
+            <Button size="sm" variant="secondary" onClick={triggerSync} disabled={syncing}>
+              {syncing ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
+              Sync facturen
+            </Button>
+          </div>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <InvoiceTile label="Paid" status="paid" rows={holded} tone="success" />
