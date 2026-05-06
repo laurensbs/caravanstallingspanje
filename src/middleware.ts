@@ -22,14 +22,26 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  // CSP. img-src is ruim om alle externe foto-bronnen te accepteren:
+  //  - cubeupload (admin uploadt camping- en logo-foto's daar)
+  //  - caravanverhuurspanje.com (zustersite host eigen foto's)
+  //  - Gumlet (video-thumbnails op /caravan-huren)
+  //  - Wikimedia (locatie-foto's bij bestemmingen)
+  //  - https: in algemene zin als veiligheidsnet zodat 1 nieuwe host
+  //    niet meteen de site sloopt; wij optimaliseren tóch alleen wat
+  //    Next/Image whitelist toelaat in next.config.
+  // connect-src bevat Open-Meteo (weer-api topbar) + caravanverhuur-hub
+  // (live campings/services) + Gumlet (HLS-stream).
+  // media-src is nieuw voor de mp4/HLS video op /caravan-huren.
   const csp = [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline'",
     "style-src 'self' 'unsafe-inline'",
     "font-src 'self' data:",
-    "img-src 'self' data: blob:",
-    "connect-src 'self' https://*.neon.tech https://api.holded.com https://api.stripe.com https://checkout.stripe.com",
-    "frame-src 'self' https://checkout.stripe.com https://js.stripe.com",
+    "img-src 'self' data: blob: https:",
+    "media-src 'self' blob: https://*.gumlet.io https://*.gumlet.com",
+    "connect-src 'self' https://*.neon.tech https://api.holded.com https://api.stripe.com https://checkout.stripe.com https://api.open-meteo.com https://caravanverhuurspanje.com https://*.gumlet.io https://*.gumlet.com",
+    "frame-src 'self' https://checkout.stripe.com https://js.stripe.com https://play.gumlet.io",
     "worker-src 'self' blob:",
     "object-src 'none'",
     "base-uri 'self'",
