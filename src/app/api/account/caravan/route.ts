@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyCustomerToken } from '@/lib/auth';
-import { getCustomerByEmail, getCaravansByCustomer, getServiceHistory } from '@/lib/db';
+import { getCustomerByEmail, getCaravansByCustomer, getServiceHistory, listCaravanPhotos } from '@/lib/db';
 
 // Geeft de caravan(s) + service-historie van de ingelogde klant terug.
 // Toont in /account dashboard caravan-card en /account/caravan tabs.
@@ -19,7 +19,10 @@ export async function GET(req: NextRequest) {
   // Toon alleen de eerste — voor klanten met meerdere caravans kunnen we
   // later een selector toevoegen.
   const caravan = caravans[0];
-  const history = await getServiceHistory(caravan.id);
+  const [history, photos] = await Promise.all([
+    getServiceHistory(caravan.id),
+    listCaravanPhotos(caravan.id),
+  ]);
   return NextResponse.json({
     caravan: {
       id: caravan.id,
@@ -43,6 +46,16 @@ export async function GET(req: NextRequest) {
       description: h.description,
       happenedOn: h.happened_on,
       createdAt: h.created_at,
+    })),
+    photos: photos.map((p) => ({
+      id: p.id,
+      url: p.url,
+      webUrl: p.web_url,
+      fileName: p.file_name,
+      sizeKb: p.size_kb,
+      caption: p.caption,
+      uploadedBy: p.uploaded_by,
+      createdAt: p.created_at,
     })),
   });
 }

@@ -2192,8 +2192,72 @@ export async function ensureCaravansSchema(): Promise<void> {
       sql`CREATE INDEX IF NOT EXISTS idx_caravan_service_history_caravan ON caravan_service_history(caravan_id)`);
     await tryMigrate('caravan_service_history.idx_happened', () =>
       sql`CREATE INDEX IF NOT EXISTS idx_caravan_service_history_happened ON caravan_service_history(happened_on DESC)`);
+
+    // Klant-foto's: foto's die de klant zelf upload via /account/caravan.
+    await tryMigrate('caravan_photos.create', () => sql`
+      CREATE TABLE IF NOT EXISTS caravan_photos (
+        id SERIAL PRIMARY KEY,
+        caravan_id INTEGER NOT NULL REFERENCES customer_caravans(id) ON DELETE CASCADE,
+        url TEXT NOT NULL,
+        web_url TEXT,
+        file_name TEXT,
+        size_kb INTEGER,
+        caption TEXT,
+        uploaded_by TEXT NOT NULL DEFAULT 'customer',
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    await tryMigrate('caravan_photos.idx_caravan', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_caravan_photos_caravan ON caravan_photos(caravan_id)`);
   })();
   return _caravansMigrationsApplied;
+}
+
+export type CaravanPhotoRow = {
+  id: number;
+  caravan_id: number;
+  url: string;
+  web_url: string | null;
+  file_name: string | null;
+  size_kb: number | null;
+  caption: string | null;
+  uploaded_by: string;
+  created_at: string;
+};
+
+export async function listCaravanPhotos(caravanId: number): Promise<CaravanPhotoRow[]> {
+  await ensureCaravansSchema();
+  return sql`SELECT * FROM caravan_photos WHERE caravan_id = ${caravanId} ORDER BY created_at DESC` as unknown as Promise<CaravanPhotoRow[]>;
+}
+
+export async function createCaravanPhoto(data: {
+  caravan_id: number;
+  url: string;
+  web_url?: string | null;
+  file_name?: string | null;
+  size_kb?: number | null;
+  caption?: string | null;
+  uploaded_by?: string;
+}): Promise<CaravanPhotoRow> {
+  await ensureCaravansSchema();
+  const rows = await sql`
+    INSERT INTO caravan_photos (caravan_id, url, web_url, file_name, size_kb, caption, uploaded_by)
+    VALUES (${data.caravan_id}, ${data.url}, ${data.web_url || null}, ${data.file_name || null},
+            ${data.size_kb ?? null}, ${data.caption || null}, ${data.uploaded_by || 'customer'})
+    RETURNING *` as unknown as CaravanPhotoRow[];
+  return rows[0];
+}
+
+export async function deleteCaravanPhoto(id: number): Promise<boolean> {
+  await ensureCaravansSchema();
+  const rows = await sql`DELETE FROM caravan_photos WHERE id = ${id} RETURNING id` as unknown as { id: number }[];
+  return rows.length > 0;
+}
+
+export async function getCaravanPhotoById(id: number): Promise<CaravanPhotoRow | null> {
+  await ensureCaravansSchema();
+  const rows = await sql`SELECT * FROM caravan_photos WHERE id = ${id}` as unknown as CaravanPhotoRow[];
+  return rows[0] || null;
 }
 
 export type CustomerCaravanRow = {

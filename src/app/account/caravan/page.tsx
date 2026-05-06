@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Loader2, Caravan as CaravanIcon, ShieldCheck, Calendar, FileText, Camera,
-  Wrench, ClipboardCheck, Sparkles, Download,
+  Wrench, ClipboardCheck, Sparkles, X,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import AccountLayout from '@/components/account/AccountLayout';
@@ -35,6 +35,17 @@ type Caravan = {
   notes: string | null;
 };
 
+type CaravanPhoto = {
+  id: number;
+  url: string;
+  webUrl: string | null;
+  fileName: string | null;
+  sizeKb: number | null;
+  caption: string | null;
+  uploadedBy: string;
+  createdAt: string;
+};
+
 type ServiceHistoryItem = {
   id: number;
   kind: string;
@@ -53,6 +64,7 @@ export default function MijnCaravanPage() {
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [caravan, setCaravan] = useState<Caravan | null>(null);
   const [history, setHistory] = useState<ServiceHistoryItem[]>([]);
+  const [photos, setPhotos] = useState<CaravanPhoto[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>('overview');
 
@@ -75,6 +87,7 @@ export default function MijnCaravanPage() {
           if (!alive) return;
           setCaravan(cv.caravan);
           setHistory(cv.history || []);
+          setPhotos(cv.photos || []);
         }
       } catch {
         if (alive) router.push('/account/login');
@@ -183,7 +196,7 @@ export default function MijnCaravanPage() {
           {tab === 'overview' && <OverviewTab t={t} caravan={caravan} />}
           {tab === 'history' && <HistoryTab t={t} history={history} />}
           {tab === 'docs' && <DocsTab t={t} />}
-          {tab === 'photos' && <PhotosTab t={t} />}
+          {tab === 'photos' && <PhotosTab t={t} caravanId={caravan.id} initialPhotos={photos} />}
         </>
       )}
     </AccountLayout>
@@ -377,11 +390,194 @@ function DocsTab({ t }: { t: T }) {
   );
 }
 
-function PhotosTab({ t }: { t: T }) {
+function PhotosTab({
+  t, caravanId, initialPhotos,
+}: {
+  t: T;
+  caravanId: number;
+  initialPhotos: CaravanPhoto[];
+}) {
+  const [photos, setPhotos] = useState<CaravanPhoto[]>(initialPhotos);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
+
+  const uploadRef = `caravan-${caravanId}`;
+
+  const handleFiles = async (files: FileList) => {
+    setError('');
+    setUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        if (file.size > 10 * 1024 * 1024) {
+          setError(`${file.name}: te groot (>10 MB)`);
+          continue;
+        }
+        // Upload naar OneDrive
+        const fd = new FormData();
+        fd.append('file', file);
+        fd.append('kind', 'contact'); // Geen aparte kind voor klant-foto's, hergebruiken
+        fd.append('ref', uploadRef);
+        const upRes = await fetch('/api/uploads', { method: 'POST', body: fd });
+        const up = await upRes.json();
+        if (!upRes.ok) {
+          setError(up?.error || `Upload mislukt: ${file.name}`);
+          continue;
+        }
+        // Koppel aan caravan
+        const linkRes = await fetch('/api/account/caravan/photos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            url: up.url,
+            webUrl: up.webUrl,
+            fileName: up.fileName,
+            sizeKb: up.sizeKb,
+          }),
+          credentials: 'include',
+        });
+        const link = await linkRes.json();
+        if (!linkRes.ok) {
+          setError(link?.error || 'Foto koppelen mislukt');
+          continue;
+        }
+        setPhotos((p) => [link.photo, ...p]);
+      }
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const remove = async (id: number) => {
+    if (!confirm('Foto verwijderen?')) return;
+    const res = await fetch(`/api/account/caravan/photos/${id}`, {
+      method: 'DELETE', credentials: 'include',
+    });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      setError(d?.error || 'Verwijderen mislukt');
+      return;
+    }
+    setPhotos((p) => p.filter((x) => x.id !== id));
+  };
+
   return (
-    <div className="card-mk text-center" style={{ padding: 40 }}>
-      <Camera size={32} style={{ margin: '0 auto 10px', color: 'var(--muted)', opacity: 0.5 }} aria-hidden />
-      <p style={{ color: 'var(--muted)', fontSize: 14, margin: 0 }}>{t('pt1.cv-photos-empty')}</p>
+    <div className="space-y-5">
+      <div className="card-mk" style={{ padding: 24 }}>
+        <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 16, color: 'var(--navy)', margin: '0 0 6px' }}>
+          Eigen foto&apos;s toevoegen
+        </h3>
+        <p style={{ fontSize: 13.5, color: 'var(--ink-2)', margin: '0 0 14px', lineHeight: 1.55 }}>
+          Upload foto&apos;s van je caravan voor je eigen archief — bijvoorbeeld vóór de stalling of na een reparatie.
+          Wij kunnen ze ook als referentie gebruiken bij vragen.
+        </p>
+
+        <label
+          htmlFor="caravan-photo-upload"
+          style={{
+            display: 'block',
+            padding: '24px 18px',
+            border: '2px dashed var(--line-2)',
+            borderRadius: 12,
+            background: 'var(--bg)',
+            cursor: uploading ? 'wait' : 'pointer',
+            opacity: uploading ? 0.6 : 1,
+            textAlign: 'center',
+          }}
+        >
+          {uploading ? (
+            <Loader2 size={22} className="animate-spin" style={{ margin: '0 auto 6px', color: 'var(--muted)' }} aria-hidden />
+          ) : (
+            <Camera size={22} style={{ margin: '0 auto 6px', color: 'var(--orange)' }} aria-hidden />
+          )}
+          <div style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 14, color: 'var(--navy)', marginBottom: 4 }}>
+            {uploading ? 'Bezig met uploaden…' : 'Klik om foto\'s te kiezen'}
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--muted)' }}>
+            JPG, PNG of HEIC · max 10 MB per foto
+          </div>
+          <input
+            id="caravan-photo-upload"
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+            multiple
+            hidden
+            disabled={uploading}
+            onChange={(e) => {
+              if (e.target.files) handleFiles(e.target.files);
+              e.target.value = '';
+            }}
+          />
+        </label>
+
+        {error && (
+          <div role="alert" style={{ marginTop: 10, padding: 10, background: '#FEF2F2', border: '1px solid #FECACA', color: '#991B1B', borderRadius: 8, fontSize: 12.5 }}>
+            {error}
+          </div>
+        )}
+      </div>
+
+      {photos.length === 0 ? (
+        <div className="card-mk text-center" style={{ padding: 32 }}>
+          <p style={{ color: 'var(--muted)', fontSize: 14, margin: 0 }}>
+            {t('pt1.cv-photos-empty')}
+          </p>
+        </div>
+      ) : (
+        <div className="card-mk" style={{ padding: 24 }}>
+          <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 16, color: 'var(--navy)', margin: '0 0 16px' }}>
+            {photos.length} foto{photos.length === 1 ? '' : '\'s'}
+          </h3>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
+              gap: 10,
+            }}
+          >
+            {photos.map((p) => (
+              <div
+                key={p.id}
+                style={{
+                  position: 'relative',
+                  aspectRatio: '1 / 1',
+                  borderRadius: 10,
+                  overflow: 'hidden',
+                  border: '1px solid var(--line)',
+                  background: 'var(--bg)',
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={p.url}
+                  alt={p.fileName || 'Caravan-foto'}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                />
+                {p.uploadedBy === 'customer' && (
+                  <button
+                    type="button"
+                    onClick={() => remove(p.id)}
+                    aria-label="Verwijder foto"
+                    style={{
+                      position: 'absolute',
+                      top: 6, right: 6,
+                      width: 24, height: 24,
+                      borderRadius: 999,
+                      background: 'rgba(31,42,54,0.85)',
+                      color: '#fff',
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'grid',
+                      placeItems: 'center',
+                    }}
+                  >
+                    <X size={13} />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -433,27 +629,3 @@ function SpecRow({ k, v }: { k: string; v: string }) {
   );
 }
 
-function DocLink({ label, detail }: { label: string; detail?: string }) {
-  return (
-    <li>
-      <a
-        href="#"
-        onClick={(e) => e.preventDefault()}
-        style={{
-          display: 'flex', alignItems: 'center', gap: 12,
-          padding: '10px 12px', borderRadius: 8,
-          background: 'var(--bg)',
-          textDecoration: 'none',
-          fontSize: 13.5, color: 'var(--ink)',
-        }}
-      >
-        <FileText size={15} aria-hidden style={{ color: 'var(--orange)', flexShrink: 0 }} />
-        <span style={{ flex: 1 }}>
-          <span style={{ display: 'block', fontFamily: 'var(--sora)', fontWeight: 600, color: 'var(--navy)' }}>{label}</span>
-          {detail && <span style={{ display: 'block', fontSize: 11.5, color: 'var(--muted)', marginTop: 1 }}>{detail}</span>}
-        </span>
-        <Download size={14} aria-hidden style={{ color: 'var(--muted)' }} />
-      </a>
-    </li>
-  );
-}
