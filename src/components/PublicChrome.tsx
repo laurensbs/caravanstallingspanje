@@ -2,11 +2,12 @@
 
 import { usePathname } from 'next/navigation';
 import CookieBanner from './CookieBanner';
-import WhatsAppBubble from './marketing/WhatsAppBubble';
 
 // Dunne client-wrapper die in de root layout draait en op basis van het
 // pathname bepaalt of publieke chrome (skip-link + cookiebanner) gerenderd
 // wordt. Admin- en API-routes krijgen 'm niet — daar gelden andere regels.
+//
+// WhatsApp-knop zit nu in de topbar zelf, niet meer als floating bubble.
 
 const ADMIN_PREFIXES = ['/admin'];
 
@@ -21,7 +22,6 @@ export default function PublicChrome() {
   return (
     <>
       <SkipLink />
-      <WhatsAppBubble />
       <CookieBanner />
     </>
   );

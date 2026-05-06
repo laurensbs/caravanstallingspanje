@@ -1889,6 +1889,17 @@ a.card-mk:hover, button.card-mk:hover, .card-mk.is-clickable:hover {
 }
 .brand-topbar a:hover { color: #fff; }
 .brand-topbar a.tb-login { color: #fff; }
+.brand-topbar a.tb-whatsapp {
+  background: rgba(37, 211, 102, 0.14);
+  color: #6EE7A8;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.brand-topbar a.tb-whatsapp:hover {
+  background: rgba(37, 211, 102, 0.24);
+  color: #fff;
+}
 .brand-topbar .pipe {
   width: 1px;
   height: 12px;
@@ -1912,6 +1923,7 @@ a.card-mk:hover, button.card-mk:hover, .card-mk.is-clickable:hover {
   box-shadow: 0 0 0 0 rgba(65, 138, 70, 0.55);
   animation: pulseDot 2.4s infinite;
 }
+.brand-topbar .live .live-short { display: none; }
 @keyframes pulseDot {
   0%, 100% { box-shadow: 0 0 0 0 rgba(65, 138, 70, 0.55); }
   50% { box-shadow: 0 0 0 7px rgba(65, 138, 70, 0); }
@@ -2476,16 +2488,30 @@ a.card-mk:hover, button.card-mk:hover, .card-mk.is-clickable:hover {
    ═══════════════════════════════════════════════════════════ */
 
 @media (max-width: 768px) {
-  /* Topbar — alleen live-pulse + telefoon, rest hide om horizontale druk
-     weg te halen; kleinere padding. Plus kleinere font-size. */
+  /* Topbar — kleinere padding, gaps, icons-only WhatsApp/telefoon */
   .brand-topbar {
-    padding: 6px 16px;
+    padding: 6px 14px;
     font-size: 11.5px;
   }
   .brand-topbar .tb-left,
   .brand-topbar .tb-right {
-    gap: 10px;
+    gap: 8px;
   }
+  /* Icon-only knoppen op mobiel — labels verbergen, padding gelijk */
+  .brand-topbar .tb-whatsapp-label,
+  .brand-topbar .tb-phone-label {
+    display: none;
+  }
+  .brand-topbar a.tb-whatsapp {
+    padding: 5px 7px;
+  }
+  /* live-pulse compacter — alleen "4 plekken vrij" ipv full */
+  .brand-topbar .live {
+    font-size: 11px;
+    gap: 6px;
+  }
+  .brand-topbar .live .live-full { display: none; }
+  .brand-topbar .live .live-short { display: inline; }
 
   /* Megamenu uit op mobiel — daarvoor is de slide-in drawer */
   .megamenu-wrap { display: none !important; }

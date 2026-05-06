@@ -359,13 +359,16 @@ interface MultiStepProps {
   preForm?: ReactNode;
   /** Optionele content onder de form. Bv. FAQ-sectie. */
   postForm?: ReactNode;
+  /** Override voor de submit-button-tekst. Default: "Doorgaan naar betalen"
+   *  als paid, anders "Aanvraag versturen". */
+  submitLabel?: string;
 }
 
 export function MultiStepShell({
   title, intro, step1, step2, step1Valid,
   onSubmit, submitting, error, done, doneTitle, doneBody, publicCode,
   paid = false, summary, eyebrow, eyebrowIcon, icon, accent = 'default',
-  inlineError, errorTrigger = 0, aside, preForm, postForm,
+  inlineError, errorTrigger = 0, aside, preForm, postForm, submitLabel,
 }: MultiStepProps) {
   const { t } = useLocale();
   const [step, setStep] = useState(0);
@@ -511,7 +514,7 @@ export function MultiStepShell({
                 {submitting ? <Loader2 size={18} className="animate-spin" aria-hidden /> : null}
                 {submitting
                   ? (paid ? t('common.forwarding') : t('common.sending'))
-                  : (paid ? t('common.continue-to-pay') : t('common.send-request'))}
+                  : (submitLabel || (paid ? t('common.continue-to-pay') : t('common.send-request')))}
                 {!submitting && <ArrowRight size={17} aria-hidden />}
               </button>
             )}

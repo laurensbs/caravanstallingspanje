@@ -338,6 +338,7 @@ export default function TransportPage() {
       publicCode={publicCode}
       preForm={preForm}
       aside={aside}
+      submitLabel="Boek transport (gelijk betalen)"
     />
   );
 }
