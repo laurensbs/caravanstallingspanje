@@ -12,15 +12,15 @@ import Topbar from '@/components/marketing/Topbar';
 import PublicHeader from '@/components/PublicHeader';
 import PublicFooter from '@/components/PublicFooter';
 import type { StringKey } from '@/lib/i18n';
+import type { PublicService } from '@/lib/services-catalog';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 type T = (k: StringKey, ...a: (string | number)[]) => string;
 
 export interface DienstenClientProps {
-  cleaningFull: number;
-  maintenanceFull: number;
-  inspection: number;
+  cleaning: PublicService[];
+  maintenance: PublicService[];
 }
 
 function fmtEur(n: number) {
@@ -39,9 +39,9 @@ export default function DienstenClient(props: DienstenClientProps) {
       <PublicHeader />
       <main id="main" className="flex-1">
         <Hero t={t} />
-        <Specialties t={t} prices={props} />
+        <Specialties t={t} services={props} />
         <MoreServices t={t} />
-        <Combos t={t} prices={props} />
+        <Combos t={t} />
         <CtaBand t={t} />
       </main>
       <PublicFooter />
@@ -89,28 +89,10 @@ function Hero({ t }: { t: T }) {
 }
 
 // ─── SPECIALTIES — schoonmaken + onderhoud naast elkaar ────
-function Specialties({ t, prices }: { t: T; prices: DienstenClientProps }) {
-  // Sub-tarieven verschillen per caravan-maat → "Op aanvraag". Het volledige
-  // pakket (featured-rij) komt uit DB als admin het ingesteld heeft.
+// Services-lijsten komen uit reparatie-paneel master via fetchServicesCatalog.
+// Geen lokale config meer voor schoonmaak/onderhoud.
+function Specialties({ t, services }: { t: T; services: DienstenClientProps }) {
   const onRequest = t('pri1.on-request');
-  const cleaningFullPrice = prices.cleaningFull > 0 ? fmtEur(prices.cleaningFull) : onRequest;
-  const maintFullPrice = prices.maintenanceFull > 0 ? fmtEur(prices.maintenanceFull) : onRequest;
-
-  const cleaning = [
-    { keyL: 'svc1.clean-row-1' as StringKey, price: onRequest, featured: false },
-    { keyL: 'svc1.clean-row-2' as StringKey, price: onRequest, featured: false },
-    { keyL: 'svc1.clean-row-3' as StringKey, price: onRequest, featured: false },
-    { keyL: 'svc1.clean-row-4' as StringKey, price: onRequest, featured: false },
-    { keyL: 'svc1.clean-row-5' as StringKey, price: cleaningFullPrice, featured: true },
-  ];
-  const maint = [
-    { keyL: 'svc1.maint-row-1' as StringKey, price: onRequest, featured: false },
-    { keyL: 'svc1.maint-row-2' as StringKey, price: onRequest, featured: false },
-    { keyL: 'svc1.maint-row-3' as StringKey, price: onRequest, featured: false },
-    { keyL: 'svc1.maint-row-4' as StringKey, price: maintFullPrice, featured: true },
-    { keyL: 'svc1.maint-row-5' as StringKey, price: onRequest, featured: false },
-  ];
-
   return (
     <section className="py-16 sm:py-20">
       <div className="max-w-[1200px] mx-auto px-5 sm:px-10">
@@ -128,7 +110,8 @@ function Specialties({ t, prices }: { t: T; prices: DienstenClientProps }) {
             descKey="svc1.clean-desc"
             ctaKey="svc1.clean-cta"
             ctaHref="/diensten/service"
-            rows={cleaning}
+            services={services.cleaning}
+            onRequest={onRequest}
           />
           <SpecialtyBlock
             t={t}
@@ -136,8 +119,9 @@ function Specialties({ t, prices }: { t: T; prices: DienstenClientProps }) {
             titleKey="svc1.maint-title"
             descKey="svc1.maint-desc"
             ctaKey="svc1.maint-cta"
-            ctaHref="/diensten/reparatie"
-            rows={maint}
+            ctaHref="/diensten/service"
+            services={services.maintenance}
+            onRequest={onRequest}
           />
         </div>
       </div>
@@ -146,7 +130,7 @@ function Specialties({ t, prices }: { t: T; prices: DienstenClientProps }) {
 }
 
 function SpecialtyBlock({
-  t, icon: Icon, titleKey, descKey, ctaKey, ctaHref, rows,
+  t, icon: Icon, titleKey, descKey, ctaKey, ctaHref, services, onRequest,
 }: {
   t: T;
   icon: LucideIcon;
@@ -154,7 +138,8 @@ function SpecialtyBlock({
   descKey: StringKey;
   ctaKey: StringKey;
   ctaHref: string;
-  rows: Array<{ keyL: StringKey; price: string; featured: boolean }>;
+  services: PublicService[];
+  onRequest: string;
 }) {
   return (
     <div className="card-mk" style={{ padding: 28 }}>
@@ -186,10 +171,25 @@ function SpecialtyBlock({
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => (
-              <tr key={r.keyL} className={r.featured ? 'featured' : undefined}>
-                <td>{t(r.keyL)}</td>
-                <td className="price" style={{ textAlign: 'right' }}>{r.price}</td>
+            {services.length === 0 ? (
+              <tr>
+                <td colSpan={2} style={{ textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
+                  {onRequest}
+                </td>
+              </tr>
+            ) : services.map((s) => (
+              <tr key={s.upstreamId}>
+                <td>
+                  <div style={{ fontWeight: 500 }}>{s.name}</div>
+                  {s.description && (
+                    <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>
+                      {s.description}
+                    </div>
+                  )}
+                </td>
+                <td className="price" style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                  {fmtEur(s.priceEur)}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -238,10 +238,7 @@ function MoreServices({ t }: { t: T }) {
 }
 
 // ─── COMBOS — 3 pakket-cards met korting-prijs ─────
-function Combos({ t, prices: _prices }: { t: T; prices: DienstenClientProps }) {
-  // _prices nog niet gebruikt — combo's blijven "Op aanvraag" tot er een
-  // expliciete bundle-prijs wordt geconfigureerd.
-  void _prices;
+function Combos({ t }: { t: T }) {
   const combos = [
     {
       titleKey: 'svc1.combo-1-title' as StringKey,

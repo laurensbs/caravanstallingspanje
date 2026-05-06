@@ -19,9 +19,6 @@ type FormState = {
   fridge_stock_airco: string;
   transport_price_wij_rijden: string;
   transport_price_zelf: string;
-  service_price_cleaning_full: string;
-  service_price_maintenance_full: string;
-  service_price_inspection: string;
   service_price_repair_hourly: string;
   stalling_address: string;
 };
@@ -31,8 +28,7 @@ const empty: FormState = {
   fridge_price_grote: '', fridge_price_tafel: '', fridge_price_airco: '',
   fridge_stock_grote: '', fridge_stock_tafel: '', fridge_stock_airco: '',
   transport_price_wij_rijden: '', transport_price_zelf: '',
-  service_price_cleaning_full: '', service_price_maintenance_full: '',
-  service_price_inspection: '', service_price_repair_hourly: '',
+  service_price_repair_hourly: '',
   stalling_address: '',
 };
 
@@ -56,9 +52,6 @@ export default function SettingsPage() {
           fridge_stock_airco: String(Number(d.fridge_stock_airco ?? 10)),
           transport_price_wij_rijden: String(Number(d.transport_price_wij_rijden ?? 100)),
           transport_price_zelf: String(Number(d.transport_price_zelf ?? 50)),
-          service_price_cleaning_full: String(Number(d.service_price_cleaning_full ?? 0)),
-          service_price_maintenance_full: String(Number(d.service_price_maintenance_full ?? 0)),
-          service_price_inspection: String(Number(d.service_price_inspection ?? 0)),
           service_price_repair_hourly: String(Number(d.service_price_repair_hourly ?? 0)),
           stalling_address: String(d.stalling_address ?? ''),
         });
@@ -92,9 +85,6 @@ export default function SettingsPage() {
         fridge_stock_airco: parseInt0(form.fridge_stock_airco),
         transport_price_wij_rijden: parse(form.transport_price_wij_rijden),
         transport_price_zelf: parse(form.transport_price_zelf),
-        service_price_cleaning_full: parse(form.service_price_cleaning_full),
-        service_price_maintenance_full: parse(form.service_price_maintenance_full),
-        service_price_inspection: parse(form.service_price_inspection),
         service_price_repair_hourly: parse(form.service_price_repair_hourly),
         stalling_address: form.stalling_address,
       };
@@ -213,30 +203,20 @@ export default function SettingsPage() {
 
         <div className="card-surface p-6 space-y-4">
           <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
-            Service rates (0 = "Op aanvraag" tonen op website)
+            Service rates
           </h2>
           <p className="text-[12px] text-text-muted -mt-2">
-            Schoonmaak, onderhoud, inspectie en reparatie. Een waarde van €0 verbergt het bedrag op /tarieven en op de service-pages — daar staat dan &quot;Op aanvraag&quot;.
+            Schoonmaak-, onderhoud-, inspectie- en reparatie-tarieven worden beheerd in het{' '}
+            <strong>reparatie-paneel</strong>. De website leest die catalogus rechtstreeks (op /tarieven en
+            /diensten). Hieronder alleen het algemene reparatie-uurtarief — verschijnt als bullet onder de
+            tarieven-tabellen. Zet op €0 om te verbergen.
           </p>
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {[0, 1, 2, 3].map(i => <Skeleton key={i} className="h-10" delayMs={i * 40} />)}
-            </div>
+            <Skeleton className="h-10" />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Input label="Volledig schoonmaak-pakket (€)" inputMode="decimal"
-                value={form.service_price_cleaning_full}
-                onChange={(e) => set('service_price_cleaning_full', e.target.value)} />
-              <Input label="Volledige jaarlijkse onderhoudbeurt (€)" inputMode="decimal"
-                value={form.service_price_maintenance_full}
-                onChange={(e) => set('service_price_maintenance_full', e.target.value)} />
-              <Input label="25-punts inspectie (€)" inputMode="decimal"
-                value={form.service_price_inspection}
-                onChange={(e) => set('service_price_inspection', e.target.value)} />
-              <Input label="Reparatie uurtarief (€/u)" inputMode="decimal"
-                value={form.service_price_repair_hourly}
-                onChange={(e) => set('service_price_repair_hourly', e.target.value)} />
-            </div>
+            <Input label="Reparatie uurtarief (€/u)" inputMode="decimal"
+              value={form.service_price_repair_hourly}
+              onChange={(e) => set('service_price_repair_hourly', e.target.value)} />
           )}
         </div>
 

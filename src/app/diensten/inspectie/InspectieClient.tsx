@@ -63,8 +63,8 @@ function Hero({ t, inspectionPrice }: { t: T; inspectionPrice: number }) {
               <span className="l">{t('ins1.chip-2-l')}</span>
             </span>
             <span className="spec-chip">
-              <span className="v">{inspectionPrice > 0 ? fmtEur(inspectionPrice) : t('ins1.chip-3-v')}</span>
-              <span className="l">{inspectionPrice > 0 ? 'Vaste prijs' : t('ins1.chip-3-l')}</span>
+              <span className="v">{inspectionPrice > 0 ? `vanaf ${fmtEur(inspectionPrice)}` : t('ins1.chip-3-v')}</span>
+              <span className="l">{inspectionPrice > 0 ? 'Tarief' : t('ins1.chip-3-l')}</span>
             </span>
           </motion.div>
         </div>

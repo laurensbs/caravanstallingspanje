@@ -8,12 +8,10 @@ import PublicHeader from '@/components/PublicHeader';
 import PublicFooter from '@/components/PublicFooter';
 import { useLocale } from '@/components/LocaleProvider';
 import type { StringKey } from '@/lib/i18n';
+import type { PublicService } from '@/lib/services-catalog';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 type T = (k: StringKey, ...a: (string | number)[]) => string;
-
-type Row = { keyL: StringKey; price: string; featured?: boolean };
-type Cat = { titleKey: StringKey; rows: Row[] };
 
 interface Props {
   fridgeLarge: number;
@@ -21,10 +19,12 @@ interface Props {
   airco: number;
   transportWij: number;
   transportZelf: number;
-  cleaningFull: number;
-  maintenanceFull: number;
-  inspection: number;
   repairHourly: number;
+  cleaning: PublicService[];
+  maintenance: PublicService[];
+  inspection: PublicService[];
+  repair: PublicService[];
+  other: PublicService[];
 }
 
 function fmtEur(n: number, suffix?: string) {
@@ -41,69 +41,96 @@ export default function TarievenClient(props: Props) {
   const { t } = useLocale();
   const onRequest = t('pri1.on-request');
 
-  // Helper: toont vast bedrag als > 0, anders "Op aanvraag".
-  const priced = (n: number, suffix?: string) =>
-    n > 0 ? fmtEur(n, suffix) : onRequest;
-
-  const cats: Cat[] = [
-    {
-      titleKey: 'pri1.cat-storage',
-      rows: [
-        { keyL: 'pri1.cat-storage-row-1', price: onRequest },
-        { keyL: 'pri1.cat-storage-row-2', price: onRequest, featured: true },
-        { keyL: 'pri1.cat-storage-row-3', price: onRequest },
-      ],
-    },
-    {
-      titleKey: 'pri1.cat-clean',
-      rows: [
-        { keyL: 'pri1.cat-clean-row-1', price: onRequest },
-        { keyL: 'pri1.cat-clean-row-2', price: onRequest },
-        { keyL: 'pri1.cat-clean-row-3', price: onRequest },
-        { keyL: 'pri1.cat-clean-row-4', price: priced(props.cleaningFull), featured: true },
-      ],
-    },
-    {
-      titleKey: 'pri1.cat-maint',
-      rows: [
-        { keyL: 'pri1.cat-maint-row-1', price: onRequest },
-        { keyL: 'pri1.cat-maint-row-2', price: onRequest },
-        { keyL: 'pri1.cat-maint-row-3', price: onRequest },
-        { keyL: 'pri1.cat-maint-row-4', price: priced(props.maintenanceFull), featured: true },
-      ],
-    },
-    {
-      titleKey: 'pri1.cat-rental',
-      rows: [
-        { keyL: 'pri1.cat-rental-row-1', price: fmtEur(props.fridgeLarge, '/ wk') },
-        { keyL: 'pri1.cat-rental-row-2', price: fmtEur(props.fridgeTable, '/ wk') },
-        { keyL: 'pri1.cat-rental-row-3', price: fmtEur(props.airco, '/ wk') },
-      ],
-    },
-    {
-      titleKey: 'pri1.cat-inspection',
-      rows: [
-        { keyL: 'pri1.cat-inspection-row-1', price: priced(props.inspection) },
-        { keyL: 'pri1.cat-inspection-row-2', price: onRequest },
-      ],
-    },
-    {
-      titleKey: 'pri1.cat-transport',
-      rows: [
-        { keyL: 'pri1.cat-transport-row-1', price: fmtEur(props.transportWij) },
-        { keyL: 'pri1.cat-transport-row-2', price: fmtEur(props.transportZelf) },
-        { keyL: 'pri1.cat-transport-row-3', price: onRequest },
-      ],
-    },
-  ];
-
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
       <Topbar />
       <PublicHeader />
       <main id="main" className="flex-1">
         <Hero t={t} />
-        <Tables t={t} cats={cats} />
+
+        <section className="py-16 sm:py-20">
+          <div className="max-w-[1080px] mx-auto px-5 sm:px-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Stalling */}
+              <CategoryTable
+                titleKey="pri1.cat-storage"
+                t={t}
+                rows={[
+                  { label: t('pri1.cat-storage-row-1'), price: onRequest },
+                  { label: t('pri1.cat-storage-row-2'), price: onRequest, featured: true },
+                  { label: t('pri1.cat-storage-row-3'), price: onRequest },
+                ]}
+              />
+
+              {/* Verhuur — uit app_settings */}
+              <CategoryTable
+                titleKey="pri1.cat-rental"
+                t={t}
+                rows={[
+                  { label: t('pri1.cat-rental-row-1'), price: fmtEur(props.fridgeLarge, '/ wk') },
+                  { label: t('pri1.cat-rental-row-2'), price: fmtEur(props.fridgeTable, '/ wk') },
+                  { label: t('pri1.cat-rental-row-3'), price: fmtEur(props.airco, '/ wk') },
+                ]}
+              />
+
+              {/* Schoonmaak — uit reparatie-paneel master */}
+              <ServiceCategoryTable
+                titleKey="pri1.cat-clean"
+                t={t}
+                services={props.cleaning}
+                emptyHint="Schoonmaak-tarieven krijg je in een offerte op maat."
+              />
+
+              {/* Onderhoud — uit master */}
+              <ServiceCategoryTable
+                titleKey="pri1.cat-maint"
+                t={t}
+                services={props.maintenance}
+                emptyHint="Onderhoud-tarieven krijg je in een offerte op maat."
+              />
+
+              {/* Inspectie — uit master */}
+              <ServiceCategoryTable
+                titleKey="pri1.cat-inspection"
+                t={t}
+                services={props.inspection}
+                emptyHint="Inspectie-tarieven krijg je in een offerte op maat."
+              />
+
+              {/* Transport — uit app_settings */}
+              <CategoryTable
+                titleKey="pri1.cat-transport"
+                t={t}
+                rows={[
+                  { label: t('pri1.cat-transport-row-1'), price: fmtEur(props.transportWij) },
+                  { label: t('pri1.cat-transport-row-2'), price: fmtEur(props.transportZelf) },
+                  { label: t('pri1.cat-transport-row-3'), price: onRequest },
+                ]}
+              />
+
+              {/* Reparatie — uit master als specifieke services bestaan; anders uurtarief */}
+              {props.repair.length > 0 && (
+                <ServiceCategoryTable
+                  titleNl="Reparatie"
+                  t={t}
+                  services={props.repair}
+                  emptyHint=""
+                />
+              )}
+
+              {/* Overig — uit master als categorie 'overig' bestaat */}
+              {props.other.length > 0 && (
+                <ServiceCategoryTable
+                  titleNl="Overige diensten"
+                  t={t}
+                  services={props.other}
+                  emptyHint=""
+                />
+              )}
+            </div>
+          </div>
+        </section>
+
         <Notes t={t} repairHourly={props.repairHourly} />
       </main>
       <PublicFooter />
@@ -131,33 +158,89 @@ function Hero({ t }: { t: T }) {
   );
 }
 
-function Tables({ t, cats }: { t: T; cats: Cat[] }) {
+interface CategoryTableProps {
+  t: T;
+  titleKey?: StringKey;
+  titleNl?: string;
+  rows: Array<{ label: string; price: string; featured?: boolean }>;
+}
+
+function CategoryTable({ t, titleKey, titleNl, rows }: CategoryTableProps) {
+  const title = titleKey ? t(titleKey) : (titleNl || '');
   return (
-    <section className="py-16 sm:py-20">
-      <div className="max-w-[1080px] mx-auto px-5 sm:px-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {cats.map((cat) => (
-            <div key={cat.titleKey} className="tbl-wrap-mk">
-              <div style={{ padding: '18px 22px', borderBottom: '1px solid var(--line)', background: 'var(--bg)' }}>
-                <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 16, color: 'var(--navy)', margin: 0 }}>
-                  {t(cat.titleKey)}
-                </h3>
-              </div>
-              <table className="tbl-mk">
-                <tbody>
-                  {cat.rows.map((r) => (
-                    <tr key={r.keyL} className={r.featured ? 'featured' : undefined}>
-                      <td>{t(r.keyL)}</td>
-                      <td className="price" style={{ textAlign: 'right' }}>{r.price}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+    <div className="tbl-wrap-mk">
+      <div style={{ padding: '18px 22px', borderBottom: '1px solid var(--line)', background: 'var(--bg)' }}>
+        <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 16, color: 'var(--navy)', margin: 0 }}>
+          {title}
+        </h3>
+      </div>
+      <table className="tbl-mk">
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.label} className={r.featured ? 'featured' : undefined}>
+              <td>{r.label}</td>
+              <td className="price" style={{ textAlign: 'right' }}>{r.price}</td>
+            </tr>
           ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+interface ServiceCategoryTableProps {
+  t: T;
+  titleKey?: StringKey;
+  titleNl?: string;
+  services: PublicService[];
+  /** Tekst die getoond wordt als services leeg is. */
+  emptyHint?: string;
+}
+
+function ServiceCategoryTable({ t, titleKey, titleNl, services, emptyHint = '' }: ServiceCategoryTableProps) {
+  const title = titleKey ? t(titleKey) : (titleNl || '');
+  if (services.length === 0) {
+    if (!emptyHint) return null;
+    return (
+      <div className="tbl-wrap-mk">
+        <div style={{ padding: '18px 22px', borderBottom: '1px solid var(--line)', background: 'var(--bg)' }}>
+          <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 16, color: 'var(--navy)', margin: 0 }}>
+            {title}
+          </h3>
+        </div>
+        <div style={{ padding: '20px 22px', fontSize: 13.5, color: 'var(--muted)' }}>
+          {emptyHint}
         </div>
       </div>
-    </section>
+    );
+  }
+  return (
+    <div className="tbl-wrap-mk">
+      <div style={{ padding: '18px 22px', borderBottom: '1px solid var(--line)', background: 'var(--bg)' }}>
+        <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 16, color: 'var(--navy)', margin: 0 }}>
+          {title}
+        </h3>
+      </div>
+      <table className="tbl-mk">
+        <tbody>
+          {services.map((s) => (
+            <tr key={s.upstreamId}>
+              <td>
+                <div style={{ fontWeight: 500 }}>{s.name}</div>
+                {s.description && (
+                  <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>
+                    {s.description}
+                  </div>
+                )}
+              </td>
+              <td className="price" style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                {fmtEur(s.priceEur)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
