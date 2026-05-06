@@ -92,9 +92,12 @@ export default function OgImage() {
             </div>
             <div style={{ marginTop: 4 }}>caravanstalling-spanje.com</div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ color: '#F4B942', fontSize: 26 }}>★ ★ ★ ★ ★</span>
-            <span style={{ color: '#F1F5F9' }}>4.9 · 25 reviews</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, color: '#F1F5F9' }}>
+            <span>Stalling</span>
+            <span style={{ opacity: 0.4 }}>·</span>
+            <span>Reparatie</span>
+            <span style={{ opacity: 0.4 }}>·</span>
+            <span>Verhuur</span>
           </div>
         </div>
       </div>

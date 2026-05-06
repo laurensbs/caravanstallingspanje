@@ -33,7 +33,6 @@ export default function HomePage() {
         <Steps t={t} />
         <Security t={t} />
         <Workshop t={t} />
-        <Quotes t={t} />
         <Location t={t} />
         <CtaBand t={t} />
       </main>
@@ -466,46 +465,6 @@ function WorkshopSvg() {
 
 // ───────────────────────────────────────────────────
 // QUOTES — 3 quote-cards
-// ───────────────────────────────────────────────────
-function Quotes({ t }: { t: T }) {
-  const quotes: Array<{ textKey: StringKey; nameKey: StringKey; metaKey: StringKey; av: string }> = [
-    { textKey: 'home1.q-1-text', nameKey: 'home1.q-1-name', metaKey: 'home1.q-1-meta', av: 'MV' },
-    { textKey: 'home1.q-2-text', nameKey: 'home1.q-2-name', metaKey: 'home1.q-2-meta', av: 'JD' },
-    { textKey: 'home1.q-3-text', nameKey: 'home1.q-3-name', metaKey: 'home1.q-3-meta', av: 'PB' },
-  ];
-  return (
-    <section className="py-16 sm:py-20 section-bg-grey">
-      <div className="max-w-[1200px] mx-auto px-5 sm:px-10">
-        <div className="text-center max-w-[720px] mx-auto mb-10 sm:mb-12">
-          <span className="eyebrow-mk">{t('home1.q-eyebrow')}</span>
-          <h2 className="h2-mk">{t('home1.q-h2')}</h2>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {quotes.map((q, i) => (
-            <motion.div
-              key={q.textKey}
-              className="quote-card-mk"
-              initial={{ opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.45, ease: EASE, delay: i * 0.08 }}
-            >
-              <p>{t(q.textKey)}</p>
-              <div className="who">
-                <span className="av">{q.av}</span>
-                <div>
-                  <div className="nm">{t(q.nameKey)}</div>
-                  <div className="mt">{t(q.metaKey)}</div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 // ───────────────────────────────────────────────────
 // LOCATION — kaart-strip met dot-pattern
 // ───────────────────────────────────────────────────

@@ -649,12 +649,12 @@ export const STRINGS = {
 
   'home1.stat-1-v': { nl: '25+', en: '25+' },
   'home1.stat-1-l': { nl: 'Jaar ervaring', en: 'Years experience' },
-  'home1.stat-2-v': { nl: '650+', en: '650+' },
-  'home1.stat-2-l': { nl: 'Vaste klanten', en: 'Loyal customers' },
+  'home1.stat-2-v': { nl: '850 m²', en: '850 m²' },
+  'home1.stat-2-l': { nl: 'Eigen werkplaats', en: 'On-site workshop' },
   'home1.stat-3-v': { nl: '24/7', en: '24/7' },
   'home1.stat-3-l': { nl: 'Securitas Direct', en: 'Securitas Direct' },
-  'home1.stat-4-v': { nl: '4.9', en: '4.9' },
-  'home1.stat-4-l': { nl: 'Sterren · Google', en: 'Stars · Google' },
+  'home1.stat-4-v': { nl: '50+', en: '50+' },
+  'home1.stat-4-l': { nl: 'Aangesloten campings', en: 'Affiliated campsites' },
 
   'home1.svc-eyebrow': { nl: 'Onze diensten', en: 'Our services' },
   'home1.svc-h2': { nl: 'Alles voor je caravan op één plek', en: 'Everything for your caravan in one place' },
