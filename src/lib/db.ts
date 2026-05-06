@@ -2134,4 +2134,253 @@ export async function markStallingCustomerNotified(id: number, statusNotified: s
     WHERE id = ${id}`;
 }
 
+// ─── Voorraad / verkoop ──────────────────────────────────
+// stock_items: caravans/campers die wij verkopen.
+// purchase_intakes: aanvragen van klanten die hun caravan aan ons willen
+// verkopen (inkoop-flow met foto's).
+
+let _salesMigrationsApplied: Promise<void> | null = null;
+
+export async function ensureSalesSchema(): Promise<void> {
+  if (_salesMigrationsApplied) return _salesMigrationsApplied;
+  _salesMigrationsApplied = (async () => {
+    await tryMigrate('stock_items.create', () => sql`
+      CREATE TABLE IF NOT EXISTS stock_items (
+        id SERIAL PRIMARY KEY,
+        kind TEXT NOT NULL DEFAULT 'caravan',
+        brand TEXT NOT NULL,
+        model TEXT NOT NULL,
+        year INTEGER,
+        km INTEGER,
+        length_m NUMERIC(4,2),
+        price_eur NUMERIC(10,2),
+        status TEXT NOT NULL DEFAULT 'available',
+        slug TEXT UNIQUE,
+        description TEXT,
+        hero_photo_url TEXT,
+        gallery_urls JSONB NOT NULL DEFAULT '[]'::jsonb,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    await tryMigrate('stock_items.idx_status', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_stock_items_status ON stock_items(status)`);
+    await tryMigrate('stock_items.idx_kind', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_stock_items_kind ON stock_items(kind)`);
+    await tryMigrate('stock_items.idx_created', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_stock_items_created ON stock_items(created_at DESC)`);
+
+    await tryMigrate('purchase_intakes.create', () => sql`
+      CREATE TABLE IF NOT EXISTS purchase_intakes (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        phone TEXT,
+        kind TEXT NOT NULL DEFAULT 'caravan',
+        brand TEXT,
+        model TEXT,
+        year INTEGER,
+        registration TEXT,
+        km INTEGER,
+        condition_note TEXT,
+        asking_price_eur NUMERIC(10,2),
+        photos JSONB NOT NULL DEFAULT '[]'::jsonb,
+        status TEXT NOT NULL DEFAULT 'new',
+        admin_note TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    await tryMigrate('purchase_intakes.idx_status', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_purchase_intakes_status ON purchase_intakes(status)`);
+    await tryMigrate('purchase_intakes.idx_created', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_purchase_intakes_created ON purchase_intakes(created_at DESC)`);
+  })();
+  return _salesMigrationsApplied;
+}
+
+export type StockItemRow = {
+  id: number;
+  kind: string;
+  brand: string;
+  model: string;
+  year: number | null;
+  km: number | null;
+  length_m: string | null;
+  price_eur: string | null;
+  status: string;
+  slug: string | null;
+  description: string | null;
+  hero_photo_url: string | null;
+  gallery_urls: unknown;
+  created_at: string;
+  updated_at: string;
+};
+
+export async function listStockItems(opts?: { onlyVisible?: boolean }): Promise<StockItemRow[]> {
+  await ensureSalesSchema();
+  if (opts?.onlyVisible) {
+    return sql`SELECT * FROM stock_items
+      WHERE status IN ('available', 'reserved', 'new', 'sold')
+      ORDER BY
+        CASE status WHEN 'new' THEN 0 WHEN 'available' THEN 1 WHEN 'reserved' THEN 2 ELSE 3 END,
+        created_at DESC` as unknown as Promise<StockItemRow[]>;
+  }
+  return sql`SELECT * FROM stock_items ORDER BY created_at DESC` as unknown as Promise<StockItemRow[]>;
+}
+
+export async function getStockItemById(id: number): Promise<StockItemRow | null> {
+  await ensureSalesSchema();
+  const rows = await sql`SELECT * FROM stock_items WHERE id = ${id}` as unknown as StockItemRow[];
+  return rows[0] || null;
+}
+
+export async function getStockItemBySlug(slug: string): Promise<StockItemRow | null> {
+  await ensureSalesSchema();
+  const rows = await sql`SELECT * FROM stock_items WHERE slug = ${slug}` as unknown as StockItemRow[];
+  return rows[0] || null;
+}
+
+export async function createStockItem(data: {
+  kind: string;
+  brand: string;
+  model: string;
+  year?: number | null;
+  km?: number | null;
+  length_m?: number | null;
+  price_eur?: number | null;
+  status?: string;
+  slug?: string | null;
+  description?: string | null;
+  hero_photo_url?: string | null;
+  gallery_urls?: string[];
+}): Promise<StockItemRow> {
+  await ensureSalesSchema();
+  const status = data.status || 'available';
+  const gallery = JSON.stringify(data.gallery_urls || []);
+  const rows = await sql`
+    INSERT INTO stock_items
+      (kind, brand, model, year, km, length_m, price_eur, status, slug, description, hero_photo_url, gallery_urls)
+    VALUES
+      (${data.kind}, ${data.brand}, ${data.model},
+       ${data.year ?? null}, ${data.km ?? null}, ${data.length_m ?? null},
+       ${data.price_eur ?? null}, ${status},
+       ${data.slug || null}, ${data.description || null},
+       ${data.hero_photo_url || null}, ${gallery}::jsonb)
+    RETURNING *` as unknown as StockItemRow[];
+  return rows[0];
+}
+
+export async function updateStockItem(id: number, data: Partial<{
+  kind: string;
+  brand: string;
+  model: string;
+  year: number | null;
+  km: number | null;
+  length_m: number | null;
+  price_eur: number | null;
+  status: string;
+  slug: string | null;
+  description: string | null;
+  hero_photo_url: string | null;
+  gallery_urls: string[];
+}>): Promise<StockItemRow | null> {
+  await ensureSalesSchema();
+  // Bouw expliciet — neon-tagged-template heeft geen dynamic SET-builder.
+  const cur = await getStockItemById(id);
+  if (!cur) return null;
+  const galleryArr = data.gallery_urls ?? (Array.isArray(cur.gallery_urls) ? cur.gallery_urls as string[] : []);
+  const rows = await sql`
+    UPDATE stock_items SET
+      kind = ${data.kind ?? cur.kind},
+      brand = ${data.brand ?? cur.brand},
+      model = ${data.model ?? cur.model},
+      year = ${data.year !== undefined ? data.year : cur.year},
+      km = ${data.km !== undefined ? data.km : cur.km},
+      length_m = ${data.length_m !== undefined ? data.length_m : cur.length_m},
+      price_eur = ${data.price_eur !== undefined ? data.price_eur : cur.price_eur},
+      status = ${data.status ?? cur.status},
+      slug = ${data.slug !== undefined ? data.slug : cur.slug},
+      description = ${data.description !== undefined ? data.description : cur.description},
+      hero_photo_url = ${data.hero_photo_url !== undefined ? data.hero_photo_url : cur.hero_photo_url},
+      gallery_urls = ${JSON.stringify(galleryArr)}::jsonb,
+      updated_at = NOW()
+    WHERE id = ${id}
+    RETURNING *` as unknown as StockItemRow[];
+  return rows[0] || null;
+}
+
+export async function deleteStockItem(id: number): Promise<boolean> {
+  await ensureSalesSchema();
+  const rows = await sql`DELETE FROM stock_items WHERE id = ${id} RETURNING id` as unknown as { id: number }[];
+  return rows.length > 0;
+}
+
+// ─── Purchase intakes (inkoop-aanvragen) ─────────────────
+export type PurchaseIntakeRow = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  kind: string;
+  brand: string | null;
+  model: string | null;
+  year: number | null;
+  registration: string | null;
+  km: number | null;
+  condition_note: string | null;
+  asking_price_eur: string | null;
+  photos: unknown;
+  status: string;
+  admin_note: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export async function createPurchaseIntake(data: {
+  name: string;
+  email: string;
+  phone?: string | null;
+  kind: string;
+  brand?: string | null;
+  model?: string | null;
+  year?: number | null;
+  registration?: string | null;
+  km?: number | null;
+  condition_note?: string | null;
+  asking_price_eur?: number | null;
+  photos?: Array<{ url: string; webUrl?: string; fileName: string; sizeKb?: number }>;
+}): Promise<PurchaseIntakeRow> {
+  await ensureSalesSchema();
+  const photos = JSON.stringify(data.photos || []);
+  const rows = await sql`
+    INSERT INTO purchase_intakes
+      (name, email, phone, kind, brand, model, year, registration, km, condition_note, asking_price_eur, photos)
+    VALUES
+      (${data.name}, ${data.email}, ${data.phone || null}, ${data.kind},
+       ${data.brand || null}, ${data.model || null}, ${data.year ?? null},
+       ${data.registration || null}, ${data.km ?? null},
+       ${data.condition_note || null}, ${data.asking_price_eur ?? null},
+       ${photos}::jsonb)
+    RETURNING *` as unknown as PurchaseIntakeRow[];
+  return rows[0];
+}
+
+export async function listPurchaseIntakes(): Promise<PurchaseIntakeRow[]> {
+  await ensureSalesSchema();
+  return sql`SELECT * FROM purchase_intakes ORDER BY created_at DESC` as unknown as Promise<PurchaseIntakeRow[]>;
+}
+
+export async function updatePurchaseIntakeStatus(id: number, status: string, adminNote?: string | null): Promise<PurchaseIntakeRow | null> {
+  await ensureSalesSchema();
+  const rows = await sql`
+    UPDATE purchase_intakes
+    SET status = ${status},
+        admin_note = COALESCE(${adminNote ?? null}, admin_note),
+        updated_at = NOW()
+    WHERE id = ${id}
+    RETURNING *` as unknown as PurchaseIntakeRow[];
+  return rows[0] || null;
+}
+
 export { sql };

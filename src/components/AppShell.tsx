@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Refrigerator, Bell, Truck, LogOut, ChevronLeft,
   Settings, Users, Warehouse, MessageSquare, Search, Lightbulb, Wind, CalendarRange,
+  Tag, Recycle,
 } from 'lucide-react';
 import { ReactNode, useEffect, useState } from 'react';
 import CommandPalette from './CommandPalette';
@@ -42,6 +43,13 @@ const NAV_GROUPS: NavGroup[] = [
       { href: '/admin/contact', label: 'Messages', icon: MessageSquare, countKey: 'contact' },
       { href: '/admin/ideeen', label: 'Ideas inbox', icon: Lightbulb, countKey: 'ideas' },
       { href: '/admin/wachtlijst', label: 'Waitlist', icon: Bell, countKey: 'waitlist' },
+    ],
+  },
+  {
+    label: 'Sales',
+    items: [
+      { href: '/admin/voorraad', label: 'Stock', icon: Tag },
+      { href: '/admin/inkoop', label: 'Buy-back', icon: Recycle },
     ],
   },
   {
