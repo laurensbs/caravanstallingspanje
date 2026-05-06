@@ -57,13 +57,13 @@ function Hero() {
       <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-14 sm:py-20">
         <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-14 items-center">
           <div>
-            <motion.div {...fade(0)} style={{ marginBottom: 18 }}>
+            <motion.div {...fade(0)} style={{ marginBottom: 22 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={VERHUUR_LOGO}
                 alt="Caravanverhuur Spanje"
                 style={{
-                  height: 'clamp(56px, 7.5vw, 84px)',
+                  height: 'clamp(96px, 13vw, 160px)',
                   width: 'auto',
                   objectFit: 'contain',
                 }}
