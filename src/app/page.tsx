@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   Phone, ArrowRight, ShieldCheck, Wrench as WrenchIcon, Truck, Sparkles,
@@ -110,79 +111,35 @@ function Hero({ t }: { t: T }) {
             </motion.div>
           </div>
 
-          {/* Caravan-SVG illustratie. Subtiele float-animatie voor "leven". */}
+          {/* Hero-foto rechts — Costa Brava sfeer. Geen animatie zodat
+              hij niet "goedkoop" voelt. */}
           <motion.div
             {...fade(0.18)}
             className="hidden lg:block"
-            aria-hidden
           >
-            <motion.div
-              animate={reduce ? undefined : { y: [0, -8, 0] }}
-              transition={reduce ? undefined : { duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+            <div
+              style={{
+                position: 'relative',
+                aspectRatio: '5 / 4',
+                borderRadius: 22,
+                overflow: 'hidden',
+                boxShadow: 'var(--shadow-card-mk), 0 32px 64px -24px rgba(31, 42, 54, 0.30)',
+                border: '1px solid rgba(255, 255, 255, 0.40)',
+              }}
             >
-              <HeroIllustration />
-            </motion.div>
+              <Image
+                src="/images/campings/cala_d_aiguablava__begur.jpg"
+                alt="Cala d'Aiguablava bij Begur — Costa Brava"
+                fill
+                priority
+                sizes="(max-width: 1024px) 0px, 540px"
+                style={{ objectFit: 'cover' }}
+              />
+            </div>
           </motion.div>
         </div>
       </div>
     </section>
-  );
-}
-
-function HeroIllustration() {
-  return (
-    <svg viewBox="0 0 480 360" width="100%" height="auto" role="img" aria-label="Caravan onder palm">
-      <defs>
-        <linearGradient id="vanBody" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor="#FFFFFF" />
-          <stop offset="1" stopColor="#E8F2F9" />
-        </linearGradient>
-        <linearGradient id="ground" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor="#F2DDB6" />
-          <stop offset="1" stopColor="#E5C98A" />
-        </linearGradient>
-      </defs>
-      {/* Ground */}
-      <ellipse cx="240" cy="310" rx="220" ry="22" fill="url(#ground)" opacity="0.55" />
-
-      {/* Palm */}
-      <g transform="translate(385,80)">
-        <path d="M0 230 Q-4 150 6 80" stroke="#5C4422" strokeWidth="7" fill="none" strokeLinecap="round" />
-        <g fill="#418A46">
-          <path d="M6 80 Q-30 50 -60 60 Q-32 68 -10 78 Z" />
-          <path d="M6 80 Q40 50 70 60 Q42 68 18 78 Z" />
-          <path d="M6 80 Q-15 30 -40 18 Q-10 38 0 70 Z" />
-          <path d="M6 80 Q22 30 50 20 Q22 38 12 70 Z" />
-          <path d="M6 80 Q4 35 -8 8 Q10 32 14 72 Z" />
-        </g>
-      </g>
-
-      {/* Caravan body */}
-      <g transform="translate(70,150)">
-        <rect x="0" y="0" width="240" height="110" rx="14" fill="url(#vanBody)" stroke="#2F4254" strokeWidth="2" />
-        {/* Roof line */}
-        <path d="M0 22 H240" stroke="#95D8FD" strokeWidth="3" />
-        {/* Window */}
-        <rect x="20" y="34" width="80" height="48" rx="6" fill="#95D8FD" stroke="#2F4254" strokeWidth="2" />
-        <path d="M60 34 V82" stroke="#FFFFFF" strokeWidth="2" />
-        {/* Door */}
-        <rect x="120" y="34" width="48" height="68" rx="4" fill="#F9AD36" stroke="#2F4254" strokeWidth="2" />
-        <circle cx="160" cy="68" r="2.5" fill="#2F4254" />
-        {/* Side window 2 */}
-        <rect x="184" y="34" width="40" height="34" rx="4" fill="#95D8FD" stroke="#2F4254" strokeWidth="2" />
-        {/* Hitch */}
-        <path d="M0 60 L-30 78 L-44 78" stroke="#2F4254" strokeWidth="3" fill="none" strokeLinecap="round" />
-        {/* Wheels */}
-        <circle cx="50" cy="116" r="16" fill="#2F4254" />
-        <circle cx="50" cy="116" r="6" fill="#95D8FD" />
-        <circle cx="200" cy="116" r="16" fill="#2F4254" />
-        <circle cx="200" cy="116" r="6" fill="#95D8FD" />
-      </g>
-
-      {/* Sun */}
-      <circle cx="120" cy="80" r="22" fill="#F9AD36" opacity="0.9" />
-      <circle cx="120" cy="80" r="34" fill="#F9AD36" opacity="0.18" />
-    </svg>
   );
 }
 
