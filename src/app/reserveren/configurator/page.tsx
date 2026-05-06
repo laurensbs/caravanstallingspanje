@@ -247,6 +247,7 @@ function Stepper({ t, step }: { t: T; step: Step }) {
                   {done ? <Check size={14} /> : n}
                 </span>
                 <span
+                  className={active ? 'stepper-label active' : 'stepper-label'}
                   style={{
                     fontFamily: 'var(--sora)',
                     fontWeight: active || done ? 600 : 500,
@@ -258,7 +259,7 @@ function Stepper({ t, step }: { t: T; step: Step }) {
                   {t(labelKey)}
                 </span>
                 {i < labels.length - 1 && (
-                  <span aria-hidden style={{ width: 24, height: 1, background: 'var(--line)' }} />
+                  <span aria-hidden className="stepper-sep" style={{ width: 24, height: 1, background: 'var(--line)' }} />
                 )}
               </div>
             );
