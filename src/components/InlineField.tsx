@@ -48,12 +48,12 @@ export default function InlineField({ value, label, placeholder, type = 'text', 
     if (e.key === 'Escape') { e.preventDefault(); cancel(); }
   };
 
-  const display = value && value.trim().length > 0 ? value : (emptyText ?? <span className="text-text-subtle italic">— niet ingevuld —</span>);
+  const display = value && value.trim().length > 0 ? value : (emptyText ?? <span className="text-[color:var(--muted-2)] italic">— niet ingevuld —</span>);
 
   return (
     <div className="group">
       {label && (
-        <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-text-muted mb-1.5">
+        <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-[color:var(--muted)] mb-1.5">
           {label}
         </div>
       )}
@@ -67,7 +67,7 @@ export default function InlineField({ value, label, placeholder, type = 'text', 
               onKeyDown={onKey}
               rows={3}
               placeholder={placeholder}
-              className="flex-1 px-2.5 py-2 text-[14px] bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors"
+              className="flex-1 px-2.5 py-2 text-[14px] bg-white border border-[color:var(--line)] rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-[rgba(47,66,84,0.10)] focus:border-[color:var(--navy)] transition-colors"
             />
           ) : (
             <input
@@ -77,7 +77,7 @@ export default function InlineField({ value, label, placeholder, type = 'text', 
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={onKey}
               placeholder={placeholder}
-              className="flex-1 h-9 px-2.5 text-[14px] bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors"
+              className="flex-1 h-9 px-2.5 text-[14px] bg-white border border-[color:var(--line)] rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-[rgba(47,66,84,0.10)] focus:border-[color:var(--navy)] transition-colors"
             />
           )}
           <button
@@ -93,7 +93,7 @@ export default function InlineField({ value, label, placeholder, type = 'text', 
             type="button"
             onClick={cancel}
             disabled={saving}
-            className="h-9 w-9 inline-flex items-center justify-center rounded-[var(--radius-md)] border border-border bg-surface hover:border-border-strong text-text-muted hover:text-text transition-colors"
+            className="h-9 w-9 inline-flex items-center justify-center rounded-[var(--radius-md)] border border-[color:var(--line)] bg-white hover:border-[color:var(--line)]-strong text-[color:var(--muted)] hover:text-[color:var(--ink)] transition-colors"
             aria-label="Annuleren"
           >
             <X size={14} />
@@ -103,9 +103,9 @@ export default function InlineField({ value, label, placeholder, type = 'text', 
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="w-full text-left px-2 py-1.5 -mx-2 rounded-[var(--radius-sm)] hover:bg-surface-2 transition-colors flex items-start justify-between gap-2 group"
+          className="w-full text-left px-2 py-1.5 -mx-2 rounded-[var(--radius-sm)] hover:bg-white-2 transition-colors flex items-start justify-between gap-2 group"
         >
-          <span className={`text-[14px] ${value && value.trim() ? 'text-text' : ''} whitespace-pre-wrap break-words flex-1`}>
+          <span className={`text-[14px] ${value && value.trim() ? 'text-[color:var(--ink)]' : ''} whitespace-pre-wrap break-words flex-1`}>
             {display}
           </span>
           <span className="flex items-center gap-1.5 shrink-0">
@@ -121,7 +121,7 @@ export default function InlineField({ value, label, placeholder, type = 'text', 
                 </motion.span>
               )}
             </AnimatePresence>
-            <Pencil size={12} className="text-text-subtle opacity-0 group-hover:opacity-100 transition-opacity" />
+            <Pencil size={12} className="text-[color:var(--muted-2)] opacity-0 group-hover:opacity-100 transition-opacity" />
           </span>
         </button>
       )}

@@ -124,13 +124,13 @@ export default function TransportPage() {
           >
             <div className="pt-2">
               <Section title={isZelf ? 'Ophalen bij Stalling' : 'Ophalen op camping'}>
-                <div className="rounded-[var(--radius-lg)] border border-border bg-surface-2 p-3 flex items-center justify-between text-[12px] text-text-muted gap-3">
+                <div className="rounded-[var(--radius-lg)] border border-[color:var(--line)] bg-[color:var(--bg)] p-3 flex items-center justify-between text-[12px] text-[color:var(--muted)] gap-3">
                   <span className="inline-flex items-center gap-1.5">
                     <AnimatedServiceIcon kind="transport" size={14} loop /> Stalling
                   </span>
-                  <ArrowRightIcon size={12} className="text-text-subtle" />
-                  <span className="truncate text-text">{camping || '—'}</span>
-                  <ArrowRightIcon size={12} className="text-text-subtle rotate-180" />
+                  <ArrowRightIcon size={12} className="text-[color:var(--muted-2)]" />
+                  <span className="truncate text-[color:var(--ink)]">{camping || '—'}</span>
+                  <ArrowRightIcon size={12} className="text-[color:var(--muted-2)] rotate-180" />
                   <span className="inline-flex items-center gap-1.5">
                     <AnimatedServiceIcon kind="transport" size={14} loop /> Stalling
                   </span>
@@ -220,7 +220,7 @@ export default function TransportPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.4 }}
-          className="text-[13px] text-text-muted text-center"
+          className="text-[13px] text-[color:var(--muted)] text-center"
         >
           ↑ Kies eerst hoe je het wilt regelen
         </motion.p>
@@ -292,33 +292,37 @@ function ModeCard({
       role="radio"
       aria-checked={selected}
       onClick={onClick}
-      whileTap={{ scale: 0.97 }}
+      whileTap={{ scale: 0.98 }}
       transition={{ type: 'spring', stiffness: 380, damping: 26 }}
-      className={`text-left p-5 rounded-[var(--radius-xl)] border-2 transition-all ${
-        selected
-          ? 'border-accent bg-surface shadow-md'
-          : 'border-border bg-surface hover:border-border-strong'
-      }`}
+      className={selected ? 'radio-card selected' : 'radio-card'}
+      style={{ width: '100%', textAlign: 'left', display: 'flex', gap: 14 }}
     >
-      <div className="flex items-start justify-between mb-3">
-        <div className="w-11 h-11 rounded-[var(--radius-md)] bg-surface-2 border border-border flex items-center justify-center text-text">
-          <Icon size={20} />
-        </div>
-        <div aria-hidden className={`w-5 h-5 rounded-full border-2 transition-colors flex items-center justify-center ${selected ? 'border-accent bg-accent' : 'border-border'}`}>
-          {selected && <Check size={11} className="text-accent-fg" strokeWidth={3} />}
-        </div>
+      <span
+        aria-hidden
+        style={{
+          width: 44, height: 44, borderRadius: 10,
+          background: 'var(--sky-soft)', color: 'var(--navy)',
+          display: 'grid', placeItems: 'center', flexShrink: 0,
+        }}
+      >
+        <Icon size={20} />
+      </span>
+      <div className="info" style={{ flex: 1, minWidth: 0 }}>
+        <h4>
+          <span>{title}</span>
+          <span className="price">{price}</span>
+        </h4>
+        <p>{desc}</p>
       </div>
-      <div className="text-[15px] font-semibold">{title}</div>
-      <div className="text-[13px] text-text-muted mt-1">{desc}</div>
-      <div className="text-[20px] font-semibold tabular-nums mt-3">{price}</div>
+      <span className="dot" aria-hidden style={{ marginTop: 6 }} />
     </motion.button>
   );
 }
 
 function SummaryRow({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
   return (
-    <div className="flex justify-between items-baseline gap-3 py-2 border-b border-border last:border-b-0">
-      <span className="text-[13px] text-text-muted">{label}</span>
+    <div className="flex justify-between items-baseline gap-3 py-2 border-b border-[color:var(--line)] last:border-b-0">
+      <span className="text-[13px] text-[color:var(--muted)]">{label}</span>
       <span className={`text-[14px] tabular-nums text-right ${bold ? 'font-semibold' : ''}`}>{value}</span>
     </div>
   );

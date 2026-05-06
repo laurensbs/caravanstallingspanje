@@ -132,11 +132,11 @@ function Included({ t }: { t: T }) {
           <span className="eyebrow-mk">{t('stl1.incl-eyebrow')}</span>
           <h2 className="h2-mk">{t('stl1.incl-h2')}</h2>
         </div>
-        <ul className="checklist-mk grid grid-cols-1 sm:grid-cols-2 gap-x-10" style={{ maxWidth: 880, margin: '0 auto' }}>
+        <ul className="checklist-mk" style={{ maxWidth: 880, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', columnGap: 32, padding: 0 }}>
           {items.map((k) => (
             <li key={k}>
-              <span className="v" />
-              {t(k)}
+              <span className="v" aria-hidden />
+              <span>{t(k)}</span>
             </li>
           ))}
         </ul>

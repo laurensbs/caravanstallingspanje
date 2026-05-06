@@ -104,7 +104,7 @@ export default function IdeeenPage() {
       {/* CONTENT — wit canvas, premium rust. Compose links + feed rechts. */}
       <section
         className="relative flex-1 max-w-6xl w-full mx-auto px-5 sm:px-8 py-12 sm:py-16"
-        style={{ color: 'var(--color-text)' }}
+        style={{ color: 'var(--ink)' }}
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
 
@@ -134,8 +134,8 @@ export default function IdeeenPage() {
                   noValidate
                   className="cs-compose-card relative rounded-[var(--radius-2xl)] overflow-hidden"
                   style={{
-                    background: 'var(--color-surface)',
-                    border: '1px solid var(--color-border)',
+                    background: '#fff',
+                    border: '1px solid var(--line)',
                     boxShadow: '0 1px 2px rgba(20,14,5,0.04), 0 24px 56px -16px rgba(20,14,5,0.10)',
                   }}
                 >
@@ -143,10 +143,10 @@ export default function IdeeenPage() {
 
                     {/* Header */}
                     <div>
-                      <div className="text-[10px] uppercase tracking-[0.18em] font-medium" style={{ color: 'var(--color-text-subtle)' }}>
+                      <div className="text-[10px] uppercase tracking-[0.18em] font-medium" style={{ color: 'var(--muted-2)' }}>
                         Stap 1 — {t('ideas.compose-step-cat')}
                       </div>
-                      <h2 className="mt-1 text-[18px] sm:text-[20px] font-semibold" style={{ color: 'var(--color-text)', letterSpacing: '-0.014em' }}>
+                      <h2 className="mt-1 text-[18px] sm:text-[20px] font-semibold" style={{ color: 'var(--ink)', letterSpacing: '-0.014em' }}>
                         {t('ideas.compose-title')}
                       </h2>
                       <p className="text-[13px] mt-1" style={{ color: 'rgba(251,245,236,0.6)' }}>
@@ -169,13 +169,13 @@ export default function IdeeenPage() {
                             transition={{ type: 'spring', stiffness: 380, damping: 26 }}
                             className="press-spring inline-flex items-center gap-2 px-3 h-9 rounded-full text-[13px] font-medium transition-colors"
                             style={{
-                              background: sel ? 'var(--color-amber-soft)' : 'var(--color-surface-2)',
-                              border: `1px solid ${sel ? 'var(--color-amber-border)' : 'var(--color-border)'}`,
-                              color: sel ? 'var(--color-amber-deep)' : 'var(--color-text-muted)',
+                              background: sel ? 'var(--color-amber-soft)' : 'var(--bg)',
+                              border: `1px solid ${sel ? 'var(--color-amber-border)' : 'var(--line)'}`,
+                              color: sel ? 'var(--color-amber-deep)' : 'var(--muted)',
                             }}
                             aria-pressed={sel}
                           >
-                            <Icon size={13} aria-hidden style={{ color: sel ? 'var(--color-amber-deep)' : 'var(--color-text-subtle)' }} />
+                            <Icon size={13} aria-hidden style={{ color: sel ? 'var(--color-amber-deep)' : 'var(--muted-2)' }} />
                             {t(c.labelKey)}
                           </motion.button>
                         );
@@ -185,7 +185,7 @@ export default function IdeeenPage() {
                           type="button"
                           onClick={() => setValue('category', '', { shouldDirty: true })}
                           className="press-spring inline-flex items-center gap-1 px-3 h-9 rounded-full text-[12px] font-medium"
-                          style={{ color: 'var(--color-text-subtle)' }}
+                          style={{ color: 'var(--muted-2)' }}
                         >
                           <X size={12} aria-hidden /> {t('ideas.compose-step-cat-skip')}
                         </button>
@@ -223,16 +223,16 @@ export default function IdeeenPage() {
                                   onClick={() => setValue('title', s, { shouldDirty: true, shouldValidate: true })}
                                   className="press-spring text-[12px] px-2.5 h-7 inline-flex items-center rounded-full transition-colors"
                                   style={{
-                                    background: 'var(--color-surface)',
-                                    border: '1px solid var(--color-border)',
-                                    color: 'var(--color-text)',
+                                    background: '#fff',
+                                    border: '1px solid var(--line)',
+                                    color: 'var(--ink)',
                                   }}
                                 >
                                   {s}
                                 </button>
                               ))}
                             </div>
-                            <p className="text-[11px] mt-2" style={{ color: 'var(--color-text-muted)' }}>
+                            <p className="text-[11px] mt-2" style={{ color: 'var(--muted)' }}>
                               {t('ideas.inspire-hint')}
                             </p>
                           </div>
@@ -240,11 +240,11 @@ export default function IdeeenPage() {
                       )}
                     </AnimatePresence>
 
-                    <hr style={{ borderColor: 'var(--color-border)' }} />
+                    <hr style={{ borderColor: 'var(--line)' }} />
 
                     {/* Stap 2 — idee */}
                     <div>
-                      <div className="text-[10px] uppercase tracking-[0.18em] font-medium mb-1" style={{ color: 'var(--color-text-subtle)' }}>
+                      <div className="text-[10px] uppercase tracking-[0.18em] font-medium mb-1" style={{ color: 'var(--muted-2)' }}>
                         Stap 2 — {t('ideas.compose-step-idea')}
                       </div>
                     </div>
@@ -280,14 +280,14 @@ export default function IdeeenPage() {
                       )}
                     </Field>
 
-                    <hr style={{ borderColor: 'var(--color-border)' }} />
+                    <hr style={{ borderColor: 'var(--line)' }} />
 
                     {/* Stap 3 — wie */}
                     <div>
-                      <div className="text-[10px] uppercase tracking-[0.18em] font-medium mb-1" style={{ color: 'var(--color-text-subtle)' }}>
+                      <div className="text-[10px] uppercase tracking-[0.18em] font-medium mb-1" style={{ color: 'var(--muted-2)' }}>
                         Stap 3 — {t('ideas.compose-step-you')}
                       </div>
-                      <p className="text-[13px]" style={{ color: 'var(--color-text-muted)' }}>
+                      <p className="text-[13px]" style={{ color: 'var(--muted)' }}>
                         {t('ideas.compose-step-you-hint')}
                       </p>
                     </div>
@@ -358,7 +358,7 @@ export default function IdeeenPage() {
                       </span>
                     </button>
 
-                    <p className="text-[11px] text-center" style={{ color: 'var(--color-text-subtle)' }}>
+                    <p className="text-[11px] text-center" style={{ color: 'var(--muted-2)' }}>
                       {t('ideas.compose-disclaimer')}
                     </p>
                   </div>
@@ -399,8 +399,8 @@ function IdeasHero() {
     <header
       className="relative border-b"
       style={{
-        background: 'linear-gradient(180deg, #fff 0%, var(--color-marketing-cream) 100%)',
-        borderColor: 'var(--color-marketing-line)',
+        background: 'linear-gradient(180deg, #fff 0%, var(--bg) 100%)',
+        borderColor: 'var(--line)',
       }}
     >
       <div className="max-w-[1180px] w-full mx-auto px-5 sm:px-8 pt-10 sm:pt-14 pb-8 sm:pb-12">
@@ -418,7 +418,7 @@ function IdeasHero() {
             <h1
               className="font-display"
               style={{
-                color: 'var(--color-navy)',
+                color: 'var(--navy)',
                 fontSize: 'clamp(2rem, 4vw + 0.75rem, 3.25rem)',
                 lineHeight: 1.08,
                 letterSpacing: '-0.012em',
@@ -428,7 +428,7 @@ function IdeasHero() {
             >
               {t('ideas.h1')}
             </h1>
-            <p className="mt-2 leading-relaxed text-[15px] sm:text-[17px] max-w-xl" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+            <p className="mt-2 leading-relaxed text-[15px] sm:text-[17px] max-w-xl" style={{ color: 'var(--ink-2)' }}>
               {t('ideas.intro')}
             </p>
 
@@ -439,12 +439,12 @@ function IdeasHero() {
                 transition={{ delay: 0.3, duration: 0.4 }}
                 className="mt-5 inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
                 style={{
-                  background: 'var(--color-terracotta-soft)',
+                  background: 'var(--sky-soft)',
                   border: '1px solid rgba(217,110,60,0.28)',
                 }}
               >
-                <span aria-hidden className="cs-orb-pulse w-2 h-2 rounded-full" style={{ background: 'var(--color-terracotta)' }} />
-                <span className="text-[12px] font-medium tabular-nums" style={{ color: 'var(--color-terracotta-deep)' }}>
+                <span aria-hidden className="cs-orb-pulse w-2 h-2 rounded-full" style={{ background: 'var(--orange)' }} />
+                <span className="text-[12px] font-medium tabular-nums" style={{ color: 'var(--orange-d)' }}>
                   {t(count === 1 ? 'ideas.live-count-singular' : 'ideas.live-count', count)}
                 </span>
               </motion.div>
@@ -463,17 +463,17 @@ function IdeasHero() {
             <div
               aria-hidden
               className="absolute inset-0 rounded-full blur-2xl"
-              style={{ background: 'var(--color-terracotta)', opacity: 0.18 }}
+              style={{ background: 'var(--orange)', opacity: 0.18 }}
             />
             <div
               className="cs-orb-pulse relative w-32 h-32 rounded-full flex items-center justify-center"
               style={{
                 background: '#fff',
-                border: '1px solid var(--color-terracotta-soft)',
+                border: '1px solid var(--sky-soft)',
                 boxShadow: '0 0 0 8px rgba(217,110,60,0.06), inset 0 0 32px rgba(217,110,60,0.10)',
               }}
             >
-              <Lightbulb size={48} style={{ color: 'var(--color-terracotta-deep)' }} />
+              <Lightbulb size={48} style={{ color: 'var(--orange-d)' }} />
             </div>
           </motion.div>
         </div>
@@ -538,7 +538,7 @@ function FeaturedIdeasFeed() {
       {/* Sectie-kop — op licht canvas, monochroom */}
       <div className="mb-4 flex items-center gap-2">
         <Star size={13} aria-hidden style={{ color: 'var(--color-amber-deep)' }} />
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.20em]" style={{ color: 'var(--color-text-muted)' }}>
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.20em]" style={{ color: 'var(--muted)' }}>
           {t('ideas.feed-title')}
         </h2>
       </div>
@@ -549,9 +549,9 @@ function FeaturedIdeasFeed() {
         <div
           className="rounded-[var(--radius-lg)] p-5 text-[13px]"
           style={{
-            background: 'var(--color-surface-2)',
-            border: '1px dashed var(--color-border)',
-            color: 'var(--color-text-muted)',
+            background: 'var(--bg)',
+            border: '1px dashed var(--line)',
+            color: 'var(--muted)',
           }}
         >
           {t('ideas.feed-empty')}
@@ -570,8 +570,8 @@ function FeaturedIdeasFeed() {
                 transition={{ delay: i * 0.04, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                 className="relative rounded-[var(--radius-2xl)] overflow-hidden"
                 style={{
-                  background: 'var(--color-surface)',
-                  border: '1px solid var(--color-border)',
+                  background: '#fff',
+                  border: '1px solid var(--line)',
                   boxShadow: '0 1px 2px rgba(20,14,5,0.04), 0 8px 24px -8px rgba(20,14,5,0.06)',
                   backdropFilter: 'blur(8px)',
                 }}
@@ -598,10 +598,10 @@ function FeaturedIdeasFeed() {
                     </div>
                   )}
 
-                  <h3 className="text-[16px] font-semibold mb-2 leading-snug" style={{ color: 'var(--color-text)', letterSpacing: '-0.012em' }}>
+                  <h3 className="text-[16px] font-semibold mb-2 leading-snug" style={{ color: 'var(--ink)', letterSpacing: '-0.012em' }}>
                     {idea.title}
                   </h3>
-                  <p className="text-[14px] leading-relaxed whitespace-pre-wrap mb-4" style={{ color: 'var(--color-text-muted)' }}>
+                  <p className="text-[14px] leading-relaxed whitespace-pre-wrap mb-4" style={{ color: 'var(--muted)' }}>
                     {idea.message}
                   </p>
 
@@ -610,7 +610,7 @@ function FeaturedIdeasFeed() {
                     <div className="mb-4">
                       <div
                         className="relative h-1.5 rounded-full overflow-hidden"
-                        style={{ background: 'var(--color-surface-2)' }}
+                        style={{ background: 'var(--bg)' }}
                         role="img"
                         aria-label={t('ideas.feed-votes-summary', totalVotes, upPct)}
                       >
@@ -623,15 +623,15 @@ function FeaturedIdeasFeed() {
                           style={{ background: 'var(--color-amber)' }}
                         />
                       </div>
-                      <p className="text-[11px] mt-1.5" style={{ color: 'var(--color-text-subtle)' }}>
+                      <p className="text-[11px] mt-1.5" style={{ color: 'var(--muted-2)' }}>
                         {t('ideas.feed-votes-summary', totalVotes, upPct)}
                       </p>
                     </div>
                   )}
 
                   {/* Vote-buttons */}
-                  <div className="flex items-center gap-2 pt-3 border-t" style={{ borderColor: 'var(--color-border)' }}>
-                    <p className="text-[12px] mr-auto" style={{ color: 'var(--color-text-subtle)' }}>
+                  <div className="flex items-center gap-2 pt-3 border-t" style={{ borderColor: 'var(--line)' }}>
+                    <p className="text-[12px] mr-auto" style={{ color: 'var(--muted-2)' }}>
                       {t('ideas.feed-vote-prompt')}
                     </p>
                     <VoteButton
@@ -657,7 +657,7 @@ function FeaturedIdeasFeed() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       className="text-[11px] mt-2 inline-flex items-center gap-1"
-                      style={{ color: 'var(--color-success)' }}
+                      style={{ color: 'var(--green)' }}
                     >
                       <Check size={11} aria-hidden /> {t('ideeen.vote-thanks')}
                     </motion.p>
@@ -685,8 +685,8 @@ function VoteButton({
   const Icon = direction === 'up' ? ThumbsUp : ThumbsDown;
   // Monochroom: success (zacht groen) voor up, danger (zacht rood) voor down.
   // Semantisch correct én restraint — geen vier kleuren in een feed.
-  const accentColor = direction === 'up' ? 'var(--color-success)' : 'var(--color-danger)';
-  const accentSoft = direction === 'up' ? 'var(--color-success-soft)' : 'var(--color-danger-soft)';
+  const accentColor = direction === 'up' ? 'var(--green)' : 'var(--color-danger)';
+  const accentSoft = direction === 'up' ? 'var(--green-soft)' : 'var(--color-danger-soft)';
   return (
     <motion.button
       type="button"
@@ -696,9 +696,9 @@ function VoteButton({
       onClick={onClick}
       className="press-spring inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-[13px] font-medium transition-colors"
       style={{
-        background: selected ? accentSoft : 'var(--color-surface-2)',
-        border: `1px solid ${selected ? accentColor : 'var(--color-border)'}`,
-        color: selected ? accentColor : 'var(--color-text-muted)',
+        background: selected ? accentSoft : 'var(--bg)',
+        border: `1px solid ${selected ? accentColor : 'var(--line)'}`,
+        color: selected ? accentColor : 'var(--muted)',
         opacity: disabled && !selected ? 0.5 : 1,
       }}
       aria-pressed={selected}
@@ -718,14 +718,14 @@ function FeedSkeletons() {
           key={i}
           className="rounded-[var(--radius-2xl)] p-5"
           style={{
-            background: 'var(--color-surface)',
-            border: '1px solid var(--color-border)',
+            background: '#fff',
+            border: '1px solid var(--line)',
           }}
         >
           <div
             className="h-3 w-2/3 rounded mb-3"
             style={{
-              background: 'var(--color-surface-2)',
+              background: 'var(--bg)',
               animation: 'shimmer 1.6s ease-in-out infinite',
               animationDelay: `${i * 100}ms`,
             }}
@@ -765,8 +765,8 @@ function DoneCard({ onAnother }: { onAnother: () => void }) {
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       className="relative rounded-[var(--radius-2xl)] overflow-hidden text-center p-8 sm:p-12"
       style={{
-        background: 'var(--color-surface)',
-        border: '1px solid var(--color-border)',
+        background: '#fff',
+        border: '1px solid var(--line)',
         boxShadow: '0 1px 2px rgba(20,14,5,0.04), 0 24px 56px -16px rgba(20,14,5,0.10)',
       }}
     >
@@ -798,12 +798,12 @@ function DoneCard({ onAnother }: { onAnother: () => void }) {
         style={{
           fontSize: 'clamp(1.5rem, 1.5vw + 0.75rem, 2rem)',
           letterSpacing: '-0.018em',
-          color: 'var(--color-text)',
+          color: 'var(--ink)',
         }}
       >
         {t('ideas.done-title')}
       </h2>
-      <p className="leading-relaxed text-[15px] mb-7" style={{ color: 'var(--color-text-muted)' }}>
+      <p className="leading-relaxed text-[15px] mb-7" style={{ color: 'var(--muted)' }}>
         {t('ideas.done-body')}
       </p>
 
@@ -824,9 +824,9 @@ function DoneCard({ onAnother }: { onAnother: () => void }) {
           href="/"
           className="press-spring inline-flex items-center justify-center gap-2 h-12 px-5 rounded-[var(--radius-md)] text-[14px] font-medium transition-colors"
           style={{
-            background: 'var(--color-surface-2)',
-            border: '1px solid var(--color-border)',
-            color: 'var(--color-text)',
+            background: 'var(--bg)',
+            border: '1px solid var(--line)',
+            color: 'var(--ink)',
           }}
         >
           <ArrowRight size={14} className="rotate-180" aria-hidden /> {t('ideas.done-back')}

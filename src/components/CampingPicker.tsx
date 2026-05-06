@@ -17,7 +17,7 @@ interface CampingPickerProps {
 }
 
 const inputCls =
-  'w-full h-10 pl-3 pr-9 text-sm bg-surface border border-border rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-accent/15 focus:border-accent transition-colors placeholder:text-text-subtle text-left';
+  'w-full h-10 pl-3 pr-9 text-sm bg-white border border-[color:var(--line)] rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-[rgba(47,66,84,0.10)] focus:border-[color:var(--navy)] transition-colors placeholder:text-[color:var(--muted-2)] text-left';
 
 export default function CampingPicker({
   value,
@@ -109,13 +109,13 @@ export default function CampingPicker({
           aria-controls={listboxId}
           className={`${inputCls} flex items-center justify-between`}
         >
-          <span className={value ? 'text-text truncate' : 'text-text-subtle truncate'}>
+          <span className={value ? 'text-[color:var(--ink)] truncate' : 'text-[color:var(--muted-2)] truncate'}>
             {value || placeholder || 'Kies een camping'}
           </span>
         </button>
         <ChevronDown
           size={14}
-          className={`absolute right-3 top-1/2 -translate-y-1/2 text-text-muted transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`absolute right-3 top-1/2 -translate-y-1/2 text-[color:var(--muted)] transition-transform ${open ? 'rotate-180' : ''}`}
         />
         {/* Hidden required input so the form's native validation still triggers. */}
         {required && (
@@ -139,28 +139,28 @@ export default function CampingPicker({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.15 }}
-            // Eigen ondoorzichtige achtergrond i.p.v. bg-surface — die wordt
+            // Eigen ondoorzichtige achtergrond i.p.v. bg-white — die wordt
             // op page-public-dark overschreven naar 6% wit, wat de dropdown
             // onleesbaar maakt over de navy hero. Inline style negeert die
             // cascade gegarandeerd. Op admin (lichte BG) blijft 't ook netjes.
             className="cs-camping-picker-popover absolute z-30 left-0 right-0 mt-1.5 border rounded-[var(--radius-md)] shadow-lg overflow-hidden"
           >
             {/* Search bar */}
-            <div className="relative border-b border-border">
-              <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle" />
+            <div className="relative border-b border-[color:var(--line)]">
+              <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--muted-2)]" />
               <input
                 ref={inputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKey}
                 placeholder="Zoek camping of plaats…"
-                className="w-full h-10 pl-9 pr-9 text-sm bg-transparent focus:outline-none placeholder:text-text-subtle"
+                className="w-full h-10 pl-9 pr-9 text-sm bg-transparent focus:outline-none placeholder:text-[color:var(--muted-2)]"
               />
               {query && (
                 <button
                   type="button"
                   onClick={() => { setQuery(''); inputRef.current?.focus(); }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full text-text-subtle hover:text-text hover:bg-surface-2 transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full text-[color:var(--muted-2)] hover:text-[color:var(--ink)] hover:bg-white-2 transition-colors"
                   aria-label="Wissen"
                 >
                   <X size={12} />
@@ -174,17 +174,17 @@ export default function CampingPicker({
               className="max-h-[min(60vh,340px)] overflow-y-auto py-1"
             >
               {groups.length === 0 ? (
-                <div className="px-4 py-6 text-center text-[12px] text-text-muted">
+                <div className="px-4 py-6 text-center text-[12px] text-[color:var(--muted)]">
                   Geen camping gevonden
                 </div>
               ) : (
                 groups.map((g) => (
                   <div key={`${g.comarca}-${g.subregion}`} className="py-1">
                     <div className="px-3 pt-1.5 pb-1">
-                      <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-text-subtle">
+                      <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[color:var(--muted-2)]">
                         {g.comarca}
                       </div>
-                      <div className="text-[11px] text-text-muted">{g.subregion}</div>
+                      <div className="text-[11px] text-[color:var(--muted)]">{g.subregion}</div>
                     </div>
                     {g.campings.map((c) => {
                       const idxInFlat = flat.findIndex((x) => x.id === c.id);
@@ -199,15 +199,15 @@ export default function CampingPicker({
                           onMouseEnter={() => setHighlight(idxInFlat)}
                           onClick={() => select(c)}
                           className={`w-full flex items-center justify-between gap-3 px-3 py-2 text-left transition-colors ${
-                            isHighlight ? 'bg-surface-2' : 'bg-transparent'
+                            isHighlight ? 'bg-white-2' : 'bg-transparent'
                           }`}
                         >
                           <span className="flex items-center gap-2 min-w-0">
-                            <MapPin size={11} className="text-text-subtle shrink-0" />
+                            <MapPin size={11} className="text-[color:var(--muted-2)] shrink-0" />
                             <span className="text-sm truncate">{c.name}</span>
-                            <span className="text-[11px] text-text-muted truncate">{c.location}</span>
+                            <span className="text-[11px] text-[color:var(--muted)] truncate">{c.location}</span>
                           </span>
-                          {isSelected && <Check size={13} className="text-text shrink-0" />}
+                          {isSelected && <Check size={13} className="text-[color:var(--ink)] shrink-0" />}
                         </button>
                       );
                     })}

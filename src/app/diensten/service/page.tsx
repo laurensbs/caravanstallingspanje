@@ -67,11 +67,11 @@ export default function ServicePage() {
           </div>
         ) : catalog.length === 0 ? (
           <div className="card-surface p-8 text-center">
-            <p className="text-sm text-text-muted">
+            <p className="text-sm text-[color:var(--muted)]">
               {t('service.empty')}{' '}
               <a
                 href="mailto:info@caravanstalling-spanje.com"
-                className="text-text underline-offset-4 hover:underline"
+                className="text-[color:var(--ink)] underline-offset-4 hover:underline"
               >
                 info@caravanstalling-spanje.com
               </a>
@@ -93,29 +93,19 @@ export default function ServicePage() {
                   role="radio"
                   aria-checked={sel}
                   onClick={() => setValue('serviceCategory', s.slug, { shouldValidate: true, shouldDirty: true })}
-                  whileTap={{ scale: 0.97 }}
+                  whileTap={{ scale: 0.98 }}
                   transition={{ type: 'spring', stiffness: 380, damping: 26 }}
-                  className={`text-left p-4 rounded-[var(--radius-lg)] border transition-all ${
-                    sel
-                      ? 'border-accent bg-surface shadow-md'
-                      : 'border-border bg-surface hover:border-border-strong'
-                  }`}
+                  className={sel ? 'radio-card selected' : 'radio-card'}
+                  style={{ width: '100%', textAlign: 'left' }}
                 >
-                  <div className="flex items-start justify-between mb-2 gap-2">
-                    <span className="text-[15px] font-semibold">{s.name}</span>
-                    <div
-                      aria-hidden
-                      className={`w-5 h-5 rounded-full border-2 transition-colors shrink-0 flex items-center justify-center ${
-                        sel ? 'border-accent bg-accent' : 'border-border'
-                      }`}
-                    >
-                      {sel && <Check size={11} className="text-accent-fg" strokeWidth={3} />}
-                    </div>
+                  <span className="dot" aria-hidden style={{ marginTop: 4 }} />
+                  <div className="info">
+                    <h4>
+                      <span>{s.name}</span>
+                      <span className="price">{formatEur(s.price_eur)}</span>
+                    </h4>
+                    {s.description && <p>{s.description}</p>}
                   </div>
-                  {s.description && (
-                    <p className="text-[13px] text-text-muted leading-relaxed mb-2">{s.description}</p>
-                  )}
-                  <div className="text-[16px] font-semibold tabular-nums">{formatEur(s.price_eur)}</div>
                 </motion.button>
               );
             })}
@@ -181,8 +171,8 @@ export default function ServicePage() {
 
 function SummaryRow({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
   return (
-    <div className="flex justify-between items-baseline gap-3 py-2 border-b border-border last:border-b-0">
-      <span className="text-[13px] text-text-muted">{label}</span>
+    <div className="flex justify-between items-baseline gap-3 py-2 border-b border-[color:var(--line)] last:border-b-0">
+      <span className="text-[13px] text-[color:var(--muted)]">{label}</span>
       <span className={`text-[14px] tabular-nums text-right ${bold ? 'font-semibold' : ''}`}>{value}</span>
     </div>
   );

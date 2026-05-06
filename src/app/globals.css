@@ -904,6 +904,7 @@ body {
 .section-bg-grey {
   background: linear-gradient(180deg, var(--bg) 0%, #FAFCFD 60%, var(--bg) 100%);
   position: relative;
+  overflow: hidden;
 }
 .section-bg-grey::before {
   content: '';
@@ -1660,10 +1661,16 @@ a.card-mk:hover, button.card-mk:hover, .card-mk.is-clickable:hover {
   color: #fff;
   display: grid;
   place-items: center;
-  font-size: 11px;
-  font-weight: 700;
   flex-shrink: 0;
-  font-family: var(--sora);
+  margin-top: 1px;
+}
+.checklist-mk .v::before {
+  content: '';
+  width: 10px;
+  height: 6px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-45deg) translate(1px, -1px);
 }
 .tick-list-mk {
   list-style: none;

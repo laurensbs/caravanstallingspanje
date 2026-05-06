@@ -108,7 +108,7 @@ export default function AircoPage() {
             <Check size={22} />
           </div>
           <h1 className="text-3xl font-semibold tracking-tight mb-3">{t('fridge.confirm-title')}</h1>
-          <p className="text-text-muted leading-relaxed">{t('fridge.confirm-body', done.days, formatEur(done.total))}</p>
+          <p className="text-[color:var(--muted)] leading-relaxed">{t('fridge.confirm-body', done.days, formatEur(done.total))}</p>
         </motion.div>
       </main>
     );
@@ -122,12 +122,12 @@ export default function AircoPage() {
           <div className="w-12 h-12 rounded-full bg-warning-soft text-warning flex items-center justify-center mb-5">
             <AlertTriangle size={20} />
           </div>
-          <p className="text-text-muted leading-relaxed mb-2">{t('fridge.sold-out-dates')}</p>
-          <p className="text-text-muted leading-relaxed mb-8">{t('fridge.sold-out-help')}</p>
+          <p className="text-[color:var(--muted)] leading-relaxed mb-2">{t('fridge.sold-out-dates')}</p>
+          <p className="text-[color:var(--muted)] leading-relaxed mb-8">{t('fridge.sold-out-help')}</p>
           <button
             type="button"
             onClick={() => setSoldOut(false)}
-            className="press-spring w-full h-12 rounded-[var(--radius-md)] border border-border bg-surface hover:border-border-strong text-[14px] font-medium transition-colors"
+            className="press-spring w-full h-12 rounded-[var(--radius-md)] border border-[color:var(--line)] bg-white hover:border-[color:var(--line-2)] text-[14px] font-medium transition-colors"
           >
             {t('fridge.adjust-period')}
           </button>
@@ -142,20 +142,34 @@ export default function AircoPage() {
   const step1 = (
     <>
       <Section title={t('airco.heading')}>
-        <div className="rounded-[var(--radius-xl)] border-2 border-accent bg-surface shadow-md p-5">
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-[var(--radius-md)] bg-surface-2 border border-border flex items-center justify-center text-text">
-                <AnimatedServiceIcon kind="airco" size={20} loop />
-              </div>
-              <span className="text-[15px] font-semibold">{t('airco.device-name')}</span>
-            </div>
+        <div
+          className="card-mk"
+          style={{
+            padding: 22,
+            border: '2px solid var(--navy)',
+            boxShadow: '0 0 0 3px rgba(47,66,84,0.08), var(--shadow-card-mk)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12 }}>
+            <span
+              aria-hidden
+              style={{
+                width: 44, height: 44, borderRadius: 10,
+                background: 'var(--sky-soft)', color: 'var(--navy)',
+                display: 'grid', placeItems: 'center', flexShrink: 0,
+              }}
+            >
+              <AnimatedServiceIcon kind="airco" size={20} loop />
+            </span>
+            <span style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 16, color: 'var(--navy)' }}>
+              {t('airco.device-name')}
+            </span>
           </div>
-          <div className="text-[26px] font-semibold tabular-nums mt-1">
+          <div style={{ fontFamily: 'var(--sora)', fontWeight: 700, fontSize: 28, color: 'var(--navy)', lineHeight: 1.1 }}>
             {formatEur(aircoWeekPrice)}
-            <span className="text-[14px] font-normal text-text-muted"> {t('fridge.per-week')}</span>
+            <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--muted)' }}> {t('fridge.per-week')}</span>
           </div>
-          <div className="text-[13px] text-text-muted mt-1">
+          <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
             {t('fridge.afterwards')} {formatEur(dayPrice)}{t('fridge.per-day')}
           </div>
         </div>
@@ -193,7 +207,7 @@ export default function AircoPage() {
             )}
           </Field>
         </div>
-        <p className="text-[12px] text-text-muted">{t('fridge.minimum-days', MIN_DAYS)}</p>
+        <p className="text-[12px] text-[color:var(--muted)]">{t('fridge.minimum-days', MIN_DAYS)}</p>
       </Section>
 
       <Section title={t('fridge.camping')}>
@@ -225,20 +239,23 @@ export default function AircoPage() {
             transition={{ duration: 0.25 }}
             className="overflow-hidden"
           >
-            <div className="rounded-[var(--radius-xl)] bg-surface-2 border border-border p-5 space-y-2">
+            <div
+              className="card-mk space-y-2"
+              style={{ padding: 20, background: 'var(--bg)' }}
+            >
               <div className="flex justify-between text-[14px]">
-                <span className="text-text-muted">{t('fridge.first-week')}</span>
+                <span className="text-[color:var(--muted)]">{t('fridge.first-week')}</span>
                 <span className="tabular-nums">{formatEur(price.weekPrice)}</span>
               </div>
               {price.extraDays > 0 && (
                 <div className="flex justify-between text-[14px]">
-                  <span className="text-text-muted">
+                  <span className="text-[color:var(--muted)]">
                     {t(price.extraDays === 1 ? 'fridge.extra-days-one' : 'fridge.extra-days-many', price.extraDays, formatEur(price.dayPrice))}
                   </span>
                   <span className="tabular-nums">{formatEur(price.extraTotal)}</span>
                 </div>
               )}
-              <div className="flex justify-between pt-3 border-t border-border">
+              <div className="flex justify-between pt-3 border-t border-[color:var(--line)]">
                 <span className="font-semibold">{t('fridge.total-days', price.days)}</span>
                 <span className="font-semibold tabular-nums text-xl">{formatEur(price.total)}</span>
               </div>
@@ -296,8 +313,8 @@ export default function AircoPage() {
 
 function SummaryRow({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
   return (
-    <div className="flex justify-between items-baseline gap-3 py-2 border-b border-border last:border-b-0">
-      <span className="text-[13px] text-text-muted">{label}</span>
+    <div className="flex justify-between items-baseline gap-3 py-2 border-b border-[color:var(--line)] last:border-b-0">
+      <span className="text-[13px] text-[color:var(--muted)]">{label}</span>
       <span className={`text-[14px] tabular-nums text-right ${bold ? 'font-semibold' : ''}`}>{value}</span>
     </div>
   );

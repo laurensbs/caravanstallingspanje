@@ -185,17 +185,17 @@ export default function KoelkastBestelPagina() {
               <div
                 aria-hidden
                 className="absolute inset-0 rounded-full blur-xl opacity-50"
-                style={{ background: 'var(--color-terracotta)' }}
+                style={{ background: 'var(--orange)' }}
               />
               <div
                 className="relative w-full h-full rounded-full flex items-center justify-center"
                 style={{
                   background: '#fff',
-                  border: '1px solid var(--color-terracotta)',
+                  border: '1px solid var(--orange)',
                   boxShadow: '0 8px 24px rgba(217,110,60,0.25)',
                 }}
               >
-                <Check size={28} strokeWidth={2.5} style={{ color: 'var(--color-terracotta-deep)' }} aria-hidden />
+                <Check size={28} strokeWidth={2.5} style={{ color: 'var(--orange-d)' }} aria-hidden />
               </div>
             </MotionBounce>
 
@@ -205,22 +205,22 @@ export default function KoelkastBestelPagina() {
                 fontSize: 'clamp(1.75rem, 2vw + 0.75rem, 2.25rem)',
                 letterSpacing: '-0.012em',
                 lineHeight: 1.15,
-                color: 'var(--color-navy)',
+                color: 'var(--navy)',
                 fontWeight: 700,
                 margin: '0 0 0.6rem',
               }}
             >
               {t('fridge.confirm-title')}
             </h1>
-            <p className="leading-relaxed text-[15px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+            <p className="leading-relaxed text-[15px]" style={{ color: 'var(--ink-2)' }}>
               {t('fridge.confirm-body', done.days, formatEur(done.total))}
             </p>
-            <p className="text-[14px] mt-8" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+            <p className="text-[14px] mt-8" style={{ color: 'var(--ink-2)' }}>
               {t('common.questions')}{' '}
               <a
                 href="mailto:info@caravanstalling-spanje.com"
                 className="underline-offset-4 hover:underline"
-                style={{ color: 'var(--color-terracotta-deep)' }}
+                style={{ color: 'var(--orange-d)' }}
               >
                 info@caravanstalling-spanje.com
               </a>
@@ -243,8 +243,8 @@ export default function KoelkastBestelPagina() {
             <div
               className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-6"
               style={{
-                background: 'var(--color-success-soft)',
-                color: 'var(--color-success)',
+                background: 'var(--green-soft)',
+                color: 'var(--green)',
               }}
             >
               <Check size={22} aria-hidden />
@@ -252,7 +252,7 @@ export default function KoelkastBestelPagina() {
             <h1
               className="font-display"
               style={{
-                color: 'var(--color-navy)',
+                color: 'var(--navy)',
                 fontSize: 'clamp(1.75rem, 2vw + 0.75rem, 2.25rem)',
                 fontWeight: 700,
                 letterSpacing: '-0.012em',
@@ -262,7 +262,7 @@ export default function KoelkastBestelPagina() {
             >
               {t('fridge.waitlist-on-title')}
             </h1>
-            <p className="leading-relaxed" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+            <p className="leading-relaxed" style={{ color: 'var(--ink-2)' }}>
               {t('fridge.waitlist-on-body-one', t(DEVICE_LABEL_LOWER_KEY[form.device_type]))}
             </p>
           </motion.div>
@@ -287,18 +287,18 @@ export default function KoelkastBestelPagina() {
             <div
               className="w-12 h-12 rounded-full flex items-center justify-center"
               style={{
-                background: 'var(--color-terracotta-soft)',
+                background: 'var(--sky-soft)',
                 border: '1px solid rgba(217,110,60,0.22)',
-                color: 'var(--color-terracotta-deep)',
+                color: 'var(--orange-d)',
               }}
             >
               <AlertTriangle size={20} aria-hidden />
             </div>
             <div className="space-y-2">
-              <p className="leading-relaxed" style={{ color: 'var(--color-marketing-ink)' }}>
+              <p className="leading-relaxed" style={{ color: 'var(--ink)' }}>
                 {t('fridge.sold-out-body-one', t(DEVICE_PLURAL_KEY[form.device_type]))}
               </p>
-              <p className="leading-relaxed" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+              <p className="leading-relaxed" style={{ color: 'var(--ink-2)' }}>
                 {t('fridge.sold-out-help')}
               </p>
             </div>
@@ -322,7 +322,7 @@ export default function KoelkastBestelPagina() {
                 {t('fridge.adjust-period')}
               </button>
             </form>
-            <p className="text-[12px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+            <p className="text-[12px]" style={{ color: 'var(--ink-2)' }}>
               {t('fridge.privacy-note')}
             </p>
           </div>
@@ -367,27 +367,27 @@ export default function KoelkastBestelPagina() {
                     >
                       <AnimatedServiceIcon kind="fridge" size={20} loop />
                     </div>
-                    <span className="text-[15px] font-semibold" style={{ color: 'var(--color-marketing-ink)' }}>
+                    <span className="text-[15px] font-semibold" style={{ color: 'var(--ink)' }}>
                       {t(DEVICE_LABEL_KEY[type])}
                     </span>
                   </div>
                   <div
                     className="w-5 h-5 rounded-full flex items-center justify-center transition-colors"
                     style={{
-                      border: `2px solid ${selected ? 'var(--color-terracotta)' : 'var(--color-marketing-line)'}`,
-                      background: selected ? 'var(--color-terracotta)' : 'transparent',
+                      border: `2px solid ${selected ? 'var(--orange)' : 'var(--line)'}`,
+                      background: selected ? 'var(--orange)' : 'transparent',
                     }}
                   >
                     {selected && <Check size={11} color="#fff" strokeWidth={3} />}
                   </div>
                 </div>
-                <div className="text-[26px] font-semibold tabular-nums mt-1" style={{ color: 'var(--color-marketing-ink)' }}>
+                <div className="text-[26px] font-semibold tabular-nums mt-1" style={{ color: 'var(--ink)' }}>
                   {formatEur(weekPrice)}
-                  <span className="text-[14px] font-normal" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+                  <span className="text-[14px] font-normal" style={{ color: 'var(--ink-2)' }}>
                     {' '}{t('fridge.per-week')}
                   </span>
                 </div>
-                <div className="text-[13px] mt-1" style={{ color: 'var(--color-marketing-ink-soft)' }}>
+                <div className="text-[13px] mt-1" style={{ color: 'var(--ink-2)' }}>
                   {t('fridge.afterwards')} {formatEur(dayPrice)}{t('fridge.per-day')}
                 </div>
               </motion.button>
@@ -419,7 +419,7 @@ export default function KoelkastBestelPagina() {
             />
           </Field>
         </div>
-        <p className="text-[12px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>{t('fridge.minimum-days', MIN_DAYS)}</p>
+        <p className="text-[12px]" style={{ color: 'var(--ink-2)' }}>{t('fridge.minimum-days', MIN_DAYS)}</p>
       </Section>
 
       <Section title={t('fridge.camping')}>
@@ -456,28 +456,28 @@ export default function KoelkastBestelPagina() {
             <div
               className="rounded-[var(--radius-xl)] p-5 space-y-2"
               style={{
-                background: 'var(--color-sand)',
-                border: '1px solid var(--color-marketing-line)',
+                background: 'var(--bg)',
+                border: '1px solid var(--line)',
               }}
             >
               <div className="flex justify-between text-[14px]">
-                <span style={{ color: 'var(--color-marketing-ink-soft)' }}>{t('fridge.first-week')}</span>
-                <span className="tabular-nums" style={{ color: 'var(--color-marketing-ink)' }}>{formatEur(price.weekPrice)}</span>
+                <span style={{ color: 'var(--ink-2)' }}>{t('fridge.first-week')}</span>
+                <span className="tabular-nums" style={{ color: 'var(--ink)' }}>{formatEur(price.weekPrice)}</span>
               </div>
               {price.extraDays > 0 && (
                 <div className="flex justify-between text-[14px]">
-                  <span style={{ color: 'var(--color-marketing-ink-soft)' }}>
+                  <span style={{ color: 'var(--ink-2)' }}>
                     {t(price.extraDays === 1 ? 'fridge.extra-days-one' : 'fridge.extra-days-many', price.extraDays, formatEur(price.dayPrice))}
                   </span>
-                  <span className="tabular-nums" style={{ color: 'var(--color-marketing-ink)' }}>{formatEur(price.extraTotal)}</span>
+                  <span className="tabular-nums" style={{ color: 'var(--ink)' }}>{formatEur(price.extraTotal)}</span>
                 </div>
               )}
               <div
                 className="flex justify-between pt-3 border-t"
-                style={{ borderColor: 'var(--color-marketing-line)' }}
+                style={{ borderColor: 'var(--line)' }}
               >
-                <span className="font-semibold" style={{ color: 'var(--color-marketing-ink)' }}>{t('fridge.total-days', price.days)}</span>
-                <span className="font-semibold tabular-nums text-xl" style={{ color: 'var(--color-navy)' }}>{formatEur(price.total)}</span>
+                <span className="font-semibold" style={{ color: 'var(--ink)' }}>{t('fridge.total-days', price.days)}</span>
+                <span className="font-semibold tabular-nums text-xl" style={{ color: 'var(--navy)' }}>{formatEur(price.total)}</span>
               </div>
             </div>
           </motion.div>
@@ -524,12 +524,12 @@ function SummaryRow({ label, value, bold }: { label: string; value: string; bold
   return (
     <div
       className="flex justify-between items-baseline gap-3 py-2.5 border-b last:border-b-0"
-      style={{ borderColor: 'var(--color-marketing-line)' }}
+      style={{ borderColor: 'var(--line)' }}
     >
-      <span className="text-[13px]" style={{ color: 'var(--color-marketing-ink-soft)' }}>{label}</span>
+      <span className="text-[13px]" style={{ color: 'var(--ink-2)' }}>{label}</span>
       <span
         className={`text-[14px] tabular-nums text-right ${bold ? 'font-semibold' : ''}`}
-        style={{ color: 'var(--color-marketing-ink)' }}
+        style={{ color: 'var(--ink)' }}
       >
         {value}
       </span>

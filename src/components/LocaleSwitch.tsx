@@ -25,7 +25,7 @@ export default function LocaleSwitch({
   return (
     <div
       className={`inline-flex items-center rounded-full p-0.5 text-[11px] font-medium ${
-        isDark ? '' : 'border border-border bg-surface'
+        isDark ? '' : 'border border-[color:var(--line)] bg-white'
       } ${className}`}
       role="group"
       aria-label="Language"

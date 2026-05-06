@@ -522,7 +522,8 @@ function RedirectOverlay() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
-      className="fixed inset-0 z-50 bg-bg/95 backdrop-blur-sm flex items-center justify-center px-6"
+      className="fixed inset-0 z-50 flex items-center justify-center px-6"
+      style={{ background: 'rgba(248, 251, 253, 0.96)', backdropFilter: 'blur(8px)' }}
     >
       <motion.div
         initial={{ opacity: 0, y: 8 }}
@@ -530,13 +531,24 @@ function RedirectOverlay() {
         transition={{ delay: 0.1, duration: 0.4 }}
         className="text-center max-w-sm"
       >
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-surface border border-border mb-5">
-          <Lock size={18} className="text-text" />
+        <div
+          className="inline-flex items-center justify-center mb-5"
+          style={{
+            width: 48, height: 48, borderRadius: 999,
+            background: 'var(--sky-soft)', border: '1px solid var(--sky)',
+            color: 'var(--navy)',
+          }}
+        >
+          <Lock size={18} aria-hidden />
         </div>
-        <h2 className="text-base font-semibold mb-1">{t('common.stripe-redirect')}</h2>
-        <p className="text-[13px] text-text-muted leading-relaxed">{t('common.stripe-secure')}</p>
+        <h2 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 18, color: 'var(--navy)', margin: '0 0 6px' }}>
+          {t('common.stripe-redirect')}
+        </h2>
+        <p style={{ fontSize: 13, color: 'var(--ink-2)', lineHeight: 1.55, margin: 0 }}>
+          {t('common.stripe-secure')}
+        </p>
         <div className="flex justify-center mt-5">
-          <Loader2 size={16} className="animate-spin text-text-muted" />
+          <Loader2 size={16} className="animate-spin" aria-hidden style={{ color: 'var(--muted)' }} />
         </div>
       </motion.div>
     </motion.div>
