@@ -250,14 +250,14 @@ export function ServicePageShell({
         variant: 'compact',
       }}
     >
-      <section className="max-w-2xl w-full mx-auto px-5 sm:px-6 py-8 sm:py-12">
+      <section className="max-w-[820px] w-full mx-auto px-5 sm:px-10 py-12 sm:py-16">
         <motion.form
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: E }}
           onSubmit={onSubmit}
-          className="card-mk space-y-8"
-          style={{ padding: 28 }}
+          className="card-mk card-lift space-y-8"
+          style={{ padding: 32 }}
         >
           <InfoBanner>
             <strong>{t('banner.important')}</strong> {t('banner.match-hint')}
@@ -395,7 +395,7 @@ export function MultiStepShell({
         variant: 'compact',
       }}
     >
-      <section className="max-w-2xl w-full mx-auto px-5 sm:px-6 py-8 sm:py-12">
+      <section className="max-w-[820px] w-full mx-auto px-5 sm:px-10 py-12 sm:py-16">
         <form
           onSubmit={(e) => {
             // Voorkom dat een per ongeluk-submit (bv. enter in date-input)
@@ -407,8 +407,8 @@ export function MultiStepShell({
             }
             onSubmit(e);
           }}
-          className="card-mk"
-          style={{ padding: 28 }}
+          className="card-mk card-lift"
+          style={{ padding: 32 }}
         >
           <Stepper current={step} steps={stepLabels} />
 
