@@ -636,12 +636,12 @@ export const STRINGS = {
 
   // ─── Homepage v3 (mockup p01) ───────────────────────────
   'home1.hero-eyebrow': { nl: 'Costa Brava · Sinds 2009', en: 'Costa Brava · Since 2009' },
-  'home1.hero-h1-prefix': { nl: 'De zorgeloze', en: 'The carefree' },
-  'home1.hero-h1-accent': { nl: 'caravan-thuishaven', en: 'caravan home base' },
-  'home1.hero-h1-suffix': { nl: 'aan de Costa Brava.', en: 'on the Costa Brava.' },
+  'home1.hero-h1-prefix': { nl: 'Jouw caravan,', en: 'Your caravan,' },
+  'home1.hero-h1-accent': { nl: 'altijd op vakantie.', en: 'always on holiday.' },
+  'home1.hero-h1-suffix': { nl: '', en: '' },
   'home1.hero-lead': {
-    nl: '24/7 beveiligde stalling, eigen werkplaats, transport én verkoop — sinds 2009 door een vast Nederlands-Spaans team. Stap je vliegtuig uit en stap je vakantie in.',
-    en: '24/7 secured storage, on-site workshop, transport & sales — run by a fixed Dutch-Spanish team since 2009. Step off the plane and into your holiday.',
+    nl: 'Beveiligde stalling, eigen werkplaats, transport en verhuur. Sinds 2009 door een vast Nederlands-Spaans team — zodat jij alleen nog hoeft te genieten.',
+    en: 'Secured storage, on-site workshop, transport and rentals. Run by a fixed Dutch-Spanish team since 2009 — so all you have to do is enjoy.',
   },
   'home1.hero-cta-primary': { nl: 'Plan ophaaldatum', en: 'Schedule pickup' },
   'home1.hero-cta-secondary': { nl: 'Bekijk diensten', en: 'View services' },

@@ -102,13 +102,16 @@ function Hero({ t }: { t: T }) {
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(to right, rgba(15,27,36,0.78) 0%, rgba(15,27,36,0.55) 45%, rgba(15,27,36,0.25) 100%)',
+            // Subtieler dan eerder: links 60% donker, snel naar 10% rechts.
+            // Video komt nu veel meer naar voren — alleen genoeg dimmen om
+            // de tekst-zijde leesbaar te houden.
+            background: 'linear-gradient(to right, rgba(15,27,36,0.60) 0%, rgba(15,27,36,0.30) 50%, rgba(15,27,36,0.10) 100%)',
           }}
         />
         <div
           className="absolute inset-0 sm:hidden"
           style={{
-            background: 'rgba(15,27,36,0.45)',
+            background: 'rgba(15,27,36,0.30)',
           }}
         />
       </div>
@@ -122,26 +125,21 @@ function Hero({ t }: { t: T }) {
           <motion.h1
             {...fade(0.08)}
             className="h1-mk on-navy"
-            style={{ marginTop: 4, textShadow: '0 2px 32px rgba(0,0,0,0.65), 0 1px 2px rgba(0,0,0,0.4)' }}
+            style={{ marginTop: 4, textShadow: '0 2px 24px rgba(0,0,0,0.55)' }}
           >
-            {t('home1.hero-h1-prefix')}{' '}
-            <em
+            {t('home1.hero-h1-prefix')}
+            <br />
+            <span
               style={{
-                fontStyle: 'italic',
-                // Warmere logo-oranje gradient zodat het accent meer pop't tegen
-                // de donkere video-achtergrond. Drop-shadow met dezelfde tint
-                // geeft een subtiele glow zonder overdreven te worden.
-                background: 'linear-gradient(120deg, #FFB347 0%, #F9AD36 50%, #E8951C 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
+                // Solid logo-oranje, geen glow/drop-shadow — voelt cleaner
+                // en de oranje pop't al sterk genoeg tegen wit + donkere
+                // video-achtergrond.
                 color: '#F9AD36',
-                filter: 'drop-shadow(0 2px 12px rgba(249, 173, 54, 0.45))',
               }}
             >
               {t('home1.hero-h1-accent')}
-            </em>{' '}
-            {t('home1.hero-h1-suffix')}
+            </span>
+            {t('home1.hero-h1-suffix') && <> {t('home1.hero-h1-suffix')}</>}
           </motion.h1>
           <motion.p
             {...fade(0.16)}
