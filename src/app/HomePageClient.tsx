@@ -59,90 +59,114 @@ function Hero({ t }: { t: T }) {
       : { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.55, ease: EASE, delay } };
 
   return (
-    <section className="section-bg-navy relative overflow-hidden">
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-10 py-14 sm:py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-10 lg:gap-14 items-center">
-          <div>
-            <motion.span {...fade(0)} className="eyebrow-mk on-navy">
-              {t('home1.hero-eyebrow')}
-            </motion.span>
-            <motion.h1 {...fade(0.08)} className="h1-mk on-navy" style={{ marginTop: 4 }}>
-              {t('home1.hero-h1-prefix')}{' '}
-              <em
-                style={{
-                  fontStyle: 'italic',
-                  background: 'linear-gradient(120deg, #FFC773 0%, #FBB851 50%, #FFC773 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  color: '#FBB851',
-                }}
-              >
-                {t('home1.hero-h1-accent')}
-              </em>{' '}
-              {t('home1.hero-h1-suffix')}
-            </motion.h1>
-            <motion.p {...fade(0.16)} className="lead-mk" style={{ marginTop: 14, color: 'rgba(255,255,255,0.82)' }}>
-              {t('home1.hero-lead')}
-            </motion.p>
+    <section
+      className="relative overflow-hidden"
+      style={{
+        minHeight: 'min(720px, 88vh)',
+        display: 'flex',
+        alignItems: 'flex-end',
+        background: '#0F1B24',
+      }}
+    >
+      {/* Vimeo full-bleed achtergrond. Vimeo player serveert geen scaled
+          versie via iframe, dus we vergroten 'm zodat hij het frame vult
+          ongeacht aspect-ratio (object-fit cover-equivalent).
+          background=1 = autoplay + loop + muted + geen controls.
+          playsinline + muted = autoplay werkt op iOS/Android. */}
+      <div className="absolute inset-0" style={{ zIndex: 0, overflow: 'hidden' }}>
+        <iframe
+          src="https://player.vimeo.com/video/1190126706?h=dae28da598&autoplay=1&loop=1&muted=1&background=1&playsinline=1&dnt=1"
+          title="Caravan Storage Spain — Costa Brava"
+          allow="autoplay; fullscreen; picture-in-picture"
+          loading="eager"
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            // 16:9 video schalen we naar minimum 100vw én 100% height; de
+            // grootste van de twee wint zodat we cover-gedrag krijgen.
+            width: 'max(100%, calc(100vh * 16 / 9))',
+            height: 'max(100%, calc(100vw * 9 / 16))',
+            border: 0,
+            pointerEvents: 'none',
+          }}
+        />
+        {/* Donkere gradient-overlay zodat tekst leesbaar blijft op
+            elke video-frame. Bottom-heavy zodat content onderaan goed
+            contrast heeft, top is iets lichter zodat sky niet helemaal
+            zwart is. */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(to top, rgba(15,27,36,0.85) 0%, rgba(15,27,36,0.55) 45%, rgba(15,27,36,0.25) 100%)',
+          }}
+        />
+      </div>
 
-            <motion.div {...fade(0.24)} className="mt-7 flex flex-wrap gap-3">
-              <Link href="/reserveren/configurator" className="btn btn-primary">
-                {t('home1.hero-cta-primary')} <ArrowRight size={16} aria-hidden />
-              </Link>
-              <Link href="/diensten" className="btn btn-ghost-light">
-                {t('home1.hero-cta-secondary')}
-              </Link>
-            </motion.div>
-
-            <motion.div
-              {...fade(0.32)}
-              className="mt-8 inline-flex items-center gap-3 px-4 py-2 rounded-full"
+      {/* Content */}
+      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-10 py-14 sm:py-20 w-full" style={{ zIndex: 1 }}>
+        <div className="max-w-[760px]">
+          <motion.span {...fade(0)} className="eyebrow-mk on-navy">
+            {t('home1.hero-eyebrow')}
+          </motion.span>
+          <motion.h1
+            {...fade(0.08)}
+            className="h1-mk on-navy"
+            style={{ marginTop: 4, textShadow: '0 2px 24px rgba(0,0,0,0.45)' }}
+          >
+            {t('home1.hero-h1-prefix')}{' '}
+            <em
               style={{
-                background: 'rgba(255,255,255,0.10)',
-                border: '1px solid rgba(255,255,255,0.20)',
-                backdropFilter: 'blur(4px)',
-                fontFamily: 'var(--sora)',
-                fontSize: 13,
-                color: '#fff',
-                fontWeight: 600,
+                fontStyle: 'italic',
+                background: 'linear-gradient(120deg, #FFC773 0%, #FBB851 50%, #FFC773 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                color: '#FBB851',
               }}
             >
-              <span aria-hidden style={{ color: '#F9AD36', letterSpacing: 1 }}>★★★★★</span>
-              {t('home1.hero-trust')}
-            </motion.div>
-          </div>
+              {t('home1.hero-h1-accent')}
+            </em>{' '}
+            {t('home1.hero-h1-suffix')}
+          </motion.h1>
+          <motion.p
+            {...fade(0.16)}
+            className="lead-mk"
+            style={{
+              marginTop: 14,
+              color: 'rgba(255,255,255,0.92)',
+              textShadow: '0 1px 16px rgba(0,0,0,0.4)',
+              maxWidth: 600,
+            }}
+          >
+            {t('home1.hero-lead')}
+          </motion.p>
 
-          {/* Hero-video rechts — Vimeo background-mode (autoplay + loop + muted,
-              werkt op mobiel iOS/Android door playsInline + muted-default).
-              background=1 zet de Vimeo-controls uit en activeert auto-play
-              gedrag dat ook op mobiel zonder user-interactie start. */}
-          <motion.div {...fade(0.18)}>
-            <div
-              style={{
-                position: 'relative',
-                aspectRatio: '5 / 4',
-                borderRadius: 22,
-                overflow: 'hidden',
-                boxShadow: 'var(--shadow-card-mk), 0 32px 64px -24px rgba(31, 42, 54, 0.30)',
-                border: '1px solid rgba(255, 255, 255, 0.40)',
-                background: '#0F1B24',
-              }}
-            >
-              <iframe
-                src="https://player.vimeo.com/video/1190126706?h=dae28da598&autoplay=1&loop=1&muted=1&background=1&playsinline=1&dnt=1"
-                title="Caravan Storage Spain — Costa Brava"
-                allow="autoplay; fullscreen; picture-in-picture"
-                loading="eager"
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  width: '100%',
-                  height: '100%',
-                  border: 0,
-                }}
-              />
-            </div>
+          <motion.div {...fade(0.24)} className="mt-7 flex flex-wrap gap-3">
+            <Link href="/reserveren/configurator" className="btn btn-primary">
+              {t('home1.hero-cta-primary')} <ArrowRight size={16} aria-hidden />
+            </Link>
+            <Link href="/diensten" className="btn btn-ghost-light">
+              {t('home1.hero-cta-secondary')}
+            </Link>
+          </motion.div>
+
+          <motion.div
+            {...fade(0.32)}
+            className="mt-8 inline-flex items-center gap-3 px-4 py-2 rounded-full"
+            style={{
+              background: 'rgba(255,255,255,0.10)',
+              border: '1px solid rgba(255,255,255,0.20)',
+              backdropFilter: 'blur(4px)',
+              fontFamily: 'var(--sora)',
+              fontSize: 13,
+              color: '#fff',
+              fontWeight: 600,
+            }}
+          >
+            <span aria-hidden style={{ color: '#F9AD36', letterSpacing: 1 }}>★★★★★</span>
+            {t('home1.hero-trust')}
           </motion.div>
         </div>
       </div>
