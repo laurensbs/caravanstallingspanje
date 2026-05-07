@@ -128,11 +128,15 @@ function Hero({ t }: { t: T }) {
             <em
               style={{
                 fontStyle: 'italic',
-                background: 'linear-gradient(120deg, #FFC773 0%, #FBB851 50%, #FFC773 100%)',
+                // Warmere logo-oranje gradient zodat het accent meer pop't tegen
+                // de donkere video-achtergrond. Drop-shadow met dezelfde tint
+                // geeft een subtiele glow zonder overdreven te worden.
+                background: 'linear-gradient(120deg, #FFB347 0%, #F9AD36 50%, #E8951C 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
-                color: '#FBB851',
+                color: '#F9AD36',
+                filter: 'drop-shadow(0 2px 12px rgba(249, 173, 54, 0.45))',
               }}
             >
               {t('home1.hero-h1-accent')}
