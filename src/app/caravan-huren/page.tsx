@@ -63,7 +63,7 @@ function Hero() {
                 src={VERHUUR_LOGO}
                 alt="Caravanverhuur Spanje"
                 style={{
-                  height: 'clamp(96px, 13vw, 160px)',
+                  height: 'clamp(140px, 18vw, 240px)',
                   width: 'auto',
                   objectFit: 'contain',
                 }}
