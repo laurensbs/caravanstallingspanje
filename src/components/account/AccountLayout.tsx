@@ -54,7 +54,7 @@ export default function AccountLayout({ customerName, customerEmail, children }:
       >
         <Link href="/" aria-label="Caravanstalling Spanje" style={{ display: 'inline-block', marginBottom: 28 }}>
           <Image
-            src="/images/logo.png"
+            src="/images/logo-v2.png"
             alt="Caravanstalling Spanje"
             width={512}
             height={115}
@@ -147,7 +147,7 @@ export default function AccountLayout({ customerName, customerEmail, children }:
         }}
       >
         <Link href="/" style={{ display: 'inline-block' }}>
-          <Image src="/images/logo.png" alt="" width={512}
+          <Image src="/images/logo-v2.png" alt="" width={512}
             height={115} style={{ height: 26, width: 'auto' }} />
         </Link>
         <button

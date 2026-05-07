@@ -438,8 +438,37 @@ function Workshop({ t }: { t: T }) {
     <section className="py-16 sm:py-20">
       <div className="max-w-[1200px] mx-auto px-5 sm:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-[0.95fr_1fr] gap-10 lg:gap-14 items-center">
-          <div className="card-mk card-lift" aria-hidden style={{ padding: 18, background: 'linear-gradient(180deg, #F8FBFD 0%, #FFFFFF 100%)' }}>
-            <WorkshopSvg />
+          <div
+            aria-hidden
+            style={{
+              position: 'relative',
+              aspectRatio: '5 / 4',
+              borderRadius: 22,
+              overflow: 'hidden',
+              boxShadow: 'var(--shadow-card-mk), 0 32px 64px -24px rgba(31, 42, 54, 0.30)',
+              border: '1px solid rgba(31, 42, 54, 0.10)',
+              background: '#0F1B24',
+            }}
+          >
+            {/* Vimeo background-mode iframe — schaalt cover binnen de container
+                via de transform/max-trick zodat geen zwarte randen verschijnen
+                bij brede of smalle viewports. */}
+            <iframe
+              src="https://player.vimeo.com/video/1190126706?h=dae28da598&autoplay=1&loop=1&muted=1&background=1&playsinline=1&dnt=1"
+              title="Caravan Storage Spain — werkplaats"
+              allow="autoplay; fullscreen; picture-in-picture"
+              loading="lazy"
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: 'max(100%, calc(100% * 16 / 9 * 4 / 5))',
+                height: 'max(100%, calc(100% * 9 / 16 * 5 / 4))',
+                border: 0,
+                pointerEvents: 'none',
+              }}
+            />
           </div>
           <div>
             <span className="eyebrow-mk">{t('home1.shop-eyebrow')}</span>

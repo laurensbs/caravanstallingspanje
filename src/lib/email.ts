@@ -95,7 +95,7 @@ h1{font-size:20px;line-height:1.3;margin:0 0 12px;font-weight:600;letter-spacing
 // staging.
 function logoUrl(): string {
   const base = (process.env.APP_URL || 'https://caravanstalling-spanje.com').replace(/\/$/, '');
-  return `${base}/images/logo.png`;
+  return `${base}/images/logo-v2.png`;
 }
 
 function shell(content: string, opts?: { eyebrow?: string; heading?: string; subline?: string }): string {

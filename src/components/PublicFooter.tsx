@@ -43,7 +43,7 @@ export default function PublicFooter() {
         <div className="brand-blk">
           <Link href="/" className="inline-block" style={{ marginBottom: 14 }}>
             <Image
-              src="/images/logo.png"
+              src="/images/logo-v2.png"
               alt="Caravanstalling Spanje"
               width={512}
               height={115}

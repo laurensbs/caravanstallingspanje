@@ -106,7 +106,7 @@ export default function PublicHeader({}: PublicHeaderProps = {}) {
       <div className="brand-nav">
         <Link href="/" aria-label={t('common.brand')} className="nav-brand">
           <Image
-            src="/images/logo.png"
+            src="/images/logo-v2.png"
             alt="Caravanstalling Spanje"
             width={512}
             height={115}
@@ -232,7 +232,7 @@ export default function PublicHeader({}: PublicHeaderProps = {}) {
               {/* Drawer header */}
               <div className="mobile-menu-head">
                 <Image
-                  src="/images/logo.png"
+                  src="/images/logo-v2.png"
                   alt="Caravanstalling Spanje"
                   width={512}
                   height={115}

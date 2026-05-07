@@ -108,7 +108,7 @@ export default function PublicHero({
         >
           {showLogo && (
             <Image
-              src="/images/logo.png"
+              src="/images/logo-v2.png"
               alt="Caravanstalling Spanje"
               width={512}
               height={115}

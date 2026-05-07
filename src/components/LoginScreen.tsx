@@ -160,7 +160,7 @@ export default function LoginScreen({ onSuccess }: LoginScreenProps) {
           {/* Logo direct op de navy gradient — de PNG is wit-op-transparant
               dus 'm rendert vanzelf goed leesbaar zonder witte chip. */}
           <Image
-            src="/images/logo.png"
+            src="/images/logo-v2.png"
             alt="Caravanstalling"
             width={220}
             height={50}

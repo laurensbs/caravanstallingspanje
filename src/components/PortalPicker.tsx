@@ -35,7 +35,7 @@ export default function PortalPicker() {
           className="text-center mb-12"
         >
           <Image
-            src="/images/logo.png"
+            src="/images/logo-v2.png"
             alt="Caravanstalling"
             width={512}
             height={115}
