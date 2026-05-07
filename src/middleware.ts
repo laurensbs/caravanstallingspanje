@@ -65,7 +65,7 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
     "img-src 'self' data: blob: https:",
     "media-src 'self' blob: https://*.gumlet.io https://*.gumlet.com",
     "connect-src 'self' https://*.neon.tech https://api.holded.com https://api.stripe.com https://checkout.stripe.com https://api.open-meteo.com https://caravanverhuurspanje.com https://*.gumlet.io https://*.gumlet.com",
-    "frame-src 'self' https://checkout.stripe.com https://js.stripe.com https://play.gumlet.io https://www.google.com",
+    "frame-src 'self' https://checkout.stripe.com https://js.stripe.com https://play.gumlet.io https://www.google.com https://player.vimeo.com",
     "worker-src 'self' blob:",
     "object-src 'none'",
     "base-uri 'self'",

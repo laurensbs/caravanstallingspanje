@@ -113,12 +113,11 @@ function Hero({ t }: { t: T }) {
             </motion.div>
           </div>
 
-          {/* Hero-foto rechts — Costa Brava sfeer. Geen animatie zodat
-              hij niet "goedkoop" voelt. */}
-          <motion.div
-            {...fade(0.18)}
-            className="hidden lg:block"
-          >
+          {/* Hero-video rechts — Vimeo background-mode (autoplay + loop + muted,
+              werkt op mobiel iOS/Android door playsInline + muted-default).
+              background=1 zet de Vimeo-controls uit en activeert auto-play
+              gedrag dat ook op mobiel zonder user-interactie start. */}
+          <motion.div {...fade(0.18)}>
             <div
               style={{
                 position: 'relative',
@@ -127,15 +126,21 @@ function Hero({ t }: { t: T }) {
                 overflow: 'hidden',
                 boxShadow: 'var(--shadow-card-mk), 0 32px 64px -24px rgba(31, 42, 54, 0.30)',
                 border: '1px solid rgba(255, 255, 255, 0.40)',
+                background: '#0F1B24',
               }}
             >
-              <Image
-                src="/images/campings/cala_d_aiguablava__begur.jpg"
-                alt="Cala d'Aiguablava bij Begur — Costa Brava"
-                fill
-                priority
-                sizes="(max-width: 1024px) 0px, 540px"
-                style={{ objectFit: 'cover' }}
+              <iframe
+                src="https://player.vimeo.com/video/1190126706?h=dae28da598&autoplay=1&loop=1&muted=1&background=1&playsinline=1&dnt=1"
+                title="Caravan Storage Spain — Costa Brava"
+                allow="autoplay; fullscreen; picture-in-picture"
+                loading="eager"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  border: 0,
+                }}
               />
             </div>
           </motion.div>
