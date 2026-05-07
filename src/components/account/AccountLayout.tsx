@@ -56,8 +56,8 @@ export default function AccountLayout({ customerName, customerEmail, children }:
           <Image
             src="/images/logo.png"
             alt="Caravanstalling Spanje"
-            width={420}
-            height={95}
+            width={512}
+            height={115}
             style={{ height: 32, width: 'auto', filter: 'drop-shadow(0 0 14px rgba(255,255,255,0.10))' }}
           />
         </Link>
@@ -147,7 +147,8 @@ export default function AccountLayout({ customerName, customerEmail, children }:
         }}
       >
         <Link href="/" style={{ display: 'inline-block' }}>
-          <Image src="/images/logo.png" alt="" width={420} height={95} style={{ height: 26, width: 'auto' }} />
+          <Image src="/images/logo.png" alt="" width={512}
+            height={115} style={{ height: 26, width: 'auto' }} />
         </Link>
         <button
           type="button"

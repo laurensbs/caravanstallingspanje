@@ -110,8 +110,8 @@ export default function PublicHero({
             <Image
               src="/images/logo.png"
               alt="Caravanstalling Spanje"
-              width={420}
-              height={95}
+              width={512}
+              height={115}
               priority
               className="h-10 sm:h-12 w-auto mb-5 sm:mb-6"
               style={{

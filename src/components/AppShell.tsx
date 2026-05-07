@@ -169,8 +169,8 @@ export default function AppShell({ userName, children, onLogout }: AppShellProps
               <Image
                 src="/images/logo.png"
                 alt="Caravanstalling"
-                width={420}
-                height={95}
+                width={512}
+                height={115}
                 priority
                 quality={100}
                 style={{

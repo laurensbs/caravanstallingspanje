@@ -37,8 +37,8 @@ export default function PortalPicker() {
           <Image
             src="/images/logo.png"
             alt="Caravanstalling"
-            width={420}
-            height={95}
+            width={512}
+            height={115}
             priority
             className="mx-auto h-20 w-auto mb-6"
           />
