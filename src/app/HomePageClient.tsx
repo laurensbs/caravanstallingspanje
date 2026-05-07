@@ -617,15 +617,31 @@ function Location({ t }: { t: T }) {
             </div>
           </div>
           <div
-            className="dot-pattern relative rounded-[18px] overflow-hidden"
+            className="relative rounded-[18px] overflow-hidden"
             style={{
               aspectRatio: '5 / 4',
-              background: 'linear-gradient(160deg, #E5F3FB 0%, #F2DDB6 100%)',
-              border: '1px solid var(--line)',
+              boxShadow: 'var(--shadow-card-mk), 0 32px 64px -24px rgba(31, 42, 54, 0.30)',
+              border: '1px solid rgba(31, 42, 54, 0.10)',
+              background: '#0F1B24',
             }}
             aria-hidden
           >
-            <LocationMapSvg />
+            <iframe
+              src="https://player.vimeo.com/video/1190144902?autoplay=1&loop=1&muted=1&background=1&playsinline=1&dnt=1"
+              title="Caravan Storage Spain — locatie Sant Climent de Peralta"
+              allow="autoplay; fullscreen; picture-in-picture"
+              loading="lazy"
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: 'max(100%, calc(100% * 16 / 9 * 4 / 5))',
+                height: 'max(100%, calc(100% * 9 / 16 * 5 / 4))',
+                border: 0,
+                pointerEvents: 'none',
+              }}
+            />
           </div>
         </div>
       </div>
