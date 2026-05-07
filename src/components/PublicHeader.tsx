@@ -7,12 +7,13 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Menu, X, ShieldCheck, Wrench, Sparkles, ClipboardCheck, Truck,
-  Snowflake, Tag, Recycle, ArrowRight, Phone, Mail, Heart, User,
+  Snowflake, Tag, Recycle, ArrowRight, Phone, Mail, Heart, User, Bot,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import LocaleSwitch from './LocaleSwitch';
 import { useLocale } from './LocaleProvider';
 import { useFocusTrap } from '@/lib/focusTrap';
+import ChatBotModal from './marketing/ChatBotModal';
 import type { StringKey } from '@/lib/i18n';
 
 // Hoofd-nav uit mockup (p01-21): navy-deep canvas, logo links, links midden,
@@ -62,6 +63,7 @@ export default function PublicHeader({}: PublicHeaderProps = {}) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const megaRef = useRef<HTMLDivElement>(null);
 
@@ -158,14 +160,15 @@ export default function PublicHeader({}: PublicHeaderProps = {}) {
           >
             <User size={16} aria-hidden />
           </Link>
-          <a
-            href="tel:+34633778699"
-            aria-label="Bel ons"
+          <button
+            type="button"
+            onClick={() => setChatOpen(true)}
+            aria-label="Open chat-assistent"
             className="nav-icon-btn"
-            title="+34 633 77 86 99"
+            title="Chat met ons"
           >
-            <Phone size={16} aria-hidden />
-          </a>
+            <Bot size={16} aria-hidden />
+          </button>
           <Link href="/reserveren/configurator" className="nav-cta">
             {t('nav.cta-pickup')}
           </Link>
@@ -322,6 +325,8 @@ export default function PublicHeader({}: PublicHeaderProps = {}) {
           </>
         )}
       </AnimatePresence>
+
+      <ChatBotModal open={chatOpen} onClose={() => setChatOpen(false)} />
     </div>
   );
 }

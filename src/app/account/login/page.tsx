@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
-  LogIn, Loader2, AlertCircle, Receipt, Camera, Calendar, ArrowLeft,
+  LogIn, Loader2, AlertCircle, Receipt, Camera, Calendar,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import Topbar from '@/components/marketing/Topbar';
@@ -140,9 +140,6 @@ function Benefits({ t }: { t: T }) {
   ];
   return (
     <div>
-      <Link href="/" className="inline-flex items-center gap-1.5" style={{ color: 'var(--muted)', fontSize: 13, textDecoration: 'none', marginBottom: 22, fontFamily: 'var(--inter)' }}>
-        <ArrowLeft size={14} aria-hidden /> {t('pt1.back-to-site')}
-      </Link>
       <span className="eyebrow-mk">{t('pt1.login-eyebrow')}</span>
       <h1 className="h1-mk" style={{ marginTop: 4, fontSize: 'clamp(2rem, 4vw, 2.6rem)' }}>
         {t('pt1.login-h1')}
