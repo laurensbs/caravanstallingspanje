@@ -64,7 +64,7 @@ function Hero({ t }: { t: T }) {
       style={{
         minHeight: 'min(720px, 88vh)',
         display: 'flex',
-        alignItems: 'flex-end',
+        alignItems: 'center',
         background: '#0F1B24',
       }}
     >
@@ -92,14 +92,23 @@ function Hero({ t }: { t: T }) {
             pointerEvents: 'none',
           }}
         />
-        {/* Donkere gradient-overlay zodat tekst leesbaar blijft op
-            elke video-frame. Bottom-heavy zodat content onderaan goed
-            contrast heeft, top is iets lichter zodat sky niet helemaal
-            zwart is. */}
+        {/* Twee-laagse overlay:
+            1) Side-gradient (links donker → rechts transparant) zodat tekst
+               leesbaar is en de rechterkant van de video volledig zichtbaar.
+            2) Subtiele bottom-fade zodat de overgang naar de stat-row
+               (volgende sectie) zachter wordt — geen harde lijn.
+            Mobile: overlay is iets gelijkmatiger (geen side-gradient,
+            wel een algemene donkere wash) omdat tekst gewoon centraal staat. */}
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(to top, rgba(15,27,36,0.85) 0%, rgba(15,27,36,0.55) 45%, rgba(15,27,36,0.25) 100%)',
+            background: 'linear-gradient(to right, rgba(15,27,36,0.78) 0%, rgba(15,27,36,0.55) 45%, rgba(15,27,36,0.25) 100%)',
+          }}
+        />
+        <div
+          className="absolute inset-0 sm:hidden"
+          style={{
+            background: 'rgba(15,27,36,0.45)',
           }}
         />
       </div>
@@ -113,7 +122,7 @@ function Hero({ t }: { t: T }) {
           <motion.h1
             {...fade(0.08)}
             className="h1-mk on-navy"
-            style={{ marginTop: 4, textShadow: '0 2px 24px rgba(0,0,0,0.45)' }}
+            style={{ marginTop: 4, textShadow: '0 2px 32px rgba(0,0,0,0.65), 0 1px 2px rgba(0,0,0,0.4)' }}
           >
             {t('home1.hero-h1-prefix')}{' '}
             <em
@@ -135,8 +144,8 @@ function Hero({ t }: { t: T }) {
             className="lead-mk"
             style={{
               marginTop: 14,
-              color: 'rgba(255,255,255,0.92)',
-              textShadow: '0 1px 16px rgba(0,0,0,0.4)',
+              color: '#fff',
+              textShadow: '0 2px 20px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.4)',
               maxWidth: 600,
             }}
           >
