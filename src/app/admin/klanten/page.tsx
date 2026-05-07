@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
   Search, Plus, Download, Loader2, Mail, Phone, MapPin, ExternalLink, AlertTriangle, User, Building2,
+  FileSpreadsheet, Send, X,
 } from 'lucide-react';
 import { Button, Skeleton, Badge } from '@/components/ui';
 import PageHeader from '@/components/admin/PageHeader';
@@ -38,6 +39,17 @@ export default function KlantenPage() {
   const [creating, setCreating] = useState(false);
   const [importing, setImporting] = useState(false);
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('');
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [bulkSending, setBulkSending] = useState(false);
+
+  const toggleSelected = (id: number) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+  const clearSelection = () => setSelected(new Set());
 
   useEffect(() => {
     const t = setTimeout(() => setDebounced(search), 250);
@@ -113,6 +125,31 @@ export default function KlantenPage() {
     }
   };
 
+  const sendBulkWelcome = async () => {
+    if (selected.size === 0) return;
+    if (!confirm(`Welkomstmail versturen naar ${selected.size} klanten? Klanten met een leeg e-mailveld worden overgeslagen.`)) return;
+    setBulkSending(true);
+    try {
+      const res = await fetch('/api/admin/customers/bulk-welcome', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ customerIds: Array.from(selected) }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data?.error || 'Bulk-versturen mislukt');
+        return;
+      }
+      toast.success(`${data.sent} verstuurd, ${data.failed} mislukt (van ${data.processed})`);
+      clearSelection();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Bulk-versturen mislukt');
+    } finally {
+      setBulkSending(false);
+    }
+  };
+
   const totalPages = data ? Math.max(1, Math.ceil(data.total / data.pageSize)) : 1;
 
   return (
@@ -123,6 +160,13 @@ export default function KlantenPage() {
         description={data ? `${data.total} customers managed.` : 'Customer register — linked to Holded.'}
         actions={
           <div className="flex gap-2 items-center">
+            <a
+              href="/api/admin/customers/export"
+              download
+              className="inline-flex items-center gap-1.5 h-9 px-3 text-[13px] font-medium rounded-[var(--radius-md)] border border-border bg-surface hover:border-border-strong transition-colors"
+            >
+              <FileSpreadsheet size={14} /> Export CSV
+            </a>
             <Button variant="secondary" onClick={importHolded} disabled={importing}>
               {importing ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
               Import from Holded
@@ -171,6 +215,30 @@ export default function KlantenPage() {
         </div>
       </div>
 
+      {selected.size > 0 && (
+        <div
+          className="sticky top-2 z-10 mb-4 flex items-center justify-between gap-3 px-4 py-2.5 rounded-[var(--radius-md)] border border-accent/30 bg-accent-soft"
+        >
+          <div className="text-[13px] text-text font-medium">
+            {selected.size} {selected.size === 1 ? 'klant' : 'klanten'} geselecteerd
+          </div>
+          <div className="flex gap-2 items-center">
+            <Button variant="secondary" onClick={sendBulkWelcome} disabled={bulkSending}>
+              {bulkSending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+              Stuur welkomstmail
+            </Button>
+            <button
+              type="button"
+              onClick={clearSelection}
+              className="inline-flex items-center justify-center w-8 h-8 rounded-[var(--radius-sm)] text-text-muted hover:text-text hover:bg-surface transition-colors"
+              aria-label="Deselecteer alles"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div className="card-surface overflow-hidden">
           <div className="divide-y divide-border">
@@ -211,10 +279,25 @@ export default function KlantenPage() {
                   initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, x: -6 }}
+                  className={`flex items-stretch transition-colors ${selected.has(c.id) ? 'bg-accent-soft/30' : ''}`}
                 >
+                  {/* Checkbox-cel — los van de Link zodat klikken niet
+                      het hele klant-detail opent. */}
+                  <label
+                    className="flex items-center pl-5 pr-1 cursor-pointer hover:bg-surface-2 transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selected.has(c.id)}
+                      onChange={() => toggleSelected(c.id)}
+                      className="w-4 h-4 rounded cursor-pointer accent-accent"
+                      aria-label={`Selecteer ${c.name}`}
+                    />
+                  </label>
                   <Link
                     href={`/admin/klanten/${c.id}`}
-                    className="px-5 py-3.5 flex items-start gap-4 hover:bg-surface-2 transition-colors"
+                    className="flex-1 px-4 py-3.5 flex items-start gap-4 hover:bg-surface-2 transition-colors"
                   >
                     <div
                       className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium shrink-0 border ${

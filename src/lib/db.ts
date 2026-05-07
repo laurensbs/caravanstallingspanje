@@ -1679,6 +1679,15 @@ export async function listCustomers(opts: { page?: number; pageSize?: number; se
   };
 }
 
+// Alle (niet-deleted) klanten — voor CSV-export en bulk-acties. Zonder
+// pagina-grenzen; Postgres slikt 10k rows zonder problemen, en de huidige
+// klantenbase is klein genoeg dat dit snel genoeg is.
+export async function listAllCustomers(): Promise<CustomerRow[]> {
+  await ensureCustomerSchema();
+  const rows = await sql`SELECT * FROM customers WHERE deleted_at IS NULL ORDER BY name ASC`;
+  return rows as unknown as CustomerRow[];
+}
+
 export async function getCustomerById(id: number): Promise<CustomerRow | null> {
   await ensureCustomerSchema();
   const rows = await sql`SELECT * FROM customers WHERE id = ${id} AND deleted_at IS NULL LIMIT 1`;
