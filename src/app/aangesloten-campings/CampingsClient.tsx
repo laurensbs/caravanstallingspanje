@@ -182,7 +182,9 @@ function CampingCard({ camping }: { camping: Camping }) {
         padding: 0,
         overflow: 'hidden',
         textDecoration: 'none',
-        display: 'block',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
       }}
     >
       <div
@@ -218,29 +220,45 @@ function CampingCard({ camping }: { camping: Camping }) {
           {camping.region}
         </span>
       </div>
-      <div style={{ padding: 22 }}>
+      <div style={{ padding: 22, display: 'flex', flexDirection: 'column', flex: 1 }}>
         <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 17, color: 'var(--navy)', margin: '0 0 6px' }}>
           {camping.name}
         </h3>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12.5, color: 'var(--muted)', marginBottom: 12 }}>
           <MapPin size={12} aria-hidden /> {camping.location}
         </div>
-        <p style={{ fontSize: 13.5, color: 'var(--ink-2)', margin: '0 0 12px', lineHeight: 1.5 }}>
-          {camping.description}
-        </p>
-        <span
+        <p
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-            color: 'var(--orange-d)',
-            fontFamily: 'var(--sora)',
-            fontWeight: 600,
-            fontSize: 13,
+            fontSize: 13.5,
+            color: 'var(--ink-2)',
+            margin: '0 0 12px',
+            lineHeight: 1.5,
+            // Clamp naar 3 regels zodat alle kaarten gelijk hoog zijn ongeacht
+            // de variabele description-lengte uit de hub-API.
+            display: '-webkit-box',
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            minHeight: 'calc(13.5px * 1.5 * 3)',
           }}
         >
-          Bekijk faciliteiten <ArrowRight size={13} aria-hidden />
-        </span>
+          {camping.description}
+        </p>
+        <div style={{ marginTop: 'auto' }}>
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              color: 'var(--orange-d)',
+              fontFamily: 'var(--sora)',
+              fontWeight: 600,
+              fontSize: 13,
+            }}
+          >
+            Bekijk faciliteiten <ArrowRight size={13} aria-hidden />
+          </span>
+        </div>
       </div>
     </Link>
   );

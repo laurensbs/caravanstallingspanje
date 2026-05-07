@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useMemo } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Search, Plus, ArrowRight, Phone } from 'lucide-react';
 import Topbar from '@/components/marketing/Topbar';
 import MotionPageTransition from '@/components/motion/MotionPageTransition';
@@ -106,7 +106,12 @@ export default function FaqPage() {
                   const id = it.qKey;
                   const isOpen = open === id;
                   return (
-                    <div key={id} className={isOpen ? 'acc-item-mk open' : 'acc-item-mk'}>
+                    <motion.div
+                      key={id}
+                      layout
+                      transition={{ layout: { duration: 0.28, ease: [0.16, 1, 0.3, 1] } }}
+                      className={isOpen ? 'acc-item-mk open' : 'acc-item-mk'}
+                    >
                       <button
                         type="button"
                         onClick={() => setOpen(isOpen ? null : id)}
@@ -115,10 +120,34 @@ export default function FaqPage() {
                         style={{ background: 'none', border: 'none' }}
                       >
                         <span>{t(it.qKey)}</span>
-                        <span className="pl" aria-hidden><Plus size={20} /></span>
+                        <motion.span
+                          className="pl"
+                          aria-hidden
+                          animate={{ rotate: isOpen ? 45 : 0 }}
+                          transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                          style={{ display: 'inline-flex' }}
+                        >
+                          <Plus size={20} />
+                        </motion.span>
                       </button>
-                      {isOpen && <div className="acc-a-mk">{t(it.aKey)}</div>}
-                    </div>
+                      <AnimatePresence initial={false}>
+                        {isOpen && (
+                          <motion.div
+                            key="answer"
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{
+                              height: { duration: 0.28, ease: [0.16, 1, 0.3, 1] },
+                              opacity: { duration: 0.18, ease: 'easeOut' },
+                            }}
+                            style={{ overflow: 'hidden' }}
+                          >
+                            <div className="acc-a-mk">{t(it.aKey)}</div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
                   );
                 })}
               </div>

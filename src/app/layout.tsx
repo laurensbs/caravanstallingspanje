@@ -27,9 +27,9 @@ import JsonLd from '@/components/JsonLd';
 import { alternatesFor, localBusinessLd, organizationLd, SITE_URL } from '@/lib/seo';
 import './globals.css';
 
-// SEO-flip: zet env `SEO_INDEX=true` zodra hreflang + JSON-LD + redirects klaar
-// zijn (zie roadmap fase 8). Tot die tijd noindex op alle pagina's.
-const SEO_INDEX = process.env.SEO_INDEX === 'true';
+// SEO indexing: standaard AAN. Zet env `SEO_NOINDEX=true` om alle pages
+// uit Google te halen (bv. tijdens content-migratie of staging-deploys).
+const SEO_INDEX = process.env.SEO_NOINDEX !== 'true';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

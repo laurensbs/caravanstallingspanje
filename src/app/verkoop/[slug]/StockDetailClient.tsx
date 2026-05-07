@@ -43,18 +43,7 @@ export default function StockDetailClient({ item }: { item: DetailItem }) {
       <Topbar />
       <PublicHeader />
       <main id="main" className="flex-1">
-        <section className="section-bg-sky-soft">
-          <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-8">
-            <Link
-              href="/verkoop"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--muted)', fontSize: 13, fontFamily: 'var(--inter)', textDecoration: 'none' }}
-            >
-              <ArrowLeft size={14} aria-hidden /> Terug naar voorraad
-            </Link>
-          </div>
-        </section>
-
-        <section className="pt-2 pb-16 sm:pb-20 section-bg-sky-soft">
+        <section className="pt-12 pb-16 sm:pb-20 section-bg-sky-soft">
           <div className="max-w-[1200px] mx-auto px-5 sm:px-10">
             <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 items-start">
 

@@ -23,27 +23,7 @@ export default function CampingDetailClient({ camping }: { camping: Camping }) {
       <Topbar />
       <PublicHeader />
       <main id="main" className="flex-1">
-        {/* Back-link strip */}
-        <section className="section-bg-sky-soft" style={{ paddingTop: 24, paddingBottom: 8 }}>
-          <div className="max-w-[1200px] mx-auto px-5 sm:px-10">
-            <Link
-              href="/aangesloten-campings"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                color: 'var(--muted)',
-                fontSize: 13,
-                fontFamily: 'var(--inter)',
-                textDecoration: 'none',
-              }}
-            >
-              <ArrowLeft size={14} aria-hidden /> Terug naar campings
-            </Link>
-          </div>
-        </section>
-
-        <section className="section-bg-sky-soft" style={{ paddingTop: 8, paddingBottom: 60 }}>
+        <section className="section-bg-sky-soft" style={{ paddingTop: 24, paddingBottom: 60 }}>
           <div className="max-w-[1200px] mx-auto px-5 sm:px-10">
             <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 items-start">
               {/* Galerij */}

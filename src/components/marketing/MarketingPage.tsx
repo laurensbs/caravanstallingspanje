@@ -1,9 +1,8 @@
 'use client';
 
 import { ReactNode } from 'react';
-import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowLeft, type LucideIcon } from 'lucide-react';
+import { type LucideIcon } from 'lucide-react';
 import Topbar from './Topbar';
 import PublicHeader from '../PublicHeader';
 import PublicFooter from '../PublicFooter';
@@ -78,18 +77,8 @@ function PageHero({ title, intro, eyebrow, eyebrowKey, back, icon: Icon }: HeroP
   return (
     <section className="section-bg-sky-soft">
       <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-12 sm:py-16">
-        {back && (
-          <motion.div {...fade(0)} className="mb-6">
-            <Link
-              href={back.href}
-              className="inline-flex items-center gap-1.5 text-[13px] transition-opacity hover:opacity-70"
-              style={{ color: 'var(--muted)', fontFamily: 'var(--inter)' }}
-            >
-              <ArrowLeft size={14} aria-hidden /> {back.label}
-            </Link>
-          </motion.div>
-        )}
-
+        {/* Back-link weggehaald: header heeft al logo dat naar / linkt,
+            dubbele back-actie was visueel rommelig en deed goedkoop aan. */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-10 items-center">
           <div className="max-w-2xl">
             {eyebrowText && (

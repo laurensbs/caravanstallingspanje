@@ -278,9 +278,6 @@ function Hero() {
   return (
     <section className="section-bg-sky-soft">
       <div className="max-w-[1200px] mx-auto px-5 sm:px-10 py-12 sm:py-16">
-        <Link href="/verkoop" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--muted)', fontSize: 13, fontFamily: 'var(--inter)', textDecoration: 'none', marginBottom: 22 }}>
-          <ArrowLeft size={14} aria-hidden /> Terug naar verkoop
-        </Link>
         <motion.span {...fade(0)} className="eyebrow-mk">
           <Tag size={11} aria-hidden style={{ marginRight: 6 }} /> Inkoop
         </motion.span>

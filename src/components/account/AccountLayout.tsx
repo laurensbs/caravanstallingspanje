@@ -103,17 +103,6 @@ export default function AccountLayout({ customerName, customerEmail, children }:
         </nav>
 
         <div style={{ paddingTop: 18, borderTop: '1px solid var(--navy-line)', display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Link
-            href="/"
-            style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              padding: '10px 12px', borderRadius: 8,
-              fontSize: 13, color: '#8AA0B5', textDecoration: 'none',
-              fontFamily: 'var(--inter)',
-            }}
-          >
-            <ArrowLeft size={14} aria-hidden /> {t('pt1.back-to-site')}
-          </Link>
           <button
             type="button"
             onClick={logout}

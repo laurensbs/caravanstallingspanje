@@ -31,15 +31,8 @@ export default function InspectieClient({ inspectionPrice }: { inspectionPrice: 
   );
 }
 
-function fmtEur(n: number) {
-  return new Intl.NumberFormat('nl-NL', {
-    style: 'currency', currency: 'EUR',
-    minimumFractionDigits: Number.isInteger(n) ? 0 : 2,
-    maximumFractionDigits: 2,
-  }).format(n);
-}
-
 function Hero({ t, inspectionPrice }: { t: T; inspectionPrice: number }) {
+  void inspectionPrice;
   const reduce = useReducedMotion();
   const fade = (delay = 0) =>
     reduce
@@ -63,8 +56,8 @@ function Hero({ t, inspectionPrice }: { t: T; inspectionPrice: number }) {
               <span className="l">{t('ins1.chip-2-l')}</span>
             </span>
             <span className="spec-chip">
-              <span className="v">{inspectionPrice > 0 ? `vanaf ${fmtEur(inspectionPrice)}` : t('ins1.chip-3-v')}</span>
-              <span className="l">{inspectionPrice > 0 ? 'Tarief' : t('ins1.chip-3-l')}</span>
+              <span className="v">{t('ins1.chip-3-v')}</span>
+              <span className="l">{t('ins1.chip-3-l')}</span>
             </span>
           </motion.div>
         </div>
@@ -190,7 +183,7 @@ function FormSection() {
           endpoint="/api/order/inspection"
           uploadKind="inspection-intake"
           title="Inspectie-aanvraag"
-          intro="Volledige BOVAG-keuring met officieel certificaat (PDF). Je kunt foto's meesturen van eventuele bestaande zorgen."
+          intro="Complete technische keuring met officieel certificaat (PDF). Je kunt foto's meesturen van eventuele bestaande zorgen."
           descriptionPlaceholder="Bv: Pre-seizoens-check; aandachtspunten zijn lekkage rechts achter en remmen die weleens piepen. Voor de verzekering of voor verkoop?"
           withPreferredDate
           submitLabel="Plan inspectie"

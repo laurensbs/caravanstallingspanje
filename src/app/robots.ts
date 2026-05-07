@@ -1,15 +1,11 @@
 import type { MetadataRoute } from 'next';
 
-// Robots.txt — staat tijdens de upgrade nog op disallow: / zodat zoekmachines
-// de site niet oppikken voordat de SEO-pakket (sitemap, JSON-LD, hreflang,
-// OG, canonical) klaar staat.
-//
-// Bij de flip in fase 8: vervang `disallow: '/'` door `allow: '/'` en houd
-// alleen admin/api als disallow. De sitemap-URL kan blijven staan.
+// Robots.txt — standaard allow: /. Zet env SEO_NOINDEX=true om alles
+// dicht te zetten (handig tijdens content-migraties of staging deploys).
 
 export default function robots(): MetadataRoute.Robots {
   const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://caravanstalling-spanje.com';
-  const seoEnabled = process.env.SEO_INDEX === 'true';
+  const seoEnabled = process.env.SEO_NOINDEX !== 'true';
 
   if (!seoEnabled) {
     return {

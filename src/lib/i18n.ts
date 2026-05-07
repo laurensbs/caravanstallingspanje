@@ -666,7 +666,7 @@ export const STRINGS = {
   'home1.svc-3-title': { nl: 'Onderhoud & service', en: 'Maintenance & service' },
   'home1.svc-3-desc': { nl: 'Schoonmaak, polish, jaarlijkse service — klaar voor het seizoen.', en: 'Cleaning, polish, annual service — ready for the season.' },
   'home1.svc-4-title': { nl: 'Inspectie', en: 'Inspection' },
-  'home1.svc-4-desc': { nl: 'Volledige BOVAG-keuring met officieel certificaat (PDF). Voor seizoen, verkoop of verzekering.', en: 'Full BOVAG-style inspection with official certificate (PDF). Pre-season, for sale or insurance.' },
+  'home1.svc-4-desc': { nl: 'Uitgebreide technische keuring met officieel certificaat (PDF). Voor seizoen, verkoop of verzekering.', en: 'Comprehensive technical inspection with official certificate (PDF). Pre-season, for sale or insurance.' },
   'home1.svc-5-title': { nl: 'Transport', en: 'Transport' },
   'home1.svc-5-desc': { nl: 'Stalling ↔ camping — eigen vrachtwagens, vaste chauffeurs, vaste prijzen.', en: 'Storage ↔ campsite — own trucks, fixed drivers, fixed prices.' },
   'home1.svc-6-title': { nl: 'Koelkast & airco huren', en: 'Fridge & AC rental' },
@@ -785,7 +785,7 @@ export const STRINGS = {
   'svc1.more-2-title': { nl: 'Reparatie', en: 'Repair' },
   'svc1.more-2-desc': { nl: 'Carrosserie, lekkages, dak, technische storingen.', en: 'Bodywork, leaks, roof, technical issues.' },
   'svc1.more-3-title': { nl: 'Inspectie', en: 'Inspection' },
-  'svc1.more-3-desc': { nl: 'BOVAG-keuring met PDF-certificaat.', en: 'BOVAG-style inspection with PDF certificate.' },
+  'svc1.more-3-desc': { nl: 'Technische keuring met PDF-certificaat.', en: 'Technical inspection with PDF certificate.' },
   'svc1.more-4-title': { nl: 'Transport', en: 'Transport' },
   'svc1.more-4-desc': { nl: 'NL ↔ ES — eigen vrachtwagens, vaste prijzen.', en: 'NL ↔ ES — own trucks, fixed prices.' },
   'svc1.more-5-title': { nl: 'Koelkast & airco huren', en: 'Fridge & AC rental' },
@@ -865,9 +865,9 @@ export const STRINGS = {
   // Categorieën matchen 1-op-1 het BOVAG-keuringscertificaat dat de
   // garage afgeeft (zie src/lib/inspection-checklist.ts en de PDF-template
   // op /api/account/inspection-certs/[id]/pdf).
-  'ins1.hero-eyebrow': { nl: 'Inspectie · BOVAG-keuring', en: 'Inspection · BOVAG-style check' },
+  'ins1.hero-eyebrow': { nl: 'Inspectie · Technische keuring', en: 'Inspection · Technical check' },
   'ins1.hero-h1': { nl: 'Volledige technische keuring — met certificaat.', en: 'Full technical inspection — with certificate.' },
-  'ins1.hero-lead': { nl: 'Voor seizoen, verkoop of verzekering: een complete keuring door eigen monteurs volgens BOVAG-richtlijnen. Resultaat: officieel certificaat (PDF) in je klantportaal.', en: 'Pre-season, for sale or insurance: a complete inspection by our own technicians following BOVAG guidelines. Result: an official certificate (PDF) in your customer portal.' },
+  'ins1.hero-lead': { nl: 'Voor seizoen, verkoop of verzekering: een complete keuring door onze eigen monteurs. Resultaat: officieel certificaat (PDF) in je klantportaal.', en: 'Pre-season, for sale or insurance: a complete inspection by our own technicians. Result: an official certificate (PDF) in your customer portal.' },
   'ins1.chip-1-v': { nl: '50+', en: '50+' },
   'ins1.chip-1-l': { nl: 'Controlepunten', en: 'Checkpoints' },
   'ins1.chip-2-v': { nl: '~ 2 uur', en: '~ 2 hr' },
@@ -875,7 +875,7 @@ export const STRINGS = {
   'ins1.chip-3-v': { nl: 'Op aanvraag', en: 'On request' },
   'ins1.chip-3-l': { nl: 'Tarief', en: 'Rate' },
   'ins1.list-eyebrow': { nl: 'Wat we checken', en: 'What we check' },
-  'ins1.list-h2': { nl: 'De volledige BOVAG-keuring', en: 'The full BOVAG-style inspection' },
+  'ins1.list-h2': { nl: 'De complete technische keuring', en: 'The complete technical inspection' },
   // 6 hoofdsecties met de belangrijkste sub-items uit het cert-template.
   'ins1.list-cat-1': { nl: 'Onderstel', en: 'Undercarriage' },
   'ins1.list-cat-1-1': { nl: 'Oplooprem, koppeling, breekkabel', en: 'Overrun brake, hitch, breakaway cable' },
@@ -909,7 +909,7 @@ export const STRINGS = {
   'ins1.list-cat-6-4': { nl: 'EHBO + brandblusser (advies)', en: 'First-aid + extinguisher (advised)' },
   'ins1.report-eyebrow': { nl: 'Het certificaat', en: 'The certificate' },
   'ins1.report-h2': { nl: 'Officieel keuringscertificaat in je portaal', en: 'Official inspection certificate in your portal' },
-  'ins1.report-bullet-1': { nl: 'BOVAG-template met klant- + voertuig-gegevens', en: 'BOVAG template with customer + vehicle data' },
+  'ins1.report-bullet-1': { nl: 'Officieel certificaat met klant- + voertuig-gegevens', en: 'Official certificate with customer + vehicle data' },
   'ins1.report-bullet-2': { nl: 'Per controlepunt: ✓ akkoord, ! aandachtspunt, ✗ reparatie nodig', en: 'Per checkpoint: ✓ ok, ! attention, ✗ repair needed' },
   'ins1.report-bullet-3': { nl: 'Banden-tabel met BAR, profiel en DOT-code per wiel', en: 'Tyre table with BAR, profile and DOT code per wheel' },
   'ins1.report-bullet-4': { nl: 'Direct downloadbaar als PDF — bruikbaar voor verzekering, koper of garage', en: 'Direct PDF download — usable for insurance, buyer or garage' },

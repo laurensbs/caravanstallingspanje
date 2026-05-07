@@ -494,7 +494,7 @@ export default function InspectionCertificatePdf({ cert, logoBase64 }: Props) {
           <View style={styles.cardBody}>
             <Text style={{ fontSize: 9, marginBottom: 8, lineHeight: 1.4 }}>
               Bovengenoemde caravan is bij Caravan Storage Spain onderworpen aan een volledige
-              onderhoudsbeurt en keuring volgens de geldende BOVAG-richtlijnen. De volgende
+              onderhoudsbeurt en technische keuring. De volgende
               categorieën zijn gecontroleerd, met onderstaand resultaat per onderdeel:
             </Text>
             <View style={styles.sectionStatusGrid}>
@@ -739,7 +739,7 @@ function Footer({ pageInfo }: { pageInfo: string }) {
       <View>
         <Text>Caravan Storage Spain · www.caravanstoragespain.com · info@caravanstoragespain.com</Text>
         <Text style={{ marginTop: 1, fontStyle: 'italic' }}>
-          Inspectie uitgevoerd volgens BOVAG-richtlijnen · Geldigheid: 12 maanden na inspectiedatum
+          Technische keuring door eigen monteurs · Geldigheid: 12 maanden na inspectiedatum
         </Text>
       </View>
       <Text>{pageInfo}</Text>
