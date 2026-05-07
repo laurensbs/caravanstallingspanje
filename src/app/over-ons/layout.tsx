@@ -4,7 +4,7 @@ import { alternatesFor } from '@/lib/seo';
 export const metadata: Metadata = {
   title: 'Over ons',
   description:
-    'Een familiebedrijf op de Costa Brava — al 25 jaar caravanstalling, reparatie en service voor Nederlandse en Belgische klanten.',
+    'Een familiebedrijf op de Costa Brava — sinds 2009 caravanstalling, reparatie en service voor Nederlandse en Belgische klanten.',
   alternates: alternatesFor('/over-ons'),
 };
 

@@ -136,7 +136,7 @@ export default function ChatBotModal({ open, onClose }: Props) {
       ? { role: 'bot', text: match.answer, cta: match.cta }
       : {
         role: 'bot',
-        text: 'Daar kan ik je nog niet 100% goed mee helpen. Stuur een berichtje via WhatsApp of het contactformulier — Laurens of het team antwoordt meestal binnen een paar uur.',
+        text: 'Daar kan ik je nog niet goed mee helpen. Stuur een berichtje via WhatsApp of het contactformulier — Laurens of het team antwoordt meestal binnen één werkdag.',
         cta: [
           { href: 'https://wa.me/34633778699', label: 'WhatsApp' },
           { href: '/contact', label: 'Contactformulier' },

@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     template: '%s · Caravanstalling Spanje',
   },
   description:
-    'Stalling, reparatie, transport en service aan de Costa Brava. 24/7 beveiligd, eigen werkplaats, vast personeel — al meer dan 25 jaar.',
+    'Stalling, reparatie, transport en service aan de Costa Brava. 24/7 beveiligd, eigen werkplaats, vast personeel — sinds 2009.',
   applicationName: 'Caravanstalling Spanje',
   authors: [{ name: 'Caravan Storage Spain S.L.' }],
   robots: SEO_INDEX

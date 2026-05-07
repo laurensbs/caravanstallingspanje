@@ -409,7 +409,7 @@ export const STRINGS = {
     en: 'Fridge, AC or transport to and from the campsite — we take care of it. Book online, pay, and we get to work.',
   },
   'home.trust-reviews': { nl: '· 25 reviews', en: '· 25 reviews' },
-  'home.trust-experience': { nl: '25 jaar ervaring', en: '25 years experience' },
+  'home.trust-experience': { nl: '15+ jaar ervaring', en: '15+ years experience' },
   'home.trust-workshop': { nl: 'Eigen werkplaats', en: 'On-site workshop' },
   'home.trust-aria': { nl: '4.9 sterren op 25 Google reviews', en: '4.9 stars from 25 Google reviews' },
 
@@ -547,13 +547,13 @@ export const STRINGS = {
   'home2.hero-h1-line1': { nl: 'Meer dan alleen', en: 'More than just' },
   'home2.hero-h1-line2': { nl: 'caravanstalling.', en: 'caravan storage.' },
   'home2.hero-intro': {
-    nl: 'Stalling, reparatie, onderhoud, transport en verhuur — al meer dan 25 jaar door een vast familieteam aan de Costa Brava.',
-    en: 'Storage, repair, maintenance, transport and rentals — by a fixed family team on the Costa Brava for over 25 years.',
+    nl: 'Stalling, reparatie, onderhoud, transport en verhuur — sinds 2009 door een vast familieteam aan de Costa Brava.',
+    en: 'Storage, repair, maintenance, transport and rentals — by a fixed family team on the Costa Brava since 2009.',
   },
   'home2.cta-primary': { nl: 'Bekijk onze diensten', en: 'View our services' },
   'home2.cta-call': { nl: 'Bel +34 633 77 86 99', en: 'Call +34 633 77 86 99' },
   'home2.trust-reviews': { nl: '4.9 · 25 Google reviews', en: '4.9 · 25 Google reviews' },
-  'home2.trust-experience': { nl: '25 jaar ervaring', en: '25 years experience' },
+  'home2.trust-experience': { nl: 'Sinds 2009', en: 'Since 2009' },
   'home2.trust-security': { nl: '24/7 Securitas Direct', en: '24/7 Securitas Direct' },
 
   // Wie zijn we
@@ -605,8 +605,8 @@ export const STRINGS = {
   },
   'home2.usp-team-title': { nl: 'Vast team', en: 'Fixed team' },
   'home2.usp-team-body': {
-    nl: 'Twaalf medewerkers in het seizoen. Je weet bij wie je bent.',
-    en: 'Twelve people during the season. You know who you\'re dealing with.',
+    nl: 'Vast Nederlands-Spaans team. Je weet bij wie je bent.',
+    en: 'Fixed Dutch-Spanish team. You know who you\'re dealing with.',
   },
   'home2.usp-care-title': { nl: 'Aandacht voor detail', en: 'Attention to detail' },
   'home2.usp-care-body': {
@@ -635,19 +635,19 @@ export const STRINGS = {
   'home2.contact-cta': { nl: 'Stuur een bericht', en: 'Send a message' },
 
   // ─── Homepage v3 (mockup p01) ───────────────────────────
-  'home1.hero-eyebrow': { nl: 'Costa Brava · Sinds 1998', en: 'Costa Brava · Since 1998' },
+  'home1.hero-eyebrow': { nl: 'Costa Brava · Sinds 2009', en: 'Costa Brava · Since 2009' },
   'home1.hero-h1-prefix': { nl: 'De zorgeloze', en: 'The carefree' },
   'home1.hero-h1-accent': { nl: 'caravan-thuishaven', en: 'caravan home base' },
   'home1.hero-h1-suffix': { nl: 'aan de Costa Brava.', en: 'on the Costa Brava.' },
   'home1.hero-lead': {
-    nl: '24/7 beveiligde stalling, eigen werkplaats, transport én verkoop — al meer dan 25 jaar door een vast Nederlands-Spaans team. Stap je vliegtuig uit en stap je vakantie in.',
-    en: '24/7 secured storage, on-site workshop, transport & sales — over 25 years run by a fixed Dutch-Spanish team. Step off the plane and into your holiday.',
+    nl: '24/7 beveiligde stalling, eigen werkplaats, transport én verkoop — sinds 2009 door een vast Nederlands-Spaans team. Stap je vliegtuig uit en stap je vakantie in.',
+    en: '24/7 secured storage, on-site workshop, transport & sales — run by a fixed Dutch-Spanish team since 2009. Step off the plane and into your holiday.',
   },
   'home1.hero-cta-primary': { nl: 'Plan ophaaldatum', en: 'Schedule pickup' },
   'home1.hero-cta-secondary': { nl: 'Bekijk diensten', en: 'View services' },
-  'home1.hero-trust': { nl: '4.9 / 5 · 25+ reviews · Vast familieteam', en: '4.9 / 5 · 25+ reviews · Family-run team' },
+  'home1.hero-trust': { nl: '4.9 / 5 · Google reviews · Vast familieteam', en: '4.9 / 5 · Google reviews · Family-run team' },
 
-  'home1.stat-1-v': { nl: '25+', en: '25+' },
+  'home1.stat-1-v': { nl: '15+', en: '15+' },
   'home1.stat-1-l': { nl: 'Jaar ervaring', en: 'Years experience' },
   'home1.stat-2-v': { nl: '850 m²', en: '850 m²' },
   'home1.stat-2-l': { nl: 'Eigen werkplaats', en: 'On-site workshop' },
@@ -680,7 +680,7 @@ export const STRINGS = {
   'home1.svc-more': { nl: 'Lees meer', en: 'Read more' },
 
   'home1.cert-eyebrow': { nl: 'Vier zekerheden', en: 'Four certainties' },
-  'home1.cert-h2': { nl: 'Waarom mensen al 25 jaar voor ons kiezen', en: 'Why people have chosen us for 25 years' },
+  'home1.cert-h2': { nl: 'Waarom mensen jaar na jaar voor ons kiezen', en: 'Why people choose us, year after year' },
   'home1.cert-1-title': { nl: 'Vast familieteam', en: 'Family team' },
   'home1.cert-1-desc': { nl: 'Geen wisselend personeel — je weet bij wie je bent en wie je caravan kent.', en: 'No rotating staff — you know who handles your caravan.' },
   'home1.cert-2-title': { nl: '24/7 Securitas Direct', en: '24/7 Securitas Direct' },
@@ -758,7 +758,7 @@ export const STRINGS = {
   'svc1.spec-intro': { nl: 'Schoonmaak en jaarlijks onderhoud — vaste pakketten, vaste prijzen, vaste kwaliteit.', en: 'Cleaning and annual maintenance — fixed packages, fixed prices, consistent quality.' },
 
   'svc1.clean-title': { nl: 'Schoonmaken', en: 'Cleaning' },
-  'svc1.clean-desc': { nl: 'Caravan of camper terug in topstaat — binnen, buiten, dak en zonneluifel.', en: 'Bring your caravan or camper back to top condition — inside, outside, roof and awning.' },
+  'svc1.clean-desc': { nl: 'Caravan of camper grondig schoongemaakt — binnen, buiten, dak en zonneluifel.', en: 'Caravan or camper thoroughly cleaned — inside, outside, roof and awning.' },
   'svc1.clean-row-1': { nl: 'Buitenwas + dakreiniging', en: 'Exterior wash + roof' },
   'svc1.clean-row-2': { nl: 'Interieur + meubels + ramen', en: 'Interior + furniture + windows' },
   'svc1.clean-row-3': { nl: 'Zonneluifel reinigen', en: 'Awning cleaning' },
@@ -1006,10 +1006,10 @@ export const STRINGS = {
   // ─── Over ons p11 ───────────────────────────────────────
   'abo1.hero-eyebrow': { nl: 'Over ons', en: 'About us' },
   'abo1.hero-h1': { nl: 'Een familiebedrijf op de Costa Brava.', en: 'A family business on the Costa Brava.' },
-  'abo1.hero-lead': { nl: 'Sinds 1998 helpen we Nederlanders en Belgen hun caravan-vakantie zorgeloos te maken. Vast team, eigen werkplaats, één aanspreekpunt.', en: 'Since 1998 we\'ve helped Dutch and Belgian travellers make their caravan holidays carefree. Fixed team, on-site workshop, one contact.' },
+  'abo1.hero-lead': { nl: 'Sinds 2009 helpen we Nederlanders en Belgen hun caravan-vakantie zorgeloos te maken. Vast team, eigen werkplaats, één aanspreekpunt.', en: 'Since 2009 we\'ve helped Dutch and Belgian travellers make their caravan holidays carefree. Fixed team, on-site workshop, one contact.' },
   'abo1.tl-eyebrow': { nl: 'Onze geschiedenis', en: 'Our history' },
   'abo1.tl-h2': { nl: 'Van garage naar full-service stalling', en: 'From garage to full-service storage' },
-  'abo1.tl-1-y': { nl: '1998', en: '1998' },
+  'abo1.tl-1-y': { nl: '2009', en: '2009' },
   'abo1.tl-1-t': { nl: 'Begin als kleine garage', en: 'Started as small garage' },
   'abo1.tl-1-d': { nl: 'Reparaties en onderhoud aan caravans van bekenden — informeel en op afspraak.', en: 'Repairs and maintenance for caravans of acquaintances — informal and by appointment.' },
   'abo1.tl-2-y': { nl: '2005', en: '2005' },
@@ -1040,7 +1040,7 @@ export const STRINGS = {
   'abo1.val-1-t': { nl: 'Transparant', en: 'Transparent' },
   'abo1.val-1-d': { nl: 'Geen verrassingen op de factuur. Foto\'s vóór/na elke reparatie. Vaste uurtarieven.', en: 'No surprises on the invoice. Before/after photos for every repair. Fixed hourly rates.' },
   'abo1.val-2-t': { nl: 'Betrouwbaar', en: 'Reliable' },
-  'abo1.val-2-d': { nl: 'Wat we beloven, doen we. 25 jaar ervaring met dezelfde klanten.', en: 'What we promise, we deliver. 25 years of experience with the same customers.' },
+  'abo1.val-2-d': { nl: 'Wat we beloven, doen we. Veel klanten komen jaar na jaar bij ons terug.', en: 'What we promise, we deliver. Many customers come back to us year after year.' },
   'abo1.val-3-t': { nl: 'Persoonlijk', en: 'Personal' },
   'abo1.val-3-d': { nl: 'Geen call-center. Eén aanspreekpunt, in jouw taal.', en: 'No call centre. One contact, in your language.' },
   'abo1.cert-eyebrow': { nl: 'Certificeringen', en: 'Certifications' },
@@ -1286,7 +1286,7 @@ export const STRINGS = {
   'mk.hero-trust-securitas': { nl: 'Securitas Direct', en: 'Securitas Direct' },
   'mk.hero-trust-securitas-sub': { nl: '24/7 alarm & camera\'s', en: '24/7 alarm & cameras' },
   'mk.hero-trust-team': { nl: 'Vast team', en: 'Fixed team' },
-  'mk.hero-trust-team-sub': { nl: '~12 medewerkers in seizoen', en: '~12 staff during season' },
+  'mk.hero-trust-team-sub': { nl: 'NL-ES team', en: 'NL-ES team' },
 
   // Stats-strip
   'mk.stat-customers': { nl: 'Caravans in beheer', en: 'Caravans in care' },
