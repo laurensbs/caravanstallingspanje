@@ -79,6 +79,8 @@ function Checklist({ t }: { t: T }) {
     { titleKey: 'ins1.list-cat-2', itemKeys: ['ins1.list-cat-2-1', 'ins1.list-cat-2-2', 'ins1.list-cat-2-3', 'ins1.list-cat-2-4'] },
     { titleKey: 'ins1.list-cat-3', itemKeys: ['ins1.list-cat-3-1', 'ins1.list-cat-3-2', 'ins1.list-cat-3-3', 'ins1.list-cat-3-4'] },
     { titleKey: 'ins1.list-cat-4', itemKeys: ['ins1.list-cat-4-1', 'ins1.list-cat-4-2', 'ins1.list-cat-4-3', 'ins1.list-cat-4-4'] },
+    { titleKey: 'ins1.list-cat-5', itemKeys: ['ins1.list-cat-5-1', 'ins1.list-cat-5-2', 'ins1.list-cat-5-3', 'ins1.list-cat-5-4'] },
+    { titleKey: 'ins1.list-cat-6', itemKeys: ['ins1.list-cat-6-1', 'ins1.list-cat-6-2', 'ins1.list-cat-6-3', 'ins1.list-cat-6-4'] },
   ];
   return (
     <section className="py-16 sm:py-20 section-bg-grey">
@@ -188,7 +190,7 @@ function FormSection() {
           endpoint="/api/order/inspection"
           uploadKind="inspection-intake"
           title="Inspectie-aanvraag"
-          intro="25-punts technische check, PDF-rapport. Je kunt foto's meesturen van eventuele bestaande zorgen."
+          intro="Volledige BOVAG-keuring met officieel certificaat (PDF). Je kunt foto's meesturen van eventuele bestaande zorgen."
           descriptionPlaceholder="Bv: Pre-seizoens-check; aandachtspunten zijn lekkage rechts achter en remmen die weleens piepen. Voor de verzekering of voor verkoop?"
           withPreferredDate
           submitLabel="Plan inspectie"

@@ -55,7 +55,7 @@ type ServiceHistoryItem = {
   createdAt: string;
 };
 
-type Tab = 'overview' | 'history' | 'docs' | 'photos' | 'requests';
+type Tab = 'overview' | 'history' | 'certificates' | 'docs' | 'photos' | 'requests';
 
 type ServiceRequest = {
   id: number;
@@ -123,6 +123,7 @@ export default function MijnCaravanPage() {
   const tabs: Array<{ id: Tab; label: string }> = [
     { id: 'overview', label: t('pt1.cv-tab-overview') },
     { id: 'history', label: t('pt1.cv-tab-history') },
+    { id: 'certificates', label: 'Certificaten' },
     { id: 'requests', label: 'Aanvragen' },
     { id: 'docs', label: t('pt1.cv-tab-docs') },
     { id: 'photos', label: t('pt1.cv-tab-photos') },
@@ -208,6 +209,7 @@ export default function MijnCaravanPage() {
 
           {tab === 'overview' && <OverviewTab t={t} caravan={caravan} />}
           {tab === 'history' && <HistoryTab t={t} history={history} />}
+          {tab === 'certificates' && <CertificatesTab />}
           {tab === 'requests' && <RequestsTab />}
           {tab === 'docs' && <DocsTab t={t} />}
           {tab === 'photos' && <PhotosTab t={t} caravanId={caravan.id} initialPhotos={photos} />}
@@ -849,6 +851,109 @@ function RequestsTab() {
         </ul>
       )}
     </div>
+  );
+}
+
+// ─── Keuringscertificaten ───────────────────────────────────────
+type ClientInspectionCert = {
+  id: number;
+  certificateNumber: string;
+  inspectionDate: string;
+  overallResult: 'goedgekeurd' | 'afgekeurd' | string;
+  technicianName: string;
+  caravan: {
+    brand: string | null;
+    model: string | null;
+    registration: string | null;
+  };
+  createdAt: string;
+};
+
+function CertificatesTab() {
+  const [certs, setCerts] = useState<ClientInspectionCert[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/account/inspection-certs', { credentials: 'include' })
+      .then((r) => r.json())
+      .then((d) => { if (!cancelled) setCerts(d.certificates || []); })
+      .catch(() => { if (!cancelled) setCerts([]); });
+    return () => { cancelled = true; };
+  }, []);
+
+  if (certs === null) {
+    return (
+      <div className="card-mk text-center" style={{ padding: 32 }}>
+        <Loader2 className="animate-spin" style={{ color: 'var(--muted)' }} />
+      </div>
+    );
+  }
+
+  if (certs.length === 0) {
+    return (
+      <div className="card-mk text-center" style={{ padding: 40 }}>
+        <ClipboardCheck size={32} style={{ margin: '0 auto 12px', color: 'var(--muted)' }} aria-hidden />
+        <h3 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 16, color: 'var(--navy)', margin: '0 0 6px' }}>
+          Nog geen keuringscertificaten
+        </h3>
+        <p style={{ fontSize: 13.5, color: 'var(--muted)', margin: 0, lineHeight: 1.55 }}>
+          Zodra je caravan een technische keuring krijgt, vind je het certificaat hier terug — direct te downloaden als PDF.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 10 }}>
+      {certs.map((c) => {
+        const passed = c.overallResult === 'goedgekeurd';
+        return (
+          <li
+            key={c.id}
+            className="card-mk"
+            style={{
+              padding: 18,
+              borderLeft: `4px solid ${passed ? 'var(--green)' : 'var(--red)'}`,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, minWidth: 220 }}>
+                <div style={{ fontFamily: 'var(--sora)', fontWeight: 600, color: 'var(--navy)', fontSize: 15 }}>
+                  Keuring {c.certificateNumber}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 3 }}>
+                  {new Date(c.inspectionDate).toLocaleDateString('nl-NL', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  {c.caravan.brand || c.caravan.model ? ` · ${[c.caravan.brand, c.caravan.model].filter(Boolean).join(' ')}` : ''}
+                  {c.caravan.registration ? ` · ${c.caravan.registration}` : ''}
+                  {c.technicianName ? ` · ${c.technicianName}` : ''}
+                </div>
+              </div>
+              <span
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '4px 12px', borderRadius: 999, fontSize: 12,
+                  fontFamily: 'var(--sora)', fontWeight: 600,
+                  background: passed ? 'var(--green-soft)' : 'rgba(220,38,38,0.10)',
+                  color: passed ? 'var(--green)' : 'var(--red)',
+                }}
+              >
+                {passed ? <CheckCircle2 size={12} /> : <X size={12} />}
+                {passed ? 'Goedgekeurd' : 'Afgekeurd'}
+              </span>
+              <a
+                href={`/api/account/inspection-certs/${c.id}/pdf`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+                style={{ fontSize: 13 }}
+              >
+                <FileText size={14} aria-hidden /> Bekijk PDF
+              </a>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 

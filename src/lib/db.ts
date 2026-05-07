@@ -2580,8 +2580,196 @@ export async function ensureCaravansSchema(): Promise<void> {
       sql`CREATE INDEX IF NOT EXISTS idx_csr_customer ON customer_service_requests(customer_id)`);
     await tryMigrate('customer_service_requests.idx_status', () =>
       sql`CREATE INDEX IF NOT EXISTS idx_csr_status ON customer_service_requests(status)`);
+
+    // Inspection certificates: ontvangen vanuit reparatie-paneel via
+    // /api/inbound/inspection-result. Alle structuur als JSONB zodat
+    // we niet voor elk PDF-veld een kolom hoeven aan te maken.
+    // Snapshots (customer_*_snapshot) bevriezen klant-data op moment
+    // van versturen — naam-wijzigingen achteraf raken het certificaat
+    // niet (BOVAG-conform: cert is een momentopname).
+    await tryMigrate('inspection_certificates.create', () => sql`
+      CREATE TABLE IF NOT EXISTS inspection_certificates (
+        id SERIAL PRIMARY KEY,
+        certificate_number TEXT NOT NULL UNIQUE,
+        caravan_id INTEGER REFERENCES customer_caravans(id) ON DELETE SET NULL,
+        customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL,
+        customer_name_snapshot TEXT,
+        customer_address_snapshot TEXT,
+        customer_postal_city_snapshot TEXT,
+        customer_number_snapshot TEXT,
+        caravan_brand_snapshot TEXT,
+        caravan_model_snapshot TEXT,
+        caravan_registration_snapshot TEXT,
+        caravan_chassis_snapshot TEXT,
+        inspection_date DATE NOT NULL,
+        technician_name TEXT NOT NULL,
+        overall_result TEXT NOT NULL,
+        technician_notes TEXT,
+        sections_data JSONB NOT NULL,
+        tyres_data JSONB,
+        repair_job_id TEXT,
+        source TEXT NOT NULL DEFAULT 'repair_panel',
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    await tryMigrate('inspection_certificates.idx_caravan', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_ins_cert_caravan ON inspection_certificates(caravan_id)`);
+    await tryMigrate('inspection_certificates.idx_customer', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_ins_cert_customer ON inspection_certificates(customer_id)`);
+    await tryMigrate('inspection_certificates.idx_date', () =>
+      sql`CREATE INDEX IF NOT EXISTS idx_ins_cert_date ON inspection_certificates(inspection_date DESC)`);
   })();
   return _caravansMigrationsApplied;
+}
+
+export type InspectionCertificateRow = {
+  id: number;
+  certificate_number: string;
+  caravan_id: number | null;
+  customer_id: number | null;
+  customer_name_snapshot: string | null;
+  customer_address_snapshot: string | null;
+  customer_postal_city_snapshot: string | null;
+  customer_number_snapshot: string | null;
+  caravan_brand_snapshot: string | null;
+  caravan_model_snapshot: string | null;
+  caravan_registration_snapshot: string | null;
+  caravan_chassis_snapshot: string | null;
+  inspection_date: string;
+  technician_name: string;
+  overall_result: string;
+  technician_notes: string | null;
+  sections_data: unknown;
+  tyres_data: unknown;
+  repair_job_id: string | null;
+  source: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export async function createInspectionCertificate(data: {
+  certificate_number: string;
+  caravan_id: number | null;
+  customer_id: number | null;
+  customer_name_snapshot: string | null;
+  customer_address_snapshot: string | null;
+  customer_postal_city_snapshot: string | null;
+  customer_number_snapshot: string | null;
+  caravan_brand_snapshot: string | null;
+  caravan_model_snapshot: string | null;
+  caravan_registration_snapshot: string | null;
+  caravan_chassis_snapshot: string | null;
+  inspection_date: string;
+  technician_name: string;
+  overall_result: string;
+  technician_notes: string | null;
+  sections_data: unknown;
+  tyres_data: unknown;
+  repair_job_id: string | null;
+}): Promise<InspectionCertificateRow> {
+  await ensureCaravansSchema();
+  const rows = await sql`
+    INSERT INTO inspection_certificates (
+      certificate_number, caravan_id, customer_id,
+      customer_name_snapshot, customer_address_snapshot,
+      customer_postal_city_snapshot, customer_number_snapshot,
+      caravan_brand_snapshot, caravan_model_snapshot,
+      caravan_registration_snapshot, caravan_chassis_snapshot,
+      inspection_date, technician_name, overall_result, technician_notes,
+      sections_data, tyres_data, repair_job_id
+    ) VALUES (
+      ${data.certificate_number}, ${data.caravan_id}, ${data.customer_id},
+      ${data.customer_name_snapshot}, ${data.customer_address_snapshot},
+      ${data.customer_postal_city_snapshot}, ${data.customer_number_snapshot},
+      ${data.caravan_brand_snapshot}, ${data.caravan_model_snapshot},
+      ${data.caravan_registration_snapshot}, ${data.caravan_chassis_snapshot},
+      ${data.inspection_date}, ${data.technician_name}, ${data.overall_result}, ${data.technician_notes},
+      ${JSON.stringify(data.sections_data)}::jsonb,
+      ${data.tyres_data ? JSON.stringify(data.tyres_data) : null}::jsonb,
+      ${data.repair_job_id}
+    )
+    RETURNING *` as unknown as InspectionCertificateRow[];
+  return rows[0];
+}
+
+export async function getInspectionCertificateById(id: number): Promise<InspectionCertificateRow | null> {
+  await ensureCaravansSchema();
+  const rows = await sql`SELECT * FROM inspection_certificates WHERE id = ${id} LIMIT 1` as unknown as InspectionCertificateRow[];
+  return rows[0] || null;
+}
+
+export async function getInspectionCertificateByNumber(num: string): Promise<InspectionCertificateRow | null> {
+  await ensureCaravansSchema();
+  const rows = await sql`SELECT * FROM inspection_certificates WHERE certificate_number = ${num} LIMIT 1` as unknown as InspectionCertificateRow[];
+  return rows[0] || null;
+}
+
+export async function listInspectionCertificatesForCaravan(caravanId: number): Promise<InspectionCertificateRow[]> {
+  await ensureCaravansSchema();
+  return sql`SELECT * FROM inspection_certificates WHERE caravan_id = ${caravanId} ORDER BY inspection_date DESC, id DESC` as unknown as Promise<InspectionCertificateRow[]>;
+}
+
+export async function listInspectionCertificatesForCustomer(customerId: number): Promise<InspectionCertificateRow[]> {
+  await ensureCaravansSchema();
+  return sql`SELECT * FROM inspection_certificates WHERE customer_id = ${customerId} ORDER BY inspection_date DESC, id DESC` as unknown as Promise<InspectionCertificateRow[]>;
+}
+
+export type InspectionCertificateWithCustomer = InspectionCertificateRow & {
+  customer_name: string | null;
+  customer_email: string | null;
+};
+
+export async function listInspectionCertificatesForAdmin(opts: {
+  search?: string;
+  limit?: number;
+} = {}): Promise<InspectionCertificateWithCustomer[]> {
+  await ensureCaravansSchema();
+  const limit = opts.limit ?? 200;
+  if (opts.search && opts.search.trim()) {
+    const term = `%${opts.search.trim()}%`;
+    return sql`
+      SELECT ic.*, c.name AS customer_name, c.email AS customer_email
+      FROM inspection_certificates ic
+      LEFT JOIN customers c ON c.id = ic.customer_id
+      WHERE ic.certificate_number ILIKE ${term}
+         OR ic.caravan_registration_snapshot ILIKE ${term}
+         OR ic.customer_name_snapshot ILIKE ${term}
+         OR c.name ILIKE ${term}
+         OR c.email ILIKE ${term}
+      ORDER BY ic.inspection_date DESC, ic.id DESC
+      LIMIT ${limit}
+    ` as unknown as Promise<InspectionCertificateWithCustomer[]>;
+  }
+  return sql`
+    SELECT ic.*, c.name AS customer_name, c.email AS customer_email
+    FROM inspection_certificates ic
+    LEFT JOIN customers c ON c.id = ic.customer_id
+    ORDER BY ic.inspection_date DESC, ic.id DESC
+    LIMIT ${limit}
+  ` as unknown as Promise<InspectionCertificateWithCustomer[]>;
+}
+
+// Genereert een uniek certificaat-nr volgens patroon CSS-YYYYMMDD-NNNN.
+// NNNN = volgnummer voor die dag (010, 011, ...).
+export async function generateCertificateNumber(date: Date = new Date()): Promise<string> {
+  await ensureCaravansSchema();
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const prefix = `CSS-${yyyy}${mm}${dd}-`;
+  const rows = await sql`
+    SELECT certificate_number FROM inspection_certificates
+    WHERE certificate_number LIKE ${prefix + '%'}
+    ORDER BY certificate_number DESC LIMIT 1
+  ` as unknown as { certificate_number: string }[];
+  let next = 1;
+  if (rows.length > 0) {
+    const last = rows[0].certificate_number;
+    const seq = Number(last.slice(prefix.length));
+    if (Number.isFinite(seq)) next = seq + 1;
+  }
+  return `${prefix}${String(next).padStart(4, '0')}`;
 }
 
 export type CustomerServiceRequestRow = {
