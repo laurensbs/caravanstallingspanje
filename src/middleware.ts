@@ -1,5 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminToken, verifyCustomerToken } from '@/lib/auth';
+import { verifyAdminToken, verifyCustomerToken, verifyCustomerTokenWithExp, createCustomerToken } from '@/lib/auth';
+
+// Sliding-session: als customer_token binnen REFRESH_THRESHOLD_S verloopt,
+// re-issue 'm zodat actieve klanten niet ineens uitgelogd worden bij een
+// 7-daagse JWT die net is verlopen. Drempel: laatste 24u van de geldigheid.
+const REFRESH_THRESHOLD_S = 24 * 60 * 60;
+const COOKIE_MAX_AGE_S = 7 * 24 * 60 * 60;
+
+async function maybeRefreshCustomerCookie(token: string, response: NextResponse): Promise<void> {
+  const session = await verifyCustomerTokenWithExp(token);
+  if (!session) return;
+  const remaining = session.exp - Math.floor(Date.now() / 1000);
+  if (remaining > REFRESH_THRESHOLD_S) return;
+  // Re-issue met dezelfde payload — exp wordt automatisch +7d.
+  const fresh = await createCustomerToken({
+    id: session.id, email: session.email, name: session.name,
+  });
+  response.cookies.set('customer_token', fresh, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: COOKIE_MAX_AGE_S,
+    path: '/',
+  });
+}
 
 const rateMap = new Map<string, { count: number; reset: number }>();
 const RATE_LIMIT = 60;
@@ -93,6 +117,11 @@ export async function middleware(request: NextRequest) {
       url.search = '';
       return NextResponse.redirect(url);
     }
+    // Sliding-session: refresh cookie als 'm bijna verloopt zodat actieve
+    // klanten niet ineens uitgelogd raken.
+    const response = NextResponse.next();
+    if (token) await maybeRefreshCustomerCookie(token, response);
+    return addSecurityHeaders(response);
   }
 
   // Customer-portal API: alle endpoints vereisen sessie behalve /login
@@ -108,6 +137,10 @@ export async function middleware(request: NextRequest) {
     const token = request.cookies.get('customer_token')?.value;
     const session = token ? await verifyCustomerToken(token) : null;
     if (!session) return NextResponse.json({ error: 'Niet ingelogd' }, { status: 401 });
+    // Sliding-session: ook bij API-calls cookie verlengen indien bijna afgelopen.
+    const response = NextResponse.next();
+    if (token) await maybeRefreshCustomerCookie(token, response);
+    return addSecurityHeaders(response);
   }
 
   return addSecurityHeaders(NextResponse.next());

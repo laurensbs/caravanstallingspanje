@@ -674,7 +674,7 @@ export const STRINGS = {
   'home1.svc-7-title': { nl: 'Verkoop', en: 'Sales' },
   'home1.svc-7-desc': { nl: 'Tweedehands caravans en campers — gekeurd & schoon.', en: 'Used caravans and campers — inspected & clean.' },
   'home1.svc-8-title': { nl: 'Inkoop', en: 'Buy-back' },
-  'home1.svc-8-desc': { nl: 'Klaar met je caravan? Wij doen een eerlijk bod.', en: 'Done with your caravan? We give a fair offer.' },
+  'home1.svc-8-desc': { nl: 'Klaar met je caravan? Wij doen een marktconform bod binnen 48 uur.', en: 'Done with your caravan? We make a market-rate offer within 48 hours.' },
   'home1.svc-9-title': { nl: 'Caravan huren', en: 'Rent a caravan' },
   'home1.svc-9-desc': { nl: 'Geen eigen caravan? Onze zustersite levert er een op je camping.', en: 'No caravan? Our sister site delivers one to your campsite.' },
   'home1.svc-more': { nl: 'Lees meer', en: 'Read more' },
@@ -954,7 +954,7 @@ export const STRINGS = {
   'sal1.cta-detail': { nl: 'Details bekijken', en: 'View details' },
   'sal1.empty-cta': { nl: 'Stuur ons je wensen', en: 'Send us your wishlist' },
   'sal1.intake-eyebrow': { nl: 'Inkoop', en: 'Buy-back' },
-  'sal1.intake-h2': { nl: 'Klaar met je caravan? Wij doen een eerlijk bod.', en: 'Done with your caravan? We give a fair offer.' },
+  'sal1.intake-h2': { nl: 'Klaar met je caravan? Wij doen een marktconform bod binnen 48 uur.', en: 'Done with your caravan? We make a market-rate offer within 48 hours.' },
   'sal1.intake-intro': { nl: 'In drie stappen van eerste taxatie tot uitbetaling — geen gedoe met privé-verkoop, advertenties of bezichtigingen.', en: 'Three steps from valuation to payout — no hassle with private sale, ads or viewings.' },
   'sal1.intake-1-title': { nl: 'Stuur foto\'s + papieren', en: 'Send photos + papers' },
   'sal1.intake-1-desc': { nl: 'Via portaal of WhatsApp — bouwjaar, kenteken, schade-historie.', en: 'Via portal or WhatsApp — year, registration, damage history.' },
@@ -1093,7 +1093,7 @@ export const STRINGS = {
   'faq1.q-oth-1-q': { nl: 'Spreken jullie Nederlands?', en: 'Do you speak Dutch?' },
   'faq1.q-oth-1-a': { nl: 'Ja — eigenaar en kantoor-team zijn Nederlands. Monteurs Spaans of Engels.', en: 'Yes — owner and office team are Dutch. Technicians Spanish or English.' },
   'faq1.q-oth-2-q': { nl: 'Kunnen jullie mijn caravan verkopen?', en: 'Can you sell my caravan?' },
-  'faq1.q-oth-2-a': { nl: 'Ja, via inkoop (eerlijk bod binnen 48u) of consignatie (we verkopen \'m, jij krijgt restbedrag).', en: 'Yes, via buy-back (fair offer within 48h) or consignment (we sell, you get the balance).' },
+  'faq1.q-oth-2-a': { nl: 'Ja, via inkoop (marktconform bod binnen 48u) of consignatie (we verkopen \'m, jij krijgt restbedrag).', en: 'Yes, via buy-back (market-rate offer within 48h) or consignment (we sell, you get the balance).' },
 
   // ─── Booking flow p14-17 ────────────────────────────────
   'bk1.hero-eyebrow': { nl: 'Reservering', en: 'Reservation' },

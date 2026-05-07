@@ -978,6 +978,42 @@ export async function cleanupOldPendingIntakes(hours = 24) {
       AND created_at < NOW() - (${hours}::int * INTERVAL '1 hour')`;
 }
 
+// Stalling- en transport-requests die nooit een Stripe-betaling hebben
+// gekregen (status='controleren', paid_at IS NULL) en ouder zijn dan 72u:
+// markeren als 'verlaten'. Voorkomt dat admin handmatig moet opruimen
+// en houdt action-queue schoon.
+export async function cleanupAbandonedRequests(hours = 72): Promise<{ stalling: number; transport: number; bookings: number }> {
+  const stallingRows = await sql`
+    UPDATE stalling_requests
+    SET status = 'verlaten', updated_at = NOW()
+    WHERE status = 'controleren'
+      AND paid_at IS NULL
+      AND holded_invoice_id IS NULL
+      AND created_at < NOW() - (${hours}::int * INTERVAL '1 hour')
+    RETURNING id` as unknown as { id: number }[];
+  const transportRows = await sql`
+    UPDATE transport_requests
+    SET status = 'verlaten', updated_at = NOW()
+    WHERE status = 'controleren'
+      AND paid_at IS NULL
+      AND holded_invoice_id IS NULL
+      AND created_at < NOW() - (${hours}::int * INTERVAL '1 hour')
+    RETURNING id` as unknown as { id: number }[];
+  const bookingRows = await sql`
+    UPDATE fridge_bookings
+    SET status = 'verlaten', updated_at = NOW()
+    WHERE status = 'controleren'
+      AND paid_at IS NULL
+      AND holded_invoice_id IS NULL
+      AND created_at < NOW() - (${hours}::int * INTERVAL '1 hour')
+    RETURNING id` as unknown as { id: number }[];
+  return {
+    stalling: stallingRows.length,
+    transport: transportRows.length,
+    bookings: bookingRows.length,
+  };
+}
+
 export async function getPendingIntakeBySession(stripe_session_id: string) {
   const rows = await sql`SELECT * FROM pending_intakes WHERE stripe_session_id = ${stripe_session_id} LIMIT 1`;
   return (rows[0] as unknown as { id: number; stripe_session_id: string; payload: unknown; forwarded_at: string | null; forward_repair_job_id: string | null }) || null;

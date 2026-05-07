@@ -51,6 +51,15 @@ export async function verifyCustomerToken(token: string): Promise<CustomerTokenP
   } catch { return null; }
 }
 
+// Variant die exp-timestamp meestuurt zodat middleware een sliding-session
+// kan implementeren (cookie verlengen als < 1 dag van expiry).
+export async function verifyCustomerTokenWithExp(token: string): Promise<(CustomerTokenPayload & { exp: number }) | null> {
+  try {
+    const { payload } = await jwtVerify(token, customerSecret());
+    return payload as unknown as CustomerTokenPayload & { exp: number };
+  } catch { return null; }
+}
+
 // Cryptografisch sterk eenmalig wachtwoord. 12 tekens, mix van
 // hoofd/kleinletters + cijfers. Geen leestekens (mensen tikken 'm
 // over uit een mail). Geen 0/O/1/I/l om verwarring te voorkomen.

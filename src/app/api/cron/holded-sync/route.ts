@@ -8,6 +8,7 @@ import {
   setStallingInvoiceStatus,
   setTransportInvoiceStatus,
   setPendingIntakeInvoiceStatus,
+  cleanupAbandonedRequests,
   logActivity,
 } from '@/lib/db';
 import { getInvoice } from '@/lib/holded';
@@ -99,12 +100,23 @@ async function runSync() {
     }
   }
 
+  // Opruimen van dangling requests die nooit een betaling hebben gekregen.
+  // Klant verlaat Stripe halverwege → request blijft op 'controleren', laurens
+  // krijgt admin-mail en denkt dat 't een echte aanvraag is. Na 72u markeren
+  // als 'verlaten' zodat de action queue schoon blijft.
+  let abandoned = { stalling: 0, transport: 0, bookings: 0 };
+  try {
+    abandoned = await cleanupAbandonedRequests(72);
+  } catch (err) {
+    log.error('cleanup_abandoned_failed', err);
+  }
+
   await logActivity({
     action: 'Holded factuur-sync uitgevoerd',
     entityType: 'cron',
-    details: `b=${summary.bookings} s=${summary.stalling} t=${summary.transport} sv=${summary.services} e=${summary.errors}`,
+    details: `b=${summary.bookings} s=${summary.stalling} t=${summary.transport} sv=${summary.services} e=${summary.errors} abandoned=${abandoned.stalling + abandoned.transport + abandoned.bookings}`,
   }).catch(() => {});
 
-  log.info('holded_sync_done', summary);
-  return NextResponse.json({ ok: true, ...summary });
+  log.info('holded_sync_done', { ...summary, abandoned });
+  return NextResponse.json({ ok: true, ...summary, abandoned });
 }
