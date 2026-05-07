@@ -82,6 +82,14 @@ export async function initDatabase() {
   // then create the Stripe session, then attach the id). Drop the NOT NULL.
   await sql`ALTER TABLE pending_intakes ALTER COLUMN stripe_session_id DROP NOT NULL`.catch(() => {});
   await sql`CREATE INDEX IF NOT EXISTS idx_pending_intakes_session ON pending_intakes(stripe_session_id)`;
+  // Holded factuur-koppeling voor service-intakes. Werd voorheen wel aangemaakt
+  // in Stripe webhook maar id ging verloren — cron pikte status-updates dus
+  // nooit op. Nu opslaan zodat /api/cron/holded-sync 'm meeneemt.
+  await sql`ALTER TABLE pending_intakes ADD COLUMN IF NOT EXISTS holded_invoice_id TEXT`;
+  await sql`ALTER TABLE pending_intakes ADD COLUMN IF NOT EXISTS holded_invoice_number TEXT`;
+  await sql`ALTER TABLE pending_intakes ADD COLUMN IF NOT EXISTS holded_invoice_status TEXT`;
+  await sql`ALTER TABLE pending_intakes ADD COLUMN IF NOT EXISTS holded_invoice_synced_at TIMESTAMP`;
+  await sql`ALTER TABLE pending_intakes ADD COLUMN IF NOT EXISTS holded_invoice_url TEXT`;
 
   // services_catalog tabel is verwijderd — services worden nu beheerd in
   // het reparatiepaneel en via /api/services-public publiek opgehaald.
@@ -2304,6 +2312,33 @@ export async function setTransportInvoiceStatus(id: number, status: string, url:
       holded_invoice_synced_at = NOW(),
       updated_at = NOW()
     WHERE id = ${id}`;
+}
+
+// Service-intake (pending_intakes-tabel) Holded-koppeling: setter na het
+// aanmaken van de pro-forma in de Stripe-webhook, en getter voor de cron-sync.
+export async function setPendingIntakeHoldedInvoice(id: number, holdedInvoiceId: string, holdedInvoiceNumber: string) {
+  await sql`UPDATE pending_intakes
+    SET holded_invoice_id = ${holdedInvoiceId},
+        holded_invoice_number = ${holdedInvoiceNumber}
+    WHERE id = ${id}`;
+}
+
+export async function setPendingIntakeInvoiceStatus(id: number, status: string, url: string | null) {
+  await sql`UPDATE pending_intakes
+    SET holded_invoice_status = ${status},
+        holded_invoice_url = ${url},
+        holded_invoice_synced_at = NOW()
+    WHERE id = ${id}`;
+}
+
+export async function getInvoicedServiceIntakesForSync() {
+  return sql`SELECT id, holded_invoice_id FROM pending_intakes
+    WHERE holded_invoice_id IS NOT NULL
+      AND (holded_invoice_synced_at IS NULL
+        OR holded_invoice_synced_at < NOW() - INTERVAL '50 minutes'
+        OR holded_invoice_status IS NULL
+        OR holded_invoice_status <> 'paid')
+    ORDER BY holded_invoice_synced_at NULLS FIRST LIMIT 200`;
 }
 
 // Voor het admin-dashboard: hoeveel bookings staan er nog open in Holded?

@@ -4,6 +4,35 @@ export const PRICES = {
   'Airco': 50,
 } as const;
 
+// Transport-fallbacks: één centrale bron zodat /diensten/transport en
+// /tarieven niet uit elkaar lopen wanneer admin een prijs wijzigt en
+// de DB-fetch faalt.
+export const TRANSPORT_PRICES_FALLBACK = {
+  wij_rijden: 100,
+  zelf: 50,
+} as const;
+
+export const TRANSPORT_SETTING_KEYS = {
+  wij_rijden: 'transport_price_wij_rijden',
+  zelf: 'transport_price_zelf',
+} as const;
+
+export async function getEffectiveTransportPrices(): Promise<{ wij_rijden: number; zelf: number }> {
+  try {
+    const { getSettings } = await import('./db');
+    const map = await getSettings(Object.values(TRANSPORT_SETTING_KEYS));
+    const wij = Number(map[TRANSPORT_SETTING_KEYS.wij_rijden]);
+    const zelf = Number(map[TRANSPORT_SETTING_KEYS.zelf]);
+    return {
+      wij_rijden: Number.isFinite(wij) && wij > 0 ? wij : TRANSPORT_PRICES_FALLBACK.wij_rijden,
+      zelf: Number.isFinite(zelf) && zelf > 0 ? zelf : TRANSPORT_PRICES_FALLBACK.zelf,
+    };
+  } catch (err) {
+    console.error('[pricing] getEffectiveTransportPrices fallback to hardcoded:', err);
+    return { ...TRANSPORT_PRICES_FALLBACK };
+  }
+}
+
 export const STOCK = {
   'Grote koelkast': 110,
   'Tafelmodel koelkast': 20,

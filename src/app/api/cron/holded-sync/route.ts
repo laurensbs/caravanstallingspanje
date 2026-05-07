@@ -3,9 +3,11 @@ import {
   getInvoicedBookingsForSync,
   getInvoicedStallingForSync,
   getInvoicedTransportForSync,
+  getInvoicedServiceIntakesForSync,
   setBookingInvoiceStatus,
   setStallingInvoiceStatus,
   setTransportInvoiceStatus,
+  setPendingIntakeInvoiceStatus,
   logActivity,
 } from '@/lib/db';
 import { getInvoice } from '@/lib/holded';
@@ -44,12 +46,13 @@ export async function POST(req: NextRequest) {
 }
 
 async function runSync() {
-  const summary = { bookings: 0, stalling: 0, transport: 0, errors: 0 };
+  const summary = { bookings: 0, stalling: 0, transport: 0, services: 0, errors: 0 };
 
-  const [bookings, stalling, transports] = await Promise.all([
+  const [bookings, stalling, transports, services] = await Promise.all([
     getInvoicedBookingsForSync().catch(() => []),
     getInvoicedStallingForSync().catch(() => []),
     getInvoicedTransportForSync().catch(() => []),
+    getInvoicedServiceIntakesForSync().catch(() => []),
   ]);
 
   for (const r of bookings as unknown as Row[]) {
@@ -85,10 +88,21 @@ async function runSync() {
     }
   }
 
+  for (const r of services as unknown as Row[]) {
+    try {
+      const inv = await getInvoice(r.holded_invoice_id);
+      await setPendingIntakeInvoiceStatus(Number(r.id), inv?.status ?? 'unknown', inv?.publicUrl ?? null);
+      summary.services++;
+    } catch (err) {
+      summary.errors++;
+      log.error('holded_sync_service_failed', err, { intake_id: r.id });
+    }
+  }
+
   await logActivity({
     action: 'Holded factuur-sync uitgevoerd',
     entityType: 'cron',
-    details: `b=${summary.bookings} s=${summary.stalling} t=${summary.transport} e=${summary.errors}`,
+    details: `b=${summary.bookings} s=${summary.stalling} t=${summary.transport} sv=${summary.services} e=${summary.errors}`,
   }).catch(() => {});
 
   log.info('holded_sync_done', summary);

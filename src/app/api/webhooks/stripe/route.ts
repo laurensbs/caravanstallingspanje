@@ -16,6 +16,7 @@ import {
   setBookingHoldedInvoice,
   setStallingHoldedInvoice,
   setTransportHoldedInvoice,
+  setPendingIntakeHoldedInvoice,
   setBookingPaidAt,
   setStallingPaidAt,
   setTransportPaidAt,
@@ -372,14 +373,16 @@ async function handleCheckoutCompleted(event: Stripe.Event) {
         }).catch((mailErr) => log.error('stripe_webhook_alert_mail_failed', mailErr, { intake_id: pending.id }));
       }
     }
-    // Holded-factuur voor service.
-    if (customerEmail) {
+    // Holded-factuur voor service. Pro-forma id opslaan op pending_intake
+    // zodat /api/cron/holded-sync de status-updates kan oppikken.
+    if (customerEmail && pending) {
       try {
-        await invoiceForCustomer({
+        const inv = await invoiceForCustomer({
           customer: { name: customerName || customerEmail, email: customerEmail, phone: customerPhone || null },
           description: invoiceDescription,
           amountEur,
         });
+        await setPendingIntakeHoldedInvoice(pending.id, inv.id, inv.invoiceNum);
       } catch (err) {
         await logActivity({ action: 'Holded pro forma mislukt (service)', entityType: kind, entityId: session.id, details: err instanceof Error ? err.message : 'unknown' });
       }

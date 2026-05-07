@@ -13,6 +13,7 @@ import { useLocale } from '@/components/LocaleProvider';
 import { ArrowRight as ArrowRightIcon } from 'lucide-react';
 import AnimatedServiceIcon from '@/components/AnimatedServiceIcon';
 import { formatEur as fmtEur } from '@/lib/format';
+import { TRANSPORT_PRICES_FALLBACK } from '@/lib/pricing';
 import { useZodForm, focusFirstError, summaryError } from '@/lib/forms';
 import { transportOrderSchema } from '@/lib/validations';
 import type { z } from 'zod';
@@ -23,7 +24,10 @@ export default function TransportPage() {
   const { t, locale } = useLocale();
   const formatEur = (eur: number) => fmtEur(eur, locale, 2);
 
-  const [prices, setPrices] = useState<{ wij_rijden: number; zelf: number }>({ wij_rijden: 100, zelf: 50 });
+  const [prices, setPrices] = useState<{ wij_rijden: number; zelf: number }>({
+    wij_rijden: TRANSPORT_PRICES_FALLBACK.wij_rijden,
+    zelf: TRANSPORT_PRICES_FALLBACK.zelf,
+  });
 
   const form = useZodForm<TransportForm>(transportOrderSchema, {
     defaultValues: {
@@ -61,8 +65,8 @@ export default function TransportPage() {
       .then((d) => {
         if (d?.transport_price_wij_rijden || d?.transport_price_zelf) {
           setPrices({
-            wij_rijden: Number(d.transport_price_wij_rijden ?? 100),
-            zelf: Number(d.transport_price_zelf ?? 50),
+            wij_rijden: Number(d.transport_price_wij_rijden ?? TRANSPORT_PRICES_FALLBACK.wij_rijden),
+            zelf: Number(d.transport_price_zelf ?? TRANSPORT_PRICES_FALLBACK.zelf),
           });
         }
       })

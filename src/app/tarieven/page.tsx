@@ -1,5 +1,5 @@
 import TarievenClient from './TarievenClient';
-import { getEffectivePrices } from '@/lib/pricing';
+import { getEffectivePrices, getEffectiveTransportPrices, TRANSPORT_PRICES_FALLBACK } from '@/lib/pricing';
 import { getSettings } from '@/lib/db';
 import { fetchServicesCatalog, groupByCategory, type PublicService } from '@/lib/services-catalog';
 
@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function TarievenPage() {
   let rentPrices = { 'Grote koelkast': 40, 'Tafelmodel koelkast': 25, 'Airco': 50 };
-  let transportPrices = { wij: 100, zelf: 50 };
+  let transportPrices: { wij_rijden: number; zelf: number } = { ...TRANSPORT_PRICES_FALLBACK };
   let repairHourly = 0;
 
   try {
@@ -26,18 +26,16 @@ export default async function TarievenPage() {
   }
 
   try {
-    const s = await getSettings([
-      'transport_price_wij_rijden',
-      'transport_price_zelf',
-      'service_price_repair_hourly',
-    ]);
-    const wij = Number(s.transport_price_wij_rijden);
-    const zelf = Number(s.transport_price_zelf);
-    if (Number.isFinite(wij) && wij > 0) transportPrices.wij = wij;
-    if (Number.isFinite(zelf) && zelf > 0) transportPrices.zelf = zelf;
+    transportPrices = await getEffectiveTransportPrices();
+  } catch (err) {
+    console.warn('[tarieven] transport price fetch failed:', err);
+  }
+
+  try {
+    const s = await getSettings(['service_price_repair_hourly']);
     repairHourly = Number(s.service_price_repair_hourly) || 0;
   } catch (err) {
-    console.warn('[tarieven] settings fetch failed:', err);
+    console.warn('[tarieven] repair hourly fetch failed:', err);
   }
 
   // Master service-catalogus uit reparatie-paneel
@@ -74,7 +72,7 @@ export default async function TarievenPage() {
       fridgeLarge={rentPrices['Grote koelkast']}
       fridgeTable={rentPrices['Tafelmodel koelkast']}
       airco={rentPrices.Airco}
-      transportWij={transportPrices.wij}
+      transportWij={transportPrices.wij_rijden}
       transportZelf={transportPrices.zelf}
       repairHourly={repairHourly}
       cleaning={cleaning}

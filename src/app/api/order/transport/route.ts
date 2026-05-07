@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createTransportRequest, getSettings, logActivity } from '@/lib/db';
 import { validateBody, transportOrderSchema } from '@/lib/validations';
 import { createCheckoutSession } from '@/lib/stripe';
-import { effectiveAmountEur, formatEur } from '@/lib/pricing';
+import { effectiveAmountEur, formatEur, TRANSPORT_PRICES_FALLBACK } from '@/lib/pricing';
 import { formatRef } from '@/lib/refs';
 import { sendMail } from '@/lib/email';
 
@@ -21,8 +21,8 @@ export async function POST(req: NextRequest) {
 
     const settings = await getSettings(['transport_price_wij_rijden', 'transport_price_zelf']);
     const priceEur = d.mode === 'wij_rijden'
-      ? Number(settings.transport_price_wij_rijden ?? 100)
-      : Number(settings.transport_price_zelf ?? 50);
+      ? Number(settings.transport_price_wij_rijden ?? TRANSPORT_PRICES_FALLBACK.wij_rijden)
+      : Number(settings.transport_price_zelf ?? TRANSPORT_PRICES_FALLBACK.zelf);
 
     if (!priceEur || priceEur <= 0) {
       return NextResponse.json(
