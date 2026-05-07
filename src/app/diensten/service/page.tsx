@@ -191,7 +191,7 @@ function ServiceContent() {
           <li><span className="v" aria-hidden /><span>Eigen monteurs in onze 850 m² werkplaats</span></li>
           <li><span className="v" aria-hidden /><span>Foto-rapport vóór en na</span></li>
           <li><span className="v" aria-hidden /><span>Vaste prijs per dienst — geen verrassingen</span></li>
-          <li><span className="v" aria-hidden /><span>Klaar tussen 1–5 werkdagen</span></li>
+          <li><span className="v" aria-hidden /><span>Doorlooptijd hangt af van planning — we mailen je vooraf de geplande dag</span></li>
         </ul>
       </div>
 

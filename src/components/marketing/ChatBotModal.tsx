@@ -27,7 +27,7 @@ const KB: FaqEntry[] = [
   },
   {
     match: [['transport', 'ophalen', 'brengen', 'verzenden']],
-    answer: 'We rijden caravans van Nederland/België naar onze stalling op de Costa Brava (en terug). De ritprijs hangt af van afhaaladres en periode. Boek direct of vraag een offerte.',
+    answer: 'We brengen je caravan van onze stalling naar je camping aan de Costa Brava en terug. Heen en terug in één boeking, vaste prijs. Of een enkele rit als je je caravan zelf één kant op rijdt.',
     cta: [{ href: '/diensten/transport', label: 'Transport-info' }, { href: '/reserveren/configurator', label: 'Boek transport' }],
   },
   {
@@ -90,7 +90,7 @@ function matchAnswer(input: string): { answer: string; cta?: { href: string; lab
 
 const SUGGESTIONS = [
   'Wat kost stalling?',
-  'Transport vanuit Nederland?',
+  'Wat kost transport?',
   'Hoe huur ik een koelkast?',
   'Hoe log ik in op het portaal?',
 ];

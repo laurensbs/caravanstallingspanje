@@ -75,11 +75,18 @@ export default function TransportPage() {
   const isZelf = mode === 'zelf';
   const currentPrice = isZelf ? prices.zelf : prices.wij_rijden;
 
-  const pickupLabel = isZelf ? 'Ophaal-datum (uit stalling)' : 'Ophaal-datum (op camping)';
-  const returnLabel = isZelf ? 'Terugbreng-datum (naar stalling)' : 'Terug-datum (terug naar stalling)';
+  // De caravan vertrekt altijd uit onze stalling op de heen-datum, en gaat
+  // altijd terug naar de stalling op de retour-datum. Het verschil tussen
+  // 'wij_rijden' en 'zelf' zit alleen in WIE rijdt — niet in waar 'm staat.
+  const pickupLabel = isZelf
+    ? 'Heen-datum (jij rijdt naar camping)'
+    : 'Heen-datum (wij rijden naar camping)';
+  const returnLabel = isZelf
+    ? 'Terug-datum (jij rijdt naar stalling)'
+    : 'Terug-datum (wij halen op camping op)';
   const campingHelperText = isZelf
-    ? 'De camping waar je naartoe gaat — wij weten dan voor de terugrit waar de caravan staat als jij hem zelf later weer brengt.'
-    : 'De camping waar wij je caravan komen halen.';
+    ? 'De camping waar je naartoe gaat — wij weten dan voor de terugrit waar we de caravan moeten ophalen.'
+    : 'De camping waar wij je caravan brengen en weer ophalen.';
 
   const today = new Date().toISOString().slice(0, 10);
 

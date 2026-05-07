@@ -168,7 +168,7 @@ const USPS: Array<{ icon: LucideIcon; title: string; desc: string }> = [
   {
     icon: Truck,
     title: 'Transport mogelijk',
-    desc: 'Heb je een eigen caravan? Via Caravanstalling Spanje kun je transport naar Costa Brava boeken.',
+    desc: 'Heb je een eigen caravan in onze stalling? Wij rijden hem naar je camping en weer terug — heen en terug, of een enkele rit.',
   },
 ];
 
