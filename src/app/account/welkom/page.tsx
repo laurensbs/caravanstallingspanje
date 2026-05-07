@@ -15,8 +15,7 @@ function WelkomShell() {
   const token = params.get('token') || '';
 
   const [status, setStatus] = useState<'loading' | 'invalid' | 'ready' | 'done'>('loading');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [emailMasked, setEmailMasked] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
@@ -30,8 +29,7 @@ function WelkomShell() {
         if (!alive) return;
         if (!r.ok) { setStatus('invalid'); return; }
         const d = await r.json();
-        setName(d.name || '');
-        setEmail(d.email || '');
+        setEmailMasked(d.emailMasked || '');
         setStatus('ready');
       })
       .catch(() => { if (alive) setStatus('invalid'); });
@@ -113,10 +111,10 @@ function WelkomShell() {
             >
               <span className="eyebrow-mk">Welkom</span>
               <h1 style={{ fontFamily: 'var(--sora)', fontWeight: 600, fontSize: 24, color: 'var(--navy)', margin: '4px 0 6px' }}>
-                Hi {name || 'klant'}, kies een wachtwoord
+                Kies je wachtwoord
               </h1>
               <p style={{ fontSize: 14, color: 'var(--ink-2)', margin: '0 0 20px', lineHeight: 1.55 }}>
-                Stel je wachtwoord in voor je klantportaal. Daarna log je in met <strong>{email}</strong>.
+                Stel je wachtwoord in voor je klantportaal{emailMasked ? <> — voor account <strong>{emailMasked}</strong></> : ''}.
               </p>
 
               <label style={{ display: 'block', marginBottom: 14 }}>

@@ -1698,16 +1698,24 @@ export async function getCustomerByPasswordSetupToken(token: string): Promise<Cu
   return (rows[0] as CustomerRow) || null;
 }
 
-export async function consumePasswordSetupToken(id: number, passwordHash: string) {
+// Atomic: only update if the token-row matches what we read. Prevents
+// race where two concurrent POSTs would both successfully set a password
+// (second one overwriting the first). Returns true if this caller "won"
+// the race; false als token al gewist of vervangen.
+export async function consumePasswordSetupToken(id: number, token: string, passwordHash: string): Promise<boolean> {
   await ensureMiscSchema();
-  await sql`UPDATE customers
+  const rows = await sql`UPDATE customers
     SET password_hash = ${passwordHash},
         must_change_password = false,
         password_set_at = NOW(),
         password_setup_token = NULL,
         password_setup_token_expires = NULL,
         updated_at = NOW()
-    WHERE id = ${id}`;
+    WHERE id = ${id}
+      AND password_setup_token = ${token}
+      AND password_setup_token_expires > NOW()
+    RETURNING id` as unknown as { id: number }[];
+  return rows.length > 0;
 }
 
 export async function recordCustomerLogin(id: number) {
@@ -1918,6 +1926,76 @@ export async function getCustomerCounts(customerId: number, customerEmail: strin
     stalling: Number((stallingRows[0] as { c: string | number }).c),
     transport: Number((transportRows[0] as { c: string | number }).c),
   };
+}
+
+// Batched-versie voor admin-list (voorkomt N+1: voorheen draaiden we
+// 3 queries per klant × 50 klanten = 150 queries per page-load). Nu
+// één query per tabel met IN-clause + lookup-by-email voor unlinked rows.
+export async function getCustomerCountsBatch(
+  customers: Array<{ id: number; email: string | null }>,
+): Promise<Record<number, { fridges: number; stalling: number; transport: number }>> {
+  await ensureCustomerSchema();
+  const result: Record<number, { fridges: number; stalling: number; transport: number }> = {};
+  for (const c of customers) {
+    result[c.id] = { fridges: 0, stalling: 0, transport: 0 };
+  }
+  if (customers.length === 0) return result;
+
+  const ids = customers.map((c) => c.id);
+  const emails = customers
+    .map((c) => c.email?.toLowerCase())
+    .filter((e): e is string => !!e);
+
+  type Row = { customer_id: number | null; email: string | null; c: string | number };
+  const emailToId = new Map<string, number>();
+  for (const c of customers) {
+    if (c.email) emailToId.set(c.email.toLowerCase(), c.id);
+  }
+
+  const buckets: Array<{ table: string; key: 'fridges' | 'stalling' | 'transport' }> = [
+    { table: 'fridges', key: 'fridges' },
+    { table: 'stalling_requests', key: 'stalling' },
+    { table: 'transport_requests', key: 'transport' },
+  ];
+
+  for (const { table, key } of buckets) {
+    let rows: Row[] = [];
+    try {
+      if (table === 'fridges') {
+        rows = (await sql`
+          SELECT customer_id, LOWER(email) AS email, COUNT(*)::text AS c FROM fridges
+          WHERE customer_id = ANY(${ids}::int[])
+             OR (customer_id IS NULL AND LOWER(email) = ANY(${emails}::text[]))
+          GROUP BY customer_id, LOWER(email)
+        `) as unknown as Row[];
+      } else if (table === 'stalling_requests') {
+        rows = (await sql`
+          SELECT customer_id, LOWER(email) AS email, COUNT(*)::text AS c FROM stalling_requests
+          WHERE customer_id = ANY(${ids}::int[])
+             OR (customer_id IS NULL AND LOWER(email) = ANY(${emails}::text[]))
+          GROUP BY customer_id, LOWER(email)
+        `) as unknown as Row[];
+      } else {
+        rows = (await sql`
+          SELECT customer_id, LOWER(email) AS email, COUNT(*)::text AS c FROM transport_requests
+          WHERE customer_id = ANY(${ids}::int[])
+             OR (customer_id IS NULL AND LOWER(email) = ANY(${emails}::text[]))
+          GROUP BY customer_id, LOWER(email)
+        `) as unknown as Row[];
+      }
+    } catch {
+      // Bij faal: skip deze bucket, andere counts blijven werken.
+      continue;
+    }
+    for (const r of rows) {
+      let cid = r.customer_id;
+      if (!cid && r.email) cid = emailToId.get(r.email) ?? null;
+      if (cid && result[cid]) {
+        result[cid][key] += Number(r.c);
+      }
+    }
+  }
+  return result;
 }
 
 // Soft-delete: zet deleted_at; FK ON DELETE SET NULL ruimt de relaties op.

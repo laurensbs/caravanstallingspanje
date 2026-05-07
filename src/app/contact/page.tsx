@@ -265,9 +265,80 @@ function ContactInner() {
             )}
           </div>
         </section>
+
+        <LocationMap />
         </MotionPageTransition>
       </main>
     </PageShell>
+  );
+}
+
+function LocationMap() {
+  // Google Maps embed naar onze stalling-locatie. q=lat,lng zorgt dat
+  // bezoekers direct route kunnen plannen vanaf hun eigen positie.
+  // Geen API-key nodig voor de basic embed (alleen voor Maps Platform JS).
+  return (
+    <section className="py-12 sm:py-16 section-bg-grey">
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[0.85fr_1fr] gap-8 items-stretch">
+          <div className="card-mk" style={{ padding: 28 }}>
+            <span className="eyebrow-mk">Onze locatie</span>
+            <h2 className="h2-mk" style={{ marginTop: 4, fontSize: 'clamp(1.4rem, 2.6vw, 1.9rem)' }}>
+              Sant Climent de Peralta
+            </h2>
+            <p style={{ fontFamily: 'var(--sora)', fontWeight: 600, color: 'var(--navy)', fontSize: 15, lineHeight: 1.5, marginTop: 12 }}>
+              Ctra. de Palamós 9<br />
+              17110 Sant Climent de Peralta<br />
+              Girona, Spanje
+            </p>
+            <ul style={{ listStyle: 'none', padding: 0, margin: '18px 0 0', display: 'grid', gap: 8, fontSize: 13.5, color: 'var(--ink-2)' }}>
+              <li>🚗 15 min vanaf Palamós</li>
+              <li>✈️ 35 min vanaf Girona Airport (GRO)</li>
+              <li>🛣️ AP-7, afslag 6 (Girona Sud) — daarna ~25 min</li>
+              <li>🕒 Bezoek op afspraak</li>
+            </ul>
+            <div style={{ marginTop: 20, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <a
+                href="https://www.google.com/maps/dir/?api=1&destination=41.961,3.105"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+              >
+                Plan route
+              </a>
+              <a
+                href="https://www.google.com/maps/place/Caravanstalling+Spanje"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-ghost"
+              >
+                Open in Maps
+              </a>
+            </div>
+          </div>
+
+          <div
+            style={{
+              position: 'relative',
+              borderRadius: 18,
+              overflow: 'hidden',
+              minHeight: 360,
+              boxShadow: 'var(--shadow-card-mk)',
+              border: '1px solid var(--line)',
+            }}
+          >
+            <iframe
+              title="Caravanstalling Spanje — locatie op Google Maps"
+              src="https://www.google.com/maps?q=41.961,3.105&hl=nl&z=14&output=embed"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
+            />
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 

@@ -19,11 +19,15 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   if (!customer) return NextResponse.json({ error: 'Account niet gevonden.' }, { status: 404 });
 
   const photo = await getCaravanPhotoById(idNum);
-  if (!photo) return NextResponse.json({ error: 'not found' }, { status: 404 });
+  // Geen "not found"-leak: als foto niet bestaat OF van een andere klant
+  // is, geven we hetzelfde 404-antwoord. Voorkomt enumeration van foto-id's.
+  if (!photo || !photo.caravan_id) {
+    return NextResponse.json({ error: 'not found' }, { status: 404 });
+  }
 
   const caravans = await getCaravansByCustomer(customer.id);
   const owns = caravans.some((c) => c.id === photo.caravan_id);
-  if (!owns) return NextResponse.json({ error: 'Geen toegang.' }, { status: 403 });
+  if (!owns) return NextResponse.json({ error: 'not found' }, { status: 404 });
   if (photo.uploaded_by !== 'customer') {
     return NextResponse.json({ error: 'Alleen eigen-geüploade foto\'s kun je verwijderen.' }, { status: 403 });
   }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
   listCustomers, createCustomer, getCustomerByEmail, setCustomerHoldedId,
-  getCustomerCounts, logActivity, getAdminInfo,
+  getCustomerCountsBatch, logActivity, getAdminInfo,
 } from '@/lib/db';
 import { findContactByEmail, findContactByPhone, pushContactToHolded } from '@/lib/holded';
 
@@ -11,10 +11,14 @@ export async function GET(req: NextRequest) {
   const search = url.searchParams.get('search') || undefined;
   try {
     const result = await listCustomers({ page, pageSize: 50, search });
-    // Counts er bij — alleen voor de eerste pagina nodig.
-    const enriched = await Promise.all(result.customers.map(async (c) => {
-      const counts = await getCustomerCounts(c.id, c.email);
-      return { ...c, counts };
+    // Batched counts: één query per gerelateerde tabel ipv N×3 (voorheen
+    // 150 queries per pagina-load voor 50 klanten — nu 3).
+    const countsByCustomer = await getCustomerCountsBatch(
+      result.customers.map((c) => ({ id: c.id, email: c.email })),
+    );
+    const enriched = result.customers.map((c) => ({
+      ...c,
+      counts: countsByCustomer[c.id] || { fridges: 0, stalling: 0, transport: 0 },
     }));
     return NextResponse.json({ ...result, customers: enriched });
   } catch (err) {
